@@ -1,0 +1,6 @@
+*.cache
+*.tlog
+*.FileListAbsoute.txt
+*.pyc
+*.pdb
+*.suo
