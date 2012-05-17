@@ -11,54 +11,51 @@ namespace VBTools
         //for the various VB projects by providing event/event handlers
         //to be invoked by the project manager.
         
-        public partial class ContainerForm
+        public delegate void getMessageEventHandler(String message, object sender);
+        public event getMessageEventHandler getMessageEvent;
+        public delegate void sendMessageEventHandler(String message, object sender);
+        public event sendMessageEventHandler sendMessageEvent;
+
+
+        public void addMessageGetHandler(getMessageEventHandler handler)
         {
-            public delegate void getMessageEventHandler(String message, object sender);
-            public event getMessageEventHandler getMessageEvent;
-            public delegate void sendMessageEventHandler(String message, object sender);
-            public event sendMessageEventHandler sendMessageEvent;
+            this.getMessageEvent += handler;
+        }
 
 
-            public void addMessageGetHandler(getMessageEventHandler handler)
+        public void addMessageSendHandler(sendMessageEventHandler handler)
+        {
+            this.sendMessageEvent += handler;
+        }
+
+
+        private void OnGetMessageEvent(String message, object sender)
+        {
+            if (getMessageEvent != null)
             {
-                this.getMessageEvent += handler;
+                getMessageEvent(message, sender);
             }
+        }
 
 
-            public void addMessageSendHandler(sendMessageEventHandler handler)
+        private void OnSendMessageEvent(String message, object sender)
+        {
+            if (sendMessageEvent != null)
             {
-                this.sendMessageEvent += handler;
+                sendMessageEvent(message, sender);
             }
+        }
 
 
-            private void OnGetMessageEvent(String message, object sender)
-            {
-                if (getMessageEvent != null)
-                {
-                    getMessageEvent(message, sender);
-                }
-            }
+        public void getMessage(String message, object sender)
+        {
+            OnGetMessageEvent(message, sender);
+        }
 
 
-            private void OnSendMessageEvent(String message, object sender)
-            {
-                if (sendMessageEvent != null)
-                {
-                    sendMessageEvent(message, sender);
-                }
-            }
-
-
-            public void getMessage(String message, object sender)
-            {
-                OnGetMessageEvent(message, sender);
-            }
-
-
-            public void sendMessage(String message, object sender)
-            {
-                OnSendMessageEvent(message, sender);
-            }
+        public void sendMessage(String message, object sender)
+        {
+            OnSendMessageEvent(message, sender);
         }
     }
 }

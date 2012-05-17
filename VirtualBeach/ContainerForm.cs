@@ -31,8 +31,7 @@ namespace VirtualBeach
             appManager.SatisfyImportsExtensionsActivated +=
                 delegate(object sender, EventArgs e)
                 {
-
-                    appManager.HeaderControl.Add(new DotSpatial.Controls.Header.HeaderItem());
+                    //appManager.HeaderControl.Add(new DotSpatial.Controls.Header.HeaderItem());
                 };
             
             //Set the main application window to be the "Shell", which is where 
