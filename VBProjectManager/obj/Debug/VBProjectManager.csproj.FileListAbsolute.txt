@@ -12,7 +12,6 @@ C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Symbology.dll
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Symbology.Forms.dll
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Topology.dll
 C:\VB3\VBProjectManager\bin\Debug\VBTools.dll
-C:\VB3\VBProjectManager\bin\Debug\WeifenLuo.WinFormsUI.Docking.dll
 C:\VB3\VBProjectManager\bin\Debug\VBTools.pdb
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Controls.xml
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Data.xml
