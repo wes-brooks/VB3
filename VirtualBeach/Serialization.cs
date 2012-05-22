@@ -94,8 +94,6 @@ namespace VirtualBeach
 
             XmlSerializer serializerDict = new XmlSerializer();
             serializerDict.Serialize(dictPacked, projectFile);
-        }
-
-        
+        }        
     }
 }
