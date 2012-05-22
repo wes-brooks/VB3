@@ -1,5 +1,5 @@
-C:\VB3\VBTools\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\VBTools\bin\Debug\VBTools.dll
 C:\VB3\VBTools\bin\Debug\VBTools.pdb
+C:\VB3\VBTools\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\VBTools\obj\Debug\VBTools.dll
 C:\VB3\VBTools\obj\Debug\VBTools.pdb

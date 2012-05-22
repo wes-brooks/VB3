@@ -49,7 +49,7 @@ namespace VirtualBeach
             
             //get the filename to come over right away
             FileInfo fi = new FileInfo(projectFile);
-            projectmanager.ProjectName = fi.Name;
+            //projectmanager.ProjectName = fi.Name;
 
             //Send the packed states out to the same extensions that created them.
             foreach (DotSpatial.Extensions.IExtension extension in appManager.Extensions)
@@ -75,7 +75,7 @@ namespace VirtualBeach
         
         public void Save()
         {
-            Save(projectmanager.ProjectName);
+            //Save(projectmanager.ProjectName);
         }
 
 
@@ -90,7 +90,7 @@ namespace VirtualBeach
             }
 
             FileInfo _fi = new FileInfo(projectFile);
-            projectmanager.ProjectName = _fi.Name;
+            //projectmanager.ProjectName = _fi.Name;
 
             XmlSerializer serializerDict = new XmlSerializer();
             serializerDict.Serialize(dictPacked, projectFile);

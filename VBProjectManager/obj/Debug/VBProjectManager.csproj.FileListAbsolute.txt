@@ -1,4 +1,3 @@
-C:\VB3\VBProjectManager\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\VBProjectManager\bin\Debug\VBProjectManager.dll
 C:\VB3\VBProjectManager\bin\Debug\VBProjectManager.pdb
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Controls.dll
@@ -13,6 +12,7 @@ C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Symbology.dll
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Symbology.Forms.dll
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Topology.dll
 C:\VB3\VBProjectManager\bin\Debug\VBTools.dll
+C:\VB3\VBProjectManager\bin\Debug\WeifenLuo.WinFormsUI.Docking.dll
 C:\VB3\VBProjectManager\bin\Debug\VBTools.pdb
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Controls.xml
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Data.xml
@@ -25,5 +25,6 @@ C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Serialization.xml
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Symbology.xml
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Symbology.Forms.xml
 C:\VB3\VBProjectManager\bin\Debug\DotSpatial.Topology.xml
+C:\VB3\VBProjectManager\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\VBProjectManager\obj\Debug\VBProjectManager.dll
 C:\VB3\VBProjectManager\obj\Debug\VBProjectManager.pdb
