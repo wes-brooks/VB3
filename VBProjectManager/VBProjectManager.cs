@@ -16,14 +16,8 @@ namespace VBProjectManager
     //combining ProjectManager and HydroDesktopMainPlugin ??
     public class VBProjectManager : Extension, IFormState
     {
-        [Import("Shell")]
-        public ContainerControl Shell { get; set; }
-
         private Dictionary<string, Boolean> _tabStates;
-
         private string strName;
-
-        private VBProjectManager myProjectManager;
 
         public override void Activate()
         {
@@ -93,10 +87,12 @@ namespace VBProjectManager
             set { strName = value; }
         }
 
+
         public VBProjectManager(AppManager mainApp)
         {
             App = mainApp;
         }
+
 
         void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
@@ -118,6 +114,8 @@ namespace VBProjectManager
             //    }
             //}
         }
+
+
         void HeaderControl_RootItemSelected(object sender, RootItemEventArgs e)
         {
             //
@@ -133,11 +131,15 @@ namespace VBProjectManager
             //        latLongDisplay.ShowCoordinates = false;
             //}
         }
+
+
         void SerializationManager_Serializing(object sender, SerializingEventArgs e)
         {
             //myProjectManager.SavingProject();
             //Shell.Text = string.Format("{0} - {1}", HYDRODESKTOP_NAME, GetProjectShortName());
         }
+
+
         void SerializationManager_IsDirtyChanged(object sender, EventArgs e)
         {
             if (App.SerializationManager.IsDirty && !(Shell.Text.EndsWith(" *")))
@@ -150,6 +152,7 @@ namespace VBProjectManager
             }
         }
 
+
         void SerializationManager_NewProjectCreated(object sender, SerializingEventArgs e)
         {
             //SetupDatabases();
@@ -161,6 +164,7 @@ namespace VBProjectManager
             //    latLongDisplay.MapProjectionString = App.Map.Projection.ToEsriString();
             //}
         }
+
 
         void SerializationManager_Deserializing(object sender, SerializingEventArgs e)
         {
@@ -182,6 +186,5 @@ namespace VBProjectManager
 
             //disable progress reporting for the layers
         }
-
     }
 }

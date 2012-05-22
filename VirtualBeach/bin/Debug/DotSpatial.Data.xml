@@ -1860,6 +1860,14 @@
             <param name="header"></param>
             <param name="feature"></param>
         </member>
+        <member name="M:DotSpatial.Data.ShapefileFeatureSource.UpdateHeader(DotSpatial.Data.ShapefileHeader,DotSpatial.Topology.IBasicGeometry,System.Boolean)">
+            <summary>
+            Update the header to include the feature extent
+            </summary>
+            <param name="header"></param>
+            <param name="feature"></param>
+            <param name="writeHeaderFiles"> </param>
+        </member>
         <member name="M:DotSpatial.Data.ShapefileFeatureSource.UpdateExtents(DotSpatial.Data.IShapeSource)">
             <summary>
             Update header extents from the geometries in a IShapeSource
@@ -2394,6 +2402,31 @@
             </summary>
             <param name="index">The integer index of the feature row to access.</param>
             <returns>This FeatureRow</returns>
+        </member>
+        <member name="T:DotSpatial.Data.MockICancelProgressHandler">
+            <summary>
+            This class converts an IProgressHandler to an ICancelProgressHandler. It wraps the IProgressHandler so that
+            it can be used by a class that requires an ICancelProgressHandler. Cancel will always return false.
+            </summary>
+        </member>
+        <member name="M:DotSpatial.Data.MockICancelProgressHandler.#ctor(DotSpatial.Data.IProgressHandler)">
+            <summary>
+            Initializes a new instance of the <see cref="T:DotSpatial.Data.MockICancelProgressHandler"/> class.
+            </summary>
+            <param name="progressHandler">The progress handler.</param>
+        </member>
+        <member name="M:DotSpatial.Data.MockICancelProgressHandler.Progress(System.String,System.Int32,System.String)">
+            <summary>
+            Progress is the method that should receive a progress message.
+            </summary>
+            <param name="key">The message string without any information about the status of completion.</param>
+            <param name="percent">An integer from 0 to 100 that indicates the condition for a status bar etc.</param>
+            <param name="message">A string containing both information on what the process is, as well as its completion status.</param>
+        </member>
+        <member name="P:DotSpatial.Data.MockICancelProgressHandler.Cancel">
+            <summary>
+            Returns true if the running process should be cancelled
+            </summary>
         </member>
         <member name="T:DotSpatial.Data.ReadOnlyList`1">
             <summary>
@@ -5391,6 +5424,9 @@
             <summary>
             Gets or sets the attribute Table used by this shapefile.
             </summary>
+        </member>
+        <member name="P:DotSpatial.Data.Shapefile.FilePath">
+            <inheritdoc />
         </member>
         <member name="M:DotSpatial.Data.PointShapefile.#ctor">
             <summary>
@@ -10237,7 +10273,7 @@
         <member name="M:DotSpatial.Data.FeatureExt.Disjoint(DotSpatial.Data.IFeature,DotSpatial.Topology.IGeometry)">
             <summary>
             Gets a boolean that is true if the geometry of this feature is disjoint with the geometry
-            of the specified feature
+            of the specified feature.
             </summary>
             <param name="self">This feature</param>
             <param name="other">The feature to compare this feature to</param>
@@ -10245,12 +10281,11 @@
         </member>
         <member name="M:DotSpatial.Data.FeatureExt.Distance(DotSpatial.Data.IFeature,DotSpatial.Data.IFeature)">
             <summary>
-            Gets a boolean that is true if the geometry of this feature is disjoint with the geometry
-            of the specified feature
+            Distance between features.
             </summary>
             <param name="self">This feature</param>
             <param name="other">The feature to compare this feature to</param>
-            <returns>Boolean, true if this feature is disjoint with the specified feature</returns>
+            <returns></returns>
         </member>
         <member name="M:DotSpatial.Data.FeatureExt.Distance(DotSpatial.Data.IFeature,DotSpatial.Topology.IGeometry)">
             <summary>
@@ -13441,6 +13476,43 @@
             Gets a boolean that is true if either row or column index has no value
             </summary>
             <returns>Boolean, true if either row or column has no value</returns>
+        </member>
+        <member name="M:DotSpatial.Data.RcIndex.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object"/> is equal to this instance.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to compare with this instance.</param>
+            <returns>
+              <c>true</c> if the specified <see cref="T:System.Object"/> is equal to this instance; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:DotSpatial.Data.RcIndex.GetHashCode">
+            <summary>
+            Returns a hash code for this instance.
+            </summary>
+            <returns>
+            A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+            </returns>
+        </member>
+        <member name="M:DotSpatial.Data.RcIndex.op_Equality(DotSpatial.Data.RcIndex,DotSpatial.Data.RcIndex)">
+            <summary>
+            Implements the operator ==.
+            </summary>
+            <param name="a">A.</param>
+            <param name="b">The b.</param>
+            <returns>
+            The result of the operator.
+            </returns>
+        </member>
+        <member name="M:DotSpatial.Data.RcIndex.op_Inequality(DotSpatial.Data.RcIndex,DotSpatial.Data.RcIndex)">
+            <summary>
+            Implements the operator !=.
+            </summary>
+            <param name="a">A.</param>
+            <param name="b">The b.</param>
+            <returns>
+            The result of the operator.
+            </returns>
         </member>
         <member name="P:DotSpatial.Data.RcIndex.Empty">
             <summary>

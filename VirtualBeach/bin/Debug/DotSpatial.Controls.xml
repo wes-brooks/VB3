@@ -98,6 +98,12 @@
             The key.
             </param>
         </member>
+        <member name="M:DotSpatial.Controls.Docking.IDockManager.HidePanel(System.String)">
+            <summary>
+            Hides the panel. A subsequent call to SelectPanel will show this panel in the same place it was when hidden.
+            </summary>
+            <param name="key">The key.</param>
+        </member>
         <member name="E:DotSpatial.Controls.Docking.IDockManager.ActivePanelChanged">
             <summary>
               Occurs when the active panel is changed, meaning a difference panel is activated.
@@ -3869,10 +3875,34 @@
             </summary>
             <remarks>Will soon be responsible for tools and layer providers, too.</remarks>
         </member>
+        <member name="F:DotSpatial.Controls.AppManager.PackageDirectory">
+            <summary>
+            Name of the folder where packages reside.
+            </summary>
+        </member>
         <member name="M:DotSpatial.Controls.AppManager.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:DotSpatial.Controls.AppManager"/> class.
             </summary>
+        </member>
+        <member name="M:DotSpatial.Controls.AppManager.GetExtension(System.String)">
+            <summary>
+            Gets the extension.
+            </summary>
+            <param name="assemblyTitle">The assembly title.</param>
+            <returns>
+            Null if the extension is not present.
+            </returns>
+        </member>
+        <member name="M:DotSpatial.Controls.AppManager.GetExtension(System.String,System.String)">
+            <summary>
+            Gets the extension.
+            </summary>
+            <param name="assemblyTitle">The assembly title.</param>
+            <param name="version">The version.</param>
+            <returns>
+            Null if the extension is not present.
+            </returns>
         </member>
         <member name="M:DotSpatial.Controls.AppManager.ActivateExtensionsExclusively(System.String[])">
             <summary>
@@ -3890,7 +3920,7 @@
         </member>
         <member name="M:DotSpatial.Controls.AppManager.LoadExtensions">
             <summary>
-            Activates the extensions.
+            Activates the extensions. This should be called only once.
             </summary>
         </member>
         <member name="M:DotSpatial.Controls.AppManager.OnExtensionsActivated(System.EventArgs)">
@@ -3967,7 +3997,8 @@
             Gets or sets a value indicating whether extensions should be placed in AppDomain.CurrentDomain.BaseDirectory.
             </summary>
             <value>
-            	<c>true</c> if extensions should be placed in AppDomain.CurrentDomain.BaseDirectory; otherwise, extensions will be placed in a user profile folder based on the entry assembly name.
+            <c>true</c> if extensions should be placed in AppDomain.CurrentDomain.BaseDirectory; otherwise, extensions will be placed in a user profile folder based on the entry assembly name.
+            This must be set before calling LoadExtensions();
             </value>
         </member>
         <member name="P:DotSpatial.Controls.AppManager.Catalog">
@@ -4847,6 +4878,49 @@
             The AppDialog will button not be shown. This allows the application developer to provide a custom implementation.
             </summary>
         </member>
+        <member name="T:DotSpatial.Controls.Extensions.PackageManager">
+            <summary>
+            The PackageManager performs file based operations on packages.
+            </summary>
+        </member>
+        <member name="M:DotSpatial.Controls.Extensions.PackageManager.MarkPackageForRemoval(DotSpatial.Controls.AppManager,System.String)">
+            <summary>
+            Marks the package for removal.
+            </summary>
+            <param name="appManager">The app manager.</param>
+            <param name="path">The path.</param>
+        </member>
+        <member name="M:DotSpatial.Controls.Extensions.PackageManager.MarkExtensionForRemoval(DotSpatial.Controls.AppManager,System.String)">
+            <summary>
+            Marks the extension for removal. This will leave any dependencies.
+            </summary>
+            <param name="appManager">The AppManager.</param>
+            <param name="path">Name of the file.</param>
+        </member>
+        <member name="M:DotSpatial.Controls.Extensions.PackageManager.EnsureDeactivated(DotSpatial.Controls.AppManager,System.String)">
+            <summary>
+            Ensures the extension is deactivated.
+            </summary>
+            <param name="appManager">The AppManager.</param>
+            <param name="extensionName">Name of the extension.</param>
+            <returns></returns>
+        </member>
+        <member name="M:DotSpatial.Controls.Extensions.PackageManager.RemovePendingPackagesAndExtensions">
+            <summary>
+            Removes the pending packages and extensions.
+            </summary>
+        </member>
+        <member name="M:DotSpatial.Controls.Extensions.PackageManager.TryDeleteAllPackages">
+            <summary>
+            Deletes everything in the DotSpatial.Controls.AppManager.AbsolutePathToExtensions folder.
+            </summary>
+        </member>
+        <member name="M:DotSpatial.Controls.Extensions.PackageManager.DeleteDirectory(System.String)">
+            <summary>
+            Deletes the directory and any files, recursively.
+            </summary>
+            <param name="path">The path.</param>
+        </member>
         <member name="T:DotSpatial.Controls.ModelerToolStrip">
             <summary>
             A Brian Marchioni original toolstrip... preloaded with content.
@@ -5067,6 +5141,13 @@
             </summary>
             <param name="layer"></param>
             <param name="bounds"></param>
+        </member>
+        <member name="M:DotSpatial.Controls.FeatureIdentifier.Add(DotSpatial.Controls.IMapRasterLayer,DotSpatial.Data.Extent)">
+            <summary>
+            Adds a new node to the tree view with the layer name
+            </summary>
+            <param name="layer">The layer.</param>
+            <param name="bounds">The bounds.</param>
         </member>
         <member name="M:DotSpatial.Controls.FeatureIdentifier.ReSelect">
             <summary>
@@ -8977,6 +9058,30 @@
             <summary>
             Zooms out one notch so that the scale becomes smaller and the features become smaller.
             </summary>
+        </member>
+        <member name="M:DotSpatial.Controls.MapFrame.OnExtentsChanged(DotSpatial.Data.Extent)">
+            <summary>
+            Fires the ExtentsChanged event
+            </summary>
+            <param name="ext"></param>
+        </member>
+        <member name="M:DotSpatial.Controls.MapFrame.CanZoomToNext">
+            <summary>
+            Determines whether this instance [can zoom to next]. Should not be called inside of
+            MapFrame_ViewExtentsChanged event.
+            </summary>
+            <returns>
+              <c>true</c> if this instance [can zoom to next]; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:DotSpatial.Controls.MapFrame.CanZoomToPrevious">
+            <summary>
+            Determines whether this instance [can zoom to previous]. Should not be called inside of
+            MapFrame_ViewExtentsChanged event.
+            </summary>
+            <returns>
+              <c>true</c> if this instance [can zoom to previous]; otherwise, <c>false</c>.
+            </returns>
         </member>
         <member name="M:DotSpatial.Controls.MapFrame.ZoomToNext">
             <summary>

@@ -216,6 +216,26 @@
             <param name="fileName">Name of the file.</param>
             <param name="graph">The control graph.</param>
         </member>
+        <member name="T:DotSpatial.Extensions.ISampleProject">
+            <summary>
+            Used to specify a sample .dspx project that the user can download as a package and open.
+            </summary>
+        </member>
+        <member name="P:DotSpatial.Extensions.ISampleProject.AbsolutePathToProjectFile">
+            <summary>
+            Gets the absolute path to project file. This includes the directory, filename, and extension
+            </summary>
+        </member>
+        <member name="P:DotSpatial.Extensions.ISampleProject.Name">
+            <summary>
+            Gets the name to display to the user when they are selecting a project.
+            </summary>
+        </member>
+        <member name="P:DotSpatial.Extensions.ISampleProject.Description">
+            <summary>
+            Gets the description of the project
+            </summary>
+        </member>
         <member name="T:DotSpatial.Extensions.SplashScreens.SplashScreenCommand">
             <summary>
             The type of splash screen command
