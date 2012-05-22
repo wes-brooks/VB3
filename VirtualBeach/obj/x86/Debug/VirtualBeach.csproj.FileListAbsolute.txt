@@ -83,10 +83,7 @@ C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Controls.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.Forms.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Extensions.xml
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.xml
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Serialization.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.xml
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Topology.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.Forms.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Modeling.Forms.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.Forms.xml
@@ -99,10 +96,7 @@ C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Controls.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.Forms.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Extensions.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Serialization.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Topology.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.Forms.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Modeling.Forms.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.Forms.pdb

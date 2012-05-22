@@ -110,31 +110,8 @@ namespace VBDockManager
                     }
                 }
             }
-
-
-            ////not implemented
-            ////TODO: check MW4 implementation
-            //MainDockPanel.SaveAsXml(@"e:\dev\HydroDesktop\dock_layout.xml");
-
-            //string dockFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "dock_layout.xml");
-
-            //if (System.IO.File.Exists(dockFileName))
-            //{
-            //    try
-            //    {
-            //        MainDockPanel.LoadFromXml(dockFileName, delegate(DeserializeDockContent));
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MessageBox.Show(ex.Message);
-            //    }
-            //}
-
-            //foreach (DockContent pnl in this.dockContents.Values)
-            //{
-            //    pnl.
-            //}
         }
+
 
         /// <summary>
         /// Add a dockable panel
@@ -162,7 +139,7 @@ namespace VBDockManager
             if (dockStyle == DockStyle.Fill)
             {
                 MainDockPanel.DocumentTabStripLocation = DocumentTabStripLocation.Bottom;
-                MainDockPanel.DocumentStyle = DocumentStyle.DockingSdi;
+                MainDockPanel.DocumentStyle = DocumentStyle.DockingWindow;
             }
 
             DockContent content = new DockContent();

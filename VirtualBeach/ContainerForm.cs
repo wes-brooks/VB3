@@ -22,18 +22,6 @@ namespace VirtualBeach
 
             //t
             appManager = new AppManager();
-            //don't need the map and legend
-            //appManager.Map = new Map();
-            //appManager.Legend = new Legend();
-
-            
-            //appManager.SatisfyImportsExtensionsActivated +=
-            //    delegate(object sender, EventArgs e)
-            //    {
-            //        // we use this event to ensure that legend and map dockable panels are
-            //        // added to the DockManager before any other dockable panels.
-            //        //appManager.HeaderControl.Add(new DotSpatial.Controls.Header.HeaderItem());
-            //};
             
             //Set the main application window to be the "Shell" 
             Shell = this;
