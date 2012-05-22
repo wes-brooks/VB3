@@ -13,27 +13,15 @@ namespace VBProjectManager
 {
 
     public partial class VBProjectManager : Extension, IFormState
-    {
-
-        //event for when a project is opened
-        public event ProjectOpenedHandler ProjectOpened;
-        public delegate void ProjectOpenedHandler();
-
-        //event for when a project is saved
-        public delegate void ProjectSavedHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event ProjectSavedHandler<PackEventArgs> ProjectSaved;
-
-        //Request that plugins unpack their state... why?
-        public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event EventHandler<UnpackEventArgs> UnpackRequest;
-        
+    {        
         //
         private Dictionary<string, Boolean> _tabStates;
         private string strName;
 
         public VBProjectManager()
         {
-            this.ProjectSaved += new VBProjectManager.ProjectSavedHandler<PackEventArgs>(ProjectSavedListener);
+
+            App.SerializationManager.Serializing += new VBProjectManager.ProjectSavedHandler<PackEventArgs>(ProjectSavedListener);
         }
 
         public override void Activate()
@@ -49,7 +37,7 @@ namespace VBProjectManager
             App.HeaderControl.Add(aboutButton);
             
             //Add a Save button to the application ("File") menu.
-            var saveButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", SaveProject);
+            var saveButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", Save);
             saveButton.GroupCaption = HeaderControl.ApplicationMenuKey;
             saveButton.LargeImage = Resources.save_32x32;
             saveButton.SmallImage = Resources.save_16x16;
@@ -67,9 +55,9 @@ namespace VBProjectManager
         }
 
 
-        public void SaveProject(object sender, EventArgs e)
+        public void Save(object sender, EventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("this is a test.");
+            Save(projectFile:"test");
         }
 
 
@@ -104,7 +92,7 @@ namespace VBProjectManager
         }
 
 
-        private void ProjectSavedListener(object sender, UnpackEventArgs e)
+        private void ProjectOpenedListener(object sender, UnpackEventArgs e)
         {
         }
 

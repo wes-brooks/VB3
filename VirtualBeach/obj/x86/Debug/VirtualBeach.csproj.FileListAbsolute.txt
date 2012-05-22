@@ -66,7 +66,6 @@ C:\VB3\VirtualBeach\bin\Debug\VirtualBeach.pdb
 C:\VB3\VirtualBeach\bin\Debug\VBProjectManager.dll
 C:\VB3\VirtualBeach\bin\Debug\VBTools.dll
 C:\VB3\VirtualBeach\bin\Debug\WeifenLuo.WinFormsUI.Docking.dll
-C:\VB3\VirtualBeach\bin\Debug\XmlSerialization.dll
 C:\VB3\VirtualBeach\bin\Debug\VBProjectManager.pdb
 C:\VB3\VirtualBeach\bin\Debug\VBTools.pdb
 C:\VB3\VirtualBeach\obj\x86\Debug\ResolveAssemblyReference.cache
@@ -120,3 +119,4 @@ C:\VB3\VirtualBeach\bin\Debug\vi-VN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\zh-CN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\VBDockManager.dll
 C:\VB3\VirtualBeach\bin\Debug\VBDockManager.pdb
+C:\VB3\VirtualBeach\bin\Debug\XmlSerialization.dll

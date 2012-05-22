@@ -16,16 +16,17 @@ namespace VirtualBeach
 {
     public partial class ContainerForm
     {
-        //events for when a project is opened
+        //event for when a project is opened
         public event ProjectOpenedHandler ProjectOpened;
         public delegate void ProjectOpenedHandler();
 
-        public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event EventHandler<UnpackEventArgs> UnpackRequest;
-
-        //events for when a project is saved
+        //event for when a project is saved
         public delegate void ProjectSavedHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event ProjectSavedHandler<PackEventArgs> ProjectSaved;
+
+        //Request that plugins unpack their state... why?
+        public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
+        public event EventHandler<UnpackEventArgs> UnpackRequest;
 
 
         protected void RaiseUnpackRequest(string key, object value)
@@ -67,18 +68,6 @@ namespace VirtualBeach
         }
 
 
-        private void ProjectSavedListener(object sender, PackEventArgs e)
-        {
-            //
-        }
-
-        
-        public void Save()
-        {
-            //Save(projectmanager.ProjectName);
-        }
-
-
         public void Save(string projectFile)
         {
             SerializableDictionary<string, object> dictPacked = new SerializableDictionary<string, object>();
@@ -94,6 +83,6 @@ namespace VirtualBeach
 
             XmlSerializer serializerDict = new XmlSerializer();
             serializerDict.Serialize(dictPacked, projectFile);
-        }        
+        }
     }
 }

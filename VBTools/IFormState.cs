@@ -7,11 +7,11 @@ namespace VBTools
 {
     public interface IFormState
     {
-        void UnpackState(object objPackedStates);
+        void UnpackState(object objPackedState);
         object PackState();
 
-        void ProjectSavedLisener(object sender, PackEventArgs e);
-        void ProjectOpenedListener(object sender, UnpackEventArgs e);
+        //void ProjectSavedListener(object sender, PackEventArgs e);
+        //void ProjectOpenedListener(object sender, UnpackEventArgs e);
 
         string Name {get;}
     }
