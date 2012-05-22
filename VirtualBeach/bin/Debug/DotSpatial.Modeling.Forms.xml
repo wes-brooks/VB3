@@ -632,7 +632,7 @@
         </member>
         <member name="T:DotSpatial.Modeling.Forms.ShowParamInModel">
             <summary>
-            Defines whether or not to add the parameter to the model
+            Defines weather or not to add the parameter to the model
             </summary>
         </member>
         <member name="F:DotSpatial.Modeling.Forms.ShowParamInModel.Always">

@@ -2368,6 +2368,11 @@
             Projected
             </summary>
         </member>
+        <member name="M:DotSpatial.Projections.ProjectedSystems.#ctor">
+            <summary>
+            Creates a new instance of Projected
+            </summary>
+        </member>
         <member name="M:DotSpatial.Projections.ProjectedSystems.GetCategory(System.String)">
             <summary>
             Given the string name, this will return the specified coordinate category
@@ -2396,28 +2401,16 @@
             KnownCoordinateSystems
             </summary>
         </member>
-        <member name="F:DotSpatial.Projections.KnownCoordinateSystems._geographic">
+        <member name="F:DotSpatial.Projections.KnownCoordinateSystems.Geographic">
             <summary>
             Geographic systems operate in angular units, but can use different
             spheroid definitions or angular offsets.
             </summary>
         </member>
-        <member name="F:DotSpatial.Projections.KnownCoordinateSystems._projected">
+        <member name="F:DotSpatial.Projections.KnownCoordinateSystems.Projected">
             <summary>
             Projected systems are systems that use linear units like meters or feet
             rather than angular units like degrees or radians
-            </summary>
-        </member>
-        <member name="P:DotSpatial.Projections.KnownCoordinateSystems.Projected">
-            <summary>
-            Projected systems are systems that use linear units like meters or feet
-            rather than angular units like degrees or radians
-            </summary>
-        </member>
-        <member name="P:DotSpatial.Projections.KnownCoordinateSystems.Geographic">
-            <summary>
-            Geographic systems operate in angular units, but can use different
-            spheroid definitions or angular offsets.
             </summary>
         </member>
         <member name="T:DotSpatial.Projections.GridShift">
@@ -5560,6 +5553,11 @@
         <member name="T:DotSpatial.Projections.GeographicSystems">
             <summary>
             GeographicSystems
+            </summary>
+        </member>
+        <member name="M:DotSpatial.Projections.GeographicSystems.#ctor">
+            <summary>
+            Creates a new instance of GeographicSystems
             </summary>
         </member>
         <member name="M:DotSpatial.Projections.GeographicSystems.GetCategory(System.String)">
