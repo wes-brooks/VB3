@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBTools", "VBTools\VBTools.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBProjectManager", "VBProjectManager\VBProjectManager.csproj", "{56A96878-2E76-41B4-858A-6AAB61F99CE8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBDockManager", "VBDockManager\VBDockManager.csproj", "{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,16 @@ Global
 		{56A96878-2E76-41B4-858A-6AAB61F99CE8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{56A96878-2E76-41B4-858A-6AAB61F99CE8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{56A96878-2E76-41B4-858A-6AAB61F99CE8}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

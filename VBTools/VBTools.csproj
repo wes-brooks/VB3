@@ -33,6 +33,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,45 +43,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Communication.cs" />
-    <Compile Include="CurrentComponents.cs" />
-    <Compile Include="DataSheetInfo.cs" />
-    <Compile Include="DataSheetState.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="frmChooseWorksheet.cs" />
     <Compile Include="frmChooseWorksheet.designer.cs">
       <DependentUpon>frmChooseWorksheet.cs</DependentUpon>
     </Compile>
-    <Compile Include="GenericModel.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="IFormState.cs" />
     <Compile Include="ImportExport.cs" />
     <Compile Include="IO\DelimitedFile.cs" />
     <Compile Include="IO\ExcelOleDb.cs" />
-    <Compile Include="ListItem.cs" />
-    <Compile Include="MLRModel2.cs" />
-    <Compile Include="MLRModelingInfo.cs" />
-    <Compile Include="MLRPredInfo.cs" />
-    <Compile Include="ModelingInfo.cs" />
-    <Compile Include="PointGeo.cs" />
-    <Compile Include="Polynomial.cs" />
-    <Compile Include="ProjectData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResidualAnalysisInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />
-    <Compile Include="Site.cs" />
-    <Compile Include="TabState.cs" />
-    <Compile Include="Transform.cs" />
-    <Compile Include="Utilities.cs" />
-    <Compile Include="VBComm.cs" />
-    <Compile Include="VBCSHelp.cs" />
-    <Compile Include="VBProject.cs" />
-    <Compile Include="VBProjectManager.cs" />
-    <Compile Include="VBToolsEvents.cs" />
-    <Compile Include="Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="IO\vssver.scc" />
-    <None Include="mssccprj.scc" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmChooseWorksheet.resx">
