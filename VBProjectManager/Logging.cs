@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace VirtualBeach
+namespace VBProjectManager
 {
     /// <summary>
     /// Class is to be used as a singleton. The controller will instantiate by calling the
@@ -124,6 +124,7 @@ namespace VirtualBeach
                 }
             }
         }
+
 
         /// <summary>
         /// Add handler to event that fires when user is to see log entry.

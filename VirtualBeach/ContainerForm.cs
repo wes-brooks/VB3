@@ -19,17 +19,13 @@ namespace VirtualBeach
         public ContainerForm()
         {
             InitializeComponent();
-
-            //t
+            
+            //The AppManager is a piece of DotSpatial that we'll use only here and there.
             appManager = new AppManager();
             
             //Set the main application window to be the "Shell" 
             Shell = this;
-            appManager.LoadExtensions();
-
-            //Hook up the event handler that will 
-            //ProjectSaved += new ContainerForm.ProjectSavedHandler<PackEventArgs>(ProjectSavedListener);
-            
+            appManager.LoadExtensions();            
         }
 
         public AppManager appManager { get; set; } 

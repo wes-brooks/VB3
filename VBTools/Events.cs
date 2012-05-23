@@ -5,8 +5,7 @@ using System.Text;
 
 namespace VBTools
 {
-    //creates event arguments for unpackaging project
-
+    //Defines the event arguments used when unpacking a project from its saved state
     public class UnpackEventArgs : EventArgs
     {
         private string strKey;
@@ -16,7 +15,6 @@ namespace VBTools
         {
             this.strKey = key;
             this.objValue = value;
-
         }
 
         //Public property to read the key/value ..and get them out
@@ -24,26 +22,43 @@ namespace VBTools
         {
             get { return strKey; }
         }
+        
         public object Value
         {
             get { return objValue; }
         }
-
     }
 
+    //Defines the event arguments used when packing up a project to be saved
     public class PackEventArgs : EventArgs
     {
-        private SerializableDictionary<string, object> dictionaryPacked;
+        private SerializableDictionary<string, object> packedStates;
 
-        public PackEventArgs(SerializableDictionary<string, object> dictPack)
+        public PackEventArgs(SerializableDictionary<string, object> dictSerializable)
         {
-            this.dictionaryPacked = dictPack;
+            this.packedStates = dictSerializable;
         }
 
-        public SerializableDictionary<string, object> DictPacked
+        public SerializableDictionary<string, object> PackedPluginStates
         {
-            get { return dictionaryPacked; }
+            get { return packedStates; }
+        }
+    }
+
+
+    //Defines the event arguments for messaging
+    public class MessageArgs : EventArgs
+    {
+        private string strMessage;
+
+        public MessageArgs(string message)
+        {
+            this.strMessage = message;
         }
 
+        public string Message
+        {
+            get { return strMessage; }
+        }
     }
 }

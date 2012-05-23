@@ -2,7 +2,7 @@
 
 namespace VirtualBeach
 {
-    partial class ContainerForm
+    public partial class ContainerForm
     {
         /// <summary>
         /// Required designer variable.

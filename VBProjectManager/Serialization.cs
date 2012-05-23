@@ -16,26 +16,12 @@ namespace VBProjectManager
 {
     public partial class VBProjectManager
     {
-        //events for when a project is opened
-        public event ProjectOpenedHandler ProjectOpened;
-        public delegate void ProjectOpenedHandler();
-
-        public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event EventHandler<UnpackEventArgs> UnpackRequest;
-
-        //events for when a project is saved
-        public delegate void ProjectSavedHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event ProjectSavedHandler<PackEventArgs> ProjectSaved;
 
 
-        protected void RaiseUnpackRequest(string key, object value)
+        /*protected void Unpack(string key, object value)
         {
-            if (UnpackRequest != null)
-            {
-                UnpackEventArgs e = new UnpackEventArgs(key, value);
-                UnpackRequest(this, e);
-            }
-        }
+            signaller.RaiseUnpackRequest(key, value);
+        }*/
 
 
         public void Open(string projectFile)
@@ -52,7 +38,7 @@ namespace VBProjectManager
             //projectmanager.ProjectName = fi.Name;
 
             //Send the packed states out to the same extensions that created them.
-            foreach (DotSpatial.Extensions.IExtension extension in appManager.Extensions)
+            foreach (DotSpatial.Extensions.IExtension extension in App.Extensions)
             {
                 //test whether the extension implements a method to unpack its state
                 IFormState VBPlugin = extension as IFormState;
@@ -67,33 +53,23 @@ namespace VBProjectManager
         }
 
 
-        private void ProjectSavedListener(object sender, PackEventArgs e)
-        {
-            //
-        }
-
-        
-        public void Save()
-        {
-            //Save(projectmanager.ProjectName);
-        }
-
-
         public void Save(string projectFile)
         {
-            SerializableDictionary<string, object> dictPacked = new SerializableDictionary<string, object>();
+            SerializableDictionary<string, object> dictPackedStates = new SerializableDictionary<string, object>();
 
-            if (ProjectSaved != null) //something has been added to the list?
-            {
-                PackEventArgs e = new PackEventArgs(dictPacked);
-                ProjectSaved(this, e);
-            }
+            signaller.RaiseSaveRequest(dictPackedStates);
 
             FileInfo _fi = new FileInfo(projectFile);
             //projectmanager.ProjectName = _fi.Name;
 
             XmlSerializer serializerDict = new XmlSerializer();
-            serializerDict.Serialize(dictPacked, projectFile);
-        }        
+            serializerDict.Serialize(dictPackedStates, projectFile);
+        }
+
+
+        public object PackProjectState()
+        {
+            return "Returned from VBProjectManager.PackProjectState().";
+        }
     }
 }
