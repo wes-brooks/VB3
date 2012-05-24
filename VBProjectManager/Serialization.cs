@@ -16,7 +16,7 @@ namespace VBProjectManager
 {
     public partial class VBProjectManager
     {
-        public void Open(string projectFile)
+        /*public void Open(string projectFile)
         {
             SerializableDictionary<string, object> dictPackedState = new SerializableDictionary<string, object>();
 
@@ -43,7 +43,7 @@ namespace VBProjectManager
 
             XmlSerializer serializerDict = new XmlSerializer();
             serializerDict.Serialize(dictPackedStates, projectFile);
-        }
+        }*/
         
 
         private void ProjectSavedListener(object sender, VBTools.SerializationEventArgs e)

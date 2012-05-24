@@ -106,7 +106,6 @@ C:\VB3\VirtualBeach\bin\Debug\vi-VN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\zh-CN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\VBDockManager.dll
 C:\VB3\VirtualBeach\bin\Debug\VBDockManager.pdb
-C:\VB3\VirtualBeach\bin\Debug\XmlSerialization.dll
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Controls.dll
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.dll
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.Forms.dll
