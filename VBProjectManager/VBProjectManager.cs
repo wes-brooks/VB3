@@ -28,14 +28,13 @@ namespace VBProjectManager
 
         private void MessageReceived(object sender, MessageArgs args)
         {
-
+            //Write any messages we receive from the plugins directly to the debug console.
+            System.Diagnostics.Debug.WriteLine(args.Message);
         }
 
 
         public override void Activate()
-        {
-            App.HeaderControl.Add(new SimpleActionItem("My Button Caption", AboutVirtualBeach));
-                       
+        {                       
             //Add an item to the application ("File") menu.
             var aboutButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             aboutButton.GroupCaption = HeaderControl.ApplicationMenuKey;
@@ -146,7 +145,6 @@ namespace VBProjectManager
         public void OnImportsSatisfied()
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
-            System.Windows.Forms.MessageBox.Show("Imports satisfied on project manager");
             signaller = GetSignaller();
             signaller.ProjectSaved += new VBTools.Signaller.ProjectSavedHandler<VBTools.PackEventArgs>(ProjectSavedListener);
         }
