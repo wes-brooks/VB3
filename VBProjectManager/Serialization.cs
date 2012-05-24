@@ -16,40 +16,19 @@ namespace VBProjectManager
 {
     public partial class VBProjectManager
     {
-
-
-        /*protected void Unpack(string key, object value)
-        {
-            signaller.RaiseUnpackRequest(key, value);
-        }*/
-
-
         public void Open(string projectFile)
         {
-            Dictionary<string, object> dictPackedState = new Dictionary<string, object>();
-            Dictionary<string, object> dictState = new Dictionary<string, object>();
+            SerializableDictionary<string, object> dictPackedState = new SerializableDictionary<string, object>();
 
             XmlDeserializer deserializer = new XmlDeserializer();
 
-            dictPackedState = deserializer.Deserialize(projectFile) as Dictionary<string, object>;
+            dictPackedState = deserializer.Deserialize(projectFile) as SerializableDictionary<string, object>;
             
             //get the filename to come over right away
             FileInfo fi = new FileInfo(projectFile);
             //projectmanager.ProjectName = fi.Name;
 
-            //Send the packed states out to the same extensions that created them.
-            foreach (DotSpatial.Extensions.IExtension extension in App.Extensions)
-            {
-                //test whether the extension implements a method to unpack its state
-                IFormState VBPlugin = extension as IFormState;
-                if (VBPlugin != null)
-                {
-                    if (dictState.ContainsKey(VBPlugin.Name))
-                    {
-                        VBPlugin.UnpackState(dictPackedState[VBPlugin.Name]);
-                    }
-                }
-            }
+            signaller.UnpackProjectState(dictPackedState);
         }
 
 
@@ -65,11 +44,36 @@ namespace VBProjectManager
             XmlSerializer serializerDict = new XmlSerializer();
             serializerDict.Serialize(dictPackedStates, projectFile);
         }
+        
+
+        private void ProjectSavedListener(object sender, VBTools.SerializationEventArgs e)
+        {
+            e.PackedPluginStates.Add(strPluginKey, PackState());
+        }
 
 
-        public object PackProjectState()
+        private void ProjectOpenedListener(object sender, VBTools.SerializationEventArgs e)
+        {
+            if (e.PackedPluginStates.ContainsKey(strPluginKey))
+            {
+                this.UnpackState(e.PackedPluginStates[strPluginKey]);
+            }
+            else
+            {
+                //Set this plugin to an empty state.
+            }
+        }
+
+
+        public object PackState()
         {
             return "Returned from VBProjectManager.PackProjectState().";
+        }
+
+
+        public void UnpackState(object objPackedState)
+        {
+            //This function restores the previously packed state of the Project Manager.
         }
     }
 }

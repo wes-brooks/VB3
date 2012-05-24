@@ -7,13 +7,10 @@ namespace VBTools
 {
     public class Signaller
     {
-        //event for when a project is opened
-        public delegate void ProjectOpenedHandler();
-        public event ProjectOpenedHandler ProjectOpened;
-
         //event for when a project is saved
-        public delegate void ProjectSavedHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event ProjectSavedHandler<PackEventArgs> ProjectSaved;
+        public delegate void SerializationEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
+        public event SerializationEventHandler<SerializationEventArgs> ProjectSaved;
+        public event SerializationEventHandler<SerializationEventArgs> ProjectOpened;
 
         //Request that plugins unpack their state... why?
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -29,12 +26,24 @@ namespace VBTools
         }
 
 
+        //Tell the plugins to pack their states into the dictionary for saving
         public void RaiseSaveRequest(SerializableDictionary<string, object> dictPackedStates)
         {
             if (ProjectSaved != null) //Has some method been told to handle this event?
             {
-                PackEventArgs e = new PackEventArgs(dictPackedStates);
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
                 ProjectSaved(this, e);
+            }
+        }
+
+
+        //Tell the plugins to unpack themselves from the saved state
+        public void UnpackProjectState(SerializableDictionary<string, object> dictPackedStates)
+        {
+            if (ProjectOpened != null) //Has some method been told to handle this event?
+            {
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
+                ProjectOpened(this, e);
             }
         }
 

@@ -46,3 +46,11 @@ C:\VB3\VBDockManager\obj\Debug\VBDockManager.dll
 C:\VB3\VBDockManager\obj\Debug\VBDockManager.pdb
 C:\VB3\VirtualBeach\bin\Debug\Application Extensions\VBDockManager.dll
 C:\VB3\VirtualBeach\bin\Debug\Application Extensions\VBDockManager.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Controls.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Symbology.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Data.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Extensions.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Data.Forms.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Symbology.Forms.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Modeling.Forms.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Projections.Forms.pdb

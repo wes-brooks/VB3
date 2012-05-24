@@ -18,18 +18,18 @@ namespace VBProjectManager
         private Dictionary<string, Boolean> _tabStates;
         private string strName;
         private VBTools.Signaller signaller = new VBTools.Signaller();
+        private VBLogger logger;
+        private string strLogFile;
+        private string strPluginKey = "Project Manager";
+
 
         public VBProjectManager()
         {
-            signaller.MessageReceived += new VBTools.Signaller.MessageHandler<MessageArgs>(MessageReceived);
-            //App.SerializationManager.Serializing += new VBProjectManager.ProjectSavedHandler<PackEventArgs>(ProjectSavedListener);
-        }
+            strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach.log");
+            VBLogger.SetLogFileName(strLogFile);
+            logger = VBLogger.GetLogger();
 
-
-        private void MessageReceived(object sender, MessageArgs args)
-        {
-            //Write any messages we receive from the plugins directly to the debug console.
-            System.Diagnostics.Debug.WriteLine(args.Message);
+            signaller = new VBTools.Signaller();
         }
 
 
@@ -50,6 +50,14 @@ namespace VBProjectManager
             saveButton.SmallImage = Resources.save_16x16;
             saveButton.ToolTipText = "Save the current project state.";
             App.HeaderControl.Add(saveButton);
+
+            //Add an Open button to the application ("File") menu.
+            var openButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
+            openButton.GroupCaption = HeaderControl.ApplicationMenuKey;
+            openButton.LargeImage = Resources.open_32x32;
+            openButton.SmallImage = Resources.open_16x16;
+            openButton.ToolTipText = "Open a saved project.";
+            App.HeaderControl.Add(openButton);
             
             base.Activate();
         }
@@ -61,11 +69,26 @@ namespace VBProjectManager
             base.Deactivate();
         }
 
+        
+        private void MessageReceived(object sender, MessageArgs args)
+        {
+            //Write any messages we receive from the plugins directly to the debug console.
+            System.Diagnostics.Debug.WriteLine(args.Message);
+        }
+
 
         public void Save(object sender, EventArgs e)
         {
             SerializableDictionary<string, object> pluginStates = new SerializableDictionary<string, object>();
             signaller.RaiseSaveRequest(pluginStates);
+        }
+
+
+        public void Open(object sender, EventArgs e)
+        {
+            //Load a project file from disk and then send it out to be unpacked.
+            SerializableDictionary<string, object> pluginStates = new SerializableDictionary<string, object>();
+            signaller.UnpackProjectState(pluginStates);
         }
 
 
@@ -100,24 +123,6 @@ namespace VBProjectManager
         }
 
 
-        private void ProjectOpenedListener(object sender, UnpackEventArgs e)
-        {
-        }
-
-
-        public object PackState()
-        {
-            return null;
-            //This function packs the state of the Project Manager for saving to disk.
-        }
-
-
-        public void UnpackState(object objPackedStates)
-        {
-            //This function restores the previously packed state of the Project Manager.
-        }
-
-
         //We export this property so that other Plugins can have access to the signaller.
         public VBTools.Signaller Signaller
         {
@@ -146,13 +151,9 @@ namespace VBProjectManager
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            signaller.ProjectSaved += new VBTools.Signaller.ProjectSavedHandler<VBTools.PackEventArgs>(ProjectSavedListener);
-        }
-
-
-        private void ProjectSavedListener(object sender, VBTools.PackEventArgs e)
-        {
-            e.PackedPluginStates.Add("ProjectManager", PackProjectState());
+            signaller.MessageReceived += new VBTools.Signaller.MessageHandler<MessageArgs>(MessageReceived);
+            signaller.ProjectSaved += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectSavedListener);
+            signaller.ProjectOpened += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectOpenedListener);
         }
     }
 }

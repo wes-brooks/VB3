@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using VBTools;
+
 
 namespace VBProjectManager
 {
@@ -18,16 +20,12 @@ namespace VBProjectManager
         private static String logFileName;
         private const int i_max = 100;
 
-        public delegate void MessageLoggedEventHandler(String message, targetSStrip target);
+        public delegate void MessageLoggedEventHandler(String message, Globals.targetSStrip target);
         public event MessageLoggedEventHandler MessageEventLogged;
-
-        public enum messageIntent { LogFileOnly, UserOnly, UserAndLogFile };
-
-        public enum targetSStrip { None, StatusStrip1, StatusStrip2, StatusStrip3, ProgressBar }
 
         private bool lastsession;
 
-        public bool lastSessionClosed
+        public bool LastSessionClosed
         {
             get
             {
@@ -45,20 +43,18 @@ namespace VBProjectManager
         /// instantiation was needed.
         /// </summary>
         /// <returns></returns>
-        public static VBLogger getLogger()
+        public static VBLogger GetLogger()
         {
             if (me == null)
             {
                 lock (syncRoot)
                 {
-                    if (me == null)
+                    me = new VBLogger();
+                    if (!logFileName.Equals(String.Empty))
                     {
-                        me = new VBLogger();
-                        if (!logFileName.Equals(String.Empty))
-                        {
-                            me.logFirstTime();
-                        }
+                        me.LogFirstTime();
                     }
+                    
                 }
             }
             return me;
@@ -78,7 +74,7 @@ namespace VBProjectManager
         //}
         //        }
 
-        public static void logClose()
+        public static void CloseLog()
         {
             if (me != null)
             {
@@ -86,7 +82,7 @@ namespace VBProjectManager
                 {
                     if (me != null)
                     {
-                        me.logEvent("Log closed normally.");
+                        me.LogEvent("Log closed normally.");
                         if (me.MessageEventLogged != null)
                         {
                             foreach (Delegate del in me.MessageEventLogged.GetInvocationList())
@@ -106,13 +102,13 @@ namespace VBProjectManager
         /// Sets the static log file path. Triggers first log entry if instance is made.
         /// </summary>
         /// <param name="filePath">Full path to text file. File doesn't need to exist.</param>
-        public static void setLogFileName(String filePath)
+        public static void SetLogFileName(String filePath)
         {
             if (filePath.Equals(String.Empty))
             {
                 if (me != null)
                 {
-                    logClose();
+                    CloseLog();
                 }
             }
             else
@@ -120,7 +116,7 @@ namespace VBProjectManager
                 logFileName = filePath;
                 if (me != null)
                 {
-                    me.logFirstTime();
+                    me.LogFirstTime();
                 }
             }
         }
@@ -130,13 +126,13 @@ namespace VBProjectManager
         /// Add handler to event that fires when user is to see log entry.
         /// </summary>
         /// <param name="handler">see delegate this class</param>
-        public void addHandler(MessageLoggedEventHandler handler)
+        public void AddHandler(MessageLoggedEventHandler handler)
         {
             this.MessageEventLogged += handler;
         }
 
 
-        internal void logFirstTime()
+        internal void LogFirstTime()
         {
             try
             {
@@ -155,16 +151,16 @@ namespace VBProjectManager
                         {
                             if (!prevLn.Contains("Log closed normally"))
                             {
-                                me.lastSessionClosed = false;
+                                me.LastSessionClosed = false;
                             }
                         }
                         fs.Close();
                     }
-                    me.logEvent("Log opened.");
+                    me.LogEvent("Log opened.");
                 }
                 else
                 {
-                    initLogFile(logFileName);
+                    InitLogFile(logFileName);
                 }
             }
             catch (IOException ioe)
@@ -178,7 +174,7 @@ namespace VBProjectManager
         }
 
 
-        void initLogFile(string logFileName)
+        void InitLogFile(string logFileName)
         {
             string logFileDir = logFileName.Substring(0, logFileName.LastIndexOf('\\'));
             if (!Directory.Exists(logFileDir))
@@ -193,14 +189,14 @@ namespace VBProjectManager
                 writer.Close();
             }
             fs.Close();
-            me.lastSessionClosed = true;
+            me.LastSessionClosed = true;
         }
 
         /// <summary>
         /// Returns the field.
         /// </summary>
         /// <returns></returns>
-        public static String getLogFileName()
+        public static String GetLogFileName()
         {
             return logFileName;
         }
@@ -211,7 +207,7 @@ namespace VBProjectManager
         /// On errors, repeated attempts (file busy/open).
         /// </summary>
         /// <param name="message"></param>
-        private void logEvent(String message, int iteration)
+        private void LogEvent(String message, int iteration)
         {
             TextWriter writer = null;
             if (!logFileName.Equals(String.Empty) && iteration < i_max)
@@ -220,7 +216,7 @@ namespace VBProjectManager
                 {
                     //create the log file if necessary
                     if (!File.Exists(logFileName))
-                        initLogFile(logFileName);
+                        InitLogFile(logFileName);
 
                     //open the file and append to it.
                     using (writer = File.AppendText(logFileName))
@@ -240,7 +236,7 @@ namespace VBProjectManager
                     //this is if an IO error has occurred where the file is already open
                     //by another process.  Try to write again until success.
                     System.Threading.Thread.Sleep(200);
-                    logEvent(message, iteration + 1);
+                    LogEvent(message, iteration + 1);
                 }
                 catch (Exception)
                 {
@@ -254,7 +250,7 @@ namespace VBProjectManager
         /// If there are any registered handlers, call them now with message.
         /// </summary>
         /// <param name="message"></param>
-        private void OnMessageEventLogged(String message, targetSStrip target)
+        private void OnMessageEventLogged(String message, Globals.targetSStrip target)
         {
             if (MessageEventLogged != null)
             {
@@ -268,18 +264,18 @@ namespace VBProjectManager
         /// </summary>
         /// <param name="message"></param>
         /// <param name="intent"></param>
-        public void logEvent(String message, messageIntent intent, targetSStrip target)
+        public void LogEvent(String message, Globals.messageIntent intent, Globals.targetSStrip target)        
         {
-            if (intent == messageIntent.LogFileOnly)
+            if (intent == Globals.messageIntent.LogFileOnly)
             {
-                logEvent(message, 0); //call the method that will 
+                LogEvent(message, 0); //call the method that will 
             }
-            else if (intent == messageIntent.UserAndLogFile)
+            else if (intent == Globals.messageIntent.UserAndLogFile)
             {
-                logEvent(message, 0);
+                LogEvent(message, 0);
                 OnMessageEventLogged(message, target);
             }
-            else if (intent == messageIntent.UserOnly)
+            else if (intent == Globals.messageIntent.UserOnly)
             {
                 OnMessageEventLogged(message, target);
             }
@@ -289,9 +285,9 @@ namespace VBProjectManager
         /// Overloaded method to send the message only to the log file.
         /// </summary>
         /// <param name="message"></param>
-        public void logEvent(string message)
+        public void LogEvent(string message)
         {
-            this.logEvent(message, VBLogger.messageIntent.LogFileOnly, VBLogger.targetSStrip.None);
+            this.LogEvent(message, Globals.messageIntent.LogFileOnly, Globals.targetSStrip.None);
         }
     }
 }

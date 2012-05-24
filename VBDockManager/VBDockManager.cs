@@ -216,6 +216,7 @@ namespace VBDockManager
             return null;
         }
 
+
         public void Remove(string key)
         {
             if (dockContents.ContainsKey(key))
@@ -232,6 +233,7 @@ namespace VBDockManager
                 OnPanelRemoved(key);
             }
         }
+
 
         public void HidePanel(string key)
         {

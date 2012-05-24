@@ -30,11 +30,11 @@ namespace VBTools
     }
 
     //Defines the event arguments used when packing up a project to be saved
-    public class PackEventArgs : EventArgs
+    public class SerializationEventArgs : EventArgs
     {
         private SerializableDictionary<string, object> packedStates;
 
-        public PackEventArgs(SerializableDictionary<string, object> dictSerializable)
+        public SerializationEventArgs(SerializableDictionary<string, object> dictSerializable)
         {
             this.packedStates = dictSerializable;
         }

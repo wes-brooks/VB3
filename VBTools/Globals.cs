@@ -7,7 +7,8 @@ namespace VBTools
 {
     public class Globals
     {
-        
+        public enum messageIntent { LogFileOnly, UserOnly, UserAndLogFile };
+        public enum targetSStrip { None, StatusStrip1, StatusStrip2, StatusStrip3, ProgressBar }
 
         public enum Transforms
         {

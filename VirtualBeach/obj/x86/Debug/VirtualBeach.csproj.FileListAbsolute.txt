@@ -120,3 +120,6 @@ C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.Forms.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Modeling.Forms.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.Forms.pdb
+C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.xml
+C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Serialization.xml
+C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Topology.xml

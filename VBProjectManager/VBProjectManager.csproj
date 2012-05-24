@@ -95,6 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
+    <Content Include="Resources\open_16x16.png" />
+    <Content Include="Resources\open_32x32.png" />
     <None Include="Resources\save_32x32.png" />
     <None Include="Resources\save_16x16.png" />
     <None Include="Resources\info_32x32.png" />
