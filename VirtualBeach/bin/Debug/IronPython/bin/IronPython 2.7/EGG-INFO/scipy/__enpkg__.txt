@@ -1,0 +1,1 @@
+repo = 'http://www.enthought.com/repo/.iron/eggs/'
