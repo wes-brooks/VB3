@@ -20,11 +20,25 @@ namespace VBTools
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageReceived;
 
+        //event for broadcasting
+        public delegate void serializationEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
+        public event SerializationEventHandler<SerializationEventArgs> BroadcastState;
+        
+
         public Signaller()
         {
 
         }
 
+        //tell plugins to pack their states into a dictionary to pass to other plugins
+        public void RaiseBroadcastRequest(SerializableDictionary<string, object> dictPackedStates)
+        {
+            if (BroadcastState != null) //has some method been told to handle this event?
+            {
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
+                BroadcastState(this, e);
+            }
+        }
 
         //Tell the plugins to pack their states into the dictionary for saving
         public void RaiseSaveRequest(SerializableDictionary<string, object> dictPackedStates)
