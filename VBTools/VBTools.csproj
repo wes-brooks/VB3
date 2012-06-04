@@ -54,6 +54,7 @@
     <Compile Include="ImportExport.cs" />
     <Compile Include="IO\DelimitedFile.cs" />
     <Compile Include="IO\ExcelOleDb.cs" />
+    <Compile Include="IPlugin.cs" />
     <Compile Include="ListItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />

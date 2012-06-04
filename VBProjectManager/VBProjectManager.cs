@@ -21,8 +21,7 @@ namespace VBProjectManager
         private VBLogger logger;
         private string strLogFile;
         private string strPluginKey = "Project Manager";
-
-
+        
         public VBProjectManager()
         {
             strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach.log");
@@ -58,8 +57,30 @@ namespace VBProjectManager
             openButton.SmallImage = Resources.open_16x16;
             openButton.ToolTipText = "Open a saved project.";
             App.HeaderControl.Add(openButton);
+
+            //get plugin type for each plugin
+            List<short> allPluginTypes = new List<short>();
             
+            foreach(DotSpatial.Extensions.IExtension ext in App.Extensions)
+            {
+                if (ext is IPlugin)
+                {
+                    IPlugin plugType = (IPlugin)ext;
+
+                    //store pluginType
+                    short PType = plugType.PluginType;
+                    allPluginTypes.Add(PType);
+                }
+            }
+
+            //if PType is smallest (datasheet/map), set as activated when open
+            int pos = allPluginTypes.IndexOf(allPluginTypes.Min());
+            DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
+            IPlugin ex = (IPlugin)extension;
+            ex.MakeActive();
+
             base.Activate();
+
         }
 
 
@@ -153,7 +174,10 @@ namespace VBProjectManager
             signaller = GetSignaller();
             signaller.MessageReceived += new VBTools.Signaller.MessageHandler<MessageArgs>(MessageReceived);
             signaller.ProjectSaved += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectSavedListener);
-            signaller.ProjectOpened += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectOpenedListener);
+            signaller.ProjectOpened += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
+            
+            
+            
         }
     }
 }

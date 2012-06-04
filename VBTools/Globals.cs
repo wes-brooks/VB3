@@ -10,6 +10,15 @@ namespace VBTools
         public enum messageIntent { LogFileOnly, UserOnly, UserAndLogFile };
         public enum targetSStrip { None, StatusStrip1, StatusStrip2, StatusStrip3, ProgressBar }
 
+        public enum PluginType
+        {
+            map = 0,
+            datasheet = 1,
+            modeling = 2,
+            prediction = 3
+
+        }
+        
         public enum Transforms
         {
             none = 0,
