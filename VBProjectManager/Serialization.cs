@@ -67,13 +67,25 @@ namespace VBProjectManager
 
         public object PackState()
         {
-            return "Returned from VBProjectManager.PackProjectState().";
+            SerializableDictionary<string, object> dictLocalProjMngr = new SerializableDictionary<string, object>();
+           
+            dictLocalProjMngr.Add("ProjectName", strName);
+            //another dictionary holding key/values of order of plugins to reopen
+            dictLocalProjMngr.Add("TabStates", _tabStates); //what order (top/bottom to save plugins in
+            
+            
+            return dictLocalProjMngr;
         }
 
 
         public void UnpackState(object objPackedState)
         {
-            //This function restores the previously packed state of the Project Manager.
+           
+            SerializableDictionary<string, object> dictLocalProjectMngr = new SerializableDictionary<string, object>();
+            dictLocalProjectMngr = (SerializableDictionary<string, object>)objPackedState;
+            
+            this.strName = (string)dictLocalProjectMngr["ProjectName"];
+            this.TabStates = (Dictionary<string, bool>)dictLocalProjectMngr["TabStates"];
         }
     }
 }

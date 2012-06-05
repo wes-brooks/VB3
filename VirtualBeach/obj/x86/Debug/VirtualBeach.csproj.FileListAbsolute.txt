@@ -109,3 +109,4 @@ C:\VB3\VirtualBeach\bin\Debug\VBDockManager.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Serialization.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Topology.xml
+C:\VB3\VirtualBeach\bin\Debug\XmlSerialization.dll

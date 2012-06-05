@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Windows.Forms;
 using System.Linq;
 using System.Text;
+using Serialization;
 using VBTools;
 using DotSpatial.Controls;
 using DotSpatial.Controls.Header;
@@ -21,7 +23,8 @@ namespace VBProjectManager
         private VBLogger logger;
         private string strLogFile;
         private string strPluginKey = "Project Manager";
-        
+        public static string VB2projectsPath = null;
+
         public VBProjectManager()
         {
             strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach.log");
@@ -80,7 +83,6 @@ namespace VBProjectManager
             ex.MakeActive();
 
             base.Activate();
-
         }
 
 
@@ -100,13 +102,58 @@ namespace VBProjectManager
 
         public void Save(object sender, EventArgs e)
         {
+            string fullName = string.Empty;
+            if (ProjectName == null)
+            {
+                string filterstring = @"VB2 Project Files|*.vbpx|All Files|*.*";
+                SaveFileDialog saveFile = new SaveFileDialog();
+                //saveFile.InitialDirectory = Application.ExecutablePath + "//ProjectFiles";
+                saveFile.Title = "Enter a file name to save your project information in.";
+                saveFile.Filter = filterstring;
+                saveFile.FilterIndex = 1;
+                saveFile.RestoreDirectory = true;
+                DialogResult dr = saveFile.ShowDialog();
+                //if (dr != DialogResult.OK)
+                //{ return; }
+
+                strName = saveFile.FileName;
+
+                //_projMgr.Save(fullName, Globals.ProjectType.COMPLETE);
+            }
+            //else
+            //{
+            //    _projMgr.Save();
+            //}
+
             SerializableDictionary<string, object> pluginStates = new SerializableDictionary<string, object>();
             signaller.RaiseSaveRequest(pluginStates);
+
+            FileInfo _fi = new FileInfo(strName);
+
+            //serialize all the plugins here.
+            XmlSerializer serializerDict = new XmlSerializer();
+            serializerDict.Serialize(pluginStates, ProjectName);
         }
 
 
         public void Open(object sender, EventArgs e)
         {
+            OpenFileDialog openFile = new OpenFileDialog();
+            //openFile.InitialDirectory = Application.ExecutablePath + "//ProjectFiles";
+            openFile.InitialDirectory = VB2projectsPath;
+            openFile.Filter = @"VB3 Project Files|*.vbpx|All Files|*.*";
+            openFile.FilterIndex = 1;
+            openFile.RestoreDirectory = true;
+            if (openFile.ShowDialog() == DialogResult.OK)
+            {
+                //get a new project manager for this project
+                //_projMgr = null;
+                //_projMgr = VBProjectManager.GetProjectManager();
+
+                string fullName = openFile.FileName;
+                //_projMgr.Open(fullName);
+                
+            }
             //Load a project file from disk and then send it out to be unpacked.
             SerializableDictionary<string, object> pluginStates = new SerializableDictionary<string, object>();
             signaller.UnpackProjectState(pluginStates);
@@ -123,17 +170,6 @@ namespace VBProjectManager
         {
             get { return _tabStates; }
             set { _tabStates = value; }
-        }
-
-
-        public class ProjectChangedStatus : EventArgs
-        {
-            private string _status;
-            public string Status
-            {
-                set { _status = value; }
-                get { return _status; }
-            }
         }
 
 
@@ -175,9 +211,17 @@ namespace VBProjectManager
             signaller.MessageReceived += new VBTools.Signaller.MessageHandler<MessageArgs>(MessageReceived);
             signaller.ProjectSaved += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
-            
-            
-            
+        }
+    }
+    
+    
+    public class ProjectChangedStatus : EventArgs
+    {
+        private string _status;
+        public string Status
+        {
+            set { _status = value; }
+            get { return _status; }
         }
     }
 }
