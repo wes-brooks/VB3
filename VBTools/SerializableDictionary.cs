@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
+using System.Runtime.Serialization;
 
 namespace VBTools
 {
-
     [XmlRoot("dictionary")]
-
+    [DataContract]
     public class SerializableDictionary<TKey, TValue>
-        : Dictionary<TKey, TValue>, IXmlSerializable
+        : Dictionary<TKey, TValue>
+        //, IXmlSerializable
     {
         #region IXmlSerializable Members
 

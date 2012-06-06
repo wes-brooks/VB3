@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DotSpatial.Controls;
+using DotSpatial.Controls.Docking;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.ComponentModel;
 using System.Windows.Forms;
-using System.ComponentModel.Composition;
-using DotSpatial.Controls;
-using DotSpatial.Controls.Docking;
+
 
 namespace VirtualBeach
 {

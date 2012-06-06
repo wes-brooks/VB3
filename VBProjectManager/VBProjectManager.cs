@@ -1,14 +1,20 @@
-﻿using System;
-using System.IO;
+﻿using DotSpatial.Controls;
+using DotSpatial.Controls.Header;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Windows.Forms;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
-using Serialization;
+using System.Windows.Forms;
+//using System.Xml;
+//using System.Xml.Serialization;
+//using System.Runtime.Serialization;
 using VBTools;
-using DotSpatial.Controls;
-using DotSpatial.Controls.Header;
+using Newtonsoft.Json;
 
 
 namespace VBProjectManager
@@ -16,9 +22,8 @@ namespace VBProjectManager
 
     public partial class VBProjectManager : Extension, IFormState, IPartImportsSatisfiedNotification
     {        
-        //
         private Dictionary<string, Boolean> _tabStates;
-        private string strName;
+        private string strPathName;
         private VBTools.Signaller signaller = new VBTools.Signaller();
         private VBLogger logger;
         private string strLogFile;
@@ -103,7 +108,7 @@ namespace VBProjectManager
         public void Save(object sender, EventArgs e)
         {
             string fullName = string.Empty;
-            if (ProjectName == null)
+            if (ProjectPathName == null)
             {
                 string filterstring = @"VB2 Project Files|*.vbpx|All Files|*.*";
                 SaveFileDialog saveFile = new SaveFileDialog();
@@ -116,7 +121,7 @@ namespace VBProjectManager
                 //if (dr != DialogResult.OK)
                 //{ return; }
 
-                strName = saveFile.FileName;
+                strPathName = saveFile.FileName;
 
                 //_projMgr.Save(fullName, Globals.ProjectType.COMPLETE);
             }
@@ -125,14 +130,27 @@ namespace VBProjectManager
             //    _projMgr.Save();
             //}
 
-            SerializableDictionary<string, object> pluginStates = new SerializableDictionary<string, object>();
+            
+            Dictionary<string, object> pluginStates = new Dictionary<string, object>();
             signaller.RaiseSaveRequest(pluginStates);
 
-            FileInfo _fi = new FileInfo(strName);
-
+            //JSON
+            string json = JsonConvert.SerializeObject(pluginStates);
+            StreamWriter sw = new StreamWriter(json.);
+            sw.Close();
+            
+            
             //serialize all the plugins here.
-            XmlSerializer serializerDict = new XmlSerializer();
-            serializerDict.Serialize(pluginStates, ProjectName);
+            //XmlSerializer serializerDict = new XmlSerializer(typeof(Dictionary<string, object>));
+            //StringWriter sw = new StringWriter();
+            //serializerDict.Serialize(sw, pluginStates);
+
+            //dataContract version
+            //FileStream writer = new FileStream(strPathName, FileMode.CreateNew);
+            //DataContractSerializer serializer = new DataContractSerializer(typeof(SerializableDictionary<string, object>));
+            //serializer.WriteObject(writer, pluginStates);
+            //writer.Close();
+
         }
 
 
@@ -144,19 +162,40 @@ namespace VBProjectManager
             openFile.Filter = @"VB3 Project Files|*.vbpx|All Files|*.*";
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;
+            string fullName = string.Empty;
             if (openFile.ShowDialog() == DialogResult.OK)
             {
                 //get a new project manager for this project
                 //_projMgr = null;
                 //_projMgr = VBProjectManager.GetProjectManager();
 
-                string fullName = openFile.FileName;
+                fullName = openFile.FileName;
                 //_projMgr.Open(fullName);
                 
             }
+            
             //Load a project file from disk and then send it out to be unpacked.
-            SerializableDictionary<string, object> pluginStates = new SerializableDictionary<string, object>();
+            
+            Dictionary<string, object> pluginStates = new Dictionary<string, object>();
+            
+            //JSON
+            
+            StreamReader sr = new StreamReader(fullName);
+            string json = sr.ReadToEnd();
+
+
+            pluginStates = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            sr.Close();
+            
+            //deserialize all the plugins here.
+            //XmlSerializer deserializerDict = new XmlSerializer(typeof(SerializableDictionary<string, object>));
+            //StringReader sr = new StringReader();
+
+            //deserializerDict.Deserialize(sr, .Serialize(sr, pluginStates);
+            //XmlDeserializer deserializer = new XmlDeserializer();
+            //pluginStates = deserializer.Deserialize(fullName) as SerializableDictionary<string, object>;
             signaller.UnpackProjectState(pluginStates);
+            
         }
 
 
@@ -173,10 +212,10 @@ namespace VBProjectManager
         }
 
 
-        public string ProjectName
+        public string ProjectPathName
         {
-            get { return strName; }
-            set { strName = value; }
+            get { return strPathName; }
+            set { strPathName = value; }
         }
 
 

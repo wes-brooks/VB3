@@ -109,4 +109,6 @@ C:\VB3\VirtualBeach\bin\Debug\VBDockManager.pdb
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Serialization.xml
 C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Topology.xml
-C:\VB3\VirtualBeach\bin\Debug\XmlSerialization.dll
+C:\VB3\VirtualBeach\bin\Debug\Newtonsoft.Json.dll
+C:\VB3\VirtualBeach\bin\Debug\Newtonsoft.Json.pdb
+C:\VB3\VirtualBeach\bin\Debug\Newtonsoft.Json.xml

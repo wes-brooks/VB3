@@ -31,7 +31,7 @@ namespace VBTools
         }
 
         //tell plugins to pack their states into a dictionary to pass to other plugins
-        public void RaiseBroadcastRequest(SerializableDictionary<string, object> dictPackedStates)
+        public void RaiseBroadcastRequest(Dictionary<string, object> dictPackedStates)
         {
             if (BroadcastState != null) //has some method been told to handle this event?
             {
@@ -41,7 +41,7 @@ namespace VBTools
         }
 
         //Tell the plugins to pack their states into the dictionary for saving
-        public void RaiseSaveRequest(SerializableDictionary<string, object> dictPackedStates)
+        public void RaiseSaveRequest(Dictionary<string, object> dictPackedStates)
         {
             if (ProjectSaved != null) //Has some method been told to handle this event?
             {
@@ -52,7 +52,7 @@ namespace VBTools
 
 
         //Tell the plugins to unpack themselves from the saved state
-        public void UnpackProjectState(SerializableDictionary<string, object> dictPackedStates)
+        public void UnpackProjectState(Dictionary<string, object> dictPackedStates)
         {
             if (ProjectOpened != null) //Has some method been told to handle this event?
             {

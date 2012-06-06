@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
 using System.Reflection;
-using System.Data;
 using System.Xml;
 using System.Xml.XPath;
 using System.Windows.Forms;
-using Serialization;
 using VBTools;
 
 
@@ -67,11 +66,12 @@ namespace VBProjectManager
 
         public object PackState()
         {
-            SerializableDictionary<string, object> dictLocalProjMngr = new SerializableDictionary<string, object>();
-           
-            dictLocalProjMngr.Add("ProjectName", strName);
+            Dictionary<string, object> dictLocalProjMngr = new Dictionary<string, object>();
+
+            dictLocalProjMngr.Add("ProjectName", ProjectPathName);
+            
             //another dictionary holding key/values of order of plugins to reopen
-            dictLocalProjMngr.Add("TabStates", _tabStates); //what order (top/bottom to save plugins in
+            //dictLocalProjMngr.Add("TabStates", TabStates); //what order (top/bottom to save plugins in
             
             
             return dictLocalProjMngr;
@@ -81,10 +81,10 @@ namespace VBProjectManager
         public void UnpackState(object objPackedState)
         {
            
-            SerializableDictionary<string, object> dictLocalProjectMngr = new SerializableDictionary<string, object>();
-            dictLocalProjectMngr = (SerializableDictionary<string, object>)objPackedState;
-            
-            this.strName = (string)dictLocalProjectMngr["ProjectName"];
+            Dictionary<string, object> dictLocalProjectMngr = new Dictionary<string, object>();
+            dictLocalProjectMngr = (Dictionary<string, object>)objPackedState;
+
+            this.strPathName = (string)dictLocalProjectMngr["ProjectName"];
             this.TabStates = (Dictionary<string, bool>)dictLocalProjectMngr["TabStates"];
         }
     }

@@ -30,4 +30,6 @@ C:\VB3\VBProjectManager\obj\Debug\VBProjectManager.pdb
 C:\VB3\VBProjectManager\obj\Debug\VBProjectManager.Resources.resources
 C:\VB3\VBProjectManager\obj\Debug\GenerateResource.read.1.tlog
 C:\VB3\VBProjectManager\obj\Debug\GenerateResource.write.1.tlog
-C:\VB3\VBProjectManager\bin\Debug\XmlSerialization.dll
+C:\VB3\VBProjectManager\bin\Debug\Newtonsoft.Json.dll
+C:\VB3\VBProjectManager\bin\Debug\Newtonsoft.Json.pdb
+C:\VB3\VBProjectManager\bin\Debug\Newtonsoft.Json.xml
