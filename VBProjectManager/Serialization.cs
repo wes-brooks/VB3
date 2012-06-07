@@ -64,11 +64,11 @@ namespace VBProjectManager
         }
 
 
-        public object PackState()
+        public Dictionary<string, object> PackState()
         {
             Dictionary<string, object> dictLocalProjMngr = new Dictionary<string, object>();
 
-            dictLocalProjMngr.Add("ProjectName", ProjectPathName);
+            dictLocalProjMngr.Add("ProjectName", ProjectName);
             
             //another dictionary holding key/values of order of plugins to reopen
             //dictLocalProjMngr.Add("TabStates", TabStates); //what order (top/bottom to save plugins in
@@ -78,14 +78,14 @@ namespace VBProjectManager
         }
 
 
-        public void UnpackState(object objPackedState)
+        public void UnpackState(Dictionary<string, object> dictPackedState)
         {
            
-            Dictionary<string, object> dictLocalProjectMngr = new Dictionary<string, object>();
-            dictLocalProjectMngr = (Dictionary<string, object>)objPackedState;
+            //Dictionary<string, object> dictLocalProjectMngr = new Dictionary<string, object>();
+            //dictLocalProjectMngr = (Dictionary<string, object>)objPackedState;
 
-            this.strPathName = (string)dictLocalProjectMngr["ProjectName"];
-            this.TabStates = (Dictionary<string, bool>)dictLocalProjectMngr["TabStates"];
+            this.strPathName = (string)dictPackedState["ProjectName"];
+            //this.TabStates = (Dictionary<string, bool>)dictLocalProjectMngr["TabStates"];
         }
     }
 }

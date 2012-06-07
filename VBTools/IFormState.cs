@@ -7,8 +7,8 @@ namespace VBTools
 {
     public interface IFormState
     {
-        void UnpackState(object objPackedState);
-        object PackState();
+        void UnpackState(Dictionary<string, object> objPackedState);
+        Dictionary<string,object> PackState();
 
         //void ProjectSavedListener(object sender, PackEventArgs e);
         //void ProjectOpenedListener(object sender, UnpackEventArgs e);
