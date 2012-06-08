@@ -134,15 +134,25 @@ namespace VBProjectManager
             //}
 
 
-            Dictionary<string, Dictionary<string, object>> pluginStates = new Dictionary<string, Dictionary<string, object>>();
+            IDictionary<string, IDictionary<string, object>> pluginStates = new Dictionary<string, IDictionary<string, object>>();
             signaller.RaiseSaveRequest(pluginStates);
 
             //JSON
-            string json = JsonConvert.SerializeObject(pluginStates);
-            StreamWriter sw = new StreamWriter(strPathName); //this should contain the strPathName
-            sw.Write(json);
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; //controls how objects are created and deserialized to during deserialization.will always recreate objects and collections before setting values to them during deserialization
+            serializer.TypeNameHandling = TypeNameHandling.All; //controls whether Json.NET includes .NET type names during serialization with a $type property and reads .NET type names from that property to determine what type to create during deserialization. 
+            
+            using (StreamWriter sw = new StreamWriter(strPathName))
+            using (JsonTextWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, pluginStates);
+            }
+            //string json = JsonConvert.SerializeObject(pluginStates);
+            //StreamWriter sw = new StreamWriter(strPathName); //this should contain the strPathName
+            ////JsonWriter writer = new JsonWriter(sw);
+            //sw.Write(json);
 
-            sw.Close();            
+            //sw.Close();            
         }
 
 
@@ -168,26 +178,23 @@ namespace VBProjectManager
             
             //Load a project file from disk and then send it out to be unpacked.
 
-            Dictionary<string, Dictionary<string, object>> pluginStates = new Dictionary<string, Dictionary<string, object>>();
+            IDictionary<string, IDictionary<string, object>> pluginStates = new Dictionary<string, IDictionary<string, object>>();
             
             //JSON
             
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; //controls how objects are created and deserialized to during deserialization.will always recreate objects and collections before setting values to them during deserialization
+            serializer.TypeNameHandling = TypeNameHandling.All; //controls whether Json.NET includes .NET type names during serialization with a $type property and reads .NET type names from that property to determine what type to create during deserialization. 
+
             StreamReader sr = new StreamReader(fullName);
+            JsonTextReader reader = new JsonTextReader(sr);
             string json = sr.ReadToEnd();
-
-
-            pluginStates = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string,object>>>(json);
+            pluginStates = serializer.Deserialize<IDictionary<string, IDictionary<string, Object>>>(reader);
+            pluginStates = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, Object>>>(json);
             sr.Close();
-            
-            //deserialize all the plugins here.
-            //XmlSerializer deserializerDict = new XmlSerializer(typeof(SerializableDictionary<string, object>));
-            //StringReader sr = new StringReader();
+            reader.Close();
 
-            //deserializerDict.Deserialize(sr, .Serialize(sr, pluginStates);
-            //XmlDeserializer deserializer = new XmlDeserializer();
-            //pluginStates = deserializer.Deserialize(fullName) as SerializableDictionary<string, object>;
             signaller.UnpackProjectState(pluginStates);
-            
         }
 
 

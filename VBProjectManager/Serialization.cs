@@ -64,9 +64,9 @@ namespace VBProjectManager
         }
 
 
-        public Dictionary<string, object> PackState()
+        public IDictionary<string, object> PackState()
         {
-            Dictionary<string, object> dictLocalProjMngr = new Dictionary<string, object>();
+            IDictionary<string, object> dictLocalProjMngr = new Dictionary<string, object>();
 
             dictLocalProjMngr.Add("ProjectName", ProjectName);
             
@@ -78,7 +78,7 @@ namespace VBProjectManager
         }
 
 
-        public void UnpackState(Dictionary<string, object> dictPackedState)
+        public void UnpackState(IDictionary<string, object> dictPackedState)
         {
            
             //Dictionary<string, object> dictLocalProjectMngr = new Dictionary<string, object>();
