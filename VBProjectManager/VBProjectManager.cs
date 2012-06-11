@@ -125,34 +125,51 @@ namespace VBProjectManager
                 strPathName = saveFile.FileName;
                 FileInfo fi = new FileInfo(strPathName);
                 projectName = fi.Name;
-
                 //_projMgr.Save(fullName, Globals.ProjectType.COMPLETE);
             }
-            //else
-            //{
-            //    _projMgr.Save();
-            //}
-
+            //else {  _projMgr.Save(); }
 
             IDictionary<string, IDictionary<string, object>> pluginStates = new Dictionary<string, IDictionary<string, object>>();
             signaller.RaiseSaveRequest(pluginStates);
 
-            //JSON
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; //controls how objects are created and deserialized to during deserialization.will always recreate objects and collections before setting values to them during deserialization
-            serializer.TypeNameHandling = TypeNameHandling.All; //controls whether Json.NET includes .NET type names during serialization with a $type property and reads .NET type names from that property to determine what type to create during deserialization. 
-            
-            using (StreamWriter sw = new StreamWriter(strPathName))
-            using (JsonTextWriter writer = new JsonTextWriter(sw))
-            {
-                serializer.Serialize(writer, pluginStates);
+            //loop through plugins to get values and types
+            //dictionary to hold all of the plugin arrays
+            Dictionary<string, object> dictProjectState = new Dictionary<string, object>();
+           
+            foreach (KeyValuePair<string,IDictionary<string,object>> plugin in pluginStates)
+            { 
+                Dictionary<string, object> dictJsonRep = new Dictionary<string, object>(); //holds jsonRepresented values
+                Dictionary<string, object> dictObjRep = new Dictionary<string, object>(); //holds object types
+                object[] arrayDictHolder = new object[2];  //holds all of the dictionaries
+                string pluginKey = plugin.Key;
+                IDictionary<string, object> pluginValue = new Dictionary<string, object>(); 
+                pluginValue = plugin.Value;
+                
+                if (pluginValue == null) break;
+                foreach (KeyValuePair<string, object> element in pluginValue)
+                {
+                    string jsonRepresentation = JsonConvert.SerializeObject(element);
+                    object objType = element.Value.GetType().ToString();
+                    dictJsonRep.Add(element.Key, jsonRepresentation);
+                    dictObjRep.Add(element.Key, objType);
+                }
+                arrayDictHolder[0] = dictJsonRep;
+                arrayDictHolder[1] = dictObjRep;
+                dictProjectState.Add(pluginKey, arrayDictHolder);
             }
-            //string json = JsonConvert.SerializeObject(pluginStates);
-            //StreamWriter sw = new StreamWriter(strPathName); //this should contain the strPathName
-            ////JsonWriter writer = new JsonWriter(sw);
-            //sw.Write(json);
+            
+            ////JSON
+            JsonSerializer serializer = new JsonSerializer();
+            //serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; 
+            //serializer.TypeNameHandling = TypeNameHandling.All; 
+            //serializer.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
 
-            //sw.Close();            
+            using (StreamWriter sw = new StreamWriter(strPathName))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, dictProjectState);
+
+            }
         }
 
 
@@ -170,31 +187,49 @@ namespace VBProjectManager
                 //get a new project manager for this project
                 //_projMgr = null;
                 //_projMgr = VBProjectManager.GetProjectManager();
-
                 fullName = openFile.FileName;
                 //_projMgr.Open(fullName);
-                
             }
             
             //Load a project file from disk and then send it out to be unpacked.
-
-            IDictionary<string, IDictionary<string, object>> pluginStates = new Dictionary<string, IDictionary<string, object>>();
-            
-            //JSON
-            
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; //controls how objects are created and deserialized to during deserialization.will always recreate objects and collections before setting values to them during deserialization
-            serializer.TypeNameHandling = TypeNameHandling.All; //controls whether Json.NET includes .NET type names during serialization with a $type property and reads .NET type names from that property to determine what type to create during deserialization. 
-
+            Dictionary<string, object[]> pluginStates = new Dictionary<string, object[]>();
+                       
+            //JsonSerializer serializer = new JsonSerializer();
+            //serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; 
+            //serializer.TypeNameHandling = TypeNameHandling.All; 
             StreamReader sr = new StreamReader(fullName);
             JsonTextReader reader = new JsonTextReader(sr);
             string json = sr.ReadToEnd();
-            pluginStates = serializer.Deserialize<IDictionary<string, IDictionary<string, Object>>>(reader);
-            pluginStates = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, Object>>>(json);
+            pluginStates = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(json);
             sr.Close();
             reader.Close();
+            //Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(json);
+            object[] arrayDictHolder = new object[2];
+            foreach (var plugin in pluginStates)
+            {
+                string pluginKey = plugin.Key;
+                arrayDictHolder[0] = plugin.Value[0];
+                arrayDictHolder[1] = plugin.Value[1];
 
-            signaller.UnpackProjectState(pluginStates);
+            }
+            //loop through to get arrays and dictionaries for each plugin
+            Dictionary<string, object> dictProjectState = new Dictionary<string, object>();
+
+            //foreach (KeyValuePair<string, object> plugin in pluginStates)
+            //{
+            //      //holds 2 dictionaries per plugin
+            //    Dictionary<string, object> dictJsonRep = new Dictionary<string, object>(); //holds jsonRepresented values
+            //    Dictionary<string, object> dictObjRep = new Dictionary<string, object>(); //holds object types
+            //    string pluginKey = plugin.Key;
+                
+
+            //    //pull array 0,1
+            //    //pull dictJsonRep from array0
+            //    //pull dictObjRep from array1
+
+                
+            //}
+           // signaller.UnpackProjectState(pluginStates);
         }
 
 
