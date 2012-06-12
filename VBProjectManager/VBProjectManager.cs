@@ -148,8 +148,8 @@ namespace VBProjectManager
                 if (pluginValue == null) break;
                 foreach (KeyValuePair<string, object> element in pluginValue)
                 {
-                    string jsonRepresentation = JsonConvert.SerializeObject(element);
-                    object objType = element.Value.GetType().ToString();
+                    string jsonRepresentation = JsonConvert.SerializeObject(element.Value);
+                    object objType = element.Value.GetType();
                     dictJsonRep.Add(element.Key, jsonRepresentation);
                     dictObjRep.Add(element.Key, objType);
                 }
@@ -192,44 +192,50 @@ namespace VBProjectManager
             }
             
             //Load a project file from disk and then send it out to be unpacked.
-            Dictionary<string, object[]> pluginStates = new Dictionary<string, object[]>();
+            IDictionary<string, IDictionary<string, object>> pluginStates = new Dictionary<string, IDictionary<string, object>>();
                        
-            //JsonSerializer serializer = new JsonSerializer();
-            //serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; 
-            //serializer.TypeNameHandling = TypeNameHandling.All; 
             StreamReader sr = new StreamReader(fullName);
             JsonTextReader reader = new JsonTextReader(sr);
             string json = sr.ReadToEnd();
-            pluginStates = JsonConvert.DeserializeObject<Dictionary<string, object[]>>(json);
+            var dictProjectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
             sr.Close();
             reader.Close();
-            //Newtonsoft.Json.Linq.JObject o = Newtonsoft.Json.Linq.JObject.Parse(json);
-            object[] arrayDictHolder = new object[2];
-            foreach (var plugin in pluginStates)
+            
+            foreach (var projectStatePair in dictProjectState)
             {
-                string pluginKey = plugin.Key;
-                arrayDictHolder[0] = plugin.Value[0];
-                arrayDictHolder[1] = plugin.Value[1];
+                string pluginKey = projectStatePair.Key; //key in pluginStates dict
+                Dictionary<string, object> dictJsonRep = new Dictionary<string, object>();
+                Dictionary<string, object> dictObjRep = new Dictionary<string, object>();
+                Dictionary<string, object> pluginValues = new Dictionary<string, object>();
+                string stpluginValue = projectStatePair.Value.ToString();
+                
+                Newtonsoft.Json.Linq.JArray ja = (Newtonsoft.Json.Linq.JArray)JsonConvert.DeserializeObject(stpluginValue);
+                object[] arrayHolder = ja.ToObject<object[]>();
+                string strArray0 = arrayHolder[0].ToString();
+                string strArray1 = arrayHolder[1].ToString();
 
+                dictJsonRep = JsonConvert.DeserializeObject<Dictionary<string, object>>(strArray0);
+                dictObjRep = JsonConvert.DeserializeObject<Dictionary<string, object>>(strArray1);
+
+                foreach (var pair in dictJsonRep)
+                {
+                    string strVariableKey = pair.Key;
+                    
+                    //obj rep of this value
+                    //Type objType = dictObjRep[pair.Key].GetType();
+                    //Type objType = (Type)dictObjRep[pair.Key];
+                    object objType = dictObjRep[pair.Key];
+                    string jsonRep = (string)pair.Value;
+
+                    Type jsonType = Type.GetType(objType as string);
+                    object jsonReprValue = JsonConvert.DeserializeObject(jsonRep, jsonType);
+
+                    pluginValues.Add(strVariableKey, jsonReprValue);
+                }
+                pluginStates.Add(pluginKey, pluginValues);
             }
-            //loop through to get arrays and dictionaries for each plugin
-            Dictionary<string, object> dictProjectState = new Dictionary<string, object>();
-
-            //foreach (KeyValuePair<string, object> plugin in pluginStates)
-            //{
-            //      //holds 2 dictionaries per plugin
-            //    Dictionary<string, object> dictJsonRep = new Dictionary<string, object>(); //holds jsonRepresented values
-            //    Dictionary<string, object> dictObjRep = new Dictionary<string, object>(); //holds object types
-            //    string pluginKey = plugin.Key;
-                
-
-            //    //pull array 0,1
-            //    //pull dictJsonRep from array0
-            //    //pull dictObjRep from array1
-
-                
-            //}
-           // signaller.UnpackProjectState(pluginStates);
+            
+            signaller.UnpackProjectState(pluginStates);
         }
 
 
