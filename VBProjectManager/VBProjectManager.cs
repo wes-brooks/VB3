@@ -5,14 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-//using System.Xml;
-//using System.Xml.Serialization;
-//using System.Runtime.Serialization;
 using VBTools;
 using Newtonsoft.Json;
 
@@ -133,7 +131,6 @@ namespace VBProjectManager
             signaller.RaiseSaveRequest(pluginStates);
 
             //loop through plugins to get values and types
-            //dictionary to hold all of the plugin arrays
             Dictionary<string, object> dictProjectState = new Dictionary<string, object>();
            
             foreach (KeyValuePair<string,IDictionary<string,object>> plugin in pluginStates)
@@ -160,18 +157,13 @@ namespace VBProjectManager
             
             ////JSON
             JsonSerializer serializer = new JsonSerializer();
-            //serializer.ObjectCreationHandling = ObjectCreationHandling.Replace; 
-            //serializer.TypeNameHandling = TypeNameHandling.All; 
-            //serializer.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
 
             using (StreamWriter sw = new StreamWriter(strPathName))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 serializer.Serialize(writer, dictProjectState);
-
             }
         }
-
 
         public void Open(object sender, EventArgs e)
         {
@@ -220,16 +212,13 @@ namespace VBProjectManager
                 foreach (var pair in dictJsonRep)
                 {
                     string strVariableKey = pair.Key;
-                    
-                    //obj rep of this value
-                    //Type objType = dictObjRep[pair.Key].GetType();
-                    //Type objType = (Type)dictObjRep[pair.Key];
                     object objType = dictObjRep[pair.Key];
                     string jsonRep = (string)pair.Value;
 
                     Type jsonType = Type.GetType(objType as string);
-                    object jsonReprValue = JsonConvert.DeserializeObject(jsonRep, jsonType);
+                    object jsonReprValue = null;
 
+                    jsonReprValue = JsonConvert.DeserializeObject(jsonRep, jsonType);
                     pluginValues.Add(strVariableKey, jsonReprValue);
                 }
                 pluginStates.Add(pluginKey, pluginValues);

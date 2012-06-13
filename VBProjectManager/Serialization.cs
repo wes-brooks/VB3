@@ -62,8 +62,18 @@ namespace VBProjectManager
                 //Set this plugin to an empty state.
             }
         }
+        private void BroadcastListener(object sender, VBTools.SerializationEventArgs e)
+        {
+            //listen to others broadcast..receiving something
+            //e.PackedPluginState
+        }
 
-
+        public void Broadcast()
+        {
+            IDictionary<string, object> packedState = new Dictionary<string, object>();
+            packedState = PackState();
+            signaller.RaiseBroadcastRequest(packedState);
+        }
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictLocalProjMngr = new Dictionary<string, object>();

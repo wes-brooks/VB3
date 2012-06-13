@@ -5,6 +5,22 @@ using System.Text;
 
 namespace VBTools
 {
+    //Defines the event arguments used when broadcasting plugin
+    public class BroadCastEventArgs : EventArgs
+    {
+        private IDictionary<string, object> packedPlugin;
+
+        public BroadCastEventArgs(IDictionary<string, object> dictBroadcast)
+        {
+            this.packedPlugin = dictBroadcast;
+        }
+
+        public IDictionary<string, object> PackedPluginState
+        {
+            get { return packedPlugin; }
+        }
+    }
+
     //Defines the event arguments used when unpacking a project from its saved state
     public class UnpackEventArgs : EventArgs
     {
