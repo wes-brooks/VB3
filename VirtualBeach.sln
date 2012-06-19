@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualBeach", "VirtualBeach\VirtualBeach.csproj", "{55E1C2FA-AE9D-4972-83BF-D090A4DFBD1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBTools", "VBTools\VBTools.csproj", "{01086CD1-5D59-4C17-80D4-2E99E99DF62C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBProjectManager", "VBProjectManager\VBProjectManager.csproj", "{56A96878-2E76-41B4-858A-6AAB61F99CE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBDockManager", "VBDockManager\VBDockManager.csproj", "{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBCommon", "VBCommon\VBCommon.csproj", "{01086CD1-5D59-4C17-80D4-2E99E99DF62C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,16 +29,6 @@ Global
 		{55E1C2FA-AE9D-4972-83BF-D090A4DFBD1E}.Release|Mixed Platforms.Build.0 = Release|x86
 		{55E1C2FA-AE9D-4972-83BF-D090A4DFBD1E}.Release|x86.ActiveCfg = Release|x86
 		{55E1C2FA-AE9D-4972-83BF-D090A4DFBD1E}.Release|x86.Build.0 = Release|x86
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|x86.ActiveCfg = Release|Any CPU
 		{56A96878-2E76-41B4-858A-6AAB61F99CE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{56A96878-2E76-41B4-858A-6AAB61F99CE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56A96878-2E76-41B4-858A-6AAB61F99CE8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -59,6 +49,16 @@ Global
 		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}.Release|x86.ActiveCfg = Release|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{01086CD1-5D59-4C17-80D4-2E99E99DF62C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

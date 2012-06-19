@@ -29,25 +29,17 @@ namespace VBDockManager
         /// The lookup list of dock panels (for keeping track of existing panels)
         /// </summary>
         private Dictionary<string, DockContent> dockContents = new Dictionary<string, DockContent>();
-
         private Dictionary<DockContent, int> sortOrderLookup = new Dictionary<DockContent, int>();
-
-        /// <summary>The active panel key</summary>
         private string ActivePanelKey { get; set; }
 
-        #region Constructor
 
         /// <summary>
         /// Create the default docking manager
         /// </summary>
         public VBDockManager()
         {
-
         }
 
-        #endregion
-
-        #region IPartImportsSatisfiedNotification Members
 
         /// <summary>
         /// setup the parent form. This 
@@ -65,8 +57,6 @@ namespace VBDockManager
             MainDockPanel.ActiveDocumentChanged += new EventHandler(MainDockPanel_ActiveDocumentChanged);
         }
 
-        #endregion
-
 
         public void ResetLayout()
         {
@@ -79,7 +69,6 @@ namespace VBDockManager
                 mapContent.PanelPane = MainDockPanel.ActiveDocumentPane;
                 //mapContent.Show(MainDockPanel);
             }
-
 
             //first, check the list
             foreach (string key in dockContents.Keys)
@@ -189,6 +178,7 @@ namespace VBDockManager
             }
         }
 
+
         void content_FormClosed(object sender, FormClosedEventArgs e)
         {
             DockContent c = sender as DockContent;
@@ -198,6 +188,7 @@ namespace VBDockManager
             }
         }
 
+
         void content_FormClosing(object sender, FormClosingEventArgs e)
         {
             DockContent c = sender as DockContent;
@@ -206,6 +197,7 @@ namespace VBDockManager
                 OnPanelClosed(c.Tag.ToString());
             }
         }
+
 
         private Icon ImageToIcon(Image img)
         {
@@ -265,16 +257,14 @@ namespace VBDockManager
                 default:
                     throw new NotImplementedException();
             }
-
         }
 
+        
         public event EventHandler<DockablePanelEventArgs> ActivePanelChanged;
-
         public event EventHandler<DockablePanelEventArgs> PanelAdded;
-
         public event EventHandler<DockablePanelEventArgs> PanelRemoved;
-
         public event EventHandler<DockablePanelEventArgs> PanelClosed;
+
 
         public void SelectPanel(string key)
         {
@@ -283,6 +273,7 @@ namespace VBDockManager
                 dockContents[key].Activate();
             }
         }
+
 
         /// <summary>
         /// Raises the ActivePanelChanged event
@@ -301,6 +292,7 @@ namespace VBDockManager
             OnActivePanelChanged(activePanelKey);
         }
 
+
         protected void OnPanelClosed(string panelKey)
         {
             if (PanelClosed != null)
@@ -308,6 +300,7 @@ namespace VBDockManager
                 PanelClosed(this, new DockablePanelEventArgs(panelKey));
             }
         }
+
 
         protected void OnPanelAdded(string panelKey)
         {
@@ -317,6 +310,7 @@ namespace VBDockManager
             }
         }
 
+
         protected void OnPanelRemoved(string panelKey)
         {
             if (PanelRemoved != null)
@@ -325,6 +319,7 @@ namespace VBDockManager
             }
         }
 
+
         protected void OnActivePanelChanged(string newActivePanelKey)
         {
             if (ActivePanelChanged != null)
@@ -332,6 +327,7 @@ namespace VBDockManager
                 ActivePanelChanged(this, new DockablePanelEventArgs(newActivePanelKey));
             }
         }
+
 
         int ConvertSortOrderToIndex(DockContent content, int sortOrder)
         {

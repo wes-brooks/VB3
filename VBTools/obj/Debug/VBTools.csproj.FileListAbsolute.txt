@@ -1,8 +1,0 @@
-C:\VB3\VBTools\bin\Debug\VBTools.dll
-C:\VB3\VBTools\bin\Debug\VBTools.pdb
-C:\VB3\VBTools\obj\Debug\ResolveAssemblyReference.cache
-C:\VB3\VBTools\obj\Debug\VBTools.dll
-C:\VB3\VBTools\obj\Debug\VBTools.pdb
-C:\VB3\VBTools\obj\Debug\VBTools.frmChooseWorksheet.resources
-C:\VB3\VBTools\obj\Debug\GenerateResource.read.1.tlog
-C:\VB3\VBTools\obj\Debug\GenerateResource.write.1.tlog

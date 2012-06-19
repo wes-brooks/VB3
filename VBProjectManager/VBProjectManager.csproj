@@ -105,16 +105,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VBTools\VBTools.csproj">
-      <Project>{01086CD1-5D59-4C17-80D4-2E99E99DF62C}</Project>
-      <Name>VBTools</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VBCommon\VBCommon.csproj">
+      <Project>{01086CD1-5D59-4C17-80D4-2E99E99DF62C}</Project>
+      <Name>VBCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

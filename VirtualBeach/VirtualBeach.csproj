@@ -118,6 +118,10 @@
     <None Include="Resources\map_16x16.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VBCommon\VBCommon.csproj">
+      <Project>{01086CD1-5D59-4C17-80D4-2E99E99DF62C}</Project>
+      <Name>VBCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VBDockManager\VBDockManager.csproj">
       <Project>{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}</Project>
       <Name>VBDockManager</Name>
@@ -125,10 +129,6 @@
     <ProjectReference Include="..\VBProjectManager\VBProjectManager.csproj">
       <Project>{56A96878-2E76-41B4-858A-6AAB61F99CE8}</Project>
       <Name>VBProjectManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VBTools\VBTools.csproj">
-      <Project>{01086CD1-5D59-4C17-80D4-2E99E99DF62C}</Project>
-      <Name>VBTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

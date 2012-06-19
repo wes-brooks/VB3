@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.XPath;
 using System.Windows.Forms;
-using VBTools;
+using VBCommon;
 
 
 namespace VBProjectManager
@@ -43,15 +43,15 @@ namespace VBProjectManager
             XmlSerializer serializerDict = new XmlSerializer();
             serializerDict.Serialize(dictPackedStates, projectFile);
         }*/
-        
 
-        private void ProjectSavedListener(object sender, VBTools.SerializationEventArgs e)
+
+        private void ProjectSavedListener(object sender, VBCommon.SerializationEventArgs e)
         {
             e.PackedPluginStates.Add(strPluginKey, PackState());
         }
 
 
-        private void ProjectOpenedListener(object sender, VBTools.SerializationEventArgs e)
+        private void ProjectOpenedListener(object sender, VBCommon.SerializationEventArgs e)
         {
             if (e.PackedPluginStates.ContainsKey(strPluginKey))
             {
@@ -62,11 +62,14 @@ namespace VBProjectManager
                 //Set this plugin to an empty state.
             }
         }
-        private void BroadcastListener(object sender, VBTools.SerializationEventArgs e)
+
+
+        private void BroadcastListener(object sender, VBCommon.SerializationEventArgs e)
         {
             //listen to others broadcast..receiving something
             //e.PackedPluginState
         }
+
 
         public void Broadcast()
         {
@@ -74,6 +77,8 @@ namespace VBProjectManager
             packedState = PackState();
             signaller.RaiseBroadcastRequest(packedState);
         }
+
+
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictLocalProjMngr = new Dictionary<string, object>();
@@ -82,15 +87,13 @@ namespace VBProjectManager
             
             //another dictionary holding key/values of order of plugins to reopen
             //dictLocalProjMngr.Add("TabStates", TabStates); //what order (top/bottom to save plugins in
-            
-            
+                        
             return dictLocalProjMngr;
         }
 
-
+        
         public void UnpackState(IDictionary<string, object> dictPackedState)
-        {
-           
+        {           
             //Dictionary<string, object> dictLocalProjectMngr = new Dictionary<string, object>();
             //dictLocalProjectMngr = (Dictionary<string, object>)objPackedState;
 

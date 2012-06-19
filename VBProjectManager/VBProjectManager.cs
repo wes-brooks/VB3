@@ -11,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using VBTools;
+using VBCommon;
 using Newtonsoft.Json;
 
 
@@ -23,7 +23,7 @@ namespace VBProjectManager
         private Dictionary<string, Boolean> _tabStates;
         private string strPathName;
         private string projectName;
-        private VBTools.Signaller signaller = new VBTools.Signaller();
+        private VBCommon.Signaller signaller = new VBCommon.Signaller();
         private VBLogger logger;
         private string strLogFile;
         private string strPluginKey = "Project Manager";
@@ -35,7 +35,7 @@ namespace VBProjectManager
             VBLogger.SetLogFileName(strLogFile);
             logger = VBLogger.GetLogger();
 
-            signaller = new VBTools.Signaller();
+            signaller = new VBCommon.Signaller();
         }
 
 
@@ -66,7 +66,7 @@ namespace VBProjectManager
             App.HeaderControl.Add(openButton);
 
             //get plugin type for each plugin
-            List<short> allPluginTypes = new List<short>();
+            List<Globals.PluginType> allPluginTypes = new List<Globals.PluginType>();
             
             foreach(DotSpatial.Extensions.IExtension ext in App.Extensions)
             {
@@ -75,7 +75,7 @@ namespace VBProjectManager
                     IPlugin plugType = (IPlugin)ext;
 
                     //store pluginType
-                    short PType = plugType.PluginType;
+                    Globals.PluginType PType = plugType.PluginType;
                     allPluginTypes.Add(PType);
                 }
             }
@@ -222,8 +222,7 @@ namespace VBProjectManager
                     pluginValues.Add(strVariableKey, jsonReprValue);
                 }
                 pluginStates.Add(pluginKey, pluginValues);
-            }
-            
+            }            
             signaller.UnpackProjectState(pluginStates);
         }
 
@@ -247,14 +246,16 @@ namespace VBProjectManager
             set { strPathName = value; }
         }
 
+
         public string ProjectName
         {
             get { return projectName; }
             set { projectName = value; }
         }
 
+
         //We export this property so that other Plugins can have access to the signaller.
-        public VBTools.Signaller Signaller
+        public VBCommon.Signaller Signaller
         {
             get { return this.signaller; }
         }
@@ -262,7 +263,7 @@ namespace VBProjectManager
 
         //We export this method so that other Plugins can have access to the signaller.
         [System.ComponentModel.Composition.Export("Signalling.GetSignaller")]
-        public VBTools.Signaller ProvideAccessToSignaller()
+        public VBCommon.Signaller ProvideAccessToSignaller()
         {
             return this.Signaller;
         }
@@ -270,7 +271,7 @@ namespace VBProjectManager
 
         //This function imports the signaller from the VBProjectManager
         [System.ComponentModel.Composition.Import("Signalling.GetSignaller", AllowDefault = true)]
-        public Func<VBTools.Signaller> GetSignaller
+        public Func<VBCommon.Signaller> GetSignaller
         {
             get;
             set;
@@ -281,9 +282,9 @@ namespace VBProjectManager
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            signaller.MessageReceived += new VBTools.Signaller.MessageHandler<MessageArgs>(MessageReceived);
-            signaller.ProjectSaved += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectSavedListener);
-            signaller.ProjectOpened += new VBTools.Signaller.SerializationEventHandler<VBTools.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
+            signaller.MessageReceived += new VBCommon.Signaller.MessageHandler<MessageArgs>(MessageReceived);
+            signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectSavedListener);
+            signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
         }
     }
     
