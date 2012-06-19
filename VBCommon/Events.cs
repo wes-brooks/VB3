@@ -8,16 +8,23 @@ namespace VBCommon
     //Defines the event arguments used when broadcasting plugin
     public class BroadCastEventArgs : EventArgs
     {
+        private object plugin;
         private IDictionary<string, object> packedPlugin;
-
-        public BroadCastEventArgs(IDictionary<string, object> dictBroadcast)
+        
+        public BroadCastEventArgs(object sender, IDictionary<string, object> dictBroadcast)
         {
+            this.plugin = sender;
             this.packedPlugin = dictBroadcast;
         }
 
         public IDictionary<string, object> PackedPluginState
         {
             get { return packedPlugin; }
+        }
+
+        public object Sender
+        {
+            get { return plugin; }
         }
     }
 

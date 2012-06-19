@@ -71,11 +71,11 @@ namespace VBProjectManager
         }
 
 
-        public void Broadcast()
+        public void Broadcast(IPlugin _pluginType, IDictionary<string, object> packedState)
         {
-            IDictionary<string, object> packedState = new Dictionary<string, object>();
-            packedState = PackState();
-            signaller.RaiseBroadcastRequest(packedState);
+            //IDictionary<string, object> packedState = new Dictionary<string, object>();
+            //packedState = PackState();
+            signaller.RaiseBroadcastRequest(_pluginType, packedState);
         }
 
 

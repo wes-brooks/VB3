@@ -31,12 +31,12 @@ namespace VBCommon
         }
 
         //tell plugins to pack their states into a dictionary to pass to other plugins
-        public void RaiseBroadcastRequest(IDictionary<string, object> dictPackedPlugin)
+        public void RaiseBroadcastRequest(object sender, IDictionary<string, object> dictPackedPlugin)
         {
             if (BroadcastState != null) //has some method been told to handle this event?
             {
-                BroadCastEventArgs e = new BroadCastEventArgs(dictPackedPlugin);
-                BroadcastState(this, e);
+                BroadCastEventArgs e = new BroadCastEventArgs(sender, dictPackedPlugin);
+                BroadcastState(sender, e);
             }
         }
 

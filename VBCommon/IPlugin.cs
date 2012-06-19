@@ -10,6 +10,6 @@ namespace VBCommon
         Globals.PluginType PluginType {get;}
         string PanelKey { get; }
         void MakeActive();
-        void Broadcast(IDictionary<string,object> packedState);
+        void Broadcast(object sender, IDictionary<string,object> packedState);
     }
 }
