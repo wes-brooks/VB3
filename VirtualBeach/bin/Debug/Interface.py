@@ -67,8 +67,9 @@ class BeachInterface(object):
         return Control.SpecificityChart(validation_results)
     
 
-    def GetPossibleSpecificities(self, model, regulatory_threshold):   
+    def GetPossibleSpecificities(self, model):   
         '''Find out what values specificity could take if we count out one non-exceedance at a time.'''
+        regulatory_threshold = model.regulatory_threshold
         thresholds = np.sort(model.array_fitted[np.where(model.array_actual < regulatory_threshold)[0]])
         specificities = [x/float(thresholds.shape[0]) for x in range(thresholds.shape[0])]
         return [[float(x) for x in thresholds], list(specificities)]
