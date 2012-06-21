@@ -146,9 +146,17 @@ namespace VBProjectManager
                 foreach (KeyValuePair<string, object> element in pluginValue)
                 {
                     string jsonRepresentation = JsonConvert.SerializeObject(element.Value);
-                    object objType = element.Value.GetType();
-                    dictJsonRep.Add(element.Key, jsonRepresentation);
-                    dictObjRep.Add(element.Key, objType);
+                    if (element.Value != null)
+                    {
+                        object objType = element.Value.GetType();
+                        dictJsonRep.Add(element.Key, jsonRepresentation);
+                        dictObjRep.Add(element.Key, objType);
+                    }
+                    else
+                    {
+                        dictJsonRep.Add(element.Key, "null");
+                        dictObjRep.Add(element.Key, "null");
+                    }
                 }
                 arrayDictHolder[0] = dictJsonRep;
                 arrayDictHolder[1] = dictObjRep;
