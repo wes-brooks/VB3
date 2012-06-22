@@ -62,6 +62,7 @@ namespace VirtualBeach
             this.Name = "ContainerForm";
             this.Text = "Form1";
             this.ResumeLayout(false);
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 
         }
 
