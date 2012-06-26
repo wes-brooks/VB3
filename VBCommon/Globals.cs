@@ -42,14 +42,6 @@ namespace VBCommon
             generalexp 
         }
 
-        public enum DependentVariableTransforms
-        { 
-            none, 
-            Log10, 
-            Ln, 
-            Power 
-        }
-
         public enum Operations
         {
             SUM,
