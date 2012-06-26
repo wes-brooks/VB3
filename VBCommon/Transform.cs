@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace VBCommon
 {
@@ -34,12 +35,14 @@ namespace VBCommon
             this._dblExponent = exponent;
         }
 
+        [JsonProperty]
         public DependentVariableTransforms Type
         {
             get { return _transformType; }
             set { _transformType = value; }
         }
 
+        [JsonProperty]
         public double Exponent
         {
             get { return _dblExponent; }
