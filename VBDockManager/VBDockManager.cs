@@ -233,6 +233,10 @@ namespace VBDockManager
             if (dockContents.ContainsKey(key))
             {
                 dockContents[key].Hide();
+                //Remove(key);
+                
+                
+                
             }
         }
 

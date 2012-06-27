@@ -40,6 +40,7 @@ namespace VBProjectManager
 
         public override void Activate()
         {                       
+
             //Add an item to the application ("File") menu.
             var aboutButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             aboutButton.GroupCaption = HeaderControl.ApplicationMenuKey;
@@ -64,6 +65,15 @@ namespace VBProjectManager
             openButton.ToolTipText = "Open a saved project.";
             App.HeaderControl.Add(openButton);
 
+            //test hide panels
+            var btnRb = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Test Hide", rb_Click);
+            btnRb.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnRb.LargeImage = Resources.open_32x32;
+            btnRb.SmallImage = Resources.open_16x16;
+            btnRb.ToolTipText = "test hide panel";
+            App.HeaderControl.Add(btnRb);
+            
+            
             //get plugin type for each plugin
             List<Globals.PluginType> allPluginTypes = new List<Globals.PluginType>();
             
@@ -78,20 +88,24 @@ namespace VBProjectManager
                     allPluginTypes.Add(PType);
                 }
             }
+            
 
             //if PType is smallest (datasheet/map), set as activated when open
             int pos = allPluginTypes.IndexOf(allPluginTypes.Min());
             DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
             IPlugin ex = (IPlugin)extension;
             ex.MakeActive();
+            
 
             base.Activate();
         }
 
-
+       
         public override void Deactivate()
         {
             App.HeaderControl.RemoveAll();
+            
+            
             base.Deactivate();
         }
 
@@ -103,7 +117,24 @@ namespace VBProjectManager
         }
 
 
-        
+        public void rb_Click(object sender, EventArgs e)
+        {
+            App.HeaderControl.RemoveAll();
+            //((VBDockManager.VBDockManager)App.DockManager).HidePanel("PLSPanel");
+            //foreach (Extension ext in App.Extensions)
+            //{
+            //    if (ext is IPlugin)
+            //    {
+            //        IPlugin plugType = (IPlugin)ext;
+            //        //store pluginType
+            //        Globals.PluginType PType = plugType.PluginType;
+            //        if (PType != Globals.PluginType.Datasheet)
+            //        {
+            //            //((VBDockManager.VBDockManager)App.DockManager).HidePanel((IPlugin);
+            //        }
+            //    }
+            //}
+        }
 
 
         public void AboutVirtualBeach(object sender, EventArgs e)

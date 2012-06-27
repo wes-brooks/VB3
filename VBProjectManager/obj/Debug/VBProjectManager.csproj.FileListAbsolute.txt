@@ -32,3 +32,7 @@ C:\VB3\VBProjectManager\bin\Debug\Newtonsoft.Json.dll
 C:\VB3\VBProjectManager\bin\Debug\Newtonsoft.Json.xml
 C:\VB3\VBProjectManager\bin\Debug\VBCommon.dll
 C:\VB3\VBProjectManager\bin\Debug\VBCommon.pdb
+C:\VB3\VBProjectManager\bin\Debug\Newtonsoft.Json.pdb
+C:\VB3\VBProjectManager\bin\Debug\VBDockManager.dll
+C:\VB3\VBProjectManager\bin\Debug\WeifenLuo.WinFormsUI.Docking.dll
+C:\VB3\VBProjectManager\bin\Debug\VBDockManager.pdb
