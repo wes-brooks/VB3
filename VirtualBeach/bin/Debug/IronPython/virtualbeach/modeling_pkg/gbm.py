@@ -57,6 +57,8 @@ class Model(object):
         self.specificity = model_struct['specificity']
         self.threshold = model_struct['threshold']
         self.regulatory_threshold = model_struct['regulatory_threshold']
+        print self.GetInfluence()
+        
 
     def Create(self, **args):
         '''Create a new gbm model object'''
@@ -158,6 +160,7 @@ class Model(object):
         
         self.GetFitted()
         self.Threshold(self.specificity)
+        print self.GetInfluence()
 
 
     def AssignWeights(self, method=0):
@@ -239,9 +242,9 @@ class Model(object):
         try: container = args['extract_from']
         except KeyError: container = self.model
         
-        #use R's coef function to extract the model coefficients
-        if model_part == 'coef':
-            part = r.Call( function='coef', object=self.model, intercept=True )
+        #Get the variable names
+        if model_part == 'names':
+            part = self.model['var.names']
         
         #otherwise, go to the data structure itself
         else:
@@ -309,6 +312,34 @@ class Model(object):
         except ZeroDivisionError:
             self.threshold = 0        
             self.specificity = 1
+            
+            
+    def GetInfluence(self):        
+        #Get the covariate names
+        names = self.data_dictionary.keys()
+        names.remove(self.target)
+
+        #Now get the model coefficients from R.
+        try: 
+            summaryobj = r.Call(function='summary.gbm', object=self.model, plotit=False).AsList()
+            variables = r.Call(function='levels', x=summaryobj[0].AsVector()).AsVector().AsCharacter()
+            variables = np.array(variables)
+            variables = np.array([str(item) for item in variables])
+            index = np.array(summaryobj[0].AsVector(), dtype='int') - 1
+            rawinfluence = np.array(summaryobj[1].AsVector()).squeeze()
+        except: pass
+        
+        #Get the standard deviations (from the data_dictionary) and package the influence in a dictionary.
+        variables = variables[index]
+        influence = list()
+        
+        for name in names:
+            loc = np.where(variables==name)[0][0]
+            influence.append(rawinfluence[loc])
+ 
+        influence = [float(x/sum(influence)) for x in influence]
+                
+        return [names, influence]
         
         
     def Plot(self, **plotargs ):
