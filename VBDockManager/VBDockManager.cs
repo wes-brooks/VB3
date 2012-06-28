@@ -130,6 +130,7 @@ namespace VBDockManager
             {
                 MainDockPanel.DocumentTabStripLocation = DocumentTabStripLocation.Bottom;
                 MainDockPanel.DocumentStyle = DocumentStyle.DockingWindow;
+                
             }
 
             DockContent content = new DockContent();
@@ -233,13 +234,16 @@ namespace VBDockManager
             if (dockContents.ContainsKey(key))
             {
                 dockContents[key].Hide();
-                //Remove(key);
-                
-                
-                
             }
         }
 
+        public void ShowPanel(string key)
+        {
+            if (dockContents.ContainsKey(key))
+            {
+                dockContents[key].Show();
+            }
+        }
 
         public static WeifenLuo.WinFormsUI.Docking.DockState ConvertToDockState(System.Windows.Forms.DockStyle dockStyle)
         {

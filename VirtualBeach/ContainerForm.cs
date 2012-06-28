@@ -27,7 +27,6 @@ namespace VirtualBeach
             //Set the main application window to be the "Shell" 
             Shell = this;
             appManager.LoadExtensions();
-            appManager.HeaderControl.RemoveAll();
         }
 
         public AppManager appManager { get; set; } 
