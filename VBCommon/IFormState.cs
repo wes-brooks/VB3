@@ -14,5 +14,8 @@ namespace VBCommon
         //void ProjectOpenedListener(object sender, UnpackEventArgs e);
 
         string Name {get;}
+        
+        //void AddPluginTypeForSavingOpening(Globals.PluginType _type);
+        //void RemovePluginTypeForSavingOpening(Globals.PluginType _type);
     }
 }

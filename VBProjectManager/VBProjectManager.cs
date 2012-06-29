@@ -27,7 +27,8 @@ namespace VBProjectManager
         private string strLogFile;
         private string strPluginKey = "Project Manager";
         public static string VB2projectsPath = null;
-
+        public List<Globals.PluginType> shownPlugins = new List<Globals.PluginType>();
+        
         public VBProjectManager()
         {
             strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach.log");
@@ -40,7 +41,6 @@ namespace VBProjectManager
 
         public override void Activate()
         {                       
-
             //Add an item to the application ("File") menu.
             var aboutButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             aboutButton.GroupCaption = HeaderControl.ApplicationMenuKey;
@@ -76,31 +76,72 @@ namespace VBProjectManager
             
             //get plugin type for each plugin
             List<Globals.PluginType> allPluginTypes = new List<Globals.PluginType>();
-            
-            foreach(DotSpatial.Extensions.IExtension ext in App.Extensions)
+            Globals.PluginType PType;
+
+            foreach(DotSpatial.Extensions.IExtension ext in App.Extensions)  
             {
-                if (ext is IPlugin)
+                if (ext is IPlugin)    
                 {
-                    IPlugin plugType = (IPlugin)ext;
+                    IPlugin plugType = (IPlugin)ext;  
 
                     //store pluginType
-                    Globals.PluginType PType = plugType.PluginType;
-                    allPluginTypes.Add(PType);
+                    PType = plugType.PluginType;  
+                    allPluginTypes.Add(PType); 
                 }
             }
             
-
             //if PType is smallest (datasheet/map), set as activated when open
             int pos = allPluginTypes.IndexOf(allPluginTypes.Min());
             DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
             IPlugin ex = (IPlugin)extension;
             ex.MakeActive();
             
+            //initialize only Datasheet is shown, all others are hidden
+            foreach(DotSpatial.Extensions.IExtension x in App.Extensions)
+           {
+                if (x is IPlugin)
+                {
+                    //add datasheet to the list of shownPlugins (used for save/open
+                    if (!shownPlugins.Contains(Globals.PluginType.Datasheet))
+                        shownPlugins.Add(Globals.PluginType.Datasheet); 
 
+                    //hide the rest
+                    IPlugin pt = (IPlugin)x;
+                    if (pt.PluginType.ToString() != "Datasheet")
+                        pt.Hide();
+                }
+            }
+                    
             base.Activate();
         }
 
-       
+        public void Show(Globals.PluginType _type)
+        {
+            foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
+                if (ex is IPlugin)
+                {
+                    IPlugin plugin = (IPlugin)ex;
+                    if (plugin.PluginType.ToString() == _type.ToString())
+                        plugin.Show();
+                    else
+                        plugin.Hide();
+                
+                }
+        }
+
+
+        public void AddPluginTypeForSavingOpening(Globals.PluginType _type)
+        {
+            if (!shownPlugins.Contains(_type))
+                shownPlugins.Add(_type);
+        }
+
+        public void RemovePluginTypeForSavingOpening(Globals.PluginType _type)
+        {
+            if (!shownPlugins.Contains(_type))
+                shownPlugins.Remove(_type);
+        }
+
         public override void Deactivate()
         {
             App.HeaderControl.RemoveAll();
@@ -116,6 +157,14 @@ namespace VBProjectManager
             System.Diagnostics.Debug.WriteLine(args.Message);
         }
 
+        private void PluginMessageReceived(string sender, PluginArgs e)
+        {
+            if (sender == "Show")
+                AddPluginTypeForSavingOpening(e.PType);
+            if (sender == "Hide")
+                RemovePluginTypeForSavingOpening(e.PType);
+
+        }
 
         public void rb_Click(object sender, EventArgs e)
         {
@@ -193,6 +242,8 @@ namespace VBProjectManager
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
             signaller.MessageReceived += new VBCommon.Signaller.MessageHandler<MessageArgs>(MessageReceived);
+            signaller.PluginMessageReceived += new VBCommon.Signaller.PluginMessageHandler<VBCommon.PluginArgs>(PluginMessageReceived);
+
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
         }

@@ -266,14 +266,12 @@ namespace VBDockManager
                     throw new NotImplementedException();
             }
         }
-
-        
+                
         public event EventHandler<DockablePanelEventArgs> ActivePanelChanged;
         public event EventHandler<DockablePanelEventArgs> PanelAdded;
         public event EventHandler<DockablePanelEventArgs> PanelRemoved;
         public event EventHandler<DockablePanelEventArgs> PanelClosed;
-
-
+        
         public void SelectPanel(string key)
         {
             if (dockContents.ContainsKey(key))
