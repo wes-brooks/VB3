@@ -162,19 +162,7 @@ namespace VBProjectManager
         }
 
 
-        private void BroadcastListener(object sender, VBCommon.SerializationEventArgs e)
-        {
-            //listen to others broadcast..receiving something
-            //e.PackedPluginState
-        }
-
-
-        public void Broadcast(IPlugin _pluginType, IDictionary<string, object> packedState)
-        {
-            //IDictionary<string, object> packedState = new Dictionary<string, object>();
-            //packedState = PackState();
-            signaller.RaiseBroadcastRequest(_pluginType, packedState);
-        }
+       
 
 
         public IDictionary<string, object> PackState()

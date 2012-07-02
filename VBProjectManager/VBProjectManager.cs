@@ -17,18 +17,20 @@ using VBCommon;
 namespace VBProjectManager
 {
 
-    public partial class VBProjectManager : Extension, IFormState, IPartImportsSatisfiedNotification
+    public partial class VBProjectManager : Extension, IFormState, IPartImportsSatisfiedNotification, IPlugin
     {        
         private Dictionary<string, Boolean> _tabStates;
         private string strPathName;
         private string projectName;
         private VBCommon.Signaller signaller = new VBCommon.Signaller();
+        private Globals.PluginType _pluginType = VBCommon.Globals.PluginType.ProjectManager;
         private VBLogger logger;
         private string strLogFile;
         private string strPluginKey = "Project Manager";
         public static string VB2projectsPath = null;
         public List<Globals.PluginType> shownPlugins = new List<Globals.PluginType>();
-        
+        private Boolean boolComplete = false;
+
         public VBProjectManager()
         {
             strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach.log");
@@ -103,11 +105,11 @@ namespace VBProjectManager
                 {
                     //add datasheet to the list of shownPlugins (used for save/open
                     if (!shownPlugins.Contains(Globals.PluginType.Datasheet))
-                        shownPlugins.Add(Globals.PluginType.Datasheet); 
+                        shownPlugins.Add(Globals.PluginType.Datasheet); //add as (the actual plugin) or (pluginType)
 
                     //hide the rest
                     IPlugin pt = (IPlugin)x;
-                    if (pt.PluginType.ToString() != "Datasheet")
+                    if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
                         pt.Hide();
                 }
             }
@@ -115,31 +117,25 @@ namespace VBProjectManager
             base.Activate();
         }
 
-        public void Show(Globals.PluginType _type)
+        public void MakeActive()
         {
-            foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
-                if (ex is IPlugin)
-                {
-                    IPlugin plugin = (IPlugin)ex;
-                    if (plugin.PluginType.ToString() == _type.ToString())
-                        plugin.Show();
-                    else
-                        plugin.Hide();
-                
-                }
+            //App.DockManager.SelectPanel(strPanelKey);
+            //App.HeaderControl.SelectRoot(strPanelKey);
         }
 
-
-        public void AddPluginTypeForSavingOpening(Globals.PluginType _type)
+        public void Show()
         {
-            if (!shownPlugins.Contains(_type))
-                shownPlugins.Add(_type);
+            
         }
 
-        public void RemovePluginTypeForSavingOpening(Globals.PluginType _type)
+        public void Hide()
         {
-            if (!shownPlugins.Contains(_type))
-                shownPlugins.Remove(_type);
+            
+        }
+
+        public void AddRibbon(string sender)
+        {
+
         }
 
         public override void Deactivate()
@@ -157,32 +153,9 @@ namespace VBProjectManager
             System.Diagnostics.Debug.WriteLine(args.Message);
         }
 
-        private void PluginMessageReceived(string sender, PluginArgs e)
-        {
-            if (sender == "Show")
-                AddPluginTypeForSavingOpening(e.PType);
-            if (sender == "Hide")
-                RemovePluginTypeForSavingOpening(e.PType);
-
-        }
-
         public void rb_Click(object sender, EventArgs e)
         {
-            App.HeaderControl.RemoveAll();
-            //((VBDockManager.VBDockManager)App.DockManager).HidePanel("PLSPanel");
-            //foreach (Extension ext in App.Extensions)
-            //{
-            //    if (ext is IPlugin)
-            //    {
-            //        IPlugin plugType = (IPlugin)ext;
-            //        //store pluginType
-            //        Globals.PluginType PType = plugType.PluginType;
-            //        if (PType != Globals.PluginType.Datasheet)
-            //        {
-            //            //((VBDockManager.VBDockManager)App.DockManager).HidePanel((IPlugin);
-            //        }
-            //    }
-            //}
+           
         }
 
 
@@ -212,6 +185,20 @@ namespace VBProjectManager
             set { projectName = value; }
         }
 
+        public Boolean Complete
+        {
+            get { return boolComplete;}
+        }
+
+        public string PanelKey
+        {
+            get { return strPluginKey; }
+        }
+
+        public Globals.PluginType PluginType
+        {
+            get { return _pluginType; }
+        }
 
         //We export this property so that other Plugins can have access to the signaller.
         public VBCommon.Signaller Signaller
@@ -241,12 +228,47 @@ namespace VBProjectManager
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
+            
             signaller.MessageReceived += new VBCommon.Signaller.MessageHandler<MessageArgs>(MessageReceived);
-            signaller.PluginMessageReceived += new VBCommon.Signaller.PluginMessageHandler<VBCommon.PluginArgs>(PluginMessageReceived);
-
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
+            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.BroadCastEventArgs>(BroadcastStateListener);
         }
+
+        private void BroadcastStateListener(object sender, VBCommon.BroadCastEventArgs e)
+        {
+            //listen to others broadcast..receiving something
+            string pluginType = (((IPlugin)sender).PluginType).ToString();
+
+            if (pluginType == "Datasheet")
+            {
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //to c if modeling
+                {
+                    IPlugin plugin = (IPlugin)ex;
+                    if (plugin.PluginType.ToString() == "Modeling")
+                        if (((IPlugin)sender).Complete)  
+                            plugin.Show();
+                }
+            } 
+            else if (pluginType == "Modeling")
+            {
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //to c if prediction
+                {
+                    IPlugin plugin = (IPlugin)ex;
+                    if (plugin.PluginType.ToString() == "Prediction")
+                        if (((IPlugin)sender).Complete)  
+                            plugin.Show();
+                }
+            }                
+        }
+
+
+        public void Broadcast()
+        {
+            IDictionary<string, object> packedState = PackState();
+            signaller.RaiseBroadcastRequest(_pluginType, packedState);
+        }
+
     }
     
     

@@ -11,8 +11,9 @@ namespace VBCommon
         string PanelKey { get; }
         void MakeActive();
         void Broadcast();
+        Boolean Complete { get; }
         void AddRibbon(string sender);
-        void AddPanel();
+        //void AddPanel();
         void Hide();
         void Show();
     }

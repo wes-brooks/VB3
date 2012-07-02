@@ -15,7 +15,8 @@ namespace VBCommon
             Map = 0,
             Datasheet = 1,
             Modeling = 2,
-            Prediction = 3
+            Prediction = 3,
+            ProjectManager = 4
         }
         
         public enum Transforms
