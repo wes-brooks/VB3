@@ -87,25 +87,25 @@ namespace VBCommon
         }
     }
 
-    public class PluginArgs : EventArgs
-    {
-        private Globals.PluginType pType;
-        private string sndr;
+    //public class PluginArgs : EventArgs
+    //{
+    //    private Globals.PluginType pType;
+    //    private string sndr;
 
-        public PluginArgs(string sender, Globals.PluginType plugType)
-        {
-            this.sndr = sender;
-            this.pType = plugType;
-        }
+    //    public PluginArgs(string sender, Globals.PluginType plugType)
+    //    {
+    //        this.sndr = sender;
+    //        this.pType = plugType;
+    //    }
 
-        public string Sender
-        {
-            get { return sndr; }
-        }
+    //    public string Sender
+    //    {
+    //        get { return sndr; }
+    //    }
 
-        public Globals.PluginType PType
-        {
-            get { return pType; }
-        }
-    }
+    //    public Globals.PluginType PType
+    //    {
+    //        get { return pType; }
+    //    }
+    //}
 }

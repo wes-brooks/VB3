@@ -29,8 +29,8 @@ namespace VBProjectManager
                 saveFile.FilterIndex = 1;
                 saveFile.RestoreDirectory = true;
                 DialogResult dr = saveFile.ShowDialog();
-                //if (dr != DialogResult.OK)
-                //{ return; }
+                if (dr != DialogResult.OK)
+                { return; }
 
                 strPathName = saveFile.FileName;
                 FileInfo fi = new FileInfo(strPathName);
@@ -101,7 +101,7 @@ namespace VBProjectManager
 
             if (openFile.ShowDialog() == DialogResult.OK)
                 strFileName = openFile.FileName;
-
+            else return;
             //Load a project file from disk and then send it out to be unpacked.
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
 

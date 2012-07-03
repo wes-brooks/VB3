@@ -21,7 +21,7 @@ namespace VBCommon
         public event MessageHandler<MessageArgs> MessageReceived;
 
         public delegate void PluginMessageHandler<TArgs>(string sender, TArgs args) where TArgs : EventArgs;
-        public event PluginMessageHandler<PluginArgs> PluginMessageReceived;
+        //public event PluginMessageHandler<PluginArgs> PluginMessageReceived;
 
         //event for broadcasting
         public delegate void BroadCastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -83,13 +83,13 @@ namespace VBCommon
                 MessageReceived(this, args);
             }
         }
-        public void HandlePluginMessage(string sender, Globals.PluginType pType)
-        {
-            if (PluginMessageReceived != null)
-            {
-                PluginArgs e = new PluginArgs(sender, pType);
-                PluginMessageReceived(sender, e);
-            }
-        }
+        //public void HandlePluginMessage(string sender, Globals.PluginType pType)
+        //{
+        //    if (PluginMessageReceived != null)
+        //    {
+        //        PluginArgs e = new PluginArgs(sender, pType);
+        //        PluginMessageReceived(sender, e);
+        //    }
+        //}
     }
 }
