@@ -30,6 +30,7 @@ namespace VBProjectManager
         public static string VB2projectsPath = null;
         public List<Globals.PluginType> shownPlugins = new List<Globals.PluginType>();
         private Boolean boolComplete = false;
+        private Boolean boolVisible = false;
 
         public VBProjectManager()
         {
@@ -190,6 +191,11 @@ namespace VBProjectManager
             get { return boolComplete;}
         }
 
+        public Boolean VisiblePlugin
+        {
+            get { return boolVisible; }
+        }
+
         public string PanelKey
         {
             get { return strPluginKey; }
@@ -240,23 +246,33 @@ namespace VBProjectManager
             //listen to others broadcast..receiving something
             string pluginType = (((IPlugin)sender).PluginType).ToString();
 
-            if (pluginType == "Datasheet")
+            if (pluginType == "Datasheet") //if datasheet is broadcasting itself
             {
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //to c if modeling
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //find modeling
                 {
                     IPlugin plugin = (IPlugin)ex;
                     if (plugin.PluginType.ToString() == "Modeling")
-                        if (((IPlugin)sender).Complete)  
-                            plugin.Show();
+                        //already visible, just update not show again
+                        if (plugin.VisiblePlugin)
+                            return;
+                        //if datasheet is complete & not visible, show modeling
+                        else
+                            if (((IPlugin)sender).Complete)
+                                plugin.Show();
                 }
             } 
-            else if (pluginType == "Modeling")
+            else if (pluginType == "Modeling") //if modeling is broadcasting itself
             {
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //to c if prediction
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //find prediction
                 {
                     IPlugin plugin = (IPlugin)ex;
                     if (plugin.PluginType.ToString() == "Prediction")
-                        if (((IPlugin)sender).Complete)  
+                        //if the prediction is already visible but just needs to update itself, leave here and cont with updating
+                        if (plugin.VisiblePlugin)
+                            return;
+                        else
+                            //prediction is not visible yet and needs to show itself and update itself
+                            if (((IPlugin)sender).Complete)
                             plugin.Show();
                 }
             }                

@@ -12,6 +12,7 @@ namespace VBCommon
         void MakeActive();
         void Broadcast();
         Boolean Complete { get; }
+        Boolean VisiblePlugin { get; }
         void AddRibbon(string sender);
         //void AddPanel();
         void Hide();
