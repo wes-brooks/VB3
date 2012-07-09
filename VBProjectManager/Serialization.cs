@@ -63,6 +63,7 @@ namespace VBProjectManager
                         {
                             string jsonRepresentation = JsonConvert.SerializeObject(element.Value);
                             Type objType = element.Value.GetType();
+                            
                             dictJsonRep.Add(element.Key, jsonRepresentation);
                             dictObjectType.Add(element.Key, objType);
                         }
