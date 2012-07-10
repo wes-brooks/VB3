@@ -65,6 +65,7 @@ namespace VBCommon
         }
 
 
+        //Raise the unpack event request so that each plugin can unpack it's state
         public void RaiseUnpackRequest(string key, object value)
         {
             if (UnpackRequest != null) //Has some method been told to handle this event?
@@ -83,13 +84,5 @@ namespace VBCommon
                 MessageReceived(this, args);
             }
         }
-        //public void HandlePluginMessage(string sender, Globals.PluginType pType)
-        //{
-        //    if (PluginMessageReceived != null)
-        //    {
-        //        PluginArgs e = new PluginArgs(sender, pType);
-        //        PluginMessageReceived(sender, e);
-        //    }
-        //}
     }
 }

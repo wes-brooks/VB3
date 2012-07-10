@@ -16,45 +16,54 @@ namespace VBProjectManager
 {
     public partial class VBProjectManager
     {
+        //save a project
         public void Save(object sender, EventArgs e)
         {
             string fullName = string.Empty;
             if (ProjectPathName == null)
             {
-                string filterstring = @"VB2 Project Files|*.vbpx|All Files|*.*";
+                //set up location for saved project to be stored
+                string strFilterstring = @"VB2 Project Files|*.vbpx|All Files|*.*";
                 SaveFileDialog saveFile = new SaveFileDialog();
-                //saveFile.InitialDirectory = Application.ExecutablePath + "//ProjectFiles";
                 saveFile.Title = "Enter a file name to save your project information in.";
-                saveFile.Filter = filterstring;
+                saveFile.Filter = strFilterstring;
                 saveFile.FilterIndex = 1;
                 saveFile.RestoreDirectory = true;
+                //save File dialog
                 DialogResult dr = saveFile.ShowDialog();
                 if (dr != DialogResult.OK)
                 { return; }
 
+                //save the file name and path
                 strPathName = saveFile.FileName;
                 FileInfo fi = new FileInfo(strPathName);
-                projectName = fi.Name;
-                //_projMgr.Save(fullName, Globals.ProjectType.COMPLETE);
+                strProjectName = fi.Name;
             }
-            //else {  _projMgr.Save(); }
 
-            IDictionary<string, IDictionary<string, object>> pluginStates = new Dictionary<string, IDictionary<string, object>>();
-            signaller.RaiseSaveRequest(pluginStates);
+            //Dictionary to store each plugin's state for saving
+            IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
+            //raise the save request sending dictionary to store plugin's state
+            signaller.RaiseSaveRequest(dictPluginStates);
 
             //loop through plugins to get values and types
             Dictionary<string, object> dictProjectState = new Dictionary<string, object>();
 
-            foreach (KeyValuePair<string, IDictionary<string, object>> plugin in pluginStates)
-            {                
-                Dictionary<string, object> dictJsonRep = new Dictionary<string, object>(); //holds jsonRepresented values
-                Dictionary<string, Type> dictObjectType = new Dictionary<string, Type>(); //holds object types
-                List<object> listContainer = new List<object>();  //holds all of the dictionaries
+            //loop through each plugin in the dictionary of plugins
+            foreach (KeyValuePair<string, IDictionary<string, object>> plugin in dictPluginStates)
+            {   
+                //holds jsonRepresented values
+                Dictionary<string, object> dictJsonRep = new Dictionary<string, object>(); 
+                //holds object types
+                Dictionary<string, Type> dictObjectType = new Dictionary<string, Type>(); 
+                //holds all of the dictionaries
+                List<object> lstContainer = new List<object>();  
 
                 string strPluginKey = plugin.Key;                
+                //holds the packed plugin
                 IDictionary<string, object> dictPluginState = plugin.Value;
 
                 if (dictPluginState == null) break;
+                //loop through each element in the plugin to pull value and class type of each
                 foreach (KeyValuePair<string, object> element in dictPluginState)
                 {                    
                     if (element.Value != null)
@@ -63,24 +72,27 @@ namespace VBProjectManager
                         {
                             string jsonRepresentation = JsonConvert.SerializeObject(element.Value);
                             Type objType = element.Value.GetType();
-                            
+                            //add key and value
                             dictJsonRep.Add(element.Key, jsonRepresentation);
+                            //add key and value's type
                             dictObjectType.Add(element.Key, objType);
                         }
                         catch {}
                     }
                     else
                     {
+                        //if a plugin has a null value
                         dictJsonRep.Add(element.Key, "null");
                         dictObjectType.Add(element.Key, typeof(Nullable));
                     }
                 }
-                listContainer.Add(dictJsonRep);
-                listContainer.Add(dictObjectType);
-                dictProjectState.Add(strPluginKey, listContainer);
+                //add the values, value class type and then store in a dictionary
+                lstContainer.Add(dictJsonRep);
+                lstContainer.Add(dictObjectType);
+                dictProjectState.Add(strPluginKey, lstContainer);
             }
 
-            //JSON
+            //JSON serialization of plugins dictionary
             JsonSerializer serializer = new JsonSerializer();
 
             using (StreamWriter sw = new StreamWriter(strPathName))
@@ -90,16 +102,35 @@ namespace VBProjectManager
             }
         }
 
+
+        public void SaveAs(object sender, EventArgs e)
+        {
+            //save an opened project 
+            string message = "Are you sure you want to replace this file?";
+            string messageTitle = "Save As";
+
+            //ask user if they want to replace file, and send them to Save
+            DialogResult result = MessageBox.Show(message, messageTitle, MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                ProjectPathName = null;
+                Save(sender, e);
+            }
+            else
+                 return;
+        }
+
+
         public void Open(object sender, EventArgs e)
         {
+            //open project
             OpenFileDialog openFile = new OpenFileDialog();
-            //openFile.InitialDirectory = Application.ExecutablePath + "//ProjectFiles";
             openFile.InitialDirectory = VB2projectsPath;
             openFile.Filter = @"VB3 Project Files|*.vbpx|All Files|*.*";
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;
             string strFileName = string.Empty;
-
+            //save file name
             if (openFile.ShowDialog() == DialogResult.OK)
                 strFileName = openFile.FileName;
             else return;
@@ -113,22 +144,30 @@ namespace VBProjectManager
             streamreader.Close();
             jsonreader.Close();
 
+            //loop through plugins, deserialize each
             foreach (var plugin in dictPackedProjectState)
-            {
-                string strPluginKey = plugin.Key; //key in pluginStates dict
+            { 
+                //key in pluginStates dict
+                string strPluginKey = plugin.Key;
+                //hold value
                 Dictionary<string, string> dictJsonRep = new Dictionary<string, string>();
+                //hold class type of value
                 Dictionary<string, Type> dictObjectType = new Dictionary<string, Type>();
+                //hold plugin state with value/class type assigned
                 Dictionary<string, object> dictPluginState = new Dictionary<string, object>();
+                //store plugin elements as a string for deserializing
                 string strPluginStateJson = plugin.Value.ToString();
-
                 Newtonsoft.Json.Linq.JArray jarray = (Newtonsoft.Json.Linq.JArray)JsonConvert.DeserializeObject(strPluginStateJson);
+                
+                //convert jarray to list in order to pull index for value and index for class type
                 List<object> listContainer = jarray.ToObject<List<object>>();
                 string strJsonDictJson = listContainer[0].ToString();
                 string strObjectTypeDictJson = listContainer[1].ToString();
 
+                //deserialize value and class type of value
                 dictJsonRep = JsonConvert.DeserializeObject<Dictionary<string, string>>(strJsonDictJson);
                 dictObjectType = JsonConvert.DeserializeObject<Dictionary<string, Type>>(strObjectTypeDictJson);
-
+                //loop through each pair and deserialize the value to it's class type
                 foreach (var pair in dictJsonRep)
                 {
                     Type objType = dictObjectType[pair.Key];
@@ -136,20 +175,25 @@ namespace VBProjectManager
                     string jsonRep = pair.Value;
                                        
                     object objDeserialized = JsonConvert.DeserializeObject(jsonRep, jsonType);
+                    //add the newly constructed key value pair, containing correct class types to a dictionary
                     dictPluginState.Add(pair.Key, objDeserialized);
                 }
+                //add each plugin dictionary 
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
+            //raise unpacke event, sending packed plugins dictionary
             signaller.UnpackProjectState(dictPluginStates);
         }
 
 
+        //raise event to pack each plugin for saving and add to PackedPluginStates dictionary
         private void ProjectSavedListener(object sender, VBCommon.SerializationEventArgs e)
         {
             e.PackedPluginStates.Add(strPluginKey, PackState());
         }
 
 
+        //raise event to unpack each plugin, sending the plugin dictionary
         private void ProjectOpenedListener(object sender, VBCommon.SerializationEventArgs e)
         {
             if (e.PackedPluginStates.ContainsKey(strPluginKey))
@@ -162,21 +206,18 @@ namespace VBProjectManager
             }
         }
 
-
-       
-
-
+               
+        //pack plugin for saving, returns packed state
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
-
             dictPackedState.Add("ProjectName", ProjectName);
-            //Add other information, like the order of plugins, and which ones are open.
-
+            
             return dictPackedState;
         }
 
         
+        //unpack plugin, assigning values from incoming dictionary
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {  
             this.strPathName = (string)dictPackedState["ProjectName"];

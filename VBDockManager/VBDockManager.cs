@@ -133,6 +133,7 @@ namespace VBDockManager
                 
             }
 
+            //add the inner control of the panel
             DockContent content = new DockContent();
             content.ShowHint = ConvertToDockState(dockStyle);
             content.Controls.Add(innerControl);

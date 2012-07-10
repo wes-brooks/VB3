@@ -7,15 +7,10 @@ namespace VBCommon
 {
     public interface IFormState
     {
+        //Each plugin's underlying class must have following methods/properties
+
         void UnpackState(IDictionary<string, object> objPackedState);
         IDictionary<string,object> PackState();
-
-        //void ProjectSavedListener(object sender, PackEventArgs e);
-        //void ProjectOpenedListener(object sender, UnpackEventArgs e);
-
         string Name {get;}
-        
-        //void AddPluginTypeForSavingOpening(Globals.PluginType _type);
-        //void RemovePluginTypeForSavingOpening(Globals.PluginType _type);
     }
 }

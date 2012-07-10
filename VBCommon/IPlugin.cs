@@ -7,6 +7,7 @@ namespace VBCommon
 {
     public interface IPlugin
     {
+        //Each plugin must have following methods/properties
         Globals.PluginType PluginType {get;}
         string PanelKey { get; }
         void MakeActive();

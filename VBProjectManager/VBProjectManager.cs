@@ -16,22 +16,22 @@ using VBCommon;
 
 namespace VBProjectManager
 {
-
+    //class to manage all plugins
     public partial class VBProjectManager : Extension, IFormState, IPartImportsSatisfiedNotification, IPlugin
     {        
-        private Dictionary<string, Boolean> _tabStates;
+        private Dictionary<string, Boolean> dictTabStates;
         private string strPathName;
-        private string projectName;
+        private string strProjectName;
         private VBCommon.Signaller signaller = new VBCommon.Signaller();
         private Globals.PluginType _pluginType = VBCommon.Globals.PluginType.ProjectManager;
         private VBLogger logger;
         private string strLogFile;
         private string strPluginKey = "Project Manager";
         public static string VB2projectsPath = null;
-        public List<Globals.PluginType> shownPlugins = new List<Globals.PluginType>();
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
 
+        //constructor
         public VBProjectManager()
         {
             strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach.log");
@@ -44,41 +44,40 @@ namespace VBProjectManager
 
         public override void Activate()
         {                       
-            //Add an item to the application ("File") menu.
-            var aboutButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
-            aboutButton.GroupCaption = HeaderControl.ApplicationMenuKey;
-            aboutButton.LargeImage = Resources.info_32x32;
-            aboutButton.SmallImage = Resources.info_16x16;
-            aboutButton.ToolTipText = "Open the 'About VirtualBeach' dialog.";
-            App.HeaderControl.Add(aboutButton);
-            
             //Add a Save button to the application ("File") menu.
-            var saveButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", Save);
-            saveButton.GroupCaption = HeaderControl.ApplicationMenuKey;
-            saveButton.LargeImage = Resources.save_32x32;
-            saveButton.SmallImage = Resources.save_16x16;
-            saveButton.ToolTipText = "Save the current project state.";
-            App.HeaderControl.Add(saveButton);
+            var btnSave = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", Save);
+            btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnSave.LargeImage = Resources.save_32x32;
+            btnSave.SmallImage = Resources.save_16x16;
+            btnSave.ToolTipText = "Save the current project state.";
+            App.HeaderControl.Add(btnSave);
 
+            //Add a Save As button to the application ("File") menu.
+            var btnSaveAs = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As", SaveAs);
+            btnSaveAs.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnSaveAs.LargeImage = Resources.open_32x32;
+            btnSaveAs.SmallImage = Resources.open_16x16;
+            btnSaveAs.ToolTipText = "test hide panel";
+            App.HeaderControl.Add(btnSaveAs);
+            
             //Add an Open button to the application ("File") menu.
-            var openButton = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
-            openButton.GroupCaption = HeaderControl.ApplicationMenuKey;
-            openButton.LargeImage = Resources.open_32x32;
-            openButton.SmallImage = Resources.open_16x16;
-            openButton.ToolTipText = "Open a saved project.";
-            App.HeaderControl.Add(openButton);
+            var btnOpen = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
+            btnOpen.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnOpen.LargeImage = Resources.open_32x32;
+            btnOpen.SmallImage = Resources.open_16x16;
+            btnOpen.ToolTipText = "Open a saved project.";
+            App.HeaderControl.Add(btnOpen);
 
-            //test hide panels
-            var btnRb = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Test Hide", rb_Click);
-            btnRb.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnRb.LargeImage = Resources.open_32x32;
-            btnRb.SmallImage = Resources.open_16x16;
-            btnRb.ToolTipText = "test hide panel";
-            App.HeaderControl.Add(btnRb);
-            
-            
+            //Add an item to the application ("File") menu.
+            var btnAbout = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
+            btnAbout.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnAbout.LargeImage = Resources.info_32x32;
+            btnAbout.SmallImage = Resources.info_16x16;
+            btnAbout.ToolTipText = "Open the 'About VirtualBeach' dialog.";
+            App.HeaderControl.Add(btnAbout);
+                       
             //get plugin type for each plugin
-            List<Globals.PluginType> allPluginTypes = new List<Globals.PluginType>();
+            List<Globals.PluginType> lstAllPluginTypes = new List<Globals.PluginType>();
             Globals.PluginType PType;
 
             foreach(DotSpatial.Extensions.IExtension ext in App.Extensions)  
@@ -86,28 +85,23 @@ namespace VBProjectManager
                 if (ext is IPlugin)    
                 {
                     IPlugin plugType = (IPlugin)ext;  
-
                     //store pluginType
                     PType = plugType.PluginType;  
-                    allPluginTypes.Add(PType); 
+                    lstAllPluginTypes.Add(PType); 
                 }
             }
             
             //if PType is smallest (datasheet/map), set as activated when open
-            int pos = allPluginTypes.IndexOf(allPluginTypes.Min());
+            int pos = lstAllPluginTypes.IndexOf(lstAllPluginTypes.Min());
             DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
             IPlugin ex = (IPlugin)extension;
             ex.MakeActive();
             
             //initialize only Datasheet is shown, all others are hidden
             foreach(DotSpatial.Extensions.IExtension x in App.Extensions)
-           {
+            {
                 if (x is IPlugin)
                 {
-                    //add datasheet to the list of shownPlugins (used for save/open
-                    if (!shownPlugins.Contains(Globals.PluginType.Datasheet))
-                        shownPlugins.Add(Globals.PluginType.Datasheet); //add as (the actual plugin) or (pluginType)
-
                     //hide the rest
                     IPlugin pt = (IPlugin)x;
                     if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
@@ -118,61 +112,67 @@ namespace VBProjectManager
             base.Activate();
         }
 
+
+        //will always be active (inherits from IPlugin)
         public void MakeActive()
         {
             //App.DockManager.SelectPanel(strPanelKey);
             //App.HeaderControl.SelectRoot(strPanelKey);
         }
 
+
+        //(inherits from IPlugin)
         public void Show()
         {
             
         }
 
+
+        //(inherits from IPlugin)
         public void Hide()
         {
             
         }
 
+        //projectManager doesn't have a ribbon, (inherits from IPlugin)
         public void AddRibbon(string sender)
         {
 
         }
 
+        //projectManager doesn't get deactivated (inherits from IPlugin)
         public override void Deactivate()
         {
             App.HeaderControl.RemoveAll();
             
-            
             base.Deactivate();
         }
 
-        
+
+        //Write any messages we receive from the plugins directly to the debug console.
         private void MessageReceived(object sender, MessageArgs args)
         {
-            //Write any messages we receive from the plugins directly to the debug console.
+            
             System.Diagnostics.Debug.WriteLine(args.Message);
         }
 
-        public void rb_Click(object sender, EventArgs e)
-        {
-           
-        }
 
-
+        //Information about virtual beach
         public void AboutVirtualBeach(object sender, EventArgs e)
         {
             System.Windows.Forms.MessageBox.Show("this is a test.");
         }
 
 
+        //not sure if used
         public Dictionary<string, Boolean> TabStates
         {
-            get { return _tabStates; }
-            set { _tabStates = value; }
+            get { return dictTabStates; }
+            set { dictTabStates = value; }
         }
 
 
+        //holds project full path name
         public string ProjectPathName
         {
             get { return strPathName; }
@@ -180,27 +180,36 @@ namespace VBProjectManager
         }
 
 
+        //holds just the project name without path
         public string ProjectName
         {
-            get { return projectName; }
-            set { projectName = value; }
+            get { return strProjectName; }
+            set { strProjectName = value; }
         }
 
+
+        //inherits from IPlugin, ProjectManager's complete flag doesn't change
         public Boolean Complete
         {
             get { return boolComplete;}
         }
 
+
+        //inherits from IPlugin, ProjectManager's visible flag doesn't change
         public Boolean VisiblePlugin
         {
             get { return boolVisible; }
         }
 
+
+        //returns the panel key name
         public string PanelKey
         {
             get { return strPluginKey; }
         }
 
+
+        //returns the projectManager's pluginType (ProjectManager)
         public Globals.PluginType PluginType
         {
             get { return _pluginType; }
@@ -241,37 +250,41 @@ namespace VBProjectManager
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.BroadCastEventArgs>(BroadcastStateListener);
         }
 
+        
+        //listen to plugin's broadcast in order to update other plugins
         private void BroadcastStateListener(object sender, VBCommon.BroadCastEventArgs e)
         {
-            //listen to others broadcast..receiving something
-            string pluginType = (((IPlugin)sender).PluginType).ToString();
-
-            if (pluginType == "Datasheet") //if datasheet is broadcasting itself
+            string strPluginType = (((IPlugin)sender).PluginType).ToString();
+            //if datasheet is broadcasting any changes
+            if (strPluginType == "Datasheet") 
             {
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //find modeling
+                //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) 
                 {
                     IPlugin plugin = (IPlugin)ex;
                     if (plugin.PluginType.ToString() == "Modeling")
                         //already visible, just update not show again
                         if (plugin.VisiblePlugin)
                             return;
-                        //if datasheet is complete & not visible, show modeling
+                        //if datasheet is complete, show modeling
                         else
                             if (((IPlugin)sender).Complete)
                                 plugin.Show();
                 }
             } 
-            else if (pluginType == "Modeling") //if modeling is broadcasting itself
+            //if modeling is broadcasting itself
+            else if (strPluginType == "Modeling") 
             {
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) //find prediction
+                //find prediction plugin, needs to show itself once modeling broadcasts itself with complete flag raised
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) 
                 {
                     IPlugin plugin = (IPlugin)ex;
                     if (plugin.PluginType.ToString() == "Prediction")
-                        //if the prediction is already visible but just needs to update itself, leave here and cont with updating
+                        //already visible, just update not show again
                         if (plugin.VisiblePlugin)
                             return;
                         else
-                            //prediction is not visible yet and needs to show itself and update itself
+                            //modeling is complete, show prediction
                             if (((IPlugin)sender).Complete)
                             plugin.Show();
                 }
@@ -279,6 +292,7 @@ namespace VBProjectManager
         }
 
 
+        //projectManager broadcasting itself when a change is made
         public void Broadcast()
         {
             IDictionary<string, object> packedState = PackState();
