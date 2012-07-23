@@ -43,36 +43,35 @@ namespace VBProjectManager
 
 
         public override void Activate()
-        {                       
+        {       
+            //Add an Open button to the application ("File") menu.
+            var btnOpen = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
+            btnOpen.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnOpen.LargeImage = Resources.open_16x16;
+            //btnOpen.SmallImage = Resources.open_16x16;
+            btnOpen.ToolTipText = "Open a saved project.";
+            App.HeaderControl.Add(btnOpen);                
             //Add a Save button to the application ("File") menu.
             var btnSave = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", Save);
             btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnSave.LargeImage = Resources.save_32x32;
-            btnSave.SmallImage = Resources.save_16x16;
+            btnSave.LargeImage = Resources.Save16x16;
+            //btnSave.SmallImage = Resources.save_16x16;
             btnSave.ToolTipText = "Save the current project state.";
             App.HeaderControl.Add(btnSave);
 
             //Add a Save As button to the application ("File") menu.
             var btnSaveAs = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As", SaveAs);
             btnSaveAs.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnSaveAs.LargeImage = Resources.open_32x32;
-            btnSaveAs.SmallImage = Resources.open_16x16;
+            btnSaveAs.LargeImage = Resources.SaveAs16x16;
+            //btnSaveAs.SmallImage = Resources.open_16x16;
             btnSaveAs.ToolTipText = "test hide panel";
             App.HeaderControl.Add(btnSaveAs);
             
-            //Add an Open button to the application ("File") menu.
-            var btnOpen = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
-            btnOpen.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnOpen.LargeImage = Resources.open_32x32;
-            btnOpen.SmallImage = Resources.open_16x16;
-            btnOpen.ToolTipText = "Open a saved project.";
-            App.HeaderControl.Add(btnOpen);
-
             //Add an item to the application ("File") menu.
             var btnAbout = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             btnAbout.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnAbout.LargeImage = Resources.info_32x32;
-            btnAbout.SmallImage = Resources.info_16x16;
+            btnAbout.LargeImage = Resources.About_16x16;
+            //btnAbout.SmallImage = Resources.info_16x16;
             btnAbout.ToolTipText = "Open the 'About VirtualBeach' dialog.";
             App.HeaderControl.Add(btnAbout);
                        

@@ -96,8 +96,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
+    <None Include="Resources\Save16x16.png" />
+    <None Include="Resources\SaveAs16x16.png" />
+    <None Include="Resources\Open.png" />
+    <None Include="Resources\About.png" />
+    <None Include="Resources\About_16x16.png" />
     <Content Include="Resources\open_16x16.png" />
     <Content Include="Resources\open_32x32.png" />
+    <None Include="Resources\SaveAs.png" />
+    <None Include="Resources\Save.png" />
     <None Include="Resources\save_32x32.png" />
     <None Include="Resources\save_16x16.png" />
     <None Include="Resources\info_32x32.png" />
