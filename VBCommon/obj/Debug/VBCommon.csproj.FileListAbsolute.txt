@@ -16,4 +16,5 @@ C:\VB3\VBCommon\obj\Debug\VBCommon.dll
 C:\VB3\VBCommon\obj\Debug\VBCommon.pdb
 C:\VB3\VBCommon\bin\Debug\Newtonsoft.Json.dll
 C:\VB3\VBCommon\bin\Debug\Newtonsoft.Json.xml
-C:\VB3\VBCommon\bin\Debug\Newtonsoft.Json.pdb
+C:\VB3\VBCommon\bin\Debug\ZedGraph.dll
+C:\VB3\VBCommon\obj\Debug\VBControls.MLRPredObs.resources

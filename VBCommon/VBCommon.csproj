@@ -44,6 +44,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="ZedGraph">
+      <HintPath>..\bin\ZedGraph.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Events.cs" />
@@ -60,6 +63,13 @@
     <Compile Include="IO\ExcelOleDb.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="ListItem.cs" />
+    <Compile Include="MLRPredObs.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MLRPredObs.designer.cs">
+      <DependentUpon>MLRPredObs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ModelErrorCounts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Signaller.cs" />
@@ -71,6 +81,9 @@
   <ItemGroup>
     <EmbeddedResource Include="frmChooseWorksheet.resx">
       <DependentUpon>frmChooseWorksheet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MLRPredObs.resx">
+      <DependentUpon>MLRPredObs.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

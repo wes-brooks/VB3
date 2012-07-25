@@ -108,4 +108,4 @@ C:\VB3\VirtualBeach\bin\Debug\ro\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\th\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\vi-VN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\zh-CN\DotSpatial.Projections.Forms.resources.dll
-C:\VB3\VirtualBeach\bin\Debug\Newtonsoft.Json.pdb
+C:\VB3\VirtualBeach\bin\Debug\ZedGraph.dll
