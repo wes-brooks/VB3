@@ -1,0 +1,12 @@
+adalasso                Master function to use the adaptive lasso for
+                        shrinkage and selection in a generalized linear
+                        model
+adalasso-package        Use the adaptive lasso for shrinkage and
+                        selection in a generalized linear model
+adaptive_step           The glm step (to get adaptive penalty weights)
+                        for adaptive lasso shrinkage and selection in a
+                        generalized linear model
+lasso_step              The glmnet step (shrinks and selects model
+                        coefficients) for adaptive lasso shrinkage and
+                        selection in a generalized linear model
+predict.adalasso        Make predictions from an adalasso model

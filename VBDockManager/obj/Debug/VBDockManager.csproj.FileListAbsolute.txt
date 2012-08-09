@@ -45,3 +45,15 @@ C:\VB3\VBDockManager\bin\Debug\ro\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VBDockManager\bin\Debug\th\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VBDockManager\bin\Debug\vi-VN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VBDockManager\bin\Debug\zh-CN\DotSpatial.Projections.Forms.resources.dll
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Controls.dll
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Controls.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Symbology.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Data.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Extensions.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Data.Forms.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Symbology.Forms.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Topology.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Projections.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Modeling.Forms.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Serialization.pdb
+C:\VB3\VBDockManager\bin\Debug\DotSpatial.Projections.Forms.pdb

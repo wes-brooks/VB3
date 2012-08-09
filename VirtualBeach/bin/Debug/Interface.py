@@ -33,7 +33,7 @@ import pickle
 import re
 
 #Set the R_HOME environment variable
-os.environ["R_HOME"] = cwd + '\\IronPython\\bin\\R-2.13.2'
+os.environ["R_HOME"] = cwd + '\\IronPython\\bin\\R-2.15.1'
 
 from IronPython.virtualbeach import utils
 import IronPython.virtualbeach.BeachController as Control

@@ -1,0 +1,9 @@
+evalBIC                 Evaluate the fitness of a genalg "chromosome"
+galogistic              Fit a linear model, using the genetic algorithm
+                        for variable selection.
+galogistic-package      What the package does (short line) Builds a
+                        linear model using the genetic algorithm for
+                        variable selection
+galogistic_monitor      Monitor the process of the genetic algorithm by
+                        printing a summary at each step.
+predict.galogistic      Make predictions using a galogistic model

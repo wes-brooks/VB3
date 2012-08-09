@@ -1,0 +1,9 @@
+evalBIC                 Evaluate the fitness of a genalg "chromosome"
+galm                    Fit a linear model, using the genetic algorithm
+                        for variable selection.
+galm-package            What the package does (short line) Builds a
+                        linear model using the genetic algorithm for
+                        variable selection
+monitor                 Monitor the process of the genetic algorithm by
+                        printing a summary at each step.
+predict.galm            Make predictions using a galm model
