@@ -28,6 +28,8 @@ namespace VBCommon
         }
     }
 
+    
+
 
     //Defines the event arguments used when unpacking a project from its saved state
     public class UnpackEventArgs : EventArgs

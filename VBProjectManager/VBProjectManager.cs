@@ -247,6 +247,7 @@ namespace VBProjectManager
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.BroadCastEventArgs>(BroadcastStateListener);
+            
         }
 
         
@@ -255,27 +256,27 @@ namespace VBProjectManager
         {
             string strPluginType = (((IPlugin)sender).PluginType).ToString();
             //if datasheet is broadcasting any changes
-            if (strPluginType == "Datasheet") 
+            if (strPluginType == "Datasheet")
             {
                 //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) 
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
                 {
                     IPlugin plugin = (IPlugin)ex;
+
                     if (plugin.PluginType.ToString() == "Modeling")
                         //already visible, just update not show again
                         if (plugin.VisiblePlugin)
                             return;
                         //if datasheet is complete, show modeling
-                        else
-                            if (((IPlugin)sender).Complete)
-                                plugin.Show();
+                        else if (((IPlugin)sender).Complete)
+                            plugin.Show();
                 }
-            } 
-            //if modeling is broadcasting itself
-            else if (strPluginType == "Modeling") 
+                //if modeling is broadcasting itself
+            }
+            else if (strPluginType == "Modeling")
             {
                 //find prediction plugin, needs to show itself once modeling broadcasts itself with complete flag raised
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions) 
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
                 {
                     IPlugin plugin = (IPlugin)ex;
                     if (plugin.PluginType.ToString() == "Prediction")
@@ -285,7 +286,7 @@ namespace VBProjectManager
                         else
                             //modeling is complete, show prediction
                             if (((IPlugin)sender).Complete)
-                            plugin.Show();
+                                plugin.Show();
                 }
             }                
         }
