@@ -109,16 +109,4 @@ C:\VB3\VirtualBeach\bin\Debug\th\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\vi-VN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\zh-CN\DotSpatial.Projections.Forms.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\ZedGraph.dll
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Controls.dll
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.dll
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.Forms.dll
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Extensions.dll
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.dll
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Controls.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Data.Forms.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Extensions.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Symbology.Forms.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Modeling.Forms.pdb
-C:\VB3\VirtualBeach\bin\Debug\DotSpatial.Projections.Forms.pdb
+C:\VB3\VirtualBeach\bin\Debug\Newtonsoft.Json.pdb
