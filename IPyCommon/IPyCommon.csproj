@@ -99,6 +99,12 @@ cp $(SolutionDir)\Externals\DevExpress\DevExpress.Utils.v11.2.dll $(SolutionDir)
 cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraBars.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraBars.v11.2.dll
 cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraEditors.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraEditors.v11.2.dll
 
+
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.Data.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.Data.v11.2.dll
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.Utils.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.Utils.v11.2.dll
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraBars.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.XtraBars.v11.2.dll
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraEditors.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.XtraEditors.v11.2.dll
+
 xcopy /Y /S $(SolutionDir)\Externals\IronPython\* $(SolutionDir)\bin\Debug\</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

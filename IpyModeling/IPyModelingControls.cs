@@ -122,6 +122,8 @@ namespace IPyModeling
             this.TabPageEntered += new RequestData(RequestModelData);
             this.DataRequested += new EventHandler<ModelingCallback>(this.ProvideData);    
            // ResetIPyProject += new EventHandler(this.ResetProject);
+
+            this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);
         }
 
 
@@ -497,7 +499,7 @@ namespace IPyModeling
         }
 
 
-        //Set column header names in Variable Selection listbox
+        /*//Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string,object> packedState)
         {
             //Datasheet's packed state coming in
@@ -554,10 +556,93 @@ namespace IPyModeling
             lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
             lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
+        } */
+
+
+        //Set column header names in Variable Selection listbox
+        public void SetData(IDictionary<string, object> packedState)
+        {
+            //Datasheet's packed state coming in
+            dictPackedPlugin = packedState;
+            dsControl1.UnpackState((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
+            
+            dt = dsControl1.DT;
+            this.correlationData = dsControl1.DT;
+
+            _dtFull = dt;
+            if (_dtFull == null) return;
+            
+            tabControl1.SelectedIndex = 0;
+
+            List<string> lstFieldList = new List<string>();
+            for (int i = 2; i < _dtFull.Columns.Count; i++)
+            {
+                if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
+                {
+                    if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
+                        lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+                }
+                else
+                    lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+            }
+
+            intNumObs = _dtFull.Rows.Count;
+            lblNumObs.Text = "Number of Observations: " + intNumObs.ToString();
+
+            lbAvailableVariables.Items.Clear();
+            lbIndVariables.Items.Clear();
+
+            for (int i = 0; i < lstFieldList.Count; i++)
+            {
+                ListItem li = new ListItem(lstFieldList[i], i.ToString());
+                lbAvailableVariables.Items.Add(li);
+            }
+
+            lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+            lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
         }
 
 
-       
+        //Set column header names in Variable Selection listbox
+        public void UpdateData(object source, EventArgs e)
+        {
+            dt = dsControl1.DT;
+            this.correlationData = dsControl1.DT;
+
+            _dtFull = dt;
+            if (_dtFull == null) return;
+
+            tabControl1.SelectedIndex = 0;
+
+            List<string> lstFieldList = new List<string>();
+            for (int i = 2; i < _dtFull.Columns.Count; i++)
+            {
+                if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
+                {
+                    if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
+                        lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+                }
+                else
+                    lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+            }
+
+            intNumObs = _dtFull.Rows.Count;
+            lblNumObs.Text = "Number of Observations: " + intNumObs.ToString();
+
+            lbAvailableVariables.Items.Clear();
+            lbIndVariables.Items.Clear();
+
+            for (int i = 0; i < lstFieldList.Count; i++)
+            {
+                ListItem li = new ListItem(lstFieldList[i], i.ToString());
+                lbAvailableVariables.Items.Add(li);
+            }
+
+            lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+            lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
+        }
 
 
         //input variables are selected and ready to be added

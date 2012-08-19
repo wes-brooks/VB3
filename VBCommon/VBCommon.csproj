@@ -174,7 +174,20 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cp $(TargetPath)  $(SolutionDir)\bin\Debug\$(TargetFileName)
-cp $(TargetPath)  $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)</PostBuildEvent>
+cp $(TargetPath)  $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)
+
+cp $(SolutionDir)\Externals\DotSpatial\DotSpatial.Controls.dll $(SolutionDir)\bin\Debug\DotSpatial.Controls.dll
+cp $(SolutionDir)\Externals\DotSpatial\DotSpatial.Data.dll $(SolutionDir)\bin\Debug\DotSpatial.Data.dll
+cp $(SolutionDir)\Externals\DotSpatial\DotSpatial.Extensions.dll $(SolutionDir)\bin\Debug\DotSpatial.Extensions.dll
+cp $(SolutionDir)\Externals\DotSpatial\DotSpatial.Serialization.dll $(SolutionDir)\bin\Debug\DotSpatial.Serialization.dll
+cp $(SolutionDir)\Externals\DotSpatial\DotSpatial.Symbology.dll $(SolutionDir)\bin\Debug\DotSpatial.Symbology.dll
+cp $(SolutionDir)\Externals\DotSpatial\DotSpatial.Topology.dll $(SolutionDir)\bin\Debug\DotSpatial.Topology.dll
+cp $(SolutionDir)\Externals\RibbonControl\DotSpatial.Plugins.Ribbon.dll $(SolutionDir)\bin\Debug\DotSpatial.Plugins.Ribbon.dll
+cp $(SolutionDir)\Externals\RibbonControl\DotSpatial.Plugins.Ribbon.dll $(SolutionDir)\bin\Debug\Plugins\DotSpatial.Plugins.Ribbon.dll
+
+cp $(SolutionDir)\Externals\Json.NET\Net40\Newtonsoft.Json.dll $(SolutionDir)\bin\Debug\Newtonsoft.Json.dll
+cp $(SolutionDir)\Externals\WeifenLuo.WinformsUI.Docking\WeifenLuo.WinformsUI.Docking.dll $(SolutionDir)\bin\Debug\WeifenLuo.WinformsUI.Docking.dll
+cp $(SolutionDir)\Externals\Zedgraph\zedgraph_dll_v515\ZedGraph.dll $(SolutionDir)\bin\Debug\ZedGraph.dll</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -278,10 +278,13 @@ namespace IPyPrediction
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             IDictionary<string,object> packedState =  _frmIPyPred.PackState();
-            packedState.Add("Complete", boolComplete);
-            packedState.Add("Visible", boolVisible);
+            if (packedState != null)
+            {
+                packedState.Add("Complete", boolComplete);
+                packedState.Add("Visible", boolVisible);
 
-            e.PackedPluginStates.Add(strPanelKey, packedState);
+                e.PackedPluginStates.Add(strPanelKey, packedState);
+            }
         }
 
 

@@ -65,6 +65,7 @@ namespace Datasheet
 
         private DataTable savedDT = null;
         private DataGridView savedDGV = null;
+        private IDictionary<string, object> dictPackedDatasheetState = null;
 
         private bool boolInitialPass = true;
         private bool boolValidated = false;
@@ -99,6 +100,15 @@ namespace Datasheet
         public string XmlDataTable
         {
             get { return strXmlDataTable; }
+        }
+
+
+        // getter/setter for datasheet table
+        [JsonProperty]
+        public IDictionary<string, object> PackedDatasheetState
+        {
+            set { dictPackedDatasheetState = value; }
+            get { return dictPackedDatasheetState; }
         }
 
 
@@ -191,8 +201,8 @@ namespace Datasheet
          
         }
 
-
-        //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
+        
+        /*//unpack event handler. unpacks packed state in dictionary to repopulate datasheet
         public void UnpackState(IDictionary<string, object> dictPluginState)
         {
             //unpack datatable
@@ -237,10 +247,39 @@ namespace Datasheet
 
             //if clean, initial pass is false
             boolInitialPass = !(bool)dictPluginState["Clean"];
+        } */
+
+
+        //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
+        public void UnpackState(IDictionary<string, object> dictPluginState)
+        {
+            //unpack datasheet control
+            PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
+            dsControl1.UnpackState(dictPackedDatasheetState);
+
+            
+            //get validated flag
+            this.boolValidated = (bool)dictPluginState["DSValidated"];
+
+            //initial info for the list
+            FileInfo fi = new FileInfo(Name);
+
+
+            /*if ((bool)dictPluginState["Clean"])
+            {
+                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+            }
+            else
+            {
+                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
+            }*/
+
+            //if clean, initial pass is false
+            boolInitialPass = !(bool)dictPluginState["Clean"];
         }
 
         
-        //event handler for packing state to save project
+        /*//event handler for packing state to save project
         public IDictionary<string, object> PackState()
         {
             //save packed state to a dictionary
@@ -329,6 +368,70 @@ namespace Datasheet
             tempDt = tableutils.filterRVHcols(tempDt);
             dictPluginState.Add("DataSheetDatatable", tempDt);  //for modeling to use
             
+            return dictPluginState;
+        }*/
+
+
+        //event handler for packing state to save project
+        public IDictionary<string, object> PackState()
+        {
+            //save packed state to a dictionary
+            IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
+
+            //check to see if this is the first time going to modeling
+            if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.dirty && !boolInitialPass)
+            {
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.OK)
+                {
+                    correlationData = dsControl1.DT;
+                    //                   savedDT = dt;                 //dont see this being used anywhere
+                    dataSheetData = dsControl1.DT;
+                    dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+                }
+                else
+                { return null; }
+            }
+            else if (boolInitialPass)
+            {
+                correlationData = dsControl1.DT;
+                modelData = dsControl1.DT;
+                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+                boolInitialPass = false;
+                //                savedDT = dt;                   //dont see this being used anywhere
+                //                savedDGV = dsControl1.dgv;     //dont see this being used anywhere
+            }
+
+            dictPackedDatasheetState = dsControl1.PackState();
+            dictPluginState.Add("PackedDatasheetState", dictPackedDatasheetState);
+            
+            dictPluginState.Add("DSValidated", boolValidated);
+
+            StringWriter sw = null;
+            //Save Datasheet info as xml string for serialization
+            sw = null;
+            if (dsControl1.DT != null)
+            {
+                dsControl1.DT.TableName = "DataSheetData";
+                sw = new StringWriter();
+                dsControl1.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+                strXmlDataTable = sw.ToString();
+                sw.Close();
+                sw = null;
+                dictPluginState.Add("XmlDataTable", strXmlDataTable);
+            }
+
+            if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.clean)
+            {
+                boolClean = true;
+                dictPluginState.Add("Clean", boolClean);
+            }
+            else
+            {
+                boolClean = false;
+                dictPluginState.Add("Clean", boolClean);
+            }
+
             return dictPluginState;
         }
 

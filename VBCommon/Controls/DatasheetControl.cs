@@ -26,8 +26,8 @@ namespace VBCommon.Controls
         private dtRowInformation dtRI = null;
         private dtColumnInformation dtCI = null;
 
-        //private bool boolInitialPass = true; 
-        //private bool boolValidated = false;
+        //This event alerts the containing control to the fact that a notifiable change has been made to the datasheet.
+        public event EventHandler NotifiableChangeEvent;
 
         private int intSelectedColIndex = -1;
         private int intSelectedRowIndex = -1;
@@ -59,6 +59,8 @@ namespace VBCommon.Controls
         private int intNdisabledrows = 0;
         private int intNhiddencols = 0;
         private int intNivs = 0;
+
+        bool boolValidated = false;
 
         // getter/setter for transform type
         [JsonProperty]
@@ -102,6 +104,7 @@ namespace VBCommon.Controls
             set { dtRI = value; }
         }
 
+
         public dtColumnInformation DTCI
         {
             get { return this.dtCI; }
@@ -110,21 +113,21 @@ namespace VBCommon.Controls
 
 
         ////returns datatable row info
-        //[JsonProperty]
-        //public Dictionary<string, bool> DTRowInfo
-        //{
-        //    get { return this.dtRI.DTRowInfo; }
-        //    set { dtRI.DTRowInfo = value; }
-        //}
+        [JsonProperty]
+        public Dictionary<string, bool> DTRowInfo
+        {
+            get { return this.dtRI.DTRowInfo; }
+            set { dtRI.DTRowInfo = value; }
+        }
 
 
         //// returns datatable column info
-        //[JsonProperty]
-        //public Dictionary<string, bool> DTColInfo     
-        //{
-        //    get { return this.dtCI.DTColInfo; }
-        //    set { dtCI.DTColInfo = value; }
-        //}
+        [JsonProperty]
+        public Dictionary<string, bool> DTColInfo     
+        {
+            get { return this.dtCI.DTColInfo; }
+            set { dtCI.DTColInfo = value; }
+        }
 
         //returns current selected column index
         [JsonProperty]
@@ -206,6 +209,7 @@ namespace VBCommon.Controls
             set { tableutils = value; }
         }
 
+
         //return utilities
         [JsonProperty]
         public Utilities.GridUtils GridUtils
@@ -220,6 +224,7 @@ namespace VBCommon.Controls
             set { gridutils = value; }
         }
 
+
         //return Disabled columns
         [JsonProperty]
         public int DisabledCols
@@ -227,6 +232,7 @@ namespace VBCommon.Controls
             get { return this.intNdisabledcols; }
             set { intNdisabledcols = value; }
         }
+
 
         //return Disabled Rows
         [JsonProperty]
@@ -236,6 +242,7 @@ namespace VBCommon.Controls
             set { intNdisabledrows = value; }
         }
 
+
         //return Hidden Columns
         [JsonProperty]
         public int HiddenCols
@@ -243,6 +250,7 @@ namespace VBCommon.Controls
             get { return this.intNhiddencols; }
             set { intNhiddencols = value; }
         }
+
 
         //return Number of IVs
         [JsonProperty]
@@ -257,6 +265,17 @@ namespace VBCommon.Controls
         public DatasheetControl()      
         {
             InitializeComponent();
+        }
+
+
+        //Notify the containing control that there's been a change to the datasheet
+        private void NotifyContainer()
+        {
+            if (NotifiableChangeEvent != null)
+            {
+                EventArgs args = new EventArgs();
+                NotifiableChangeEvent(this, args);
+            }
         }
 
 
@@ -410,6 +429,7 @@ namespace VBCommon.Controls
             strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
 
             state = dtState.dirty;
+            NotifyContainer();
         }
 
 
@@ -480,6 +500,7 @@ namespace VBCommon.Controls
                     updateListView(listvals.RVCOLNAME, strResponseVarColName);
 
                     state = dtState.dirty;
+                    NotifyContainer();
                 }
                 catch (DuplicateNameException e)
                 {
@@ -540,6 +561,7 @@ namespace VBCommon.Controls
             dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.DependentVariableTransforms.Ln.ToString();
             depVarTransform = VBCommon.DependentVariableTransforms.Ln;
             state = dtState.dirty;
+            NotifyContainer();
         }
 
 
@@ -564,6 +586,7 @@ namespace VBCommon.Controls
                 depVarTransform = VBCommon.DependentVariableTransforms.Power;
                 dblPowerTransformExp = Convert.ToDouble(sexp);
                 state = dtState.dirty;
+                NotifyContainer();
             }
         }
 
@@ -662,6 +685,7 @@ namespace VBCommon.Controls
             }
             updateListView(listvals.NDISABLEDROWS, ++intNdisabledrows);
             state = dtState.dirty;
+            NotifyContainer();
         }
 
        
@@ -679,6 +703,7 @@ namespace VBCommon.Controls
 
             updateListView(listvals.NDISABLEDROWS, --intNdisabledrows);
             state = dtState.dirty;
+            NotifyContainer();
         }
 
 
@@ -728,6 +753,7 @@ namespace VBCommon.Controls
                 updateListView(listvals.RVCOLNAME, strResponseVarColName);
 
                 state = dtState.dirty;
+                NotifyContainer();
             }
         }
 
@@ -748,6 +774,7 @@ namespace VBCommon.Controls
                     dblPowerTransformExp = Convert.ToDouble(sexp);
                     dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                     state = dtState.dirty;
+                    NotifyContainer();
                 }
             }
             else
@@ -761,6 +788,7 @@ namespace VBCommon.Controls
 
                 dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                 state = dtState.dirty;
+                NotifyContainer();
             }
         }
 
@@ -777,6 +805,7 @@ namespace VBCommon.Controls
             gridutils.disableGridCol(dgv, intSelectedColIndex);
 
             state = dtState.dirty;
+            NotifyContainer();
         }
 
 
@@ -791,6 +820,7 @@ namespace VBCommon.Controls
             gridutils.enableGridCol(dgv, intSelectedColIndex, dt);
 
             state = dtState.dirty;
+            NotifyContainer();
         }
 
 
@@ -848,6 +878,7 @@ namespace VBCommon.Controls
                 updateListView(listvals.RVCOLNAME, strResponseVarColName);
 
                 state = dtState.dirty;
+                NotifyContainer();
             }
         }
 
@@ -874,6 +905,7 @@ namespace VBCommon.Controls
                 updateListView(listvals.NIVS, --intNivs);
 
                 state = dtState.dirty;
+                NotifyContainer();
             }
         }
 
@@ -893,6 +925,7 @@ namespace VBCommon.Controls
             intNivs = dt.Columns.Count - intNonivs;
             updateListView(listvals.NIVS, intNivs);
             state = dtState.dirty;
+            NotifyContainer();
         }
 
 
@@ -915,6 +948,7 @@ namespace VBCommon.Controls
             intNdisabledrows = 0;
             updateListView(listvals.NDISABLEDROWS, intNdisabledrows);
             state = dtState.dirty;
+            NotifyContainer();
         }
 
 
@@ -925,6 +959,7 @@ namespace VBCommon.Controls
             dt.Rows[e.RowIndex][e.ColumnIndex] = dgv[e.ColumnIndex, e.RowIndex].Value;
             dt.AcceptChanges();
             state = dtState.dirty;
+            NotifyContainer();
         }
 
         //response if error
@@ -1067,6 +1102,144 @@ namespace VBCommon.Controls
             bool colisCat = utils.testValueAttribute(dt.Columns[intSelectedColIndex], VBCommon.Globals.CATEGORICAL);
             if (colisT == true || colisCat == true) return false;
             else return true;
+        }
+
+
+        //event handler for packing state to save project
+        public IDictionary<string, object> PackState()
+        {
+            //save packed state to a dictionary
+            IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
+
+            /*//check to see if this is the first time going to modeling
+            if (this.State == VBCommon.Controls.DatasheetControl.dtState.dirty)
+            {
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.OK)
+                {
+                    correlationData = this.DT;
+                    dataSheetData = this.DT;
+                    this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+                }
+                else
+                { return null; }
+            }
+            else if (boolInitialPass)
+            {
+                correlationData = this.DT;
+                modelData = this.DT;
+                this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+                boolInitialPass = false;
+            }*/
+
+            dictPackedState.Add("CorrelationDataTable", this.DT); //for Modeling to use
+            dictPackedState.Add("ModelDataTable", this.DT);   //for Modeling to use
+            dictPackedState.Add("DT", this.DT);
+            //pack up mainEffect columns for Prediction
+            dictPackedState.Add("CurrentColIndex", this.SelectedColIndex);
+            dictPackedState.Add("DepVarColName", this.ResponseVarColName);
+            dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
+            dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
+            dictPackedState.Add("DSValidated", boolValidated);
+
+            //pack up listInfo for model datasheet
+            int intNumCols = this.DT.Columns.Count;
+            int intNumRows = this.DT.Rows.Count;
+            string strDateName = this.DT.Columns[0].ColumnName.ToString();
+            string strResponseVar = this.DT.Columns[1].ColumnName.ToString();
+            dictPackedState.Add("ColCount", intNumCols);
+            dictPackedState.Add("RowCount", intNumRows);
+            dictPackedState.Add("DateIndex", strDateName);
+            dictPackedState.Add("ResponseVar", strResponseVar);
+            dictPackedState.Add("DisabledRwCt", this.DisabledRows);
+            dictPackedState.Add("DisabledColCt", this.DisabledCols);
+            dictPackedState.Add("HiddenColCt", this.HiddenCols);
+            dictPackedState.Add("IndVarCt", this.NumberIVs);
+            dictPackedState.Add("fileName", this.FileName);
+
+            StringWriter sw = null;
+            //Save Datasheet info as xml string for serialization
+            sw = null;
+            if (this.DT != null)
+            {
+                this.DT.TableName = "DataSheetData";
+                sw = new StringWriter();
+                this.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+                string strXmlDataTable = sw.ToString();
+                sw.Close();
+                sw = null;
+                dictPackedState.Add("XmlDataTable", strXmlDataTable);
+            }
+
+            if (this.State == VBCommon.Controls.DatasheetControl.dtState.clean)
+            {
+                bool boolClean = true;
+                dictPackedState.Add("Clean", boolClean);
+            }
+            else
+            {
+                bool boolClean = false;
+                dictPackedState.Add("Clean", boolClean);
+            }
+
+            //model expects this change to the dt first
+            DataTable tempDt = (DataTable)dictPackedState["DT"];
+            tempDt.Columns[this.ResponseVarColName].SetOrdinal(1);
+            //filter diabled rows and columns
+            tempDt = this.filterDataTableRows(tempDt);
+            Utilities.TableUtils tableutils = new Utilities.TableUtils(tempDt);
+            tempDt = tableutils.filterRVHcols(tempDt);
+            dictPackedState.Add("DataSheetDatatable", tempDt);  //for modeling to use
+
+            return dictPackedState;
+        }
+
+
+        //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
+        public void UnpackState(IDictionary<string, object> dictPackedState)
+        {
+            //unpack datatable
+
+            this.DT = (DataTable)dictPackedState["DT"];
+            this.DT.TableName = "DataSheetData";
+            this.dgv.DataSource = null;
+            this.dgv.DataSource = this.DT;
+
+            //get row and column information
+            this.DTRI = VBCommon.Metadata.dtRowInformation.getdtRI(this.DT, true);
+            this.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPackedState["DTRowInfo"];
+
+            this.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(this.DT, true);
+            this.DTCI.DTColInfo = (Dictionary<string, bool>)dictPackedState["DTColInfo"];
+
+            this.SelectedColIndex = (int)dictPackedState["CurrentColIndex"];
+            this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
+            this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
+            //get validated flag
+            this.boolValidated = (bool)dictPackedState["DSValidated"];
+
+            this.Utils = new VBCommon.Metadata.Utilities();
+            this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
+            this.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(this.dgv);
+
+            this.GridUtils.maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
+
+            //initial info for the list
+            FileInfo fi = new FileInfo(Name);
+            this.FileName = fi.Name;
+            this.showListInfo(this.FileName, this.DT);
+
+            if ((bool)dictPackedState["Clean"])
+            {
+                this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+            }
+            else
+            {
+                this.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
+            }
+
+            //if clean, initial pass is false
+            //boolInitialPass = !(bool)dictPluginState["Clean"];
         }
 
 
