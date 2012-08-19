@@ -1,0 +1,43 @@
+THIS IS THE CHANGELOG OF THE "miscTools" PACKAGE
+
+Please note that only the most significant changes are reported here.
+A full ChangeLog is available in the log messages of the SVN repository
+on R-Forge.
+
+
+            CHANGES IN VERSION 0.6-12  (2011-11-12)
+
+* added generic function margEff() 
+
+
+            CHANGES IN VERSION 0.6-10  (2010-10-15)
+
+* stdEr.default() now checks for x$std only if x is an object of S3 class
+
+
+            CHANGES IN VERSION 0.6-8  (2010-09-02)
+
+* moved generic function stdEr() including a default method and a method
+for objects of class "lm" from the "maxLik" package to this package
+
+
+            CHANGES IN VERSION 0.6-6
+
+* added generic functions nObs() and nParam() including the "default" methods
+and methods for objects of class "lm"; these generic functions and their methods
+were moved from the "maxLik" package to this package
+
+* added function ddnorm(), which calculates the derivative(s) of the density
+function of the normal (Gaussian) distribution with respect to the quantile
+
+* added function sumKeepAttr() that returns the sum of an array while keeping
+its attributes
+
+
+            CHANGES IN VERSION 0.6-2
+
+* added function "logDataSet", which was formerly part of the "micEcon" package,
+  where it had the name ".micEconLogData"
+
+* function "colMedians" can return the medians of each non-row
+  of an *array* now

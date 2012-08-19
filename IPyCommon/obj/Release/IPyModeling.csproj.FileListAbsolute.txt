@@ -1,0 +1,5 @@
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\bin\Debug\IpyModeling.dll
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\bin\Debug\IpyModeling.pdb
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\obj\Release\ResolveAssemblyReference.cache
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\obj\Release\IpyModeling.dll
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\obj\Release\IpyModeling.pdb

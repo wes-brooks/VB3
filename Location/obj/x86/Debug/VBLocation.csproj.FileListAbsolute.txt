@@ -1,0 +1,11 @@
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\bin\Debug\Plugins\VBLocation\VBLocation.dll
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\bin\Debug\Plugins\VBLocation\VBLocation.pdb
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\VBLocation.frmLocation.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\VBLocation.Map.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\VBLocation.Properties.Resources.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\VBLocation.StaticImage.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\VBLocation.dll
+C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBLocation\obj\x86\Debug\VBLocation.pdb

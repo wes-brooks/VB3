@@ -10,16 +10,14 @@ namespace VBCommon
         public enum messageIntent { LogFileOnly, UserOnly, UserAndLogFile };
         public enum targetSStrip { None, StatusStrip1, StatusStrip2, StatusStrip3, ProgressBar }
 
-        
         public enum PluginType
         {
+            ProjectManager = -1,
             Map = 0,
             Datasheet = 1,
             Modeling = 2,
-            Prediction = 3,
-            ProjectManager = 4
+            Prediction = 3
         }
-        
         
         public enum Transforms
         {
@@ -31,7 +29,6 @@ namespace VBCommon
             logbase10 = 5,
             quarticroot = 6
         }
-
 
         public enum Transforms2 
         {   log10, 
@@ -46,6 +43,13 @@ namespace VBCommon
             generalexp 
         }
 
+        public enum DependentVariableTransforms
+        { 
+            none, 
+            Log10, 
+            Ln, 
+            Power 
+        }
 
         public enum Operations
         {
@@ -56,7 +60,6 @@ namespace VBCommon
             MIN
         }
 
-
         public enum ColumnAttributes
         {
             Disabled,
@@ -65,13 +68,11 @@ namespace VBCommon
             Visible
         }
 
-
         public enum ProjectType
         {
             COMPLETE,
             MODEL
         }
-
 
         //datatable column data attributes
         public const string MAINEFFECT = "maineffect";

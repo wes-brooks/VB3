@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{14F53376-3ADE-4FA4-9026-392DE3360177}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IPyPLSControl</RootNamespace>
+    <AssemblyName>IPyPLSControl</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\Binaries\IPyPLSControl\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\Externals\DotSpatial\DotSpatial.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Extensions">
+      <HintPath>..\Externals\DotSpatial\DotSpatial.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Externals\Json.NET\Net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>..\Externals\WeifenLuo.WinformsUI.Docking\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="ZedGraph">
+      <HintPath>..\Externals\Zedgraph\zedgraph_dll_v515\ZedGraph.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IPyPLSControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="IPyPLSControl.designer.cs">
+      <DependentUpon>IPyPLSControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IPyPLSPlugin.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IPyPLSControl.resx">
+      <DependentUpon>IPyPLSControl.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IPyCommon\IPyCommon.csproj">
+      <Project>{6BF34EC4-522C-4B55-8517-E8B02E2A3B04}</Project>
+      <Name>IPyCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IpyModeling\IPyModeling.csproj">
+      <Project>{ADE70E49-1CEB-4526-A7BB-D8A99246D718}</Project>
+      <Name>IPyModeling</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VBCommon\VBCommon.csproj">
+      <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
+      <Name>VBCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VBDockManager\VBDockManager.csproj">
+      <Project>{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}</Project>
+      <Name>VBDockManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VBProjectManager\VBProjectManager.csproj">
+      <Project>{56A96878-2E76-41B4-858A-6AAB61F99CE8}</Project>
+      <Name>VBProjectManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>cp $(TargetPath) $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

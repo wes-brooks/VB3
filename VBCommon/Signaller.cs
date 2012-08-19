@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VBCommon.PluginSupport;
 
 namespace VBCommon
 {
@@ -15,7 +16,7 @@ namespace VBCommon
         //Request that plugins unpack their state... why?
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event EventHandler<UnpackEventArgs> UnpackRequest;
-        
+
         //event for when a project is saved
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageReceived;
@@ -26,7 +27,7 @@ namespace VBCommon
         //event for broadcasting
         public delegate void BroadCastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadCastEventHandler<BroadCastEventArgs> BroadcastState;
-        
+
 
         public Signaller()
         {

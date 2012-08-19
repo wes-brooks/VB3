@@ -1,0 +1,13 @@
+C:\Users\troddick\VBFiles\IpyModelingControl\bin\Debug\IpyModelingControl.dll
+C:\Users\troddick\VBFiles\IpyModelingControl\bin\Debug\IpyModelingControl.pdb
+C:\Users\troddick\VBFiles\IpyModelingControl\bin\Debug\VBTools.dll
+C:\Users\troddick\VBFiles\IpyModelingControl\bin\Debug\VBTools.pdb
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\ResolveAssemblyReference.cache
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\IPyModelingControl.IPyGBMControl.resources
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\IPyModelingControl.IPyModelingControl.resources
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\IPyModelingControl.IPyPLSControl.resources
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\IpyModelingControl.Properties.Resources.resources
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\GenerateResource.read.1.tlog
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\GenerateResource.write.1.tlog
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\IpyModelingControl.dll
+C:\Users\troddick\VBFiles\IpyModelingControl\obj\Release\IpyModelingControl.pdb

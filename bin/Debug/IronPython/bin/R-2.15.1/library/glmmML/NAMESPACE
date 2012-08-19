@@ -1,0 +1,13 @@
+useDynLib(glmmML)
+import(stats)
+export(ghq, glmmboot, glmmbootFit, glmmML, glmmML.fit,
+       print.glmmML, summary.glmmML,
+       print.glmmboot, summary.glmmboot)
+S3method(print, glmmML)
+S3method(summary, glmmML)
+S3method(print, glmmboot)
+S3method(summary, glmmboot)
+S3method(extractAIC, glmmML)
+S3method(nobs, glmmML)
+S3method(extractAIC, glmmboot)
+S3method(nobs, glmmboot)

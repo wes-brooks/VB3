@@ -1,0 +1,13 @@
+censReg_step            Use censReg to impute the censored values based
+                        on the variables that were selected via the
+                        LASSO.
+censlars                Iterate between the censReg step and the lars
+                        step in order to produce a final model.
+censlars-package        The LASSO for linear regression with censored
+                        observations ~~ package title ~~
+initial_step            Get the intial coefficient estimates for all of
+                        the predictor variables
+lars_step               Uses the lars package to select variables based
+                        on the imputed observations that come out of
+                        the censReg step.
+predict.censlars        Make predictions using a censlars object

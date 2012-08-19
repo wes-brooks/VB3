@@ -1,0 +1,10 @@
+metadata_version = '1.1'
+name = 'ironpkg'
+version = '1.0.0'
+build = 1
+
+arch = None
+platform = 'cli'
+osdist = None
+python = None
+packages = []

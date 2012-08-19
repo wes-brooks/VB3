@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Windows.Forms;
 using VBCommon;
+using VBCommon.PluginSupport;
 using Newtonsoft.Json;
 
 
@@ -187,14 +188,14 @@ namespace VBProjectManager
 
 
         //raise event to pack each plugin for saving and add to PackedPluginStates dictionary
-        private void ProjectSavedListener(object sender, VBCommon.SerializationEventArgs e)
+        private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             e.PackedPluginStates.Add(strPluginKey, PackState());
         }
 
 
         //raise event to unpack each plugin, sending the plugin dictionary
-        private void ProjectOpenedListener(object sender, VBCommon.SerializationEventArgs e)
+        private void ProjectOpenedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             if (e.PackedPluginStates.ContainsKey(strPluginKey))
             {

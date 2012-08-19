@@ -1,0 +1,11 @@
+C:\VB3\VirtualBeach\bin\Debug\Application Extensions\IpyModelingControl.dll
+C:\VB3\VirtualBeach\bin\Debug\Application Extensions\IpyModelingControl.pdb
+C:\VB3\IpyModelingControl\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\VB3\IpyModelingControl\obj\x86\Debug\IPyModelingControl.IPyGBMControl.resources
+C:\VB3\IpyModelingControl\obj\x86\Debug\IPyModelingControl.IPyModelingControl.resources
+C:\VB3\IpyModelingControl\obj\x86\Debug\IPyModelingControl.IPyPLSControl.resources
+C:\VB3\IpyModelingControl\obj\x86\Debug\IpyModelingControl.Properties.Resources.resources
+C:\VB3\IpyModelingControl\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\VB3\IpyModelingControl\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\VB3\IpyModelingControl\obj\x86\Debug\IpyModelingControl.dll
+C:\VB3\IpyModelingControl\obj\x86\Debug\IpyModelingControl.pdb

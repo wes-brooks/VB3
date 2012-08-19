@@ -1,0 +1,25 @@
+C:\VirtualBeach\bin\Debug\Application Extensions\IpyModeling.dll
+C:\VirtualBeach\bin\Debug\Application Extensions\IpyModeling.pdb
+C:\VB3\IpyModeling\IpyModeling\obj\Debug\ResolveAssemblyReference.cache
+C:\VB3\IpyModeling\IpyModeling\obj\Debug\IpyModeling.dll
+C:\VB3\IpyModeling\IpyModeling\obj\Debug\IpyModeling.pdb
+C:\Users\troddick\VirtualBeach\bin\Debug\Application Extensions\IpyModeling.dll
+C:\Users\troddick\VirtualBeach\bin\Debug\Application Extensions\IpyModeling.pdb
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\obj\Debug\IpyModeling.dll
+C:\Users\troddick\VBFiles\IpyModeling\IpyModeling\obj\Debug\IpyModeling.pdb
+C:\Users\troddick\VBFiles\IPyModeling\IpyModeling\IpyModeling\bin\Debug\IpyModeling.dll
+C:\Users\troddick\VBFiles\IPyModeling\IpyModeling\IpyModeling\bin\Debug\IpyModeling.pdb
+C:\Users\troddick\VBFiles\IPyModeling\IpyModeling\IpyModeling\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\troddick\VBFiles\IPyModeling\IpyModeling\IpyModeling\obj\Debug\IpyModeling.dll
+C:\Users\troddick\VBFiles\IPyModeling\IpyModeling\IpyModeling\obj\Debug\IpyModeling.pdb
+C:\git\tonia\IPyModeling\IpyModeling\IpyModeling\bin\Debug\IpyModeling.dll
+C:\git\tonia\IPyModeling\IpyModeling\IpyModeling\bin\Debug\IpyModeling.pdb
+C:\git\tonia\IPyModeling\IpyModeling\IpyModeling\obj\Debug\ResolveAssemblyReference.cache
+C:\git\tonia\IPyModeling\IpyModeling\IpyModeling\obj\Debug\IpyModeling.dll
+C:\git\tonia\IPyModeling\IpyModeling\IpyModeling\obj\Debug\IpyModeling.pdb
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModeling\IpyModeling\bin\Debug\IpyModeling.dll
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModeling\IpyModeling\bin\Debug\IpyModeling.pdb
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModeling\IpyModeling\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModeling\IpyModeling\obj\Debug\IpyModeling.dll
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModeling\IpyModeling\obj\Debug\IpyModeling.pdb

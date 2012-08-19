@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6BF34EC4-522C-4B55-8517-E8B02E2A3B04}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IPyCommon</RootNamespace>
+    <AssemblyName>IPyCommon</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\Binaries\IPyCommon\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Combinatorics">
+      <HintPath>..\IpyModeling\bin\Debug\Combinatorics.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetExtensions">
+      <HintPath>..\Externals\IronPython\DotNetExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\IronPython\IronPython.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython.Modules, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\IronPython\IronPython.Modules.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Dynamic, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\ScriptingDLLs\Microsoft.Dynamic.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\ScriptingDLLs\Microsoft.Scripting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting.Metadata, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\ScriptingDLLs\Microsoft.Scripting.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IPyCommon.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VBCommon\VBCommon.csproj">
+      <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
+      <Name>VBCommon</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>cp $(TargetPath) $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)
+cp $(TargetPath) $(SolutionDir)\bin\Debug\$(TargetFileName)
+
+cp $(TargetDir)\Microsoft.Dynamic.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Dynamic.dll
+cp $(TargetDir)\Microsoft.Scripting.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Scripting.dll
+cp $(TargetDir)\Microsoft.Scripting.Metadata.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Scripting.Metadata.dll
+
+cp $(TargetDir)\Microsoft.Dynamic.dll $(SolutionDir)\bin\Debug\Microsoft.Dynamic.dll
+cp $(TargetDir)\Microsoft.Scripting.dll $(SolutionDir)\bin\Debug\Microsoft.Scripting.dll
+cp $(TargetDir)\Microsoft.Scripting.Metadata.dll $(SolutionDir)\bin\Debug\Microsoft.Scripting.Metadata.dll
+cp $(TargetDir)\DotNetExtensions.dll $(SolutionDir)\bin\Debug\DotNetExtensions.dll
+
+cp $(SolutionDir)\Externals\Ciloci.Flee\Ciloci.Flee.dll $(SolutionDir)\bin\Debug\Plugins\Ciloci.Flee.dll
+
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.Data.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.Data.v11.2.dll
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.Utils.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.Utils.v11.2.dll
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraBars.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraBars.v11.2.dll
+cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraEditors.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraEditors.v11.2.dll
+
+xcopy /Y /S $(SolutionDir)\Externals\IronPython\* $(SolutionDir)\bin\Debug\</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

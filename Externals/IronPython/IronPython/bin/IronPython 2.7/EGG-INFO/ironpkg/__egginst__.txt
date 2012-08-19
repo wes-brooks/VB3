@@ -1,0 +1,28 @@
+# egginst metadata
+egg_name = 'ironpkg-1.0.0-1.egg'
+prefix = 'C:\\Program Files (x86)\\IronPython 2.7'
+installed_size = 120215
+rel_files = [
+  'EGG-INFO\\ironpkg\\__egginst__.txt',
+  'Lib\\site-packages\\egginst\\scripts.py',
+  'Lib\\site-packages\\egginst\\exe_data.py',
+  'Lib\\site-packages\\egginst\\__init__.py',
+  'Lib\\site-packages\\egginst\\main.py',
+  'Lib\\site-packages\\egginst\\utils.py',
+  'Lib\\site-packages\\enstaller\\config.py',
+  'Lib\\site-packages\\enstaller\\verlib.py',
+  'Lib\\site-packages\\enstaller\\__init__.py',
+  'Lib\\site-packages\\enstaller\\main.py',
+  'Lib\\site-packages\\enstaller\\utils.py',
+  'Lib\\site-packages\\enstaller\\indexed_repo\\chain.py',
+  'Lib\\site-packages\\enstaller\\indexed_repo\\metadata.py',
+  'Lib\\site-packages\\enstaller\\indexed_repo\\dist_naming.py',
+  'Lib\\site-packages\\enstaller\\indexed_repo\\__init__.py',
+  'Lib\\site-packages\\enstaller\\indexed_repo\\requirement.py',
+  'EGG-INFO\\ironpkg\\spec\\depend',
+  'EGG-INFO\\ironpkg\\entry_points.txt',
+  'ironegg.exe',
+  'ironegg-script.py',
+  'ironpkg.exe',
+  'ironpkg-script.py',
+]

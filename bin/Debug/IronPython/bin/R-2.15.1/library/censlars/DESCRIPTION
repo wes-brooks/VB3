@@ -1,0 +1,12 @@
+Package: censlars
+Type: Package
+Title: The LASSO for linear regression with censored observations
+Version: 0.1
+Date: 2012-06-13
+Author: Wesley Brooks
+Maintainer: Wesley Brooks <wrbrooks@usgs.gov>
+Description: Iterate between censReg and lars to find a shrunk-and-selected linear model for data with some censoring of the response variable.
+Depends: lars, censReg
+License: GPL-3
+LazyLoad: yes
+Built: R 2.15.1; ; 2012-07-31 19:55:36 UTC; windows

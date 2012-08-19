@@ -1,0 +1,15 @@
+C:\VB3\Location\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\VB3\Location\obj\x86\Debug\VBLocation.Properties.Resources.resources
+C:\VB3\Location\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\VB3\Location\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\VB3\Location\obj\x86\Debug\VBLocation.pdb
+C:\VB3\Location\obj\x86\Debug\Location.frmLocation.resources
+C:\VB3\Location\obj\x86\Debug\Location.Map.resources
+C:\VB3\Location\obj\x86\Debug\Location.StaticImage.resources
+C:\VB3\bin\Debug\Plugins\VBLocation\VBLocation.dll
+C:\VB3\bin\Debug\Plugins\VBLocation\VBLocation.pdb
+C:\VB3\Location\obj\x86\Debug\VBLocation.dll
+C:\VB3\bin\Debug\Plugins\Location\VBLocation.dll
+C:\VB3\bin\Debug\Plugins\Location\VBLocation.pdb
+C:\VB3\bin\Debug\Binaries\Location\VBLocation.dll
+C:\VB3\bin\Debug\Binaries\Location\VBLocation.pdb

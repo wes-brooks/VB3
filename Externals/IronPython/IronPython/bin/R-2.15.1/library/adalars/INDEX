@@ -1,0 +1,10 @@
+adalars                 Iterate between the censReg step and the lars
+                        step in order to produce a final model.
+adalars-package         The adaptive LASSO for linear regression ~~
+                        package title ~~
+adalars_initial_step    Get the intial coefficient estimates for all of
+                        the predictor variables
+adalars_step            Uses the lars package to select variables based
+                        on the imputed observations that come out of
+                        the censReg step.
+predict.adalars         Make predictions using a adalars object

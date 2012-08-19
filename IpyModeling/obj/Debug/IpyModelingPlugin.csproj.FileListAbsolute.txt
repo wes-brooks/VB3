@@ -1,0 +1,9 @@
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\bin\Debug\IpyModelingControl.dll
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\bin\Debug\IpyModelingControl.pdb
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\obj\Debug\IPyModelingControl.IPyModelingControl.resources
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\obj\Debug\IpyModelingControl.Properties.Resources.resources
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\obj\Debug\GenerateResource.read.1.tlog
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\obj\Debug\GenerateResource.write.1.tlog
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\obj\Debug\IpyModelingControl.dll
+C:\Users\wrbrooks\git\tonia\IPyModeling\IpyModelingControl\obj\Debug\IpyModelingControl.pdb

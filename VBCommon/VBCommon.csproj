@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{01086CD1-5D59-4C17-80D4-2E99E99DF62C}</ProjectGuid>
+    <ProjectGuid>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VBCommon</RootNamespace>
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\Binaries\VBCommon\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -31,8 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\VirtualBeach\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\Json.NET\Net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -44,49 +46,136 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="ZedGraph">
-      <HintPath>..\bin\ZedGraph.dll</HintPath>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>..\Externals\WeifenLuo.WinformsUI.Docking\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="ZedGraph, Version=5.1.5.28844, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\Zedgraph\zedgraph_dll_v515\ZedGraph.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Events.cs" />
-    <Compile Include="frmChooseWorksheet.cs">
+    <Compile Include="Controls\AnnotatedScatterPlot.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\AnnotatedScatterPlot.designer.cs">
+      <DependentUpon>AnnotatedScatterPlot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DatasheetControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DatasheetControl.designer.cs">
+      <DependentUpon>DatasheetControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Metadata\dtColumnInformation.cs" />
+    <Compile Include="Metadata\dtRowInformation.cs" />
+    <Compile Include="Controls\frmMissingValues.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmChooseWorksheet.designer.cs">
+    <Compile Include="Controls\frmMissingValues.designer.cs">
+      <DependentUpon>frmMissingValues.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\frmPlot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmPlot.designer.cs">
+      <DependentUpon>frmPlot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\frmPowerExponent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmPowerExponent.designer.cs">
+      <DependentUpon>frmPowerExponent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\frmVariableSpecification.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmVariableSpecification.designer.cs">
+      <DependentUpon>frmVariableSpecification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Metadata\Utilities.cs" />
+    <Compile Include="PluginSupport\Events.cs" />
+    <Compile Include="Controls\frmChooseWorksheet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmChooseWorksheet.designer.cs">
       <DependentUpon>frmChooseWorksheet.cs</DependentUpon>
     </Compile>
     <Compile Include="Globals.cs" />
-    <Compile Include="IFormState.cs" />
-    <Compile Include="ImportExport.cs" />
+    <Compile Include="Interfaces\IBeachSite.cs" />
+    <Compile Include="Interfaces\IFormState.cs" />
+    <Compile Include="IO\ImportExport.cs" />
     <Compile Include="IO\DelimitedFile.cs" />
     <Compile Include="IO\ExcelOleDb.cs" />
-    <Compile Include="IPlugin.cs" />
+    <Compile Include="Interfaces\IPlugin.cs" />
     <Compile Include="ListItem.cs" />
-    <Compile Include="MLRPredObs.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="MLRPredObs.designer.cs">
-      <DependentUpon>MLRPredObs.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ModelErrorCounts.cs" />
+    <Compile Include="PluginSupport\Utilities.cs" />
+    <Compile Include="Spatial\PointGeo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Signaller.cs" />
-    <Compile Include="Transform.cs" />
+    <Compile Include="Spatial\Site.cs" />
+    <Compile Include="Statistics\AndersonDarlingNormality.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\Calculus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\DescriptiveStats.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\Frequency.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\ModelErrorCounts.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\MultipleRegression.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\Polynomial.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\Statistics.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Statistics\Utility.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transforms\Transform.cs" />
+    <Compile Include="VBCSHelp.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="IO\vssver.scc" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmChooseWorksheet.resx">
+    <EmbeddedResource Include="Controls\DatasheetControl.resx">
+      <DependentUpon>DatasheetControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmChooseWorksheet.resx">
       <DependentUpon>frmChooseWorksheet.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MLRPredObs.resx">
-      <DependentUpon>MLRPredObs.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\AnnotatedScatterPlot.resx">
+      <DependentUpon>AnnotatedScatterPlot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmMissingValues.resx">
+      <DependentUpon>frmMissingValues.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmPlot.resx">
+      <DependentUpon>frmPlot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmPowerExponent.resx">
+      <DependentUpon>frmPowerExponent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmVariableSpecification.resx">
+      <DependentUpon>frmVariableSpecification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>cp $(TargetPath)  $(SolutionDir)\bin\Debug\$(TargetFileName)
+cp $(TargetPath)  $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

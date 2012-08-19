@@ -7,7 +7,7 @@ using System.Xml;
 using System.Xml.XPath;
 using System.IO;
 
-namespace VBTools
+namespace VBCommon
 {
     public class VBCSHelp
     {

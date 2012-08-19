@@ -1,0 +1,11 @@
+ghq                     Gauss-Hermite
+glmmML                  Generalized Linear Models with random intercept
+glmmML.fit              Generalized Linear Model with random intercept
+glmmboot                Generalized Linear Models with fixed effects
+                        grouping
+glmmbootFit             Generalized Linear Models with fixed effects
+                        grouping
+print.glmmML            Prints a 'glmmML' object.
+print.glmmboot          Prints a 'glmmML' object.
+summary.glmmML          Summary of a glmmML object
+summary.glmmboot        Summary of a glmmboot object

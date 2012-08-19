@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using VBCommon;
+using VBCommon.Interfaces;
+using VBCommon.PluginSupport;
 
 
 namespace VBProjectManager
@@ -244,15 +246,15 @@ namespace VBProjectManager
             signaller = GetSignaller();
             
             signaller.MessageReceived += new VBCommon.Signaller.MessageHandler<MessageArgs>(MessageReceived);
-            signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectSavedListener);
-            signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
-            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.BroadCastEventArgs>(BroadcastStateListener);
+            signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
+            signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
+            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
             
         }
 
         
         //listen to plugin's broadcast in order to update other plugins
-        private void BroadcastStateListener(object sender, VBCommon.BroadCastEventArgs e)
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
             string strPluginType = (((IPlugin)sender).PluginType).ToString();
             //if datasheet is broadcasting any changes

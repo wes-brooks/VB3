@@ -1,0 +1,10 @@
+censReg	censReg
+coef.censReg	coef.censReg
+coef.summary.censReg	coef.summary.censReg
+logLik.censReg	coef.censReg
+margEff.censReg	margEff.censReg
+print.censReg	censReg
+print.summary.censReg	summary.censReg
+summary.censReg	summary.censReg
+summary.margEff.censReg	margEff.censReg
+vcov.censReg	coef.censReg

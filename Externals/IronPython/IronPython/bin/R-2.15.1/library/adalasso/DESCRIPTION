@@ -1,0 +1,11 @@
+Package: adalasso
+Type: Package
+Title: Adaptive lasso in GLMs
+Version: 0.1
+Date: 2012-07-03
+Author: Wesley Brooks
+Depends: R (>= 2.15.0), glmnet (>= 1.7.4)
+Maintainer: Wesley Brooks <brooks.wesley@gmail.com>
+Description: Use the adaptive lasso for shrinkage and selection in a Generalized Linear Model, including when when p > n.
+License: GPL-3
+Built: R 2.15.1; ; 2012-08-06 18:02:22 UTC; windows

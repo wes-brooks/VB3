@@ -1,0 +1,6 @@
+galogistic-package	galogistic-package
+evalBIC	evalBIC_logistic
+galogistic	galogistic-package
+galogistic	galogistic
+galogistic_monitor	galogistic_monitor
+predict.galogistic	predict.galogistic
