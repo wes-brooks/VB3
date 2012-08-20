@@ -243,7 +243,6 @@
             // 
             // btnRemoveInputVariable
             // 
-            this.btnRemoveInputVariable.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnRemoveInputVariable.Location = new System.Drawing.Point(164, 216);
             this.btnRemoveInputVariable.Name = "btnRemoveInputVariable";
             this.btnRemoveInputVariable.Size = new System.Drawing.Size(25, 20);
@@ -253,7 +252,6 @@
             // 
             // btnAddInputVariable
             // 
-            this.btnAddInputVariable.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnAddInputVariable.Location = new System.Drawing.Point(164, 190);
             this.btnAddInputVariable.Name = "btnAddInputVariable";
             this.btnAddInputVariable.Size = new System.Drawing.Size(25, 20);
@@ -282,7 +280,6 @@
             // 
             // label14
             // 
-            this.label14.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label14.AutoSize = true;
             this.label14.Location = new System.Drawing.Point(194, 59);
             this.label14.Name = "label14";

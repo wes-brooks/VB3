@@ -429,7 +429,7 @@ namespace VBCommon.Metadata
                 for (int r = 0; r < dgv.Rows.Count; r++)
                 {
                     //set style to black unless the row is disabled
-                    if (!dtRI.getRowStatus(dgv[0, r].Value.ToString())) continue;
+//                    if (!dtRI.getRowStatus(dgv[0, r].Value.ToString())) continue;  //error here on Value being null
                     dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
                 }
             }

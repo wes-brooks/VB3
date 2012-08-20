@@ -28,6 +28,8 @@ namespace VBCommon
         public delegate void BroadCastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadCastEventHandler<BroadCastEventArgs> BroadcastState;
 
+        public delegate void HidePluginsHandler();
+        public event HidePluginsHandler HideTabsEvent;
 
         public Signaller()
         {
@@ -44,6 +46,15 @@ namespace VBCommon
                 BroadcastState(sender, e);
             }
         }
+
+
+        //event for hiding plugins when datasheet plugin is selected
+        public void HidePlugins()
+        {
+            if (HideTabsEvent != null)
+                HideTabsEvent();
+        }
+
 
         //Tell the plugins to pack their states into the dictionary for saving
         public void RaiseSaveRequest(IDictionary<string, IDictionary<string, object>> dictPackedStates)

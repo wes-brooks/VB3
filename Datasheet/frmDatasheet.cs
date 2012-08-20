@@ -254,8 +254,14 @@ namespace Datasheet
         public void UnpackState(IDictionary<string, object> dictPluginState)
         {
             //unpack datasheet control
-            PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
-            dsControl1.UnpackState(dictPackedDatasheetState);
+            string strDatasheetState = (string)dictPackedDatasheetState["PackedDatasheetState"];
+//            PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
+
+            //deserialize dictionary
+            
+            Dictionary<string, object> dictDeserialized;
+            dictDeserialized = JsonConvert.DeserializeObject<Dictionary<string, object>>(strDatasheetState);
+            dsControl1.UnpackState(dictDeserialized);
 
             
             //get validated flag
@@ -381,11 +387,12 @@ namespace Datasheet
             //check to see if this is the first time going to modeling
             if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.dirty && !boolInitialPass)
             {
+                
                 DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
                 if (dlgr == DialogResult.OK)
                 {
                     correlationData = dsControl1.DT;
-                    //                   savedDT = dt;                 //dont see this being used anywhere
+                    //  savedDT = dt;                 //dont see this being used anywhere
                     dataSheetData = dsControl1.DT;
                     dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 }
@@ -398,8 +405,8 @@ namespace Datasheet
                 modelData = dsControl1.DT;
                 dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 boolInitialPass = false;
-                //                savedDT = dt;                   //dont see this being used anywhere
-                //                savedDGV = dsControl1.dgv;     //dont see this being used anywhere
+                //   savedDT = dt;                   //dont see this being used anywhere
+                //   savedDGV = dsControl1.dgv;     //dont see this being used anywhere
             }
 
             dictPackedDatasheetState = dsControl1.PackState();

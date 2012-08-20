@@ -999,8 +999,8 @@ namespace VBCommon.Controls
         // user click captured - decide what menu items are appropriate and show them
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
         {            
-            dtColumnInformation dtCI = new dtColumnInformation(dt);
-            Utilities utils = new Utilities();
+            //dtColumnInformation dtCI = new dtColumnInformation(dt);
+            //Utilities utils = new Utilities();
 
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
             int colndx = ht.ColumnIndex;
@@ -1223,8 +1223,10 @@ namespace VBCommon.Controls
             this.GridUtils.maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
 
             //initial info for the list
-            FileInfo fi = new FileInfo(Name);
-            this.FileName = fi.Name;
+            this.FileName = (string)dictPackedState["fileName"];
+            
+            //FileInfo fi = new FileInfo(Name);
+            //this.FileName = fi.Name;
             this.showListInfo(this.FileName, this.DT);
 
             if ((bool)dictPackedState["Clean"])

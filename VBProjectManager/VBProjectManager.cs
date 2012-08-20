@@ -33,6 +33,7 @@ namespace VBProjectManager
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
 
+
         //constructor
         public VBProjectManager()
         {
@@ -249,10 +250,28 @@ namespace VBProjectManager
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
-            
+            signaller.HideTabsEvent += new VBCommon.Signaller.HidePluginsHandler(HideTabsListener);
         }
 
-        
+
+
+        private void HideTabsListener()
+        {
+            foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
+            {
+                //get the plugin
+                IPlugin plugin = (IPlugin)ex;
+                string strPlTy = plugin.PluginType.ToString();
+
+                //as long as it's not datasheet, hide it
+                if (strPlTy != "Datasheet")
+                {
+                    plugin.Hide();
+                }
+            }
+        }
+
+
         //listen to plugin's broadcast in order to update other plugins
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {

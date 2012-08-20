@@ -28,7 +28,7 @@ namespace Datasheet
        
         private VBCommon.Signaller signaller;
         protected string strPanelKey = "DataSheetPanel";
-        protected string strPanelCaption = "Datasheet";
+        protected string strPanelCaption = "Global Datasheet";
         //buttons
         private SimpleActionItem btnImport;
         private SimpleActionItem btnValidate;
@@ -49,16 +49,16 @@ namespace Datasheet
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
 
-        public delegate void HidePluginsHandler();
-        public event HidePluginsHandler HideTabsEvent;
+        //public delegate void HidePluginsHandler();
+        //public event HidePluginsHandler HideTabsEvent;
 
 
-        //event for hiding plugins when datasheet plugin is selected
-        private void HidePlugins()
-        {
-            if (HideTabsEvent != null)
-                HideTabsEvent();
-        }
+        ////event for hiding plugins when datasheet plugin is selected
+        //private void HidePlugins()
+        //{
+        //    if (HideTabsEvent != null)
+        //        HideTabsEvent();
+        //}
 
 
         //deactivate this plugin
@@ -127,7 +127,6 @@ namespace Datasheet
         {
             if (e.SelectedRootKey == strPanelKey)
             {
-                HidePlugins();
                 App.DockManager.SelectPanel(strPanelKey);
             }
         }
