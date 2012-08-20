@@ -796,7 +796,6 @@ namespace VBCommon.Controls
         // set table/grid/listview properties for the user-selected column menu item Disable
         public void DisableCol(object sender, EventArgs e)
         {
-            dtColumnInformation ctCI = new dtColumnInformation(dt);
             string cn = dt.Columns[intSelectedColIndex].Caption;
             dtCI.setColStatus(dt.Columns[intSelectedColIndex].ColumnName.ToString(), false);
             dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
@@ -999,8 +998,7 @@ namespace VBCommon.Controls
         
         // user click captured - decide what menu items are appropriate and show them
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
-        {
-            
+        {            
             dtColumnInformation dtCI = new dtColumnInformation(dt);
             Utilities utils = new Utilities();
 

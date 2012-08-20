@@ -106,3 +106,6 @@ C:\VB3\VirtualBeach\bin\Debug\zh-cn\ZedGraph.resources.dll
 C:\VB3\VirtualBeach\bin\Debug\zh-tw\ZedGraph.resources.dll
 C:\VB3\bin\Debug\VirtualBeach.exe
 C:\VB3\bin\Debug\VirtualBeach.pdb
+C:\VB3\bin\Debug\ContainerForm.resx
+C:\VB3\bin\Debug\ContainerForm.cs
+C:\VB3\bin\Debug\ContainerForm.Designer.cs

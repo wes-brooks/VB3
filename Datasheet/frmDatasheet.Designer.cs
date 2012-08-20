@@ -28,13 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDatasheet));
-            VBCommon.Metadata.Utilities utilities1 = new VBCommon.Metadata.Utilities();
+            VBCommon.Metadata.Utilities utilities2 = new VBCommon.Metadata.Utilities();
             this.dsControl1 = new VBCommon.Controls.DatasheetControl();
             this.SuspendLayout();
             // 
             // dsControl1
             // 
+            this.dsControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dsControl1.CurrentSelectedRowIndex = -1;
             this.dsControl1.DependentVariableTransform = VBCommon.DependentVariableTransforms.none;
             this.dsControl1.DisabledCols = 0;
@@ -55,7 +57,7 @@
             this.dsControl1.Size = new System.Drawing.Size(1063, 491);
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
-            this.dsControl1.Utils = utilities1;
+            this.dsControl1.Utils = utilities2;
             // 
             // frmDatasheet
             // 

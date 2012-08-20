@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            VBCommon.Metadata.Utilities utilities1 = new VBCommon.Metadata.Utilities();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            VBCommon.Metadata.Utilities utilities2 = new VBCommon.Metadata.Utilities();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend8 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series15 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series16 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
@@ -130,6 +130,9 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
@@ -165,6 +168,9 @@
             // 
             // dsControl1
             // 
+            this.dsControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dsControl1.CurrentSelectedRowIndex = -1;
             this.dsControl1.DependentVariableTransform = VBCommon.DependentVariableTransforms.none;
             this.dsControl1.DisabledCols = 0;
@@ -185,7 +191,7 @@
             this.dsControl1.Size = new System.Drawing.Size(1066, 494);
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
-            this.dsControl1.Utils = utilities1;
+            this.dsControl1.Utils = utilities2;
             // 
             // tabPage1
             // 
@@ -286,7 +292,8 @@
             // 
             // lbIndVariables
             // 
-            this.lbIndVariables.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.lbIndVariables.FormattingEnabled = true;
             this.lbIndVariables.HorizontalScrollbar = true;
             this.lbIndVariables.Location = new System.Drawing.Point(192, 75);
@@ -306,7 +313,8 @@
             // 
             // lbAvailableVariables
             // 
-            this.lbAvailableVariables.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbAvailableVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.lbAvailableVariables.FormattingEnabled = true;
             this.lbAvailableVariables.HorizontalScrollbar = true;
             this.lbAvailableVariables.Location = new System.Drawing.Point(3, 75);
@@ -344,6 +352,8 @@
             // 
             // pnlThresholdingButtons
             // 
+            this.pnlThresholdingButtons.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlThresholdingButtons.Controls.Add(this.btnRight25);
             this.pnlThresholdingButtons.Controls.Add(this.btnRight1);
             this.pnlThresholdingButtons.Controls.Add(this.btnLeft1);
@@ -409,32 +419,35 @@
             // 
             // chartValidation
             // 
-            chartArea1.AxisX.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisX.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.AxisX2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisX2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.AxisY.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisY.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.AxisY2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisY2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.Name = "ChartArea1";
-            this.chartValidation.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chartValidation.Legends.Add(legend1);
+            this.chartValidation.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            chartArea8.AxisX.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea8.AxisX.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea8.AxisX2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea8.AxisX2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea8.AxisY.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea8.AxisY.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea8.AxisY2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea8.AxisY2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea8.Name = "ChartArea1";
+            this.chartValidation.ChartAreas.Add(chartArea8);
+            legend8.Name = "Legend1";
+            this.chartValidation.Legends.Add(legend8);
             this.chartValidation.Location = new System.Drawing.Point(389, 9);
             this.chartValidation.Name = "chartValidation";
-            series1.BorderWidth = 2;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series1.Legend = "Legend1";
-            series1.Name = "True positives";
-            series2.BorderWidth = 2;
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series2.Legend = "Legend1";
-            series2.Name = "True negatives";
-            this.chartValidation.Series.Add(series1);
-            this.chartValidation.Series.Add(series2);
+            series15.BorderWidth = 2;
+            series15.ChartArea = "ChartArea1";
+            series15.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series15.Legend = "Legend1";
+            series15.Name = "True positives";
+            series16.BorderWidth = 2;
+            series16.ChartArea = "ChartArea1";
+            series16.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series16.Legend = "Legend1";
+            series16.Name = "True negatives";
+            this.chartValidation.Series.Add(series15);
+            this.chartValidation.Series.Add(series16);
             this.chartValidation.Size = new System.Drawing.Size(687, 550);
             this.chartValidation.TabIndex = 128;
             this.chartValidation.Text = "chart1";
@@ -451,12 +464,12 @@
             // 
             // lvValidation
             // 
+            this.lvValidation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lvValidation.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader16,
             this.columnHeader17,
             this.columnHeader18,
             this.columnHeader19});
-            this.lvValidation.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvValidation.FullRowSelect = true;
             this.lvValidation.GridLines = true;
             this.lvValidation.Location = new System.Drawing.Point(3, 16);
@@ -520,7 +533,8 @@
             // 
             // lvModel
             // 
-            this.lvModel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvModel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.lvModel.FullRowSelect = true;
             this.lvModel.GridLines = true;
             this.lvModel.Location = new System.Drawing.Point(3, 16);
@@ -816,10 +830,10 @@
             this.tabObsPred.Text = "Observed vs Predicted";
             this.tabObsPred.UseVisualStyleBackColor = true;
             // 
-            // mlrPredObs1
+            // myScatterPlot
             // 
             this.myScatterPlot.Location = new System.Drawing.Point(3, 3);
-            this.myScatterPlot.Name = "mlrPredObs1";
+            this.myScatterPlot.Name = "myScatterPlot";
             this.myScatterPlot.PowerExponent = double.NaN;
             this.myScatterPlot.Size = new System.Drawing.Size(678, 345);
             this.myScatterPlot.TabIndex = 0;

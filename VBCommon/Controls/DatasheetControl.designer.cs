@@ -59,13 +59,13 @@
             this.dgv.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgv_KeyDown);
             this.dgv.MouseUp += new System.Windows.Forms.MouseEventHandler(this.dgv_MouseUp);
             // 
-            // DSControl
+            // DatasheetControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.dgv);
             this.Controls.Add(this.listView1);
-            this.Name = "DSControl";
+            this.Name = "DatasheetControl";
             this.Size = new System.Drawing.Size(1066, 602);
             this.Load += new System.EventHandler(this.datasheet_load);
             ((System.ComponentModel.ISupportInitialize)(this.dgv)).EndInit();
