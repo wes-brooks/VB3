@@ -257,18 +257,17 @@ namespace VBProjectManager
 
         private void HideTabsListener()
         {
-            foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
+            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
             {
-                //get the plugin
-                IPlugin plugin = (IPlugin)ex;
-                string strPlTy = plugin.PluginType.ToString();
-
-                //as long as it's not datasheet, hide it
-                if (strPlTy != "Datasheet")
+                if (x is IPlugin)
                 {
-                    plugin.Hide();
+                    //hide the rest
+                    IPlugin pt = (IPlugin)x;
+                    if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
+                        pt.Hide();
                 }
             }
+           
         }
 
 

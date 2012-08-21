@@ -86,6 +86,7 @@ namespace IPyModeling
         private DataTable _dtFull = null;
         string fn = string.Empty;
         DataTable dt = new DataTable();
+        private IDictionary<string, object> dictPackedDatasheetState = null;
 
         //A flag to indicate whether this modeling tab has been used.
         protected bool boolVirgin;
@@ -149,6 +150,15 @@ namespace IPyModeling
         public List<double> TruePositives
         {
             get { return this.listTruePos; }
+        }
+
+
+        // getter/setter for datasheet table
+        [JsonProperty]
+        public IDictionary<string, object> PackedDatasheetState
+        {
+            set { dictPackedDatasheetState = value; }
+            get { return dictPackedDatasheetState; }
         }
 
 
@@ -564,6 +574,11 @@ namespace IPyModeling
         {
             //Datasheet's packed state coming in
             dictPackedPlugin = packedState;
+
+            //check to see if we should clear the model
+            if ((bool)packedState["dsStateDirty"])
+                Clear();
+
             dsControl1.UnpackState((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
             
             dt = dsControl1.DT;
@@ -1096,6 +1111,10 @@ namespace IPyModeling
             sw = null;
             dictPluginState.Add("CorrelationDataTable", xmlDataTable);
 
+            //save the model's datasheet
+            dictPackedDatasheetState = dsControl1.PackState();
+            dictPluginState.Add("PackedDatasheetState", dictPackedDatasheetState);
+
             //save predictors
             dictPluginState.Add("Predictors", listPredictors);
 
@@ -1111,6 +1130,10 @@ namespace IPyModeling
             
             //Unpack the virgin status of the project
             this.boolVirgin = (bool)dictProjectState["VirginState"];
+
+            //unpack the model's datasheet
+            PackedDatasheetState = (IDictionary<string, object>)dictProjectState["PackedDatasheetState"];
+            dsControl1.UnpackState(PackedDatasheetState);
 
             //unpack the saved state of PLS modeling control
             tabControl1.SelectedTab = tabControl1.TabPages[2]; //model

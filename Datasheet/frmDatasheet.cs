@@ -410,6 +410,10 @@ namespace Datasheet
             
             dictPluginState.Add("DSValidated", boolValidated);
 
+            //pack the state of the datasheet so model will know if it needs to clear itself
+            bool state4ModelDirty = dsControl1.State.ToString() == "dirty" ? true : false;
+            dictPluginState.Add("dsStateDirty", state4ModelDirty);
+
             StringWriter sw = null;
             //Save Datasheet info as xml string for serialization
             sw = null;

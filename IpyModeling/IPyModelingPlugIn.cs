@@ -160,6 +160,8 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
+            if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
+                Hide();
         }
 
 
@@ -220,11 +222,12 @@ namespace IPyModeling
                 innerIronPythonControl.SetData(e.PackedPluginState);
             }
             //if datasheet changes were made after a model has been run, clear the model
-            if (boolComplete && ((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
-            {
-                innerIronPythonControl.Clear();
-                MakeActive();
-            }
+            //this happens each time go back and forth between ds and model, even if no changes are made..need fix
+            //if (boolComplete && ((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
+            //{
+            //    innerIronPythonControl.Clear();
+            //    MakeActive();
+            //}
         }
 
 

@@ -127,6 +127,8 @@ namespace Datasheet
         {
             if (e.SelectedRootKey == strPanelKey)
             {
+                boolVisible = true;
+                //signaller.HidePlugins();
                 App.DockManager.SelectPanel(strPanelKey);
             }
         }

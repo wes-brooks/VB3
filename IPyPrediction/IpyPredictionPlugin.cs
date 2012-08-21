@@ -116,6 +116,7 @@ namespace IPyPrediction
             {
                 App.DockManager.SelectPanel(strPanelKey);
             }
+
         }
 
 
@@ -200,6 +201,8 @@ namespace IPyPrediction
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
+            if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
+                Hide();
         }
 
 

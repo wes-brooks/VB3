@@ -154,7 +154,7 @@
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage4.Size = new System.Drawing.Size(1094, 619);
             this.tabPage4.TabIndex = 0;
-            this.tabPage4.Text = "Dataset";
+            this.tabPage4.Text = "Data Manipulation";
             // 
             // label3
             // 

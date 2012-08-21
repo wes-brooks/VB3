@@ -1250,7 +1250,13 @@ namespace VBCommon.Controls
             {
                 this.DTCI.DTColInfo = (Dictionary<string, bool>)dictPackedState["DTColInfo"];
             }
-            this.SelectedColIndex = Convert.ToInt16((Int64)dictPackedState["CurrentColIndex"]);
+
+            //need to convert if its unpacked from saved project
+            if (dictPackedState["CurrentColIndex"].GetType().ToString() == "System.Int64")
+                this.SelectedColIndex = Convert.ToInt16((Int64)dictPackedState["CurrentColIndex"]);
+            else
+                this.SelectedColIndex = (int)dictPackedState["CurrentColIndex"];
+
             this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
             this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
             //get validated flag
