@@ -1095,6 +1095,7 @@ namespace IPyModeling
             sw.Close();
             sw = null;
             dictPluginState.Add("CorrelationDataTable", xmlDataTable);
+
             //save predictors
             dictPluginState.Add("Predictors", listPredictors);
 
@@ -1112,7 +1113,7 @@ namespace IPyModeling
             this.boolVirgin = (bool)dictProjectState["VirginState"];
 
             //unpack the saved state of PLS modeling control
-            tabControl1.SelectedTab = tabControl1.TabPages[1]; //model
+            tabControl1.SelectedTab = tabControl1.TabPages[2]; //model
 
             if (!boolVirgin)
             {

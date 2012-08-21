@@ -254,14 +254,10 @@ namespace Datasheet
         public void UnpackState(IDictionary<string, object> dictPluginState)
         {
             //unpack datasheet control
-            string strDatasheetState = (string)dictPackedDatasheetState["PackedDatasheetState"];
-//            PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
+           
+            PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
 
-            //deserialize dictionary
-            
-            Dictionary<string, object> dictDeserialized;
-            dictDeserialized = JsonConvert.DeserializeObject<Dictionary<string, object>>(strDatasheetState);
-            dsControl1.UnpackState(dictDeserialized);
+            dsControl1.UnpackState(PackedDatasheetState);
 
             
             //get validated flag

@@ -1129,10 +1129,21 @@ namespace VBCommon.Controls
                 this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 boolInitialPass = false;
             }*/
+            //save DT as xml for serialization
+            this.DT.TableName = "DataSheetData";
+            StringWriter sw = null;
+            sw = new StringWriter();
+            this.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+            string xmlDT = sw.ToString();
+            sw.Close();
+            sw = null;
+            dictPackedState.Add("xmlDT", xmlDT);
+            //above line replaces this:: 
+            //dictPackedState.Add("DT", this.DT);
 
             dictPackedState.Add("CorrelationDataTable", this.DT); //for Modeling to use
             dictPackedState.Add("ModelDataTable", this.DT);   //for Modeling to use
-            dictPackedState.Add("DT", this.DT);
+            
             //pack up mainEffect columns for Prediction
             dictPackedState.Add("CurrentColIndex", this.SelectedColIndex);
             dictPackedState.Add("DepVarColName", this.ResponseVarColName);
@@ -1155,7 +1166,7 @@ namespace VBCommon.Controls
             dictPackedState.Add("IndVarCt", this.NumberIVs);
             dictPackedState.Add("fileName", this.FileName);
 
-            StringWriter sw = null;
+            
             //Save Datasheet info as xml string for serialization
             sw = null;
             if (this.DT != null)
@@ -1181,7 +1192,7 @@ namespace VBCommon.Controls
             }
 
             //model expects this change to the dt first
-            DataTable tempDt = (DataTable)dictPackedState["DT"];
+            DataTable tempDt = this.DT;
             tempDt.Columns[this.ResponseVarColName].SetOrdinal(1);
             //filter diabled rows and columns
             tempDt = this.filterDataTableRows(tempDt);
@@ -1197,20 +1208,49 @@ namespace VBCommon.Controls
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {
             //unpack datatable
-
-            this.DT = (DataTable)dictPackedState["DT"];
+            //unpack xmlDT and repopulate this.DT
+            string xmlDT = (string)dictPackedState["xmlDT"];
+            StringReader sr = new StringReader(xmlDT);
+            DataSet ds = new DataSet();
+            ds.ReadXml(sr);
+            sr.Close();
+            this.DT = ds.Tables[0];
+            //above replaces this: this.DT = (DataTable)dictPackedState["DT"];
             this.DT.TableName = "DataSheetData";
             this.dgv.DataSource = null;
             this.dgv.DataSource = this.DT;
 
-            //get row and column information
+            //get row information
             this.DTRI = VBCommon.Metadata.dtRowInformation.getdtRI(this.DT, true);
-            this.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPackedState["DTRowInfo"];
+            
+            //json deserialize the dictionary first
+            object jsonRWHolder = (object)dictPackedState["DTRowInfo"];
+            if (jsonRWHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+            {
+                string strJson = jsonRWHolder.ToString();
+                Dictionary<string, bool> dtriRowInfo = new Dictionary<string, bool>();
+                dtriRowInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
+            }
+            else
+            {
+                this.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPackedState["DTRowInfo"];
+            }
 
+            //get row information
             this.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(this.DT, true);
-            this.DTCI.DTColInfo = (Dictionary<string, bool>)dictPackedState["DTColInfo"];
-
-            this.SelectedColIndex = (int)dictPackedState["CurrentColIndex"];
+            //json deserialize the dictionary first
+            object jsonClHolder = (object)dictPackedState["DTColInfo"];
+            if (jsonClHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+            {
+                string strJson = jsonClHolder.ToString();
+                Dictionary<string, bool> dtriColInfo = new Dictionary<string, bool>();
+                dtriColInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
+            }
+            else
+            {
+                this.DTCI.DTColInfo = (Dictionary<string, bool>)dictPackedState["DTColInfo"];
+            }
+            this.SelectedColIndex = Convert.ToInt16((Int64)dictPackedState["CurrentColIndex"]);
             this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
             this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
             //get validated flag
