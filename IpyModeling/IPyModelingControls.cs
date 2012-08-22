@@ -576,7 +576,7 @@ namespace IPyModeling
             dictPackedPlugin = packedState;
 
             //check to see if we should clear the model
-            if ((bool)packedState["dsStateDirty"])
+            if ((bool)packedState["ChangesMadeDS"])
                 Clear();
 
             dsControl1.UnpackState((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
@@ -657,6 +657,9 @@ namespace IPyModeling
             lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
             lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
+
+            //clear the model
+            Clear();
         }
 
 
@@ -1638,6 +1641,22 @@ namespace IPyModeling
                 ipyModel = null;
         }
 
+        public void btnComputeAO_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        public void btnManipulate_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        public void btnTransform_Click(object sender, EventArgs e)
+        {
+
+        }
 
         /*
         private void ProjectSavedListener()

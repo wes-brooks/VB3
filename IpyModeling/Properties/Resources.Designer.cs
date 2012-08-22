@@ -67,6 +67,27 @@ namespace IPyModeling.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap EPAComputeAO {
+            get {
+                object obj = ResourceManager.GetObject("EPAComputeAO", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap EPAmanipulate {
+            get {
+                object obj = ResourceManager.GetObject("EPAmanipulate", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap EPAtransform {
+            get {
+                object obj = ResourceManager.GetObject("EPAtransform", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap Run {
             get {
                 object obj = ResourceManager.GetObject("Run", resourceCulture);
@@ -74,9 +95,9 @@ namespace IPyModeling.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap Test {
+        internal static System.Drawing.Bitmap running_process {
             get {
-                object obj = ResourceManager.GetObject("Test", resourceCulture);
+                object obj = ResourceManager.GetObject("running_process", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

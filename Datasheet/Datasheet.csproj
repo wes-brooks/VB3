@@ -163,6 +163,21 @@
       <Name>VBProjectManager</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EPAadd_data.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EPAComputeAO.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EPAmanipulate.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EPAtransform.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EPAvalidate.PNG" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cp $(TargetPath)  $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)</PostBuildEvent>

@@ -9,7 +9,6 @@ using System.Text;
 using System.Windows.Forms;
 using DotSpatial.Controls;
 using WeifenLuo.WinFormsUI.Docking;
-using VBCommon;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -380,6 +379,8 @@ namespace Datasheet
             //save packed state to a dictionary
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
 
+            bool boolChangesMadeDS = false; ; //holds flag to clear model if changes made to ds
+
             //check to see if this is the first time going to modeling
             if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.dirty && !boolInitialPass)
             {
@@ -387,6 +388,8 @@ namespace Datasheet
                 DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
                 if (dlgr == DialogResult.OK)
                 {
+                    boolChangesMadeDS = true;
+                    
                     correlationData = dsControl1.DT;
                     //  savedDT = dt;                 //dont see this being used anywhere
                     dataSheetData = dsControl1.DT;
@@ -411,8 +414,8 @@ namespace Datasheet
             dictPluginState.Add("DSValidated", boolValidated);
 
             //pack the state of the datasheet so model will know if it needs to clear itself
-            bool state4ModelDirty = dsControl1.State.ToString() == "dirty" ? true : false;
-            dictPluginState.Add("dsStateDirty", state4ModelDirty);
+
+            dictPluginState.Add("ChangesMadeDS", boolChangesMadeDS);
 
             StringWriter sw = null;
             //Save Datasheet info as xml string for serialization
@@ -431,14 +434,13 @@ namespace Datasheet
             if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.clean)
             {
                 boolClean = true;
-                dictPluginState.Add("Clean", boolClean);
             }
             else
             {
                 boolClean = false;
-                dictPluginState.Add("Clean", boolClean);
             }
 
+            dictPluginState.Add("Clean", boolClean);
             return dictPluginState;
         }
 
@@ -614,9 +616,67 @@ namespace Datasheet
         }
 
 
+        // invoke the wind/current component decomposition tool
+        // creates data columns of orthogonal wind/current components
         public void btnComputeAO_Click(object sender, EventArgs e)
         {
+//            //just adds columns for wind and/or current components to the datatable/grid view
+//            //this will need some sort of property setting mechanisms to reset columns to
+//            //hidden, enabled, etc when the form for decomposition exits.
+//            if (dsControl1.DT != null)
+//            {
+//                //DataTable dt = filterDataTableCols(_dt);
+//                DataTable dt = dsControl1.TableUtils.filterDisabledCols(dsControl1.DT);
+//                //string rvname = _dt.Columns[_responseVarColIndex].ColumnName.ToString();
+//                string dtsname = dt.Columns[0].Caption;
 
+//                //frmUV frmWC = new frmUV(dt, rvname, dtsname);
+//                frmUV frmWC = new frmUV(dsControl1.DT, dsControl1.ResponseVarColName, dtsname);
+//                frmWC.ShowDialog();
+
+//                DataTable dtnew = frmWC.WCDT;
+
+//                //this will effect to enable column context menus on new columns
+//                foreach (DataColumn c in dtnew.Columns)
+//                {
+//                    if (!dsControl1.DTCI.getColStatus(c.ColumnName))
+//                        dsControl1.DTCI.addColumnNameToDic(c.ColumnName);
+
+//                }
+//                //add disabled col back in
+//                dtnew = dsControl1.TableUtils.addDisabledCols(dtnew, dsControl1.DT);
+//                //mark created cols as decomposition
+//                List<string> newcols = frmWC.WCColsAdded;
+//                foreach (string colname in newcols)
+//                {
+//                    dtnew.Columns[colname].ExtendedProperties[VBCommon.Globals.DECOMPOSITION] = true;
+//                }
+
+////                _dt = dtnew;
+//                dsControl1.DT = dtnew;
+//                dsControl1.dgv.DataSource = dtnew;
+////                dgv.DataSource = dtnew;
+//                dsControl1.GridUtils.maintainGrid(dsControl1.dgv, dsControl1.DT, dsControl1.SelectedColIndex, dsControl1.ResponseVarColName);
+////                _gridutils.maintainGrid(dgv, _dt, _selectedColIndex, _responseVarColName);
+//                //_gridutils.setViewOnGrid(dgv);
+
+//                //count IVs and update list
+//                int nonivs = dsControl1.HiddenCols > 0 ? 3 : 2;
+////                int nonivs = _nhiddencols > 0 ? 3 : 2;
+//                dsControl1.NumberIVs = dsControl1.DT.Columns.Count - nonivs;
+////                _nivs = _dt.Columns.Count - nonivs;
+//                dsControl1.updateListView(DatasheetControl.listvals.NIVS, dsControl1.NumberIVs);
+////                updateListView(_listvals.NIVS, _nivs);
+//                dsControl1.updateListView(DatasheetControl.listvals.NCOLS, dsControl1.DT.Columns.Count);
+////                updateListView(_listvals.NCOLS, _dt.Columns.Count);
+//                dsControl1.State = DatasheetControl.dtState.dirty;
+////                _state = _dtState.dirty;
+
+//            }
+//            else
+//            {
+//                MessageBox.Show("Must import data first.", "Proceedural Error", MessageBoxButtons.OK);
+//            }
         }
 
 

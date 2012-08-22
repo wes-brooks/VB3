@@ -278,10 +278,14 @@ namespace VBProjectManager
             //if datasheet is broadcasting any changes
             if (strPluginType == "Datasheet")
             {
+                //flag to tell prediction to show itself after being hidden
+                bool boolModelComplete = false;
+
                 //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
                 foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
                 {
                     IPlugin plugin = (IPlugin)ex;
+                    
 
                     if (plugin.PluginType.ToString() == "Modeling")
                         //already visible, just update not show again
@@ -289,7 +293,15 @@ namespace VBProjectManager
                             return;
                         //if datasheet is complete, show modeling
                         else if (((IPlugin)sender).Complete)
+                        {
+                            boolModelComplete = plugin.Complete ? true : false;
                             plugin.Show();
+                        }
+                    if (plugin.PluginType.ToString() == "Prediction")
+                    {
+                        if (boolModelComplete)
+                            plugin.Show();
+                    }
                 }
                 //if modeling is broadcasting itself
             }

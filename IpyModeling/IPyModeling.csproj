@@ -130,8 +130,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Cancel.png" />
+    <None Include="Resources\EPAComputeAO.png" />
+    <None Include="Resources\EPAmanipulate.PNG" />
+    <None Include="Resources\EPAtransform.PNG" />
     <Content Include="Resources\GoToPrediction.png" />
     <Content Include="Resources\Run.png" />
+    <None Include="Resources\running_process.png" />
     <Content Include="Resources\Test.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

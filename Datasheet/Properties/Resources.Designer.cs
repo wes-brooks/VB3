@@ -67,6 +67,41 @@ namespace Datasheet.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap EPAadd_data {
+            get {
+                object obj = ResourceManager.GetObject("EPAadd_data", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap EPAComputeAO {
+            get {
+                object obj = ResourceManager.GetObject("EPAComputeAO", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap EPAmanipulate {
+            get {
+                object obj = ResourceManager.GetObject("EPAmanipulate", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap EPAtransform {
+            get {
+                object obj = ResourceManager.GetObject("EPAtransform", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap EPAvalidate {
+            get {
+                object obj = ResourceManager.GetObject("EPAvalidate", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap GoToModeling {
             get {
                 object obj = ResourceManager.GetObject("GoToModeling", resourceCulture);

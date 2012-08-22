@@ -64,9 +64,6 @@ C:\Users\troddick\VBFiles\IpyModeling\IPyCommon\bin\Debug\VBTools.pdb
 C:\VB3\IPyCommon\bin\Debug\IPyCommon.dll
 C:\VB3\IPyCommon\bin\Debug\IPyCommon.pdb
 C:\VB3\IPyCommon\bin\Debug\Combinatorics.dll
-C:\VB3\IPyCommon\obj\Debug\ResolveAssemblyReference.cache
-C:\VB3\IPyCommon\obj\Debug\IPyCommon.dll
-C:\VB3\IPyCommon\obj\Debug\IPyCommon.pdb
 C:\VB3\IPyCommon\bin\Debug\VBCommon.dll
 C:\VB3\IPyCommon\bin\Debug\ZedGraph.dll
 C:\VB3\IPyCommon\bin\Debug\Newtonsoft.Json.dll
@@ -85,5 +82,8 @@ C:\VB3\IPyCommon\bin\Debug\sv\ZedGraph.resources.dll
 C:\VB3\IPyCommon\bin\Debug\tr\ZedGraph.resources.dll
 C:\VB3\IPyCommon\bin\Debug\zh-cn\ZedGraph.resources.dll
 C:\VB3\IPyCommon\bin\Debug\zh-tw\ZedGraph.resources.dll
+C:\VB3\IPyCommon\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\bin\Debug\Binaries\IPyCommon\IPyCommon.dll
 C:\VB3\bin\Debug\Binaries\IPyCommon\IPyCommon.pdb
+C:\VB3\IPyCommon\obj\Debug\IPyCommon.dll
+C:\VB3\IPyCommon\obj\Debug\IPyCommon.pdb

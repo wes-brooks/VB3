@@ -40,6 +40,7 @@ namespace IPyPrediction
         //complete and visible flags
         public Boolean boolComplete = false;
         public Boolean boolVisible = false;
+        public Boolean boolHasBeenVisible = false;
 
 
         //Raise a message
@@ -76,11 +77,15 @@ namespace IPyPrediction
         {
             //set visible to true
             boolVisible = true;
+            boolHasBeenVisible = true;
             //add the ribbon
             AddRibbon("Show");
             //add the panel
-            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);
+            if (boolComplete)
+            {
+                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                App.HeaderControl.SelectRoot(strPanelKey);
+            }
         }
 
 

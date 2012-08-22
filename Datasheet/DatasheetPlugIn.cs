@@ -187,7 +187,7 @@ namespace Datasheet
             const string tGroupCaption = "Add";
 
             btnImport = new SimpleActionItem(strPanelKey, "Import Data", btnImport_Click);
-            btnImport.LargeImage = Properties.Resources.Import;
+            btnImport.LargeImage = Properties.Resources.EPAadd_data;
             btnImport.GroupCaption = tGroupCaption;
             btnImport.Enabled = true;
             App.HeaderControl.Add(btnImport);
@@ -196,7 +196,7 @@ namespace Datasheet
             const string grpValidate = "Validate";
 
             btnValidate = new SimpleActionItem(strPanelKey, "Validate Data", btnValidate_Click);
-            btnValidate.LargeImage = Properties.Resources.Validate;
+            btnValidate.LargeImage = Properties.Resources.EPAvalidate;
             btnValidate.GroupCaption = grpValidate;
             btnValidate.Enabled = false;
             App.HeaderControl.Add(btnValidate);
@@ -205,19 +205,19 @@ namespace Datasheet
             const string grpManipulate = "Work with Data";
 
             btnComputeAO = new SimpleActionItem(strPanelKey, "Compute A O", _frmDatasheet.btnComputeAO_Click);
-            btnComputeAO.LargeImage = Properties.Resources.Compute;
+            btnComputeAO.LargeImage = Properties.Resources.EPAComputeAO;
             btnComputeAO.GroupCaption = grpManipulate;
             btnComputeAO.Enabled = false;
             App.HeaderControl.Add(btnComputeAO);
 
             btnManipulate = new SimpleActionItem(strPanelKey, "Manipulate", _frmDatasheet.btnManipulate_Click);
-            btnManipulate.LargeImage = Properties.Resources.Manipulate;
+            btnManipulate.LargeImage = Properties.Resources.EPAmanipulate;
             btnManipulate.GroupCaption = grpManipulate;
             btnManipulate.Enabled = false;
             App.HeaderControl.Add(btnManipulate);
 
             btnTransform = new SimpleActionItem(strPanelKey, "Transform", _frmDatasheet.btnTransform_Click);
-            btnTransform.LargeImage = Properties.Resources.Transform;
+            btnTransform.LargeImage = Properties.Resources.EPAtransform;
             btnTransform.GroupCaption = grpManipulate;
             btnTransform.Enabled = false; 
             App.HeaderControl.Add(btnTransform);

@@ -30,6 +30,9 @@ namespace IPyModeling
         //ribbon buttons
         private SimpleActionItem btnRun;
         private SimpleActionItem btnCancel;
+        private SimpleActionItem btnComputeAO;
+        private SimpleActionItem btnManipulate;
+        private SimpleActionItem btnTransform;
                 
         //Raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -126,11 +129,34 @@ namespace IPyModeling
                 App.HeaderControl.SelectRoot(strPanelKey); 
             }
 
+            
             //add sub-ribbon
-            string rGroupCaption = strPanelCaption;
+            string grpManipulate = "Manipulate Data";
+
+            btnComputeAO = new SimpleActionItem(strPanelKey, "Compute A O", innerIronPythonControl.btnComputeAO_Click);
+            btnComputeAO.LargeImage = Properties.Resources.EPAComputeAO;
+            btnComputeAO.GroupCaption = grpManipulate;
+            btnComputeAO.Enabled = true;
+            App.HeaderControl.Add(btnComputeAO);
+
+            btnManipulate = new SimpleActionItem(strPanelKey, "Manipulate", innerIronPythonControl.btnManipulate_Click);
+            btnManipulate.LargeImage = Properties.Resources.EPAmanipulate;
+            btnManipulate.GroupCaption = grpManipulate;
+            btnManipulate.Enabled = true;
+            App.HeaderControl.Add(btnManipulate);
+
+            btnTransform = new SimpleActionItem(strPanelKey, "Transform", innerIronPythonControl.btnTransform_Click);
+            btnTransform.LargeImage = Properties.Resources.EPAtransform;
+            btnTransform.GroupCaption = grpManipulate;
+            btnTransform.Enabled = true;
+            App.HeaderControl.Add(btnTransform);
+
+
+            
+            string rGroupCaption = "Model";
 
             btnRun = new SimpleActionItem(strPanelKey, "Run", btnRun_Click);
-            btnRun.LargeImage = Properties.Resources.Run;
+            btnRun.LargeImage = Properties.Resources.running_process;
             btnRun.GroupCaption = rGroupCaption;
             btnRun.Enabled = true;
             App.HeaderControl.Add(btnRun);
