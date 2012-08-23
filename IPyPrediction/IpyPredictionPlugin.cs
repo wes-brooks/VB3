@@ -41,7 +41,7 @@ namespace IPyPrediction
         public Boolean boolComplete = false;
         public Boolean boolVisible = false;
         public Boolean boolHasBeenVisible = false;
-
+        private Boolean boolClearModel; //needed for IPlugin
 
         //Raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -215,6 +215,13 @@ namespace IPyPrediction
         public Globals.PluginType PluginType
         {
             get { return pluginType; }
+        }
+
+
+        //return clear model flag
+        public Boolean ClearModel
+        {
+            get { return boolClearModel; }
         }
 
 

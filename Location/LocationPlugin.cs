@@ -26,6 +26,7 @@ namespace Location
         //complete and visible flags
         public Boolean boolComplete;
         public Boolean boolVisible;
+        private Boolean boolClearModel; //needed for IPlugin
 
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -169,6 +170,13 @@ namespace Location
         public Globals.PluginType PluginType
         {
             get { return pluginType; }
+        }
+
+
+        //return clear model flag
+        public Boolean ClearModel
+        {
+            get { return boolClearModel; }
         }
 
 

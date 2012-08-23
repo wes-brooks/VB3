@@ -43,6 +43,8 @@ namespace IPyModeling
         public Boolean boolVisible;
         public Boolean boolRunCancelled;
         public Boolean boolStopRun;
+     
+        private Boolean boolClearModel; //needed for IPlugin
 
         //deactivate this plugin
         public override void Deactivate()
@@ -205,6 +207,13 @@ namespace IPyModeling
         }
 
 
+        //return clear model flag
+        public Boolean ClearModel
+        {
+            get { return boolClearModel; }
+        }
+
+
         //returns complete flag
         public Boolean Complete
         {
@@ -246,6 +255,9 @@ namespace IPyModeling
             if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {
                 innerIronPythonControl.SetData(e.PackedPluginState);
+                //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
+                if ((bool)e.PackedPluginState["ChangesMadeDS"])
+                    boolComplete = false;
             }
             //if datasheet changes were made after a model has been run, clear the model
             //this happens each time go back and forth between ds and model, even if no changes are made..need fix

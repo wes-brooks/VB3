@@ -32,7 +32,7 @@ namespace VBProjectManager
         public static string VB2projectsPath = null;
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
-
+        private Boolean boolClearModel; //needed for IPlugin
 
         //constructor
         public VBProjectManager()
@@ -190,6 +190,13 @@ namespace VBProjectManager
         }
 
 
+        //return clear model flag
+        public Boolean ClearModel
+        {
+            get { return boolClearModel; }
+        }
+
+
         //inherits from IPlugin, ProjectManager's complete flag doesn't change
         public Boolean Complete
         {
@@ -274,19 +281,22 @@ namespace VBProjectManager
         //listen to plugin's broadcast in order to update other plugins
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
+            //flag to tell prediction to show itself after being hidden only if model is complete
+            bool boolModelComplete = false;
+            bool boolClearModel = false;
             string strPluginType = (((IPlugin)sender).PluginType).ToString();
+
             //if datasheet is broadcasting any changes
             if (strPluginType == "Datasheet")
             {
-                //flag to tell prediction to show itself after being hidden
-                bool boolModelComplete = false;
+                IPlugin dsplugin = (IPlugin)sender;
+                boolClearModel = dsplugin.ClearModel ? true : false;
 
                 //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
                 foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
                 {
                     IPlugin plugin = (IPlugin)ex;
                     
-
                     if (plugin.PluginType.ToString() == "Modeling")
                         //already visible, just update not show again
                         if (plugin.VisiblePlugin)
@@ -299,8 +309,12 @@ namespace VBProjectManager
                         }
                     if (plugin.PluginType.ToString() == "Prediction")
                     {
-                        if (boolModelComplete)
+                        if (boolModelComplete && !boolClearModel)
+                        {
                             plugin.Show();
+                            plugin.MakeActive(); //need this or location becomes selectedRoot
+                        }
+                        // if prediction is not complete, make model active plugin
                     }
                 }
                 //if modeling is broadcasting itself

@@ -14,6 +14,7 @@ namespace VBCommon.Interfaces
         void Broadcast();
         Boolean Complete { get; }
         Boolean VisiblePlugin { get; }
+        Boolean ClearModel { get; }
         void AddRibbon(string sender);
         //void AddPanel();
         void Hide();
