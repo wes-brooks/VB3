@@ -397,6 +397,8 @@ namespace IPyModeling
         //Handle a request from an IronPython-based modeling tab to begin the modeling process.
         private void ProvideData(object sender, ModelingCallback CallbackObject)
         {
+            //make cursor hourglass
+            Cursor.Current = Cursors.WaitCursor;
             DataTable modelDataTable;
             //first check to see if cancel was hit
            
@@ -453,6 +455,8 @@ namespace IPyModeling
         //This method alerts the container that we need data. The container should then use the Set property of sender.data
         protected void StartModeling()
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             if (DataRequested != null)
             {
                 ModelingCallback e = new ModelingCallback(MakeModel);
@@ -475,6 +479,8 @@ namespace IPyModeling
         //Enable or disable controls, then raise an event to do the same up the chain in the containing Form.
         protected void ChangeControlStatus(bool enable)
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             boolControlStatus = enable;
 
             rbLog10.Invoke((MethodInvoker)delegate
@@ -686,6 +692,9 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
+            
+            //if model has been completed, clear it
+            Clear();
         }
 
 
@@ -725,6 +734,9 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
+            
+            //variable was removed, if model is complete, clear it
+            Clear();
         }
 
 
@@ -779,6 +791,7 @@ namespace IPyModeling
         //used for IronPython-based modeling tab to begin the modeling process
         public DataTable CreateModelDataTable()
         {
+            Cursor.Current = Cursors.WaitCursor;
             //Datasheet's packed state coming in
             DataTable dtCorr_ = dsControl1.DT;  // this should be holding the model's dataset at this point?
             DataView dvCorr_ = dtCorr_.DefaultView;
@@ -814,7 +827,11 @@ namespace IPyModeling
         //This button runs or cancels the modeling method associated with this pane.
         public void btnRun_Click(object sender, EventArgs e)
         {
+            //clear the model before running a model
             Clear();
+
+            //show it's doing something
+            Cursor.Current = Cursors.WaitCursor;
 
             //check to see if the model tab was clicked first (otherwise will get error half way thru model run)
             if (model_data == null)
@@ -840,7 +857,9 @@ namespace IPyModeling
             ChangeControlStatus(false);
 
             StartModeling();
-
+            //keep waiting...
+            Cursor.Current = Cursors.WaitCursor;
+            
             //check to see if cancel was hit
             if (stopRun)
             {
@@ -854,6 +873,9 @@ namespace IPyModeling
             //Now the model is done running, disable cancel/enable run buttons
             boolRunning = false;
             NotifyPropChanged(boolRunning);
+
+            //all done...
+            Cursor.Current = Cursors.Default;
         }
 
 
@@ -877,6 +899,7 @@ namespace IPyModeling
         //This is the callback function that Virtual Beach will use to run the modeling process.
         protected void MakeModel(DataTable Data)
         {
+            Cursor.Current = Cursors.WaitCursor;
             //Set up the local variables we'll need for model-building.
             DataTable tblData = Data;
             double dblSpecificity = 0.9;
@@ -888,7 +911,8 @@ namespace IPyModeling
 
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
             dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblSpecificity, regulatory_threshold: dblThreshold, method: strMethod);
-
+            
+            Cursor.Current = Cursors.WaitCursor;
             //if cancel was clicked, get out of here
             if (stopRun)
             {
@@ -954,7 +978,7 @@ namespace IPyModeling
 
         protected void InitializeValidationChart()
         {
-
+            Cursor.Current = Cursors.WaitCursor;
             //if cancel was clicked, get out of here
             if (stopRun)
             {
@@ -991,6 +1015,7 @@ namespace IPyModeling
 
         protected void AnnotateChart()
         {
+            Cursor.Current = Cursors.WaitCursor;
             //if cancel was clicked, get out of here
             if (stopRun)
             {

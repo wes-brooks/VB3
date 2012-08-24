@@ -43,6 +43,8 @@ namespace IPyPLSControl
 
 		protected override void PopulateResults(dynamic model)
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             //Declare the variables we'll use in this routine
             ListViewItem lvi;
             string[] strArrItem;

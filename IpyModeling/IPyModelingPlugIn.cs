@@ -385,6 +385,7 @@ namespace IPyModeling
             if (val)
             //make cancel button enabled
             {
+                Cursor.Current = Cursors.WaitCursor;
                 btnRun.Enabled = false;
                 btnCancel.Enabled = true;
             }
@@ -402,6 +403,7 @@ namespace IPyModeling
             Broadcast();
             //bring the focus back to Modeling away from Prediction
             MakeActive();
+            Cursor.Current = Cursors.Default;
         }
     }
 }
