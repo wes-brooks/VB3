@@ -43,6 +43,7 @@ namespace IPyModeling
         public Boolean boolVisible;
         public Boolean boolRunCancelled;
         public Boolean boolStopRun;
+        public Boolean boolInitialEntry = true; //first time here flag
      
         private Boolean boolClearModel; //needed for IPlugin
 
@@ -102,6 +103,9 @@ namespace IPyModeling
             innerIronPythonControl.ModelUpdated += new EventHandler(HandleUpdatedModel);
             innerIronPythonControl.boolRunChanged += new IPyModelingControl.BoolChangedEvent(HandleBoolRunChanged);
             innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
+            innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
+            innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
+            innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
             
             base.Activate(); //ensures "enabled" is set to true
         }
@@ -160,7 +164,7 @@ namespace IPyModeling
             btnRun = new SimpleActionItem(strPanelKey, "Run", btnRun_Click);
             btnRun.LargeImage = Properties.Resources.running_process;
             btnRun.GroupCaption = rGroupCaption;
-            btnRun.Enabled = true;
+            btnRun.Enabled = false;
             App.HeaderControl.Add(btnRun);
 
             btnCancel = new SimpleActionItem(strPanelKey, "Cancel", btnCancel_Click);
@@ -204,6 +208,13 @@ namespace IPyModeling
         public Globals.PluginType PluginType
         {
             get { return pluginType; }
+        }
+
+
+        //keep track if model already has a datasheet
+        public Boolean InitialEntry
+        {
+            get { return boolInitialEntry; }
         }
 
 
@@ -254,20 +265,65 @@ namespace IPyModeling
             //if datasheet updated itself, set data with changes, passing datasheet's plugin packed state
             if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {
-                innerIronPythonControl.SetData(e.PackedPluginState);
-                //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
-                if ((bool)e.PackedPluginState["ChangesMadeDS"])
-                    boolComplete = false;
+                //no changes made, and not first time here = don't set the data, just show what was there
+                if (!(bool)e.PackedPluginState["ChangesMadeDS"] && !InitialEntry)
+                {
+                    
+                }
+                else
+                {
+                    innerIronPythonControl.SetData(e.PackedPluginState);
+                    boolInitialEntry = false;
+                    //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
+                    if ((bool)e.PackedPluginState["ChangesMadeDS"])
+                        boolComplete = false;
+                }
             }
-            //if datasheet changes were made after a model has been run, clear the model
-            //this happens each time go back and forth between ds and model, even if no changes are made..need fix
-            //if (boolComplete && ((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
-            //{
-            //    innerIronPythonControl.Clear();
-            //    MakeActive();
-            //}
         }
 
+        //only have manipulate datasheet buttons enabled when on Manipulate Datasheet tab
+        public void HandleManipulateDataTab(object sender, EventArgs e)
+        {
+            try
+            {
+                btnComputeAO.Enabled = true;
+                btnManipulate.Enabled = true;
+                btnTransform.Enabled = true;
+                btnRun.Enabled = false;
+            }
+            catch
+            { }
+        }
+
+
+        // only have model buttons enabled
+        public void HandleModelTab(object sender, EventArgs e)
+        {
+            try
+            {
+                btnComputeAO.Enabled = false;
+                btnManipulate.Enabled = false;
+                btnTransform.Enabled = false;
+                btnRun.Enabled = true;
+            }
+            catch
+            { }
+        }
+
+
+        //no buttons enabled for the variable selection tab
+        public void HandleVariableTab(object sender, EventArgs e)
+        {
+            try
+            {
+                btnComputeAO.Enabled = false;
+                btnManipulate.Enabled = false;
+                btnTransform.Enabled = false;
+                btnRun.Enabled = false;
+            }
+            catch
+            { }
+        }
 
         //when modeling makes changes, event broadcasts changes to those listening
         public void Broadcast()
@@ -385,6 +441,7 @@ namespace IPyModeling
             if (val)
             //make cancel button enabled
             {
+                Cursor.Current = Cursors.WaitCursor;
                 btnRun.Enabled = false;
                 btnCancel.Enabled = true;
             }
@@ -402,6 +459,7 @@ namespace IPyModeling
             Broadcast();
             //bring the focus back to Modeling away from Prediction
             MakeActive();
+            Cursor.Current = Cursors.Default;
         }
     }
 }

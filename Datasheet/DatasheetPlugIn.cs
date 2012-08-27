@@ -21,11 +21,10 @@ namespace Datasheet
     {
         //class instance
         private frmDatasheet _frmDatasheet;
-        
         [Import("Shell")]
         private ContainerControl Shell { get; set; }
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Datasheet;
-       
+
         private VBCommon.Signaller signaller;
         protected string strPanelKey = "DataSheetPanel";
         protected string strPanelCaption = "Global Datasheet";
@@ -56,8 +55,8 @@ namespace Datasheet
         ////event for hiding plugins when datasheet plugin is selected
         //private void HidePlugins()
         //{
-        //    if (HideTabsEvent != null)
-        //        HideTabsEvent();
+        // if (HideTabsEvent != null)
+        // HideTabsEvent();
         //}
 
 
@@ -81,7 +80,7 @@ namespace Datasheet
         {
             //hide plugin
             App.HeaderControl.RemoveAll();
-            //hide bottom tab 
+            //hide bottom tab
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
             boolVisible = false;
         }
@@ -91,7 +90,7 @@ namespace Datasheet
         public void Show()
         {
             boolVisible = true;
-            AddRibbon("Show");            
+            AddRibbon("Show");
         }
 
 
@@ -111,13 +110,13 @@ namespace Datasheet
             _frmDatasheet = new frmDatasheet();
             AddRibbon("Activate");
             AddPanel();
-          
+
             //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
 
             //when root item is selected
-            App.HeaderControl.RootItemSelected +=new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
-            
+            App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
+
             base.Activate(); //ensures "enabled" is set to true
         }
 
@@ -135,7 +134,7 @@ namespace Datasheet
 
 
         //return panel key name
-        public string PanelKey 
+        public string PanelKey
         {
             get { return strPanelKey; }
         }
@@ -147,7 +146,7 @@ namespace Datasheet
             get { return pluginType; }
         }
 
-        
+
         //return clear model flag
         public Boolean ClearModel
         {
@@ -191,7 +190,7 @@ namespace Datasheet
             btnImport.GroupCaption = tGroupCaption;
             btnImport.Enabled = true;
             App.HeaderControl.Add(btnImport);
-            
+
             //section for validating
             const string grpValidate = "Validate";
 
@@ -200,7 +199,7 @@ namespace Datasheet
             btnValidate.GroupCaption = grpValidate;
             btnValidate.Enabled = false;
             App.HeaderControl.Add(btnValidate);
-            
+
             //section for working with data
             const string grpManipulate = "Work with Data";
 
@@ -219,7 +218,7 @@ namespace Datasheet
             btnTransform = new SimpleActionItem(strPanelKey, "Transform", _frmDatasheet.btnTransform_Click);
             btnTransform.LargeImage = Properties.Resources.EPAtransform;
             btnTransform.GroupCaption = grpManipulate;
-            btnTransform.Enabled = false; 
+            btnTransform.Enabled = false;
             App.HeaderControl.Add(btnTransform);
 
             btnGoToModeling = new SimpleActionItem(strPanelKey, "Go To Model", btnGoToModeling_Click);
@@ -261,7 +260,7 @@ namespace Datasheet
         //listen to other plugin's broadcasting their changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
-                     
+
         }
 
 
@@ -274,7 +273,7 @@ namespace Datasheet
 
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
-            signaller.RaiseBroadcastRequest(this, packedState);            
+            signaller.RaiseBroadcastRequest(this, packedState);
         }
 
 
@@ -283,31 +282,31 @@ namespace Datasheet
         {
             //call packState, returing packed state of plugin
             IDictionary<string, object> packedState = _frmDatasheet.PackState();
-            //add complete and visible flags to  dictionary
+            //add complete and visible flags to dictionary
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
             //add packed state to dictionary of all packed states for saving
             e.PackedPluginStates.Add(strPanelKey, packedState);
         }
 
-        
+
         //Unpack the state of this plugin.
         private void ProjectOpenedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
-                IDictionary<string,object> dictPlugin = e.PackedPluginStates[strPanelKey];
+                IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
                 //Repopulate plugin Complete flag with saved project
                 boolComplete = (bool)dictPlugin["Complete"];
-               
+
                 //check to see if there already is a datasheet open, if so, close it before opening a saved project
                 if (boolVisible)
-                     Hide();
+                    Hide();
                 //then show the opening project datasheet
                 if ((bool)dictPlugin["Visible"])
                 {
                     Show();
-                    
+
                     //enable the buttons for opening project
                     if (boolComplete)
                     {
@@ -318,7 +317,7 @@ namespace Datasheet
                     }
                 }
 
-                //unpack it  
+                //unpack it
                 _frmDatasheet.UnpackState(e.PackedPluginStates[strPanelKey]);
             }
             else
@@ -349,7 +348,7 @@ namespace Datasheet
             }
         }
 
-        
+
         //importing datasheet
         void btnImport_Click(object sender, EventArgs e)
         {
@@ -365,7 +364,7 @@ namespace Datasheet
             btnComputeAO.Enabled = true;
             btnManipulate.Enabled = true;
             btnTransform.Enabled = true;
-            btnGoToModeling.Enabled = true; 
+            btnGoToModeling.Enabled = true;
         }
 
 

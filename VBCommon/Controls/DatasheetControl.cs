@@ -1109,26 +1109,7 @@ namespace VBCommon.Controls
             //save packed state to a dictionary
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
 
-            /*//check to see if this is the first time going to modeling
-            if (this.State == VBCommon.Controls.DatasheetControl.dtState.dirty)
-            {
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                if (dlgr == DialogResult.OK)
-                {
-                    correlationData = this.DT;
-                    dataSheetData = this.DT;
-                    this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-                }
-                else
-                { return null; }
-            }
-            else if (boolInitialPass)
-            {
-                correlationData = this.DT;
-                modelData = this.DT;
-                this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-                boolInitialPass = false;
-            }*/
+          
             //save DT as xml for serialization
             this.DT.TableName = "DataSheetData";
             StringWriter sw = null;

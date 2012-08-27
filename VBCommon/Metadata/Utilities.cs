@@ -191,6 +191,7 @@ namespace VBCommon.Metadata
                         dtCopy = copyAllColAttributes(dc, dt, dtCopy);
                     }
                 }
+
                 dtCopy.AcceptChanges();
                 return dtCopy;
             }

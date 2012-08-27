@@ -35,6 +35,9 @@ namespace IPyModeling
         public event EventHandler ModelUpdated;
         public event EventHandler ModelSaveRequested;
         public event EventHandler ResetIPyProject;
+        public event EventHandler ManipulateDataTab; //event for showing only manipulate datasheet's buttons
+        public event EventHandler ModelTab;  //event for showing only model's Run
+        public event EventHandler VariableTab; //event for variable tab, no buttons enabled
 
         public delegate void BoolChangedEvent(bool val);
         public event BoolChangedEvent boolRunChanged;
@@ -70,6 +73,7 @@ namespace IPyModeling
         //Related to underlying model:
         protected double dblMandateThreshold;
         protected string strMethod;
+        private bool boolClearPrediction; //if model has changed since prediction ran
 
         //initialize transform dictionary
         protected Dictionary<string, object> dictTransform = new Dictionary<string, object>()
@@ -120,6 +124,7 @@ namespace IPyModeling
             RequestIronPythonInterface();
 
             //Create the delegate that will raise the event that requests model data
+            this.tabPage1.Enter += new EventHandler(DataTabEnter);
             this.TabPageEntered += new RequestData(RequestModelData);
             this.DataRequested += new EventHandler<ModelingCallback>(this.ProvideData);    
            // ResetIPyProject += new EventHandler(this.ResetProject);
@@ -142,6 +147,14 @@ namespace IPyModeling
         {
             get { return strMethod; }
             set { strMethod = value; }
+        }
+
+
+        //get flag on whether prediction should clear
+        [JsonProperty]
+        public Boolean ClearPrediction
+        {
+            get { return boolClearPrediction; }
         }
 
 
@@ -397,6 +410,9 @@ namespace IPyModeling
         //Handle a request from an IronPython-based modeling tab to begin the modeling process.
         private void ProvideData(object sender, ModelingCallback CallbackObject)
         {
+            //make cursor hourglass
+            Cursor.Current = Cursors.WaitCursor;
+
             DataTable modelDataTable;
             //first check to see if cancel was hit
            
@@ -404,10 +420,41 @@ namespace IPyModeling
             CallbackObject.MakeModel(modelDataTable);
         }
 
+        protected void DataTabEnter(object sender, EventArgs args)
+        {
+            if (((TabPage)sender).Text == "Data Manipulation")
+            {
+                //event for enabling only manipulate buttons
+                if (ManipulateDataTab != null)
+                {
+                    EventArgs e = new EventArgs();
+                    ManipulateDataTab(this, e);
+                }
 
-        //Raise a request for access to the model data - should be raised by the containing TabPage when the tab is entered.
+            }
+            if (((TabPage)sender).Text == "Variable Selection")
+            {
+                //event for ensuring no buttons are enabled
+                if (VariableTab != null)
+                {
+                    EventArgs e = new EventArgs();
+                    VariableTab(this, e);
+                }
+            }
+        }
+
+        //Raise a request for access to the model data - should be raised when the Model tab is entered.
         protected void RequestModelData(object sender, EventArgs args)
         {
+            //only have run button enabled when on modeling tab
+            if (((TabPage)sender).Text == "Model")
+            {
+                if (ModelTab != null)
+                {
+                    EventArgs e = new EventArgs();
+                    ModelTab(this, e);
+                }
+            }
             if (boolVirgin == true)
             {
                 if (DataRequested != null)
@@ -415,7 +462,8 @@ namespace IPyModeling
                     ModelingCallback e = new ModelingCallback(SetModelData);
                     DataRequested(this, e);
                 }
-            }
+               
+            } 
         }
 
 
@@ -453,6 +501,8 @@ namespace IPyModeling
         //This method alerts the container that we need data. The container should then use the Set property of sender.data
         protected void StartModeling()
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             if (DataRequested != null)
             {
                 ModelingCallback e = new ModelingCallback(MakeModel);
@@ -475,6 +525,8 @@ namespace IPyModeling
         //Enable or disable controls, then raise an event to do the same up the chain in the containing Form.
         protected void ChangeControlStatus(bool enable)
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             boolControlStatus = enable;
 
             rbLog10.Invoke((MethodInvoker)delegate
@@ -686,6 +738,9 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
+
+            //if model has been completed, clear it
+            Clear();
         }
 
 
@@ -725,6 +780,9 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
+
+            //variable was removed, if model is complete, clear it
+            Clear();
         }
 
 
@@ -779,6 +837,8 @@ namespace IPyModeling
         //used for IronPython-based modeling tab to begin the modeling process
         public DataTable CreateModelDataTable()
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             //Datasheet's packed state coming in
             DataTable dtCorr_ = dsControl1.DT;  // this should be holding the model's dataset at this point?
             DataView dvCorr_ = dtCorr_.DefaultView;
@@ -814,7 +874,11 @@ namespace IPyModeling
         //This button runs or cancels the modeling method associated with this pane.
         public void btnRun_Click(object sender, EventArgs e)
         {
+            //clear the model before running a model
             Clear();
+
+            //show it's doing something
+            Cursor.Current = Cursors.WaitCursor;
 
             //check to see if the model tab was clicked first (otherwise will get error half way thru model run)
             if (model_data == null)
@@ -841,6 +905,9 @@ namespace IPyModeling
 
             StartModeling();
 
+            //keep waiting..
+            Cursor.Current = Cursors.WaitCursor;
+
             //check to see if cancel was hit
             if (stopRun)
             {
@@ -854,6 +921,9 @@ namespace IPyModeling
             //Now the model is done running, disable cancel/enable run buttons
             boolRunning = false;
             NotifyPropChanged(boolRunning);
+
+            //all done
+            Cursor.Current = Cursors.Default;
         }
 
 
@@ -877,6 +947,8 @@ namespace IPyModeling
         //This is the callback function that Virtual Beach will use to run the modeling process.
         protected void MakeModel(DataTable Data)
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             //Set up the local variables we'll need for model-building.
             DataTable tblData = Data;
             double dblSpecificity = 0.9;
@@ -888,7 +960,9 @@ namespace IPyModeling
 
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
             dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblSpecificity, regulatory_threshold: dblThreshold, method: strMethod);
-
+            
+            Cursor.Current = Cursors.WaitCursor;
+            
             //if cancel was clicked, get out of here
             if (stopRun)
             {
@@ -955,6 +1029,7 @@ namespace IPyModeling
         protected void InitializeValidationChart()
         {
 
+            Cursor.Current = Cursors.WaitCursor;
             //if cancel was clicked, get out of here
             if (stopRun)
             {
@@ -991,6 +1066,8 @@ namespace IPyModeling
 
         protected void AnnotateChart()
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             //if cancel was clicked, get out of here
             if (stopRun)
             {
@@ -1121,6 +1198,9 @@ namespace IPyModeling
             //save predictors
             dictPluginState.Add("Predictors", listPredictors);
 
+            //save whether or not the model is clean (if false, the model has been changed and prediction should clear)
+            dictPluginState.Add("CleanPredict", this.ClearPrediction);
+
             return dictPluginState;
         }
 
@@ -1215,7 +1295,8 @@ namespace IPyModeling
 
         // << clicked, moves all the way left
         protected void btnLeft25_Click(object sender, EventArgs e)
-        {
+        { 
+            boolClearPrediction = true;
             if (this.intThresholdIndex >= 25)
                 this.intThresholdIndex -= 25;
             else
@@ -1224,12 +1305,15 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
+            //flag if change made that should clear prediction
+           
         }
         
 
         // < clicked, move 1 left
         protected void btnLeft1_Click(object sender, EventArgs e)
         {
+            boolClearPrediction = true;
             if (this.intThresholdIndex >= 1)
                 this.intThresholdIndex -= 1;
             else
@@ -1238,12 +1322,15 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
+            //flag if change made that should clear prediction
+            
         }
 
 
         // > clicked, move 1 right
         protected void btnRight1_Click(object sender, EventArgs e)
         {
+            boolClearPrediction = true;
             if (this.intThresholdIndex < this.listCandidateThresholds.Count - 1)
                 this.intThresholdIndex += 1;
             else
@@ -1252,12 +1339,15 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
+            //flag if change made that should clear prediction
+            
         }
 
 
         // >> clicked, move all the way right
         protected void btnRight25_Click(object sender, EventArgs e)
         {
+            boolClearPrediction = true;
             if (this.intThresholdIndex < this.listCandidateThresholds.Count - 25)
                 this.intThresholdIndex += 25;
             else
@@ -1266,6 +1356,8 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
+            //flag if change made that should clear prediction
+            
         }
 
 

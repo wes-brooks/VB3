@@ -142,7 +142,7 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1102, 645);
             this.tabControl1.TabIndex = 0;
-            this.tabControl1.Click += new System.EventHandler(this.RequestModelData);
+//            this.tabControl1.Click += new System.EventHandler(this.RequestModelData);
             // 
             // tabPage4
             // 
@@ -154,6 +154,7 @@
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage4.Size = new System.Drawing.Size(1094, 619);
             this.tabPage4.TabIndex = 0;
+            this.tabPage4.Enter += new System.EventHandler(this.DataTabEnter);
             this.tabPage4.Text = "Data Manipulation";
             // 
             // label3
@@ -337,6 +338,7 @@
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(1094, 619);
             this.tabPage2.TabIndex = 2;
+            this.tabPage2.Enter += new System.EventHandler(this.RequestModelData);
             this.tabPage2.Text = "Model";
             // 
             // lblDecisionThreshold

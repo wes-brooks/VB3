@@ -283,13 +283,16 @@ namespace VBProjectManager
         {
             //flag to tell prediction to show itself after being hidden only if model is complete
             bool boolModelComplete = false;
+            //flag to determine if prediction or model should be MakeActive()
             bool boolClearModel = false;
+            //store the sender plugin from the broadcast
             string strPluginType = (((IPlugin)sender).PluginType).ToString();
 
             //if datasheet is broadcasting any changes
             if (strPluginType == "Datasheet")
             {
                 IPlugin dsplugin = (IPlugin)sender;
+                //determine if the datasheet has changed causing the model to clear
                 boolClearModel = dsplugin.ClearModel ? true : false;
 
                 //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
@@ -304,21 +307,34 @@ namespace VBProjectManager
                         //if datasheet is complete, show modeling
                         else if (((IPlugin)sender).Complete)
                         {
+                            //store if model is complete
                             boolModelComplete = plugin.Complete ? true : false;
                             plugin.Show();
                         }
                     if (plugin.PluginType.ToString() == "Prediction")
                     {
+                        //check to see if hte modeling is complete and it hasn't been cleared by any datasheet changes
                         if (boolModelComplete && !boolClearModel)
                         {
                             plugin.Show();
-                            plugin.MakeActive(); //need this or location becomes selectedRoot
+                            if (plugin.Complete) //if the prediction is also complete
+                            {
+                                plugin.MakeActive(); //need this or Location becomes selectedRoot
+                            }
+                            else
+                            {
+                                //loop through the extensions to get the modeling plugin to MakeActive()
+                                foreach (DotSpatial.Extensions.IExtension X in App.Extensions)
+                                {
+                                    IPlugin modelPlug = (IPlugin)X;
+                                    if (modelPlug.PluginType.ToString() == "Modeling")
+                                        modelPlug.MakeActive();
+                                }
+                            }
                         }
-                        // if prediction is not complete, make model active plugin
                     }
                 }
-                //if modeling is broadcasting itself
-            }
+            } //if modeling is broadcasting itself
             else if (strPluginType == "Modeling")
             {
                 //find prediction plugin, needs to show itself once modeling broadcasts itself with complete flag raised

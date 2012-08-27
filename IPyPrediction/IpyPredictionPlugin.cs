@@ -268,14 +268,17 @@ namespace IPyPrediction
 
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
-        {
+         {
             //listen to others broadcast..receiving something
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {                
                 _frmIPyPred.SetModel(e.PackedPluginState);
+
+                //if the prediction is complete and the model was cleared, clear the prediction
+                if (boolComplete && ((((IPlugin)sender).ClearModel) || (bool)e.PackedPluginState["CleanPredict"]))
+                    _frmIPyPred.ClearDataGridViews();
             }
-            if (boolComplete)
-                _frmIPyPred.ClearDataGridViews();
+            
         }
 
 
@@ -367,8 +370,10 @@ namespace IPyPrediction
         //make prediction, sends to form click event and sets complete to true
         void btnMakePrediction_Click(object sender, EventArgs e)
         {
+            Cursor.Current = Cursors.WaitCursor;
             _frmIPyPred.btnMakePredictions_Click(sender, e);
            boolComplete = true;
+           Cursor.Current = Cursors.Default;
         }
 
 

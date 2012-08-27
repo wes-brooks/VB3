@@ -154,6 +154,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Controls\DatasheetControl.resx">
       <DependentUpon>DatasheetControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmChooseWorksheet.resx">
       <DependentUpon>frmChooseWorksheet.cs</DependentUpon>

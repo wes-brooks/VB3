@@ -274,8 +274,13 @@ namespace IPyPrediction
         //set the model using packed state of model
         public void SetModel(IDictionary<string,object> dictPackedState)
         {
+            
             Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["ModelByObject"];
             dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
+
+            //if ((bool)dictPackedState["CleanPredict"])
+            //    ClearDataGridViews();
+
             if (dictModel != null)
             {
                 //datatables serialized as xml string to maintain extendedProperty values
@@ -532,6 +537,8 @@ namespace IPyPrediction
         //make predictions based on imported ob and iv datatables
         public void btnMakePredictions_Click(object sender, EventArgs e)
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             if (ipyInterface == null) RequestIronPythonInterface();
             if (ipyModel == null) RequestModel();
 
@@ -568,6 +575,8 @@ namespace IPyPrediction
             string pattern = @"(MAX|MEAN|PROD|SUM|MIN)\(([^\+]*)\)";
             Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
             Match m = r.Match(strModelExpression);
+
+            Cursor.Current = Cursors.WaitCursor;
                         
             if(m.Success)
             {
@@ -605,6 +614,9 @@ namespace IPyPrediction
             //make prediction
             dynamic dynPredictions = ipyInterface.Predict(ipyModel, tblForPrediction);
             List<double> lstPredictions = ((IList<object>)dynPredictions).Cast<double>().ToList();
+
+            Cursor.Current = Cursors.WaitCursor;
+
             //create prediction table to show prediction
             DataTable dtPredictions = new DataTable();
 
@@ -620,6 +632,9 @@ namespace IPyPrediction
             }
 
             dtStats = GeneratePredStats(dtPredictions, dtObs, tblForPrediction);
+            
+            Cursor.Current = Cursors.WaitCursor;
+
              if (dtStats == null)
                  return;
 
@@ -1292,6 +1307,8 @@ namespace IPyPrediction
 
         public void setViewOnGrid(DataGridView dgv)
         {
+            Cursor.Current = Cursors.WaitCursor;
+
             //utility method used to set numerical precision displayed in grid
 
             //seems to be the only way I can figure to get a string in col 1 that may
