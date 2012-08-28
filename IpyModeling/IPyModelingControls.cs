@@ -412,7 +412,10 @@ namespace IPyModeling
         {
             //make cursor hourglass
             Cursor.Current = Cursors.WaitCursor;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             DataTable modelDataTable;
             //first check to see if cancel was hit
            
@@ -744,7 +747,11 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             //if model has been completed, clear it
             Clear();
         }
@@ -786,7 +793,11 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             //variable was removed, if model is complete, clear it
             Clear();
         }
@@ -844,7 +855,10 @@ namespace IPyModeling
         public DataTable CreateModelDataTable()
         {
             Cursor.Current = Cursors.WaitCursor;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             //Datasheet's packed state coming in
             DataTable dtCorr_ = dsControl1.DT;  // this should be holding the model's dataset at this point?
             DataView dvCorr_ = dtCorr_.DefaultView;
@@ -910,10 +924,16 @@ namespace IPyModeling
             ChangeControlStatus(false);
 
             StartModeling();
+<<<<<<< HEAD
 
             //keep waiting..
             Cursor.Current = Cursors.WaitCursor;
 
+=======
+            //keep waiting...
+            Cursor.Current = Cursors.WaitCursor;
+            
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             //check to see if cancel was hit
             if (stopRun)
             {
@@ -928,7 +948,11 @@ namespace IPyModeling
             boolRunning = false;
             NotifyPropChanged(boolRunning);
 
+<<<<<<< HEAD
             //all done
+=======
+            //all done...
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             Cursor.Current = Cursors.Default;
         }
 
@@ -954,7 +978,10 @@ namespace IPyModeling
         protected void MakeModel(DataTable Data)
         {
             Cursor.Current = Cursors.WaitCursor;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             //Set up the local variables we'll need for model-building.
             DataTable tblData = Data;
             double dblSpecificity = 0.9;
@@ -968,7 +995,10 @@ namespace IPyModeling
             dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblSpecificity, regulatory_threshold: dblThreshold, method: strMethod);
             
             Cursor.Current = Cursors.WaitCursor;
+<<<<<<< HEAD
             
+=======
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             //if cancel was clicked, get out of here
             if (stopRun)
             {
@@ -1034,7 +1064,10 @@ namespace IPyModeling
 
         protected void InitializeValidationChart()
         {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             Cursor.Current = Cursors.WaitCursor;
             //if cancel was clicked, get out of here
             if (stopRun)
@@ -1073,7 +1106,10 @@ namespace IPyModeling
         protected void AnnotateChart()
         {
             Cursor.Current = Cursors.WaitCursor;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             //if cancel was clicked, get out of here
             if (stopRun)
             {

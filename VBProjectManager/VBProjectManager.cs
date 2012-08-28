@@ -278,10 +278,10 @@ namespace VBProjectManager
         }
 
 
-        //listen to plugin's broadcast in order to update other plugins
+        //listen to plugin's broadcast in order to update other plugin's visibility
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
-            //flag to tell prediction to show itself after being hidden only if model is complete
+            //flags to tell prediction to show itself after being hidden only if model is complete
             bool boolModelComplete = false;
             //flag to determine if prediction or model should be MakeActive()
             bool boolClearModel = false;
@@ -313,13 +313,21 @@ namespace VBProjectManager
                         }
                     if (plugin.PluginType.ToString() == "Prediction")
                     {
+<<<<<<< HEAD
                         //check to see if hte modeling is complete and it hasn't been cleared by any datasheet changes
+=======
+                        //check to see if the modeling is complet and it hasn't been cleared by any datasheet changes
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
                         if (boolModelComplete && !boolClearModel)
                         {
                             plugin.Show();
                             if (plugin.Complete) //if the prediction is also complete
                             {
+<<<<<<< HEAD
                                 plugin.MakeActive(); //need this or Location becomes selectedRoot
+=======
+                                plugin.MakeActive(); //need this or location becomes selectedRoot
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
                             }
                             else
                             {
@@ -334,7 +342,11 @@ namespace VBProjectManager
                         }
                     }
                 }
+<<<<<<< HEAD
             } //if modeling is broadcasting itself
+=======
+            }//if modeling is broadcasting itself
+>>>>>>> 158b3941b953675fa51c38a3a931db6c98a599b1
             else if (strPluginType == "Modeling")
             {
                 //find prediction plugin, needs to show itself once modeling broadcasts itself with complete flag raised
