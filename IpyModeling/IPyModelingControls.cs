@@ -710,14 +710,15 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
             lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
 
-            //clear the model
-            Clear();
             //clear the prediction
             if (model_data != null)
             {
                 boolClearPrediction = true;
                 UpdatePredictionTab();
             }
+            
+            //clear the model
+            Clear();
         }
 
 
