@@ -274,7 +274,9 @@ namespace IPyPrediction
         //set the model using packed state of model
         public void SetModel(IDictionary<string,object> dictPackedState)
         {
-            
+            //make sure empty model doesnt run through this method
+            if (dictPackedState.Count <= 2)
+                return;
             Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["ModelByObject"];
             dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
 

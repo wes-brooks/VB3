@@ -276,7 +276,11 @@ namespace Datasheet
             }*/
 
             //if clean, initial pass is false
-            boolInitialPass = !(bool)dictPluginState["Clean"];
+            if (dsControl1.State.ToString() == "clean")
+                boolInitialPass = false;
+            else
+                boolInitialPass = true;
+//            boolInitialPass = !(bool)dictPluginState["Clean"];
         }
 
         
@@ -389,10 +393,11 @@ namespace Datasheet
                 if (dlgr == DialogResult.OK)
                 {
                     boolChangesMadeDS = true;
-                    
-                    correlationData = dsControl1.DT;
+
+
+                    correlationData = dsControl1.DT;   //dont see this being used anywhere
                     //  savedDT = dt;                 //dont see this being used anywhere
-                    dataSheetData = dsControl1.DT;
+                    dataSheetData = dsControl1.DT;    //dont see this being used anywhere 
                     dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 }
                 else
@@ -400,8 +405,8 @@ namespace Datasheet
             }
             else if (boolInitialPass)
             {
-                correlationData = dsControl1.DT;
-                modelData = dsControl1.DT;
+                correlationData = dsControl1.DT;     //dont see this being used anywhere
+                modelData = dsControl1.DT;           //dont see this being used anywhere
                 dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 boolInitialPass = false;
                 //   savedDT = dt;                   //dont see this being used anywhere
@@ -417,30 +422,32 @@ namespace Datasheet
 
             dictPluginState.Add("ChangesMadeDS", boolChangesMadeDS);
 
-            StringWriter sw = null;
-            //Save Datasheet info as xml string for serialization
-            sw = null;
-            if (dsControl1.DT != null)
-            {
-                dsControl1.DT.TableName = "DataSheetData";
-                sw = new StringWriter();
-                dsControl1.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                strXmlDataTable = sw.ToString();
-                sw.Close();
-                sw = null;
-                dictPluginState.Add("XmlDataTable", strXmlDataTable);
-            }
+            // THIS IS DONE IN DATASHEETCONTROL.CS
+            //StringWriter sw = null;
+            ////Save Datasheet info as xml string for serialization
+            //sw = null;
+            //if (dsControl1.DT != null)
+            //{
+            //    dsControl1.DT.TableName = "DataSheetData";
+            //    sw = new StringWriter();
+            //    dsControl1.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+            //    strXmlDataTable = sw.ToString();
+            //    sw.Close();
+            //    sw = null;
+            //    dictPluginState.Add("XmlDataTable", strXmlDataTable);
+            //}
 
-            if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.clean)
-            {
-                boolClean = true;
-            }
-            else
-            {
-                boolClean = false;
-            }
+            // THIS IS DONE IN DATASHEETCONTROL.CS
+            //if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.clean)
+            //{
+            //    boolClean = true;
+            //}
+            //else
+            //{
+            //    boolClean = false;
+            //}
 
-            dictPluginState.Add("Clean", boolClean);
+            //dictPluginState.Add("Clean", boolClean);
             return dictPluginState;
         }
 

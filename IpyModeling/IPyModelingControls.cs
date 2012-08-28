@@ -712,6 +712,12 @@ namespace IPyModeling
 
             //clear the model
             Clear();
+            //clear the prediction
+            if (model_data != null)
+            {
+                boolClearPrediction = true;
+                UpdatePredictionTab();
+            }
         }
 
 
@@ -1198,7 +1204,7 @@ namespace IPyModeling
             //save predictors
             dictPluginState.Add("Predictors", listPredictors);
 
-            //save whether or not the model is clean (if false, the model has been changed and prediction should clear)
+            //save whether or not the model has been changed, if true prediction should clear)
             dictPluginState.Add("CleanPredict", this.ClearPrediction);
 
             return dictPluginState;

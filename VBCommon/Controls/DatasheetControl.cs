@@ -60,8 +60,6 @@ namespace VBCommon.Controls
         private int intNhiddencols = 0;
         private int intNivs = 0;
 
-        bool boolValidated = false;
-
         // getter/setter for transform type
         [JsonProperty]
         public VBCommon.DependentVariableTransforms DependentVariableTransform  
@@ -1108,39 +1106,18 @@ namespace VBCommon.Controls
         {
             //save packed state to a dictionary
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
-
-          
-            //save DT as xml for serialization
-            this.DT.TableName = "DataSheetData";
-            StringWriter sw = null;
-            sw = new StringWriter();
-            this.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-            string xmlDT = sw.ToString();
-            sw.Close();
-            sw = null;
-            dictPackedState.Add("xmlDT", xmlDT);
-            //above line replaces this:: 
-            //dictPackedState.Add("DT", this.DT);
-
-            dictPackedState.Add("CorrelationDataTable", this.DT); //for Modeling to use
-            dictPackedState.Add("ModelDataTable", this.DT);   //for Modeling to use
             
             //pack up mainEffect columns for Prediction
             dictPackedState.Add("CurrentColIndex", this.SelectedColIndex);
             dictPackedState.Add("DepVarColName", this.ResponseVarColName);
             dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
             dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
-            dictPackedState.Add("DSValidated", boolValidated);
 
             //pack up listInfo for model datasheet
-            int intNumCols = this.DT.Columns.Count;
-            int intNumRows = this.DT.Rows.Count;
-            string strDateName = this.DT.Columns[0].ColumnName.ToString();
-            string strResponseVar = this.DT.Columns[1].ColumnName.ToString();
-            dictPackedState.Add("ColCount", intNumCols);
-            dictPackedState.Add("RowCount", intNumRows);
-            dictPackedState.Add("DateIndex", strDateName);
-            dictPackedState.Add("ResponseVar", strResponseVar);
+            dictPackedState.Add("ColCount", this.DT.Columns.Count);
+            dictPackedState.Add("RowCount", this.DT.Rows.Count);
+            dictPackedState.Add("DateIndex", this.DT.Columns[0].ColumnName.ToString());
+            dictPackedState.Add("ResponseVar", this.DT.Columns[1].ColumnName.ToString());
             dictPackedState.Add("DisabledRwCt", this.DisabledRows);
             dictPackedState.Add("DisabledColCt", this.DisabledCols);
             dictPackedState.Add("HiddenColCt", this.HiddenCols);
@@ -1149,7 +1126,7 @@ namespace VBCommon.Controls
 
             
             //Save Datasheet info as xml string for serialization
-            sw = null;
+            StringWriter sw = null;
             if (this.DT != null)
             {
                 this.DT.TableName = "DataSheetData";
@@ -1173,13 +1150,13 @@ namespace VBCommon.Controls
             }
 
             //model expects this change to the dt first
-            DataTable tempDt = this.DT;
-            tempDt.Columns[this.ResponseVarColName].SetOrdinal(1);
+            DataTable Filtered4ModelDt = this.DT;
+            Filtered4ModelDt.Columns[this.ResponseVarColName].SetOrdinal(1);
             //filter diabled rows and columns
-            tempDt = this.filterDataTableRows(tempDt);
-            Utilities.TableUtils tableutils = new Utilities.TableUtils(tempDt);
-            tempDt = tableutils.filterRVHcols(tempDt);
-            dictPackedState.Add("DataSheetDatatable", tempDt);  //for modeling to use
+            Filtered4ModelDt = this.filterDataTableRows(Filtered4ModelDt);
+            Utilities.TableUtils tableutils = new Utilities.TableUtils(Filtered4ModelDt);
+            Filtered4ModelDt = tableutils.filterRVHcols(Filtered4ModelDt);
+            dictPackedState.Add("DataSheetDatatable", Filtered4ModelDt);  //for modeling to use
 
             return dictPackedState;
         }
@@ -1190,13 +1167,13 @@ namespace VBCommon.Controls
         {
             //unpack datatable
             //unpack xmlDT and repopulate this.DT
-            string xmlDT = (string)dictPackedState["xmlDT"];
+            string xmlDT = (string)dictPackedState["XmlDataTable"];
             StringReader sr = new StringReader(xmlDT);
             DataSet ds = new DataSet();
             ds.ReadXml(sr);
             sr.Close();
             this.DT = ds.Tables[0];
-            //above replaces this: this.DT = (DataTable)dictPackedState["DT"];
+
             this.DT.TableName = "DataSheetData";
             this.dgv.DataSource = null;
             this.dgv.DataSource = this.DT;
@@ -1211,6 +1188,7 @@ namespace VBCommon.Controls
                 string strJson = jsonRWHolder.ToString();
                 Dictionary<string, bool> dtriRowInfo = new Dictionary<string, bool>();
                 dtriRowInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
+                this.DTRI.DTRowInfo = dtriRowInfo;
             }
             else
             {
@@ -1226,6 +1204,7 @@ namespace VBCommon.Controls
                 string strJson = jsonClHolder.ToString();
                 Dictionary<string, bool> dtriColInfo = new Dictionary<string, bool>();
                 dtriColInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
+                this.DTCI.DTColInfo = dtriColInfo;
             }
             else
             {
@@ -1240,8 +1219,6 @@ namespace VBCommon.Controls
 
             this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
             this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
-            //get validated flag
-            this.boolValidated = (bool)dictPackedState["DSValidated"];
 
             this.Utils = new VBCommon.Metadata.Utilities();
             this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
@@ -1264,9 +1241,6 @@ namespace VBCommon.Controls
             {
                 this.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             }
-
-            //if clean, initial pass is false
-            //boolInitialPass = !(bool)dictPluginState["Clean"];
         }
 
 
