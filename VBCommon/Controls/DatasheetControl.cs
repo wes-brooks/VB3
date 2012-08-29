@@ -1162,6 +1162,17 @@ namespace VBCommon.Controls
         }
 
 
+        //show the modeling datasheet when no changes made to global
+        public void UnhideModelDS()
+        {
+            this.Utils = new VBCommon.Metadata.Utilities();
+            this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
+            this.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(this.dgv);
+
+            this.GridUtils.maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
+        }
+
+
         //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {

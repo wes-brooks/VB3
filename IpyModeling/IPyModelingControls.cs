@@ -621,6 +621,12 @@ namespace IPyModeling
         } */
 
 
+        //maintain the model's ds when no changes made to global
+        public void UnhideDatasheet()
+        {
+            dsControl1.UnhideModelDS();
+        }
+
         //Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string, object> packedState)
         {
@@ -629,7 +635,17 @@ namespace IPyModeling
 
             //check to see if we should clear the model
             if ((bool)packedState["ChangesMadeDS"])
+            {
+               
+                //clear the prediction
+                if (model_data != null)
+                {
+                    boolClearPrediction = true;
+                    UpdatePredictionTab();
+                } 
+                //clear model
                 Clear();
+            }
 
             dsControl1.UnpackState((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
             
@@ -719,6 +735,8 @@ namespace IPyModeling
             
             //clear the model
             Clear();
+            //make sure model's ds redraws correctly
+            UnhideDatasheet();
         }
 
 

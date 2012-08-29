@@ -268,7 +268,7 @@ namespace IPyModeling
                 //no changes made, and not first time here = don't set the data, just show what was there
                 if (!(bool)e.PackedPluginState["ChangesMadeDS"] && !InitialEntry)
                 {
-                    
+                    innerIronPythonControl.UnhideDatasheet();
                 }
                 else
                 {
