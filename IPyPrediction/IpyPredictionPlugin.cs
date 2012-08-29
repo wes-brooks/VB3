@@ -315,9 +315,6 @@ namespace IPyPrediction
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-                //repopulate plugin complete flags from saved project
-                boolComplete = (bool)dictPlugin["Complete"];
-
                 //check to see if there already is a prediction, if so, close it and open the saved project
                 if (VisiblePlugin)
                     Hide();
@@ -325,6 +322,32 @@ namespace IPyPrediction
                 //make prediction active plugin
                 if ((bool)dictPlugin["Visible"])
                     Show();
+                
+                //repopulate plugin complete flags from saved project
+                boolComplete = (bool)dictPlugin["Complete"];
+                if (!boolComplete)
+                {
+                    //if model is complete, make it active
+                    if (e.PackedPluginStates.ContainsKey("PLSPanel") || e.PackedPluginStates.ContainsKey("GBMPanel"))
+                    {
+                        IDictionary<string, object> dictPLSModel = e.PackedPluginStates["PLSPanel"];
+                        IDictionary<string, object> dictGBMModel = e.PackedPluginStates["GBMPanel"];
+                        if ((bool)dictPLSModel["Complete"] || (bool)dictGBMModel["Complete"])
+                        {
+                            //loop through the extensions to get the modeling plugin to MakeActive()
+                            foreach (DotSpatial.Extensions.IExtension X in App.Extensions)
+                            {
+                                IPlugin modelPlug = (IPlugin)X;
+                                if (modelPlug.PluginType.ToString() == "Modeling")
+                                    modelPlug.MakeActive();
+                            }
+                        }
+                        
+                        return;
+                    }
+
+                }
+
                 
                 //Unpack the state of this plugin.
                 _frmIPyPred.UnpackState(e.PackedPluginStates[strPanelKey]);
