@@ -263,7 +263,7 @@ namespace Datasheet
             this.boolValidated = (bool)dictPluginState["DSValidated"];
 
             //initial info for the list
-            FileInfo fi = new FileInfo(Name);
+            //FileInfo fi = new FileInfo(Name);
 
 
             /*if ((bool)dictPluginState["Clean"])
