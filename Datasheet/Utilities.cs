@@ -48,7 +48,8 @@ namespace Datasheet
             public TableUtils(DataTable dt)
             {
                 _dt = dt;
-                _dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
+                _dtCI = new VBCommon.Metadata.dtColumnInformation(dt);
+         //       _dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
                 _dtRI = VBCommon.Metadata.dtRowInformation.getdtRI(dt, false);
 
             }
@@ -56,7 +57,8 @@ namespace Datasheet
 
             public void registerNewCols(DataTable dt)
             {
-                _dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
+                _dtCI = new VBCommon.Metadata.dtColumnInformation(dt);
+//                _dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
                 foreach (DataColumn c in dt.Columns)
                 {
                     if (!_dtCI.getColStatus(c.ColumnName))
@@ -73,7 +75,8 @@ namespace Datasheet
                 //filter out disabled columns
                 DataTable dtCopy = dt.Copy();
 
-                VBCommon.Metadata.dtColumnInformation dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
+                VBCommon.Metadata.dtColumnInformation dtCI = new VBCommon.Metadata.dtColumnInformation(dt);
+//                VBCommon.Metadata.dtColumnInformation dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
                 foreach (KeyValuePair<string, bool> kv in dtCI.DTColInfo)
                 {
                     if (kv.Value) continue; 

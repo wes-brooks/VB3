@@ -86,7 +86,8 @@ namespace Datasheet
 
             _tu = new Utilities.TableUtils(dt);
             _dtRI = VBCommon.Metadata.dtRowInformation.getdtRI(_dt, false);
-            _dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
+            _dtCI = new VBCommon.Metadata.dtColumnInformation(dt);
+//            _dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
 
             //get a working copy of the dataset
             _dt = dt.Copy();

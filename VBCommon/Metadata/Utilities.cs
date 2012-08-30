@@ -50,7 +50,8 @@ namespace VBCommon.Metadata
             public TableUtils(DataTable dt)
             {
                 _dt = dt;
-                _dtCI = dtColumnInformation.getdtCI(dt, false);
+                _dtCI = new dtColumnInformation(dt);
+//                _dtCI = dtColumnInformation.getdtCI(dt, false);
                 _dtRI = dtRowInformation.getdtRI(dt, false);
 
             }
@@ -58,7 +59,8 @@ namespace VBCommon.Metadata
 
             public void registerNewCols(DataTable dt)
             {
-                _dtCI = dtColumnInformation.getdtCI(dt, false);
+                _dtCI = new dtColumnInformation(dt);
+      //          _dtCI = dtColumnInformation.getdtCI(dt, false);
                 foreach (DataColumn c in dt.Columns)
                 {
                     if (!_dtCI.getColStatus(c.ColumnName))
@@ -75,7 +77,8 @@ namespace VBCommon.Metadata
                 //filter out disabled columns
                 DataTable dtCopy = dt.Copy();
 
-                dtColumnInformation dtCI = dtColumnInformation.getdtCI(dt, false);
+                dtColumnInformation dtCI = new dtColumnInformation(dt);
+//                dtColumnInformation dtCI = dtColumnInformation.getdtCI(dt, false);
                 foreach (KeyValuePair<string, bool> kv in dtCI.DTColInfo)
                 {
                     if (kv.Value) continue; 

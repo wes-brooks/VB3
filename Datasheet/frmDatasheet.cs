@@ -518,7 +518,8 @@ namespace Datasheet
             dsControl1.DTRI = VBCommon.Metadata.dtRowInformation.getdtRI(dsControl1.DT, true);
             //initialize cols to all enabled for imported table
             //(builds dictionary of keys, <string>datetime and values <bool>enabled/disabled col)
-            dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
+            dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
+ //           dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
 
             //init the utilities
             dsControl1.Utils = new VBCommon.Metadata.Utilities();
@@ -617,7 +618,8 @@ namespace Datasheet
                 dsControl1.dgv.DataSource = dsControl1.DT;
                 dsControl1.dgv.Enabled = false;
                 dsControl1.DTRI = VBCommon.Metadata.dtRowInformation.getdtRI(dsControl1.DT, true);
-                dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
+                dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
+  //            dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
                 boolValidated = false;
             }
         }

@@ -1207,7 +1207,8 @@ namespace VBCommon.Controls
             }
 
             //get row information
-            this.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(this.DT, true);
+            this.DTCI = new VBCommon.Metadata.dtColumnInformation(this.DT);
+   //       this.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(this.DT, true);
             //json deserialize the dictionary first
             object jsonClHolder = (object)dictPackedState["DTColInfo"];
             if (jsonClHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")

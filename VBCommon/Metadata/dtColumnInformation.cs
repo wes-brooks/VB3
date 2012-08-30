@@ -18,7 +18,7 @@ namespace VBCommon.Metadata
         //dictionary to hold column info
         private Dictionary<string, bool> dictColstatus = null;
         //class variable
-        private static dtColumnInformation dtCI = null;
+   //     private static dtColumnInformation dtCI = null;
 
 
         /// <summary>
@@ -47,13 +47,13 @@ namespace VBCommon.Metadata
         /// <param name="dt">table</param>
         /// <param name="init">if true, initialize; for example, on import</param>
         /// <returns></returns>
-        public static dtColumnInformation getdtCI(DataTable dt, bool init)
-        {
-            //pass null after initialization to access the DTcolInfo property
-            //or pass init=true (after import) to initialize
-            if (dtCI == null || init) dtCI = new dtColumnInformation(dt);
-            return dtCI;
-        }
+//        public static dtColumnInformation getdtCI(DataTable dt, bool init)
+//        {
+//            //pass null after initialization to access the DTcolInfo property
+//            //or pass init=true (after import) to initialize
+//            if (dtCI == null || init) dtCI = new dtColumnInformation(dt);
+//            return dtCI;
+//        }
 
 
         /// <summary>

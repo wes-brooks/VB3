@@ -85,7 +85,8 @@ namespace VBCommon.Controls
 
             _tu = new Utilities.TableUtils(dt);
             _dtRI = dtRowInformation.getdtRI(_dt, false);
-            _dtCI = dtColumnInformation.getdtCI(dt, false);
+            _dtCI = new dtColumnInformation(dt);
+//            _dtCI = dtColumnInformation.getdtCI(dt, false);
 
             //get a working copy of the dataset
             _dt = dt.Copy();
