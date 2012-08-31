@@ -6,25 +6,18 @@ using System.Data;
 
 namespace VBCommon.Metadata
 {
-    /// <summary>
-    /// class to carry datatable column enable/disable information
-    /// largely superceded by use of table column extended properties
-    /// but still used by the column plots enable/disable functions
-    /// </summary>
+    // class to carry datatable column enable/disable information
+    // largely superceded by use of table column extended properties
+    // but still used by the column plots enable/disable functions
     public class dtColumnInformation
     {
         //table to operate with
         private DataTable _dt = null;
         //dictionary to hold column info
         private Dictionary<string, bool> dictColstatus = null;
-        //class variable
-   //     private static dtColumnInformation dtCI = null;
+       
 
-
-        /// <summary>
-        /// method initializes a datatable cols information structure to all enabled
-        /// </summary>
-        /// <param name="dt"></param>
+        // method initializes a datatable cols information structure to all enabled
         public dtColumnInformation(DataTable dt)
         {
             if (dt != null)
@@ -34,7 +27,21 @@ namespace VBCommon.Metadata
 
                 for (int c = 0; c < _dt.Columns.Count; c++)
                 {
-                    dictColstatus.Add(_dt.Columns[c].ColumnName.ToString(), true);
+                    //if this col has enabled flag, set that as the value in dictColstatus, else set it to true
+                    if (_dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
+                    {
+                        bool boolcoStatus;
+                        string strEnabledStatus = _dt.Columns[c].ExtendedProperties["enabled"].ToString();
+                        
+                        if (strEnabledStatus == "False") boolcoStatus = false;
+                        else boolcoStatus = true;
+                        
+                        dictColstatus.Add(_dt.Columns[c].ColumnName.ToString(), boolcoStatus);                    
+                    }                            
+                    else
+                    {
+                        dictColstatus.Add(_dt.Columns[c].ColumnName.ToString(), true);
+                    }
                 }
             }
         }
@@ -56,11 +63,8 @@ namespace VBCommon.Metadata
 //        }
 
 
-        /// <summary>
-        /// method returns the enable/disable status of the column name (key)
-        /// </summary>
-        /// <param name="key">the table column name to check</param>
-        /// <returns>true if enable, false if disable</returns>
+        // method returns the enable/disable status of the column name (key)
+        //the table column name to check, true if enable, false if disable
         public bool getColStatus(string key)
         {
             //returns the status of a row

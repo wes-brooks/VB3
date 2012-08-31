@@ -337,6 +337,7 @@ namespace VBCommon.Metadata
                 //reset the grid
                 dgv.DataSource = null;
                 dgv.DataSource = dt;
+                dtColumnInformation _dtCI = new dtColumnInformation(dt);
 
                 //mark all grid cols visible, not sortable
                 for (int c = 0; c < dgv.Columns.Count; c++)
@@ -363,11 +364,13 @@ namespace VBCommon.Metadata
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
+                            _dtCI.setColStatus(c.ColumnName.ToString(), false);   //make sure col status is updated
                         }
                         else
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
+                            _dtCI.setColStatus(c.ColumnName.ToString(), true);   //make sure col status is updated
                         }
                     }
                 }

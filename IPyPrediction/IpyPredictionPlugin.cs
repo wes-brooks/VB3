@@ -341,16 +341,15 @@ namespace IPyPrediction
                                 if (modelPlug.PluginType.ToString() == "Modeling")
                                     modelPlug.MakeActive();
                             }
-                        }
-                        
+                        }                       
                         return;
                     }
-
                 }
 
                 
                 //Unpack the state of this plugin.
                 _frmIPyPred.UnpackState(e.PackedPluginStates[strPanelKey]);
+                MakeActive();
             }
             else
             {

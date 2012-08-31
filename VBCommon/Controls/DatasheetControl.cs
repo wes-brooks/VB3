@@ -110,22 +110,22 @@ namespace VBCommon.Controls
         }
 
 
-        ////returns datatable row info
-        [JsonProperty]
-        public Dictionary<string, bool> DTRowInfo
-        {
-            get { return this.dtRI.DTRowInfo; }
-            set { dtRI.DTRowInfo = value; }
-        }
+        //returns datatable row info
+        //[JsonProperty]
+        //public Dictionary<string, bool> DTRowInfo
+        //{
+        //    get { return this.dtRI.DTRowInfo; }
+        //    set { dtRI.DTRowInfo = value; }
+        //}
 
 
         //// returns datatable column info
-        [JsonProperty]
-        public Dictionary<string, bool> DTColInfo     
-        {
-            get { return this.dtCI.DTColInfo; }
-            set { dtCI.DTColInfo = value; }
-        }
+        //[JsonProperty]
+        //public Dictionary<string, bool> DTColInfo     
+        //{
+        //    get { return this.dtCI.DTColInfo; }
+        //    set { dtCI.DTColInfo = value; }
+        //}
 
         //returns current selected column index
         [JsonProperty]
@@ -997,7 +997,7 @@ namespace VBCommon.Controls
         // user click captured - decide what menu items are appropriate and show them
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
         {            
-            //dtColumnInformation dtCI = new dtColumnInformation(dt);
+            dtColumnInformation dtCI = new dtColumnInformation(dt);  //maybe this will keep the dictColStatus updated
             //Utilities utils = new Utilities();
 
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
@@ -1163,13 +1163,15 @@ namespace VBCommon.Controls
 
 
         //show the modeling datasheet when no changes made to global
-        public void UnhideModelDS()
+        public void UnhideModelDS(DataTable dt)
         {
-            this.Utils = new VBCommon.Metadata.Utilities();
+            this.DT = dt;
+            //this.Utils = new VBCommon.Metadata.Utilities();
             this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
             this.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(this.dgv);
 
             this.GridUtils.maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
+            showListInfo(this.FileName, this.DT);
         }
 
 
@@ -1206,7 +1208,7 @@ namespace VBCommon.Controls
                 this.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPackedState["DTRowInfo"];
             }
 
-            //get row information
+            //get column information
             this.DTCI = new VBCommon.Metadata.dtColumnInformation(this.DT);
    //       this.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(this.DT, true);
             //json deserialize the dictionary first
@@ -1232,8 +1234,8 @@ namespace VBCommon.Controls
             this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
             this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
 
-            this.Utils = new VBCommon.Metadata.Utilities();
-            this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
+            //this.Utils = new VBCommon.Metadata.Utilities();
+            //this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
             this.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(this.dgv);
 
             this.GridUtils.maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
@@ -1243,6 +1245,26 @@ namespace VBCommon.Controls
             
             //FileInfo fi = new FileInfo(Name);
             //this.FileName = fi.Name;
+            
+
+            //unpack listInfo for model datasheet
+            //need to convert if its unpacked from saved project
+            if (dictPackedState["DisabledColCt"].GetType().ToString() == "System.Int64")
+                this.DisabledCols = Convert.ToInt16((Int64)dictPackedState["DisabledColCt"]);
+            else this.DisabledCols = (int)dictPackedState["DisabledColCt"];
+
+            if (dictPackedState["DisabledRwCt"].GetType().ToString() == "System.Int64")
+                this.DisabledRows = Convert.ToInt16((Int64)dictPackedState["DisabledRwCt"]);
+            else this.DisabledRows = (int)dictPackedState["DisabledRwCt"];
+
+            if (dictPackedState["HiddenColCt"].GetType().ToString() == "System.Int64")
+                this.HiddenCols = Convert.ToInt16((Int64)dictPackedState["HiddenColCt"]);
+            else this.HiddenCols = (int)dictPackedState["HiddenColCt"];
+            
+            if (dictPackedState["IndVarCt"].GetType().ToString() == "System.Int64")
+                this.NumberIVs = Convert.ToInt16((Int64)dictPackedState["IndVarCt"]);
+            else this.NumberIVs = (int)dictPackedState["IndVarCt"];
+
             this.showListInfo(this.FileName, this.DT);
 
             if ((bool)dictPackedState["Clean"])

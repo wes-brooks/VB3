@@ -622,10 +622,11 @@ namespace IPyModeling
 
 
         //maintain the model's ds when no changes made to global
-        public void UnhideDatasheet()
+        public void UnhideDatasheet(DataTable dt)
         {
-            dsControl1.UnhideModelDS();
+            dsControl1.UnhideModelDS(dt);
         }
+
 
         //Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string, object> packedState)
@@ -736,7 +737,7 @@ namespace IPyModeling
             //clear the model
             Clear();
             //make sure model's ds redraws correctly
-            UnhideDatasheet();
+            UnhideDatasheet(dsControl1.DT);
         }
 
 

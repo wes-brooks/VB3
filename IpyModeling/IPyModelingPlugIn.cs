@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Data;
+using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
 using DotSpatial.Controls;
@@ -23,6 +25,8 @@ namespace IPyModeling
         protected string strPanelCaption = "GenericIronPythonModelPanelCaption";
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Modeling;
         private RootItem rootHeaderItem;
+
+        IDictionary<string, object> dictPlugin = null;
 
         //instance of  class
         protected IPyModeling.IPyModelingControl innerIronPythonControl;
@@ -204,6 +208,14 @@ namespace IPyModeling
         }
 
 
+        //returns this model's packed state
+        public IDictionary<string, object> PackedPlugin
+        {
+            get { return dictPlugin; }
+            set { dictPlugin = value; }
+        }
+
+
         //returns plugin type (Modeling)
         public Globals.PluginType PluginType
         {
@@ -268,7 +280,21 @@ namespace IPyModeling
                 //no changes made, and not first time here = don't set the data, just show what was there
                 if (!(bool)e.PackedPluginState["ChangesMadeDS"] && !InitialEntry)
                 {
-                    innerIronPythonControl.UnhideDatasheet();
+                    if (dictPlugin != null)
+                    {
+                        if (dictPlugin.Count > 3)
+                        {
+                            Dictionary<string, object> dictDatash = (Dictionary<string, object>)dictPlugin["PackedDatasheetState"];
+                            string xmlDT = (string)dictDatash["XmlDataTable"];
+                            StringReader sr = new StringReader(xmlDT);
+                            DataSet ds = new DataSet();
+                            ds.ReadXml(sr);
+                            sr.Close();
+                            DataTable dt = ds.Tables[0];
+                            innerIronPythonControl.UnhideDatasheet(dt);
+                            MakeActive();
+                        }
+                    }
                 }
                 else
                 {
@@ -354,10 +380,10 @@ namespace IPyModeling
             //if modeling is in the list of packed plugins, go unpack 
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
-                IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
+                dictPlugin = e.PackedPluginStates[strPanelKey];
                 //repopulate plugin Complete flags from saved project
                 boolComplete = (bool)dictPlugin["Complete"];
-
+                boolInitialEntry = false; //opening projects have been entered before
                 //check to see if there already is a PLS model open, if so, close it before opening a saved project
                 if ((VisiblePlugin) && (Complete))
                     Hide();
