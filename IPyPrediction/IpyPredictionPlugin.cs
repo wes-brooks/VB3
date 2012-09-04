@@ -271,8 +271,8 @@ namespace IPyPrediction
          {
             //listen to others broadcast..receiving something
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
-            {                
-                _frmIPyPred.SetModel(e.PackedPluginState);
+            {
+                _frmIPyPred.AddModel(e.PackedPluginState);
 
                 //make sure empty model doesnt run through this method
                 if (e.PackedPluginState.Count <= 2)

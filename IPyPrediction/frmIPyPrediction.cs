@@ -51,10 +51,13 @@ namespace IPyPrediction
         private DataTable dtObsOrig = null;
         //has transform occurred
         private bool boolObsTransformed = false;
+        //holds models that are in the listbox
+        IDictionary<string, object> dictListedModel = new Dictionary<string, object>();
 
         //Added for IronPython-based modeling:
         public event EventHandler IronPythonInterfaceRequested;
         public event EventHandler ModelRequested;
+        public event EventHandler SelectedIndexChanged;
 
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
@@ -271,13 +274,46 @@ namespace IPyPrediction
         }
 
 
-        //set the model using packed state of model
+        //store packed state and populate listbox
+        public void AddModel(IDictionary<string, object> dictPackedState)
+        {
+            //make sure empty model doesnt run through this method
+            if (dictPackedState.Count <= 2)
+                return;
+            Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["ModelByObject"];
+
+            //populate the listbox of available models
+            string modelName = (string)dictModel["Model"].ToString();
+            //if there is a model with same name remove it... Or should we increment the names, so they can have more than 1 pls model to choose from?
+            if (dictListedModel.ContainsKey(modelName))
+            {
+                dictListedModel.Remove(modelName);
+                lstAvailModels.Items.Remove(modelName);
+            }
+            
+            dictListedModel.Add(modelName, dictPackedState);  //adds this model's packed state to separate dictionary linked to listbox
+            lstAvailModels.Items.Add(modelName);  //adds the model's string name to the listbox
+        }
+
+
+        //when user selects model to use, send it to SetModel()
+        private void lstAvailModels_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            //get the model that's selected and send it to SetModel()
+            string curItem = lstAvailModels.SelectedItem.ToString();
+            SetModel((IDictionary<string, object>)dictListedModel[curItem]);
+        }
+
+
+
+        //set the model using chosen model from listbox
         public void SetModel(IDictionary<string,object> dictPackedState)
         {
             //make sure empty model doesnt run through this method
             if (dictPackedState.Count <= 2)
                 return;
             Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["ModelByObject"];
+
             dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
 
             //if ((bool)dictPackedState["CleanPredict"])
@@ -1566,5 +1602,7 @@ namespace IPyPrediction
         {
             set { strModelTabClean = value; }
         }
+
+  
     }
 }

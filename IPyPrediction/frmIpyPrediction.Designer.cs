@@ -64,6 +64,8 @@
             this.btnSaveTable = new System.Windows.Forms.Button();
             this.btnIVDataValidation = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+            this.lstAvailModels = new System.Windows.Forms.ListBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.panel2.SuspendLayout();
             this.panelIVs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -80,6 +82,7 @@
             this.groupBox1.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel2
@@ -261,7 +264,7 @@
             this.groupBox1.Controls.Add(this.txtRegStd);
             this.groupBox1.Controls.Add(this.label24);
             this.groupBox1.Controls.Add(this.txtDecCrit);
-            this.groupBox1.Location = new System.Drawing.Point(22, 63);
+            this.groupBox1.Location = new System.Drawing.Point(266, 63);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(401, 124);
             this.groupBox1.TabIndex = 13;
@@ -377,19 +380,19 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.txtModel.BackColor = System.Drawing.Color.White;
             this.txtModel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtModel.Location = new System.Drawing.Point(93, 9);
+            this.txtModel.Location = new System.Drawing.Point(266, 9);
             this.txtModel.Multiline = true;
             this.txtModel.Name = "txtModel";
             this.txtModel.ReadOnly = true;
             this.txtModel.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtModel.Size = new System.Drawing.Size(850, 46);
+            this.txtModel.Size = new System.Drawing.Size(678, 46);
             this.txtModel.TabIndex = 15;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(18, 24);
+            this.label1.Location = new System.Drawing.Point(198, 24);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(60, 20);
             this.label1.TabIndex = 14;
@@ -479,15 +482,37 @@
             this.btnIVDataValidation.Visible = false;
             this.btnIVDataValidation.Click += new System.EventHandler(this.btnIVDataValidation_Click);
             // 
+            // lstAvailModels
+            // 
+            this.lstAvailModels.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lstAvailModels.FormattingEnabled = true;
+            this.lstAvailModels.Location = new System.Drawing.Point(6, 25);
+            this.lstAvailModels.Name = "lstAvailModels";
+            this.lstAvailModels.Size = new System.Drawing.Size(134, 108);
+            this.lstAvailModels.TabIndex = 18;
+            this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.lstAvailModels);
+            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox3.Location = new System.Drawing.Point(16, 9);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(146, 143);
+            this.groupBox3.TabIndex = 97;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Available Models: ";
+            // 
             // frmIPyPrediction
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnIVDataValidation);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.txtModel);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnMakePredictions);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.panel2);
@@ -513,6 +538,7 @@
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -550,5 +576,7 @@
         private System.Windows.Forms.Button btnImportObs;
         private System.Windows.Forms.Button btnImportIVs;
         private System.Windows.Forms.HelpProvider helpProvider1;
+        private System.Windows.Forms.ListBox lstAvailModels;
+        private System.Windows.Forms.GroupBox groupBox3;
     }
 }

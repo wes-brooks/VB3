@@ -102,10 +102,10 @@ C:\VB3\VirtualBeach\obj\x86\Debug\VirtualBeach.ContainerForm.resources
 C:\VB3\VirtualBeach\obj\x86\Debug\VirtualBeach.Properties.Resources.resources
 C:\VB3\VirtualBeach\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\VB3\VirtualBeach\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\VB3\VirtualBeach\obj\x86\Debug\VirtualBeach.exe
+C:\VB3\VirtualBeach\obj\x86\Debug\VirtualBeach.pdb
 C:\VB3\bin\Debug\ContainerForm.resx
 C:\VB3\bin\Debug\ContainerForm.cs
 C:\VB3\bin\Debug\ContainerForm.Designer.cs
 C:\VB3\bin\Debug\VirtualBeach.exe
 C:\VB3\bin\Debug\VirtualBeach.pdb
-C:\VB3\VirtualBeach\obj\x86\Debug\VirtualBeach.exe
-C:\VB3\VirtualBeach\obj\x86\Debug\VirtualBeach.pdb

@@ -298,11 +298,12 @@ namespace IPyModeling
                 }
                 else
                 {
-                    innerIronPythonControl.SetData(e.PackedPluginState);
                     boolInitialEntry = false;
                     //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
                     if ((bool)e.PackedPluginState["ChangesMadeDS"])
                         boolComplete = false;
+                    
+                    innerIronPythonControl.SetData(e.PackedPluginState);
                 }
             }
         }
@@ -356,6 +357,9 @@ namespace IPyModeling
         {
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = innerIronPythonControl.PackProjectState();
+            if (dictPackedState["ModelByObject"] != null)
+                boolComplete = true;
+            
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, dictPackedState);
@@ -443,9 +447,9 @@ namespace IPyModeling
             if (boolRunCancelled)
                 return;
 
-            //this model is complete and ready for prediction
-            boolComplete = true;
-            Broadcast();
+            ////this model is complete and ready for prediction
+            //boolComplete = true;
+            //Broadcast();
 
             //make modeling the focus again (Broadcast() makes Prediction visible and 'on top')
             MakeActive();

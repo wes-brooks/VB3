@@ -8,6 +8,8 @@ C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBCommon\obj\Debug\VBCommon.dll
 C:\Users\wrbrooks\svn\vb3\trunk\VirtualBeach3.0\VBCommon\obj\Debug\VBCommon.pdb
 C:\VB3\bin\Debug\VBCommon.dll
 C:\VB3\bin\Debug\VBCommon.pdb
+C:\VB3\bin\Debug\Binaries\VBCommon\VBCommon.dll
+C:\VB3\bin\Debug\Binaries\VBCommon\VBCommon.pdb
 C:\VB3\VBCommon\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.DatasheetControl.resources
 C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmChooseWorksheet.resources
@@ -18,7 +20,5 @@ C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmPowerExponent.resources
 C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmVariableSpecification.resources
 C:\VB3\VBCommon\obj\Debug\GenerateResource.read.1.tlog
 C:\VB3\VBCommon\obj\Debug\GenerateResource.write.1.tlog
-C:\VB3\bin\Debug\Binaries\VBCommon\VBCommon.dll
-C:\VB3\bin\Debug\Binaries\VBCommon\VBCommon.pdb
 C:\VB3\VBCommon\obj\Debug\VBCommon.dll
 C:\VB3\VBCommon\obj\Debug\VBCommon.pdb

@@ -33,6 +33,7 @@ namespace VBProjectManager
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
         private Boolean boolClearModel; //needed for IPlugin
+        public Stack UndoRedoStack = new Stack();
 
         //constructor
         public VBProjectManager()
@@ -281,6 +282,11 @@ namespace VBProjectManager
         //listen to plugin's broadcast in order to update other plugins
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
+            //populate stack
+            Dictionary<object, object> dictStackObj = new Dictionary<object, object>();
+            dictStackObj.Add(sender, e.PackedPluginState);
+            UndoRedoStack.Push(dictStackObj);
+
             //flag to tell prediction to show itself after being hidden only if model is complete
             bool boolModelComplete = false;
             //flag to determine if prediction or model should be MakeActive()

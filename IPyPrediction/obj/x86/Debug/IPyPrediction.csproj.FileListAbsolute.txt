@@ -2,6 +2,8 @@ C:\Binaries\Plugins\IPyPrediction.dll
 C:\Binaries\Plugins\IPyPrediction.pdb
 C:\VB3\bin\Debug\Plugins\Prediction\IPyPrediction.dll
 C:\VB3\bin\Debug\Plugins\Prediction\IPyPrediction.pdb
+C:\VB3\bin\Debug\Binaries\Prediction\IPyPrediction.dll
+C:\VB3\bin\Debug\Binaries\Prediction\IPyPrediction.pdb
 C:\VB3\IPyPrediction\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\VB3\IPyPrediction\obj\x86\Debug\IPyPrediction.frmIPyPrediction.resources
 C:\VB3\IPyPrediction\obj\x86\Debug\IPyPrediction.frmColumnMapper.resources
@@ -9,7 +11,5 @@ C:\VB3\IPyPrediction\obj\x86\Debug\IPyPrediction.frmPredictionScatterPlot.resour
 C:\VB3\IPyPrediction\obj\x86\Debug\IPyPrediction.Properties.Resources.resources
 C:\VB3\IPyPrediction\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\VB3\IPyPrediction\obj\x86\Debug\GenerateResource.write.1.tlog
-C:\VB3\bin\Debug\Binaries\Prediction\IPyPrediction.dll
-C:\VB3\bin\Debug\Binaries\Prediction\IPyPrediction.pdb
 C:\VB3\IPyPrediction\obj\x86\Debug\IPyPrediction.dll
 C:\VB3\IPyPrediction\obj\x86\Debug\IPyPrediction.pdb

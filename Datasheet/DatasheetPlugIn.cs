@@ -270,7 +270,7 @@ namespace Datasheet
             //pack the datasheet's state to pass on for modeling to use
             IDictionary<string, object> packedState = new Dictionary<string, object>();
             packedState = _frmDatasheet.PackState();
-
+            boolClearModel = (bool)packedState["ChangesMadeDS"]; //needed for projectManager BroadcastListener
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, packedState);
