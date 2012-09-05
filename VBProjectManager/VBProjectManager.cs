@@ -299,7 +299,7 @@ namespace VBProjectManager
             {
                 IPlugin dsplugin = (IPlugin)sender;
                 //determine if the datasheet has changed causing the model to clear
-                boolClearModel = dsplugin.ClearModel ? true : false;
+                boolClearModel = (bool)e.PackedPluginState["ClearModel"];
 
                 //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
                 foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
