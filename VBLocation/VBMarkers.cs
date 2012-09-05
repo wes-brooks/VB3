@@ -6,7 +6,7 @@ using System.Drawing;
 using GMap.NET;
 using GMap.NET.WindowsForms;
 
-namespace Location
+namespace VBLocation
 {
     public class VBMarker : GMapMarker
     {

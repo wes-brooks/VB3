@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using VBCommon;
 
-namespace Datasheet
+namespace VBDatasheet
 {
     public class ExpressionExecution
     {

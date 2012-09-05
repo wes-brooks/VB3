@@ -1,5 +1,5 @@
 ﻿
-namespace Location
+namespace VBLocation
 {
    using System.Windows.Forms;
    using GMap.NET.WindowsForms;

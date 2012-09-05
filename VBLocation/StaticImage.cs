@@ -10,7 +10,7 @@ using GMap.NET.WindowsForms;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-namespace Location
+namespace VBLocation
 {
    public partial class StaticImage : Form
    {

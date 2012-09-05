@@ -8,8 +8,8 @@
     <ProjectGuid>{58500DA9-66D3-4B69-86D4-E1BD43ED10B1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Datasheet</RootNamespace>
-    <AssemblyName>Datasheet</AssemblyName>
+    <RootNamespace>VBDatasheet</RootNamespace>
+    <AssemblyName>VBDatasheet</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

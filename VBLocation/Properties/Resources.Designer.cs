@@ -8,7 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Location.Properties {
+namespace VBLocation.Properties
+{
     using System;
     
     

@@ -12,7 +12,7 @@ using VBCommon;
 using VBCommon.Controls;
 using VBCommon.Metadata;
 
-namespace Datasheet
+namespace VBDatasheet
 {
     /// <summary>
     /// Class provides a mechanism to validate imported datasets.

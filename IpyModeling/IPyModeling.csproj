@@ -115,7 +115,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Datasheet\Datasheet.csproj">
+    <ProjectReference Include="..\VBDatasheet\VBDatasheet.csproj">
       <Project>{58500DA9-66D3-4B69-86D4-E1BD43ED10B1}</Project>
       <Name>Datasheet</Name>
     </ProjectReference>

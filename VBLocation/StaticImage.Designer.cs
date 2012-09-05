@@ -1,4 +1,4 @@
-﻿namespace Location
+﻿namespace VBLocation
 {
    partial class StaticImage
    {

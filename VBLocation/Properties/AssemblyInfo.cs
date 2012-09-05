@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Location")]
+[assembly: AssemblyTitle("VBLocation")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("EPA")]
-[assembly: AssemblyProduct("Location")]
+[assembly: AssemblyProduct("VBLocation")]
 [assembly: AssemblyCopyright("Copyright © EPA 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

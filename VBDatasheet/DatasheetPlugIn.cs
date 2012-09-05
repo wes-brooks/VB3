@@ -14,7 +14,7 @@ using VBCommon.Interfaces;
 using VBCommon.Controls;
 using VBProjectManager;
 
-namespace Datasheet
+namespace VBDatasheet
 {
     //datasheet plugin
     public class DatasheetPlugIn : Extension, IPartImportsSatisfiedNotification, IPlugin

@@ -1,10 +1,10 @@
 C:\VB3\VBDatasheet\obj\Debug\ResolveAssemblyReference.cache
-C:\VB3\VBDatasheet\obj\Debug\Datasheet.Properties.Resources.resources
+C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.Properties.Resources.resources
 C:\VB3\VBDatasheet\obj\Debug\GenerateResource.read.1.tlog
 C:\VB3\VBDatasheet\obj\Debug\GenerateResource.write.1.tlog
-C:\VB3\VBDatasheet\obj\Debug\Datasheet.dll
 C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.frmDatasheet.resources
 C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.frmMissingValues.resources
-C:\VB3\bin\Debug\Binaries\Datasheet\Datasheet.dll
-C:\VB3\bin\Debug\Binaries\Datasheet\Datasheet.pdb
-C:\VB3\VBDatasheet\obj\Debug\Datasheet.pdb
+C:\VB3\bin\Debug\Binaries\Datasheet\VBDatasheet.dll
+C:\VB3\bin\Debug\Binaries\Datasheet\VBDatasheet.pdb
+C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.dll
+C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.pdb

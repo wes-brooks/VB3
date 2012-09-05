@@ -12,14 +12,14 @@ using WeifenLuo.WinFormsUI.Docking;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Datasheet;
+using VBDatasheet;
 using VBCommon;
 using VBCommon.Controls;
 using VBCommon.PluginSupport;
 using VBCommon.Metadata;
 using VBCommon.Interfaces;
 
-namespace Datasheet
+namespace VBDatasheet
 {
     [JsonObject]
     public partial class frmDatasheet : UserControl, IFormState

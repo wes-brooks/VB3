@@ -10,7 +10,7 @@ using VBCommon;
 using VBCommon.Interfaces;
 using VBCommon.PluginSupport;
 
-namespace Location
+namespace VBLocation
 {
     public class LocationPlugin : Extension, IPartImportsSatisfiedNotification, IPlugin, IBeachSite
     {

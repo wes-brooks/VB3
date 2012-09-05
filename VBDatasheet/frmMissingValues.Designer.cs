@@ -1,4 +1,4 @@
-﻿namespace Datasheet
+﻿namespace VBDatasheet
 {
     partial class frmMissingValues
     {

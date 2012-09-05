@@ -16,7 +16,7 @@ using GMap.NET.WindowsForms.Markers;
 using VBCommon.Spatial;
 
 
-namespace Location
+namespace VBLocation
 {
     public partial class frmLocation : UserControl
     {

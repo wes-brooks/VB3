@@ -15,7 +15,7 @@ using VBCommon;
 //using Combinatorics;
 using System.Threading;
 using Newtonsoft.Json;
-using Datasheet;
+using VBDatasheet;
 
 
 namespace IPyModeling

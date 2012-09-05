@@ -8,7 +8,7 @@ using System.Data;
 using System.Windows.Forms;
 using VBCommon;
 
-namespace Datasheet
+namespace VBDatasheet
 {
     class DataGridViewPrinter
     {

@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using GMap.NET.WindowsForms;
 
-namespace Location
+namespace VBLocation
 {
     public class VBGMapOverlay : GMapOverlay
     {
