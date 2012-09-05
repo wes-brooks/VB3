@@ -727,17 +727,19 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
             lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
 
-            //clear the prediction
-            if (model_data != null)
-            {
-                boolClearPrediction = true;
-                UpdatePredictionTab();
-            }
-            
             //clear the model
             Clear();
             //make sure model's ds redraws correctly
             //UnhideDatasheet(dsControl1.DT);
+
+            //clear the prediction
+            //if (model_data != null)
+            //{
+                boolClearPrediction = true;
+                UpdatePredictionTab();
+            //}
+            
+            
         }
 
 

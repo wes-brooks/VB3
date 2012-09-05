@@ -285,10 +285,13 @@ namespace IPyPrediction
             //populate the listbox of available models
             string modelName = (string)dictModel["Model"].ToString();
             //if there is a model with same name remove it... Or should we increment the names, so they can have more than 1 pls model to choose from?
+            
             if (dictListedModel.ContainsKey(modelName))
             {
+                this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
                 dictListedModel.Remove(modelName);
                 lstAvailModels.Items.Remove(modelName);
+                this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
             }
             
             dictListedModel.Add(modelName, dictPackedState);  //adds this model's packed state to separate dictionary linked to listbox
@@ -540,6 +543,11 @@ namespace IPyPrediction
             this.dgvStats.DataSource = null;
             this.dgvObs.DataSource = null;
             this.dgvVariables.DataSource = null;
+            //clear listbox
+            lstAvailModels.Items.Clear();
+            //clear txtModel
+            txtModel.Text = "";
+            txtDecCrit.Text = "";
         }
 
 

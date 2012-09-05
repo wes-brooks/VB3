@@ -272,14 +272,18 @@ namespace IPyPrediction
             //listen to others broadcast..receiving something
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {
-                _frmIPyPred.AddModel(e.PackedPluginState);
+                if (((IPlugin)sender).Complete)
+                    _frmIPyPred.AddModel(e.PackedPluginState);
 
                 //make sure empty model doesnt run through this method
-                if (e.PackedPluginState.Count <= 2)
-                    return;
+                //if (e.PackedPluginState.Count <= 2)
+                //    return;
                 //if the prediction is complete and the model was cleared, clear the prediction
                 if (boolComplete && ((((IPlugin)sender).ClearModel) || (bool)e.PackedPluginState["CleanPredict"]))
+                {
                     _frmIPyPred.ClearDataGridViews();
+                    boolComplete = false;
+                }                
             }
             
         }

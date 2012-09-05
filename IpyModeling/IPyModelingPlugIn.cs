@@ -357,9 +357,14 @@ namespace IPyModeling
         {
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = innerIronPythonControl.PackProjectState();
-            if (dictPackedState["ModelByObject"] != null)
-                boolComplete = true;
-            
+            if (dictPackedState.ContainsKey("ModelByObject"))
+            {
+                if (dictPackedState["ModelByObject"] != null)
+                    boolComplete = true;
+            }
+            else
+                dictPackedState.Add("CleanPredict", true); //if the model has been cleared, lets clear the prediction too
+
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, dictPackedState);
@@ -486,6 +491,8 @@ namespace IPyModeling
         //change has been made within modeling, need to update
         private void HandleUpdatedModel(object sender, EventArgs e)
         {
+            //if here, changes were made and model has been cleared
+            boolComplete = false;
             Broadcast();
             //bring the focus back to Modeling away from Prediction
             MakeActive();
