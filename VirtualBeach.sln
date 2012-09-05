@@ -13,11 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPyCommon", "IPyCommon\IPyC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPyModeling", "IpyModeling\IPyModeling.csproj", "{ADE70E49-1CEB-4526-A7BB-D8A99246D718}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datasheet", "Datasheet\Datasheet.csproj", "{58500DA9-66D3-4B69-86D4-E1BD43ED10B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBDatasheet", "VBDatasheet\VBDatasheet.csproj", "{58500DA9-66D3-4B69-86D4-E1BD43ED10B1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPyPrediction", "IPyPrediction\IPyPrediction.csproj", "{13B5B93B-EA91-491D-A423-8D89C5838EBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Location", "Location\Location.csproj", "{6B44D461-E6E3-4AB5-9F92-EF239BD9E2BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBLocation", "VBLocation\VBLocation.csproj", "{6B44D461-E6E3-4AB5-9F92-EF239BD9E2BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPyGBMControl", "IPyGBMControl\IPyGBMControl.csproj", "{A69C0E84-3055-44E7-A612-86B1660B61B6}"
 EndProject
