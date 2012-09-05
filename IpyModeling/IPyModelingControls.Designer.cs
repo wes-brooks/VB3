@@ -192,7 +192,7 @@
             this.dsControl1.Size = new System.Drawing.Size(1066, 494);
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
-            this.dsControl1.Utils = utilities2;
+            //this.dsControl1.Utils = utilities2;
             // 
             // tabPage1
             // 

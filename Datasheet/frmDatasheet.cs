@@ -515,23 +515,23 @@ namespace Datasheet
 
             //initialize rows to all enabled for imported table
             //(builds dictionary of keys, <string>datetime and values <bool>enabled/disabled row)
-            dsControl1.DTRI = VBCommon.Metadata.dtRowInformation.getdtRI(dsControl1.DT, true);
+            dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);
             //initialize cols to all enabled for imported table
             //(builds dictionary of keys, <string>datetime and values <bool>enabled/disabled col)
             dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
  //           dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
 
             //init the utilities
-            dsControl1.Utils = new VBCommon.Metadata.Utilities();
-            dsControl1.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(dsControl1.DT);
-            dsControl1.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(dsControl1.dgv);
+            //dsControl1.Utils = new VBCommon.Metadata.Utilities();
+            //dsControl1.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(dsControl1.DT);
+            //dsControl1.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(dsControl1.dgv);
 
             //default col 1 as response
             dsControl1.SelectedColIndex = 1;
             dsControl1.ResponseVarColIndex = 1;
             dsControl1.ResponseVarColName = dsControl1.DT.Columns[1].Caption;
-            dsControl1.GridUtils.setResponseVarCol(dsControl1.dgv, dsControl1.SelectedColIndex,dsControl1.SelectedColIndex);
-            dsControl1.GridUtils.setViewOnGrid(dsControl1.dgv);
+            //dsControl1.GridUtils.setResponseVarCol(dsControl1.dgv, dsControl1.SelectedColIndex,dsControl1.SelectedColIndex);
+            //dsControl1.GridUtils.setViewOnGrid(dsControl1.dgv);
 
             //initial info for the list
             FileInfo fi = new FileInfo(import.getFileImportedName);
@@ -617,7 +617,7 @@ namespace Datasheet
                 dsControl1.DT = savedt;
                 dsControl1.dgv.DataSource = dsControl1.DT;
                 dsControl1.dgv.Enabled = false;
-                dsControl1.DTRI = VBCommon.Metadata.dtRowInformation.getdtRI(dsControl1.DT, true);
+                dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);
                 dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
   //            dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
                 boolValidated = false;

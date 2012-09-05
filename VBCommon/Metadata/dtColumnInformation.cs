@@ -30,13 +30,13 @@ namespace VBCommon.Metadata
                     //if this col has enabled flag, set that as the value in dictColstatus, else set it to true
                     if (_dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
                     {
-                        bool boolcoStatus;
+                        bool boolColStatus;
                         string strEnabledStatus = _dt.Columns[c].ExtendedProperties["enabled"].ToString();
-                        
-                        if (strEnabledStatus == "False") boolcoStatus = false;
-                        else boolcoStatus = true;
-                        
-                        dictColstatus.Add(_dt.Columns[c].ColumnName.ToString(), boolcoStatus);                    
+
+                        if (strEnabledStatus == "False") boolColStatus = false;
+                        else boolColStatus = true;
+
+                        dictColstatus.Add(_dt.Columns[c].ColumnName.ToString(), boolColStatus);                    
                     }                            
                     else
                     {
@@ -47,25 +47,9 @@ namespace VBCommon.Metadata
         }
 
 
-        /// <summary>
-        /// constructor optionally calls method to init the column information structure 
-        /// and return the itself - singleton
-        /// </summary>
-        /// <param name="dt">table</param>
-        /// <param name="init">if true, initialize; for example, on import</param>
-        /// <returns></returns>
-//        public static dtColumnInformation getdtCI(DataTable dt, bool init)
-//        {
-//            //pass null after initialization to access the DTcolInfo property
-//            //or pass init=true (after import) to initialize
-//            if (dtCI == null || init) dtCI = new dtColumnInformation(dt);
-//            return dtCI;
-//        }
-
-
         // method returns the enable/disable status of the column name (key)
         //the table column name to check, true if enable, false if disable
-        public bool getColStatus(string key)
+        public bool GetColStatus(string key)
         {
             //returns the status of a row
             bool boolStatus;
@@ -79,7 +63,7 @@ namespace VBCommon.Metadata
         /// </summary>
         /// <param name="key">table column name</param>
         /// <param name="val">true to enable, false to disable</param>
-        public void setColStatus(string key, bool val)
+        public void SetColStatus(string key, bool val)
         {
             //sets the status of a column
             dictColstatus[key] = val;
@@ -102,7 +86,7 @@ namespace VBCommon.Metadata
         /// </summary>
         /// <param name="colname">column name to add</param>
         /// <returns>true iff sucessful, false if it exists already</returns>
-        public bool addColumnNameToDic(string colname)
+        public bool AddColumnNameToDict(string colname)
         {
             bool boolRetval = true;
             try
@@ -122,7 +106,7 @@ namespace VBCommon.Metadata
         /// </summary>
         /// <param name="colname">col name to remove</param>
         /// <returns>true if successful, false iff not found</returns>
-        public bool removeColumnFromDic(string colname)
+        public bool RemoveColumnFromDict(string colname)
         {
             bool boolRetval = true;
             try

@@ -284,8 +284,8 @@ namespace IPyModeling
                     {
                         if (dictPlugin.Count > 3)
                         {
-                            Dictionary<string, object> dictDatash = (Dictionary<string, object>)dictPlugin["PackedDatasheetState"];
-                            string xmlDT = (string)dictDatash["XmlDataTable"];
+                            Dictionary<string, object> dictDatasheet = (Dictionary<string, object>)dictPlugin["PackedDatasheetState"];
+                            string xmlDT = (string)dictDatasheet["XmlDataTable"];
                             StringReader sr = new StringReader(xmlDT);
                             DataSet ds = new DataSet();
                             ds.ReadXml(sr);

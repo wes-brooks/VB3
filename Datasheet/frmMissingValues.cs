@@ -85,9 +85,8 @@ namespace Datasheet
             InitializeComponent();
 
             _tu = new Utilities.TableUtils(dt);
-            _dtRI = VBCommon.Metadata.dtRowInformation.getdtRI(_dt, false);
+            _dtRI = new VBCommon.Metadata.dtRowInformation(dt);
             _dtCI = new VBCommon.Metadata.dtColumnInformation(dt);
-//            _dtCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dt, false);
 
             //get a working copy of the dataset
             _dt = dt.Copy();
@@ -361,7 +360,7 @@ namespace Datasheet
                 if (target == "Only This Row")
                 {
                     _dgv.Rows[rndx].Cells[cndx].Selected = true;
-                    _dtRI.setRowStatus(_dt.Rows[rndx][0].ToString(), false);
+                    _dtRI.SetRowStatus(_dt.Rows[rndx][0].ToString(), false);
                     _dt = _tu.filterDataTableRows(_dt);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
@@ -375,7 +374,7 @@ namespace Datasheet
                         int c = ndxs[0];
                         int r = ndxs[1];
                         if (c != cndx) continue;
-                        _dtRI.setRowStatus(_dt.Rows[r][0].ToString(), false);
+                        _dtRI.SetRowStatus(_dt.Rows[r][0].ToString(), false);
 
                     }
                     _dt = _tu.filterDataTableRows(_dt);
@@ -390,7 +389,7 @@ namespace Datasheet
                         int[] ndxs = lstBadCells[i];
                         int c = ndxs[0];
                         int r = ndxs[1];
-                        _dtRI.setRowStatus(_dt.Rows[r][0].ToString(), false);
+                        _dtRI.SetRowStatus(_dt.Rows[r][0].ToString(), false);
 
                     }
                     _dt = _tu.filterDataTableRows(_dt);
@@ -406,7 +405,7 @@ namespace Datasheet
                 if (target == "Only This Column")
                 {
                     _dgv.Rows[rndx].Cells[cndx].Selected = true;
-                    _dtCI.setColStatus(_dt.Columns[cndx].Caption, false);
+                    _dtCI.SetColStatus(_dt.Columns[cndx].Caption, false);
                     _dt = _tu.filterDisabledCols(_dt);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
@@ -420,7 +419,7 @@ namespace Datasheet
                         int c = ndxs[0];
                         int r = ndxs[1];
                         if (r != rndx) continue;
-                        _dtCI.setColStatus(_dt.Columns[c].Caption, false);
+                        _dtCI.SetColStatus(_dt.Columns[c].Caption, false);
 
                     }
                     _dt = _tu.filterDisabledCols(_dt);
@@ -435,7 +434,7 @@ namespace Datasheet
                         int[] ndxs = lstBadCells[i];
                         int c = ndxs[0];
                         int r = ndxs[1];
-                        _dtCI.setColStatus(_dt.Columns[c].Caption, false);
+                        _dtCI.SetColStatus(_dt.Columns[c].Caption, false);
 
                     }
                     _dt = _tu.filterDisabledCols(_dt);

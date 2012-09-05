@@ -12,15 +12,15 @@ namespace VBCommon.Metadata
     /// there are no extended properties for table rows so this class
     /// is still necessary for column plots enable/disable functions
     /// </summary>
-    [Serializable]
+    //[Serializable]
     public class dtRowInformation
     {
         //table to operte with
         private DataTable _dt = null;
         //dictionary structure to hold table row enable/disable information
-        private Dictionary<string, bool> dictRowstatus = null;
+        private Dictionary<string, bool> dictRowStatus = null;
         //class variable
-        private static dtRowInformation dtRI = null;
+        //private static dtRowInformation dtRI = null;
 
 
         /// <summary>
@@ -32,17 +32,17 @@ namespace VBCommon.Metadata
             if (dt != null)
             {
                 _dt = dt.Copy();
-                dictRowstatus = new Dictionary<string, bool>();
+                dictRowStatus = new Dictionary<string, bool>();
 
                 for (int r = 0; r < _dt.Rows.Count; r++)
                 {
-                    dictRowstatus.Add(_dt.Rows[r][0].ToString(), true);
+                    dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
                 }
             }
         }
 
 
-        /// <summary>
+        /*/// <summary>
         /// constructor optionally calls method to init the row information structure 
         /// and return the itself - singleton
         /// </summary>
@@ -53,9 +53,9 @@ namespace VBCommon.Metadata
         {
             //pass null after initialization to access the DTRowInfo property
             //or pass init=true (after import) to initialize
-            if (dtRI == null || init) dtRI = new dtRowInformation(dt);
+            if (this == null || init) dtRI = new dtRowInformation(dt);
             return dtRI;
-        }
+        }*/
 
 
         /// <summary>
@@ -63,11 +63,11 @@ namespace VBCommon.Metadata
         /// </summary>
         /// <param name="key">row name is the column 0 record identifier or date/timestamp value</param>
         /// <returns>true if enabled, false if disabled</returns>
-        public bool getRowStatus(string key)
+        public bool GetRowStatus(string key)
         {
             //returns the status of a row
             bool boolStatus;
-            dictRowstatus.TryGetValue(key, out boolStatus);
+            dictRowStatus.TryGetValue(key, out boolStatus);
             return boolStatus;
         }
 
@@ -77,10 +77,10 @@ namespace VBCommon.Metadata
         /// </summary>
         /// <param name="key">record identifer</param>
         /// <param name="val">true iff enable, false if disable</param>
-        public void setRowStatus(string key, bool val)
+        public void SetRowStatus(string key, bool val)
         {
             //sets the status of a row
-            dictRowstatus[key] = val;
+            dictRowStatus[key] = val;
         }
 
         
@@ -90,8 +90,8 @@ namespace VBCommon.Metadata
         public Dictionary<string, bool> DTRowInfo
         {
             //returns a row-status dictionary for all rows in the datatable
-            set { dictRowstatus = value; }
-            get { return dictRowstatus; }
+            set { dictRowStatus = value; }
+            get { return dictRowStatus; }
         }
     }
 }

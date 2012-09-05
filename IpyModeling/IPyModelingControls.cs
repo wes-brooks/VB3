@@ -737,7 +737,7 @@ namespace IPyModeling
             //clear the model
             Clear();
             //make sure model's ds redraws correctly
-            UnhideDatasheet(dsControl1.DT);
+            //UnhideDatasheet(dsControl1.DT);
         }
 
 
