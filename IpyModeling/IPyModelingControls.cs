@@ -284,7 +284,7 @@ namespace IPyModeling
         }
 
         
-        //Return a flag indicating whether this modeling tab has been modified since the model was last exported.
+        //Return a flag indicating whether this modeling tab has been modified since the model was last exported. (false : modified)
         public bool Clean
         {
             get { return this.boolClean; }

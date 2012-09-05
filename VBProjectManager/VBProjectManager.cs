@@ -32,7 +32,6 @@ namespace VBProjectManager
         public static string VB2projectsPath = null;
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
-        private Boolean boolClearModel; //needed for IPlugin
         public Stack UndoRedoStack = new Stack();
 
         //constructor
@@ -191,13 +190,6 @@ namespace VBProjectManager
         }
 
 
-        //return clear model flag
-        public Boolean ClearModel
-        {
-            get { return boolClearModel; }
-        }
-
-
         //inherits from IPlugin, ProjectManager's complete flag doesn't change
         public Boolean Complete
         {
@@ -299,7 +291,7 @@ namespace VBProjectManager
             {
                 IPlugin dsplugin = (IPlugin)sender;
                 //determine if the datasheet has changed causing the model to clear
-                boolClearModel = (bool)e.PackedPluginState["ClearModel"];
+                boolClearModel = (bool)e.PackedPluginState["ChangesMadeDS"];
 
                 //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
                 foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)

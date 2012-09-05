@@ -41,7 +41,7 @@ namespace IPyPrediction
         public Boolean boolComplete = false;
         public Boolean boolVisible = false;
         public Boolean boolHasBeenVisible = false;
-        private Boolean boolClearModel; //needed for IPlugin
+
 
         //Raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -218,13 +218,6 @@ namespace IPyPrediction
         }
 
 
-        //return clear model flag
-        public Boolean ClearModel
-        {
-            get { return boolClearModel; }
-        }
-
-
         //return the panel key name
         public string PanelKey
         {
@@ -279,13 +272,13 @@ namespace IPyPrediction
                 //if (e.PackedPluginState.Count <= 2)
                 //    return;
                 //if the prediction is complete and the model was cleared, clear the prediction
-                if (boolComplete && ((((IPlugin)sender).ClearModel) || (bool)e.PackedPluginState["CleanPredict"]))
+                if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
                 {
                     _frmIPyPred.ClearDataGridViews();
                     boolComplete = false;
                 }                
             }
-            
+            //(((IPlugin)sender).ClearModel) || (bool)e.PackedPluginState["CleanPredict"]))
         }
 
 
