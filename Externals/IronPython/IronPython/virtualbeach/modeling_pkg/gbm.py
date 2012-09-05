@@ -292,6 +292,20 @@ class Model(object):
         self.fitted = list(r.Call("predict", **params).AsNumeric())
         self.array_fitted = np.array(self.fitted, dtype='float')
 
+        
+    def GetInfluence(self):
+        summary = r.Call(function='summary.gbm', object=self.model, plotit=False).AsList()
+        indx = [int(i) for i in summary[0].AsVector()]
+
+        influence = list(summary[1].AsVector())
+        levels = r.Call(function='levels', x=summary[0]).AsVector()  
+        vars = [levels[i-1] for i in indx]
+        
+        #Create a dictionary with all the influences and a list of those variables with influence greater than 1%.
+        self.influence = dict(zip(vars, influence))
+        self.vars = [str(vars[k]) for k in range(len(vars)) if influence[k]>5]
+        return self.influence
+        
 
     def Threshold(self, specificity=0.9):
         self.specificity = specificity

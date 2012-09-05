@@ -46,17 +46,17 @@ namespace IPyGBMControl
             ListViewItem lvi;
             string[] strArrItem;
 
-            //Extract the number of false positives, true positives, false negatives, and true negatives.
-            object objCounts = model.GetInfluence();
-            List<string> listNames = ((IList<object>)((IList<object>)objCounts)[0]).Cast<string>().ToList();
-            List<double> listInfluence = ((IList<object>)((IList<object>)objCounts)[1]).Cast<double>().ToList();
+            //Run the Get_Influence method to get the relative influence (coefficient x standard dev.) of each variable
+            dynamic dictInfluence = model.GetInfluence();
+            List<string> listKeys = ((IList<object>)dictInfluence.keys()).Cast<string>().ToList();
+            List<double> listInfluence = ((IList<object>)dictInfluence.values()).Cast<double>().ToList();
 
             //Clear the old list of model coefficients
             lvModel.Items.Clear();
             Dictionary<ListViewItem, double> dictUnorderedEntries = new Dictionary<ListViewItem, double>();
 
             //Make a list of each model parameter, its coefficient, and its influence.
-            for (int i = 0; i < listNames.Count; i++)
+            for (int i = 0; i < listKeys.Count; i++)
             {
                 int intIndex = i; 
                 bool boolMinor = false;
@@ -69,7 +69,7 @@ namespace IPyGBMControl
                 if (intIndex > -1)
                 {
                     dblInfluence = listInfluence[intIndex];
-                    strArrItem[0] = listNames[intIndex];
+                    strArrItem[0] = listKeys[intIndex];
                     strArrItem[1] = "na";
                     strArrItem[2] = String.Format("{0:F4}", dblInfluence);
                     if (dblInfluence <= 0.05) boolMinor = true;
