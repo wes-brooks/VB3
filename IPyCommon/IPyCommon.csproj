@@ -80,30 +80,30 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>cp $(TargetPath) $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)
-cp $(TargetPath) $(SolutionDir)\bin\Debug\$(TargetFileName)
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)
+copy $(TargetPath) $(SolutionDir)\bin\Debug\$(TargetFileName)
 
-cp $(TargetDir)\Microsoft.Dynamic.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Dynamic.dll
-cp $(TargetDir)\Microsoft.Scripting.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Scripting.dll
-cp $(TargetDir)\Microsoft.Scripting.Metadata.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Scripting.Metadata.dll
+copy $(TargetDir)\Microsoft.Dynamic.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Dynamic.dll
+copy $(TargetDir)\Microsoft.Scripting.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Scripting.dll
+copy $(TargetDir)\Microsoft.Scripting.Metadata.dll $(SolutionDir)\bin\Debug\Plugins\Microsoft.Scripting.Metadata.dll
 
-cp $(TargetDir)\Microsoft.Dynamic.dll $(SolutionDir)\bin\Debug\Microsoft.Dynamic.dll
-cp $(TargetDir)\Microsoft.Scripting.dll $(SolutionDir)\bin\Debug\Microsoft.Scripting.dll
-cp $(TargetDir)\Microsoft.Scripting.Metadata.dll $(SolutionDir)\bin\Debug\Microsoft.Scripting.Metadata.dll
-cp $(TargetDir)\DotNetExtensions.dll $(SolutionDir)\bin\Debug\DotNetExtensions.dll
+copy $(TargetDir)\Microsoft.Dynamic.dll $(SolutionDir)\bin\Debug\Microsoft.Dynamic.dll
+copy $(TargetDir)\Microsoft.Scripting.dll $(SolutionDir)\bin\Debug\Microsoft.Scripting.dll
+copy $(TargetDir)\Microsoft.Scripting.Metadata.dll $(SolutionDir)\bin\Debug\Microsoft.Scripting.Metadata.dll
+copy $(TargetDir)\DotNetExtensions.dll $(SolutionDir)\bin\Debug\DotNetExtensions.dll
 
-cp $(SolutionDir)\Externals\Ciloci.Flee\Ciloci.Flee.dll $(SolutionDir)\bin\Debug\Plugins\Ciloci.Flee.dll
+copy $(SolutionDir)\Externals\Ciloci.Flee\Ciloci.Flee.dll $(SolutionDir)\bin\Debug\Plugins\Ciloci.Flee.dll
 
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.Data.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.Data.v11.2.dll
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.Utils.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.Utils.v11.2.dll
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraBars.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraBars.v11.2.dll
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraEditors.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraEditors.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.Data.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.Data.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.Utils.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.Utils.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.XtraBars.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraBars.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.XtraEditors.v11.2.dll $(SolutionDir)\bin\Debug\Plugins\DevExpress.XtraEditors.v11.2.dll
 
 
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.Data.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.Data.v11.2.dll
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.Utils.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.Utils.v11.2.dll
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraBars.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.XtraBars.v11.2.dll
-cp $(SolutionDir)\Externals\DevExpress\DevExpress.XtraEditors.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.XtraEditors.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.Data.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.Data.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.Utils.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.Utils.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.XtraBars.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.XtraBars.v11.2.dll
+copy $(SolutionDir)\Externals\DevExpress\DevExpress.XtraEditors.v11.2.dll $(SolutionDir)\bin\Debug\DevExpress.XtraEditors.v11.2.dll
 
 xcopy /Y /S $(SolutionDir)\Externals\IronPython\* $(SolutionDir)\bin\Debug\</PostBuildEvent>
   </PropertyGroup>

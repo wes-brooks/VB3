@@ -205,12 +205,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>cp $(TargetPath) $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)
-cp  $(TargetDir)\GMap.NET.Core.dll $(SolutionDir)\bin\Debug\Plugins\GMap.NET.Core.dll
-cp $(TargetDir)\GMap.NET.WindowsForms.dll  $(SolutionDir)\bin\Debug\Plugins\GMap.NET.WindowsForms.dll
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)
+copy $(TargetDir)\GMap.NET.Core.dll $(SolutionDir)\bin\Debug\Plugins\GMap.NET.Core.dll
+copy $(TargetDir)\GMap.NET.WindowsForms.dll  $(SolutionDir)\bin\Debug\Plugins\GMap.NET.WindowsForms.dll
 
-cp $(TargetDir)\GMap.NET.Core.dll  $(SolutionDir)\bin\Debug\GMap.NET.Core.dll
-cp $(TargetDir)\GMap.NET.WindowsForms.dll  $(SolutionDir)\bin\Debug\GMap.NET.WindowsForms.dll</PostBuildEvent>
+copy $(TargetDir)\GMap.NET.Core.dll  $(SolutionDir)\bin\Debug\GMap.NET.Core.dll
+copy $(TargetDir)\GMap.NET.WindowsForms.dll  $(SolutionDir)\bin\Debug\GMap.NET.WindowsForms.dll</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
