@@ -121,7 +121,7 @@ namespace VBLocation
         }
 
 
-        private void InitMap()
+        public void InitMap()
         {
             //google key passed to map control for geocoding functionality.  See the document
             // "To use an API key add the following line to GMaps.doc" in the VBLocation project

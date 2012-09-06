@@ -392,7 +392,8 @@ namespace IPyModeling
                 dictPlugin = e.PackedPluginStates[strPanelKey];
                 //repopulate plugin Complete flags from saved project
                 boolComplete = (bool)dictPlugin["Complete"];
-                boolInitialEntry = false; //opening projects have been entered before
+                if (boolComplete)
+                    boolInitialEntry = false; //opening projects have been entered before
                 //check to see if there already is a PLS model open, if so, close it before opening a saved project
                 if ((VisiblePlugin) && (Complete))
                     Hide();

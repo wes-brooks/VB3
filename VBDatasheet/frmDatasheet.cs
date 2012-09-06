@@ -380,6 +380,12 @@ namespace VBDatasheet
         //event handler for packing state to save project
         public IDictionary<string, object> PackState()
         {
+            //make sure user chose transformation on response var
+            if (dsControl1.DependentVariableTransform == VBCommon.DependentVariableTransforms.none)
+            {
+                MessageBox.Show("You must define the transformation on the response variable before continuing");
+                return null;
+            }
             //save packed state to a dictionary
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
 
@@ -530,6 +536,7 @@ namespace VBDatasheet
             dsControl1.SelectedColIndex = 1;
             dsControl1.ResponseVarColIndex = 1;
             dsControl1.ResponseVarColName = dsControl1.DT.Columns[1].Caption;
+            
             //dsControl1.GridUtils.setResponseVarCol(dsControl1.dgv, dsControl1.SelectedColIndex,dsControl1.SelectedColIndex);
             //dsControl1.GridUtils.setViewOnGrid(dsControl1.dgv);
 
@@ -541,6 +548,7 @@ namespace VBDatasheet
             dsControl1.dgv.Enabled = false;
             boolInitialPass = true;
             boolValidated = false;
+            dsControl1.maintainGrid(dsControl1.dgv, dsControl1.DT, dsControl1.SelectedColIndex, dsControl1.ResponseVarColName);
         }
 
 

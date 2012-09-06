@@ -39,7 +39,7 @@ namespace VBDatasheet
         private RootItem rootDatasheetTab;
         //complete and visible flags
         private Boolean boolComplete;
-        private Boolean boolVisible;
+        private Boolean boolVisible = true;
 
         //clear model flag
         private Boolean boolClearModel;
@@ -78,11 +78,13 @@ namespace VBDatasheet
         //hide plugin
         public void Hide()
         {
-            //hide plugin
+            //set visible to false
+            boolVisible = false;
+            //remove plugin tab
             App.HeaderControl.RemoveAll();
             //hide bottom tab
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
-            boolVisible = false;
+            
         }
 
 
@@ -97,10 +99,11 @@ namespace VBDatasheet
         //make this plugin the active plugin
         public void MakeActive()
         {
-            App.DockManager.SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);
             //set visible flag to true
             boolVisible = true;
+
+            App.DockManager.SelectPanel(strPanelKey);
+            App.HeaderControl.SelectRoot(strPanelKey);
         }
 
 
@@ -270,6 +273,9 @@ namespace VBDatasheet
             //pack the datasheet's state to pass on for modeling to use
             IDictionary<string, object> packedState = new Dictionary<string, object>();
             packedState = _frmDatasheet.PackState();
+            //if null, response var wasn't transformed
+            if (packedState == null)
+                return;
             boolClearModel = (bool)packedState["ChangesMadeDS"]; //needed for projectManager BroadcastListener
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
@@ -282,6 +288,8 @@ namespace VBDatasheet
         {
             //call packState, returing packed state of plugin
             IDictionary<string, object> packedState = _frmDatasheet.PackState();
+            if ((bool)packedState["DSValidated"])
+                boolComplete = true;
             //add complete and visible flags to dictionary
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
@@ -300,7 +308,7 @@ namespace VBDatasheet
                 boolComplete = (bool)dictPlugin["Complete"];
 
                 //check to see if there already is a datasheet open, if so, close it before opening a saved project
-                if (boolVisible)
+                if (VisiblePlugin)
                     Hide();
                 //then show the opening project datasheet
                 if ((bool)dictPlugin["Visible"])

@@ -324,7 +324,7 @@ namespace VBCommon.Metadata
         /// </summary>
         public class GridUtils
         {
-            private dtRowInformation _dtRI = null;
+            //private dtRowInformation _dtRI = null;
 
             public GridUtils(DataGridView dgv)
             {
@@ -337,6 +337,7 @@ namespace VBCommon.Metadata
                 dgv.DataSource = null;
                 dgv.DataSource = dt;
                 dtColumnInformation _dtCI = new dtColumnInformation(dt);
+                dtRowInformation _dtRI = new dtRowInformation(dt);
 
                 //mark all grid cols visible, not sortable
                 for (int c = 0; c < dgv.Columns.Count; c++)
@@ -378,7 +379,7 @@ namespace VBCommon.Metadata
                 dgv.Columns[responseVarColName].DefaultCellStyle.BackColor = Color.LightBlue;
 
                 //reset disable rows
-                _dtRI = new dtRowInformation(dt);
+                //_dtRI = new dtRowInformation(dt);
                 for (int r = 0; r < dt.Rows.Count; r++)
                 {
                     bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());
@@ -386,6 +387,7 @@ namespace VBCommon.Metadata
                     {
                         for (int c = 0; c < dgv.Columns.Count; c++)
                             dgv[c, r].Style.ForeColor = Color.Red;
+
                     }
                 }
 
@@ -466,7 +468,7 @@ namespace VBCommon.Metadata
                 }
 
                 //reset disable rows
-                _dtRI = new dtRowInformation(dt);
+                dtRowInformation _dtRI = new dtRowInformation(dt);
                 for (int r = 0; r < dt.Rows.Count; r++)
                 {
                     bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());

@@ -182,6 +182,7 @@ namespace VBProjectManager
                 //add each plugin dictionary 
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
+
             //raise unpacke event, sending packed plugins dictionary
             signaller.UnpackProjectState(dictPluginStates);
         }

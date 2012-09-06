@@ -25,7 +25,7 @@ namespace VBLocation
 
         //complete and visible flags
         public Boolean boolComplete;
-        public Boolean boolVisible;
+        public Boolean boolVisible = true;
         private Boolean boolClearModel; //needed for IPlugin
 
         //raise a message

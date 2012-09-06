@@ -1602,8 +1602,12 @@ namespace VBCommon.Controls
                 if (!enabled)
                 {
                     for (int c = 0; c < dgv.Columns.Count; c++)
+                    {
                         dgv[c, r].Style.ForeColor = Color.Red;
+                        dtRI.SetRowStatus(dt.Rows[r][0].ToString(), false);  //make sure row status is updated
+                    }
                 }
+                else dtRI.SetRowStatus(dt.Rows[r][0].ToString(), true);
             }
 
             //set the numerical precision for display

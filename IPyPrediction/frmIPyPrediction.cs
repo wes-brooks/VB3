@@ -302,8 +302,22 @@ namespace IPyPrediction
         //when user selects model to use, send it to SetModel()
         private void lstAvailModels_SelectedIndexChanged(object sender, System.EventArgs e)
         {
+           
             //get the model that's selected and send it to SetModel()
             string curItem = lstAvailModels.SelectedItem.ToString();
+
+            //didn't select a model
+            if (curItem == null)
+                return;
+
+            //clear the grids if another model's info has been used
+            if (corrDT != null)
+            {
+                this.dgvStats.DataSource = null;
+                this.dgvObs.DataSource = null;
+                this.dgvVariables.DataSource = null;
+            }
+
             SetModel((IDictionary<string, object>)dictListedModel[curItem]);
         }
 
@@ -460,12 +474,20 @@ namespace IPyPrediction
         //import IV datatable
         public void btnImportIVs_Click(object sender, EventArgs e)
         {
+            //check to ensure user chose a model first
+            if (dictMainEffects == null)
+            {
+                MessageBox.Show("You must first pick a model from the Available Models");
+                return;
+            }
+            
             VBCommon.IO.ImportExport import = new ImportExport();
             DataTable dt = import.Input;            
             if (dt == null)
                 return;
 
             string[] strArrHeaderCaptions = { "Model Variables", "Imported Variables" };
+
             Dictionary<string, string> dictFields = new Dictionary<string, string>(dictMainEffects);
             frmColumnMapper colMapper = new frmColumnMapper(strArrReferencedVars, dt, strArrHeaderCaptions, true);
             DialogResult dr = colMapper.ShowDialog();

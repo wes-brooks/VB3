@@ -350,7 +350,7 @@ namespace IPyPrediction
             }
             else
             {
-                Activate();
+                //Activate();
                 //Set this plugin to an empty state.
             }
         }
