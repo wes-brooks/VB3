@@ -36,7 +36,15 @@ namespace VBCommon.Metadata
 
                 for (int r = 0; r < _dt.Rows.Count; r++)
                 {
-                    dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
+                    //check to see if enabled col has been added yet first
+                    if (_dt.Columns.Contains("Enabled"))
+                    {
+                        if (_dt.Rows[r]["Enabled"].ToString() == Convert.ToString(1)) //the row is enabled
+                            dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
+                        else //the row is disabled
+                            dictRowStatus.Add(_dt.Rows[r][0].ToString(), false);
+                    }
+                    else dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
                 }
             }
         }
@@ -80,7 +88,7 @@ namespace VBCommon.Metadata
         public void SetRowStatus(string key, bool val)
         {
             //sets the status of a row
-            dictRowStatus[key] = val;
+            dictRowStatus[key] = val;            
         }
 
         

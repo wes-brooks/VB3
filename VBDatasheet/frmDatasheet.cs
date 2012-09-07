@@ -24,43 +24,12 @@ namespace VBDatasheet
     [JsonObject]
     public partial class frmDatasheet : UserControl, IFormState
     {
-        //context menus
-        //private ContextMenu cmforResponseVar = new ContextMenu();
-        //private ContextMenu cmforIVs = new ContextMenu(); 
-        //private ContextMenu cmforRows = new ContextMenu(); 
-        ////table information
-        //private int intSelectedColIndex = -1;            
-        //private int intSelectedRowIndex = -1;     
-        //private int intResponseVarColIndex = 1;  
-        //private string strResponseVarColName = string.Empty;
-        //private string strSelectedColName = string.Empty;   
-
         private enum AddReplace { Add, Replace };     
         private AddReplace addreplace;                   
-
-        //private DataTable dt = null;                    
-        //private dtRowInformation dtRI = null;            
-        //private dtColumnInformation dtCI = null;       
-
-        //private Utilities utils = null;                   
-        //private Utilities.TableUtils tableutils = null;     
-        //private Utilities.GridUtils gridutils = null;        
+      
         private bool boolClean = true;
 
         public event EventHandler DataImported;
-       
-        //private enum listvals {NCOLS, NROWS, DATECOLNAME, RVCOLNAME, BLANK, NDISABLEDROWS, NDISABLEDCOLS, NHIDDENCOLS, NIVS};  //
-        //private Type ListVal = typeof(listvals);    
-        //private int intNdisabledcols = 0;     
-        //private int intNdisabledrows = 0;   
-        //private int intNhiddencols = 0;     
-        //private int intNivs = 0;     
-
-        //data state relative to data used in modeling/residuals/prediction
-        //state is dirty until the project manager's version of the datatable
-        //matches the filtered "gotomodeling" datatable version
-        //public enum dtState { clean, dirty };        
-        //private dtState state = dtState.dirty;
 
         private DataTable savedDT = null;
         private DataGridView savedDGV = null;
@@ -68,31 +37,11 @@ namespace VBDatasheet
 
         private bool boolInitialPass = true;
         private bool boolValidated = false;
-        //public event EventHandler ResetModel;
-        
-        //dealing with transform
-        //private VBCommon.DependentVariableTransforms depVarTransform; 
-        //private double dblPowerTransformExp = double.NaN;                       
+                     
         private string strXmlDataTable = string.Empty;
         private DataTable dataSheetData = null;
         private DataTable correlationData = null;
         private DataTable modelData = null;
-        //public string fn = string.Empty; 
-
-        // getter/setter for transform type
-        //public VBCommon.DependentVariableTransforms DependentVariableTransform 
-        //{
-        //    get { return depVarTransform; }
-        //    set { depVarTransform = value; }
-        //}
-
-
-        //// getter/setter for power tranform
-        //public double PowerTransformExponent  
-        //{
-        //    get { return dblPowerTransformExp; }
-        //    set { dblPowerTransformExp = value; }
-        //}
 
         
         // return datatable as xml string
@@ -136,46 +85,6 @@ namespace VBDatasheet
             set { modelData = value; }
         }
 
-        
-        //// getter/setter for datatable
-        //[JsonProperty]
-        //public DataTable DT 
-        //{
-        //    get { return this.dt; }
-        //}
-
-
-        ////returns datatable row info
-        //[JsonProperty]
-        //public Dictionary<string, bool> DTRowInfo 
-        //{
-        //    get { return this.dtRI.DTRowInfo; }
-        //}
-
-
-        //// returns datatable column info
-        //[JsonProperty]
-        //public Dictionary<string, bool> DTColInfo  
-        //{
-        //    get { return this.dtCI.DTColInfo; }
-        //}
-
-
-        //returns current selected column index
-        //[JsonProperty]
-        //public int CurrentColIndex   
-        //{
-        //    get { return this.intSelectedColIndex; }
-        //}
-
-
-        ////returns dependent variable column name
-        //[JsonProperty]
-        //public string DepVarColName 
-        //{
-        //    get { return this.strResponseVarColName; }
-        //}
-
 
         //returns validated flag
         [JsonProperty]
@@ -200,54 +109,6 @@ namespace VBDatasheet
          
         }
 
-        
-        /*//unpack event handler. unpacks packed state in dictionary to repopulate datasheet
-        public void UnpackState(IDictionary<string, object> dictPluginState)
-        {
-            //unpack datatable
-            
-            dsControl1.DT = (DataTable)dictPluginState["DT"];
-            dsControl1.DT.TableName = "DataSheetData";
-            dsControl1.dgv.DataSource = null;
-            dsControl1.dgv.DataSource = dsControl1.DT;
-
-            //get row and column information
-            dsControl1.DTRI = VBCommon.Metadata.dtRowInformation.getdtRI(dsControl1.DT, true);
-            dsControl1.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPluginState["DTRowInfo"];
-
-            dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
-            dsControl1.DTCI.DTColInfo = (Dictionary<string, bool>)dictPluginState["DTColInfo"];
-
-            dsControl1.SelectedColIndex = (int)dictPluginState["CurrentColIndex"];
-            dsControl1.ResponseVarColName = (string)dictPluginState["DepVarColName"];
-            dsControl1.ResponseVarColIndex = dsControl1.DT.Columns.IndexOf(dsControl1.ResponseVarColName);
-            //get validated flag
-            this.boolValidated = (bool)dictPluginState["DSValidated"];
-
-            dsControl1.Utils = new VBCommon.Metadata.Utilities();
-            dsControl1.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(dsControl1.DT);
-            dsControl1.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(dsControl1.dgv);
-
-            dsControl1.GridUtils.maintainGrid(dsControl1.dgv, dsControl1.DT, dsControl1.SelectedColIndex, dsControl1.ResponseVarColName);
-
-            //initial info for the list
-            FileInfo fi = new FileInfo( Name);
-            dsControl1.FileName = fi.Name;
-            dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);
-
-            if ((bool)dictPluginState["Clean"])
-            {
-                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-            }
-            else
-            {
-                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
-            }
-
-            //if clean, initial pass is false
-            boolInitialPass = !(bool)dictPluginState["Clean"];
-        } */
-
 
         //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
         public void UnpackState(IDictionary<string, object> dictPluginState)
@@ -258,123 +119,15 @@ namespace VBDatasheet
 
             dsControl1.UnpackState(PackedDatasheetState);
 
-            
             //get validated flag
             this.boolValidated = (bool)dictPluginState["DSValidated"];
-
-            //initial info for the list
-            //FileInfo fi = new FileInfo(Name);
-
-
-            /*if ((bool)dictPluginState["Clean"])
-            {
-                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-            }
-            else
-            {
-                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
-            }*/
 
             //if clean, initial pass is false
             if (dsControl1.State.ToString() == "clean")
                 boolInitialPass = false;
             else
                 boolInitialPass = true;
-//            boolInitialPass = !(bool)dictPluginState["Clean"];
         }
-
-        
-        /*//event handler for packing state to save project
-        public IDictionary<string, object> PackState()
-        {
-            //save packed state to a dictionary
-            IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
-
-            //check to see if this is the first time going to modeling
-            if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.dirty && !boolInitialPass)
-            {
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                if (dlgr == DialogResult.OK)
-                {
-                    correlationData = dsControl1.DT;
- //                   savedDT = dt;                 //dont see this being used anywhere
-                    dataSheetData = dsControl1.DT;
-                    dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-                }
-                else
-                { return null; }
-            }
-            else if (boolInitialPass)
-            {
-                correlationData = dsControl1.DT;
-                modelData = dsControl1.DT;
-                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-                boolInitialPass = false;
-//                savedDT = dt;                   //dont see this being used anywhere
-//                savedDGV = dsControl1.dgv;     //dont see this being used anywhere
-            }
-
-            dictPluginState.Add("CorrelationDataTable", dsControl1.DT); //for Modeling to use
-            dictPluginState.Add("ModelDataTable", dsControl1.DT);   //for Modeling to use
-            dictPluginState.Add("DT", dsControl1.DT);
-            //pack up mainEffect columns for Prediction
-            dictPluginState.Add("CurrentColIndex", dsControl1.SelectedColIndex);
-            dictPluginState.Add("DepVarColName", dsControl1.ResponseVarColName);
-            dictPluginState.Add("DTColInfo", dsControl1.DTCI.DTColInfo);
-            dictPluginState.Add("DTRowInfo", dsControl1.DTRI.DTRowInfo);
-            dictPluginState.Add("DSValidated", boolValidated);
-
-            //pack up listInfo for model datasheet
-            int intNumCols = dsControl1.DT.Columns.Count;
-            int intNumRows = dsControl1.DT.Rows.Count;
-            string strDateName = dsControl1.DT.Columns[0].ColumnName.ToString();
-            string strResponseVar = dsControl1.DT.Columns[1].ColumnName.ToString();
-            dictPluginState.Add("ColCount", intNumCols);
-            dictPluginState.Add("RowCount", intNumRows);
-            dictPluginState.Add("DateIndex", strDateName);
-            dictPluginState.Add("ResponseVar", strResponseVar);
-            dictPluginState.Add("DisabledRwCt", dsControl1.DisabledRows);
-            dictPluginState.Add("DisabledColCt", dsControl1.DisabledCols);
-            dictPluginState.Add("HiddenColCt", dsControl1.HiddenCols);
-            dictPluginState.Add("IndVarCt", dsControl1.NumberIVs);
-            dictPluginState.Add("fileName", dsControl1.FileName);
-
-            StringWriter sw = null;
-            //Save Datasheet info as xml string for serialization
-            sw = null;
-            if (dsControl1.DT != null)
-            {
-                dsControl1.DT.TableName = "DataSheetData";
-                sw = new StringWriter();
-                dsControl1.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                strXmlDataTable = sw.ToString();
-                sw.Close();
-                sw = null;
-                dictPluginState.Add("XmlDataTable", strXmlDataTable);
-            }
-
-            if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.clean)
-            {
-                boolClean = true;
-                dictPluginState.Add("Clean", boolClean);
-            }
-            else
-            {
-                boolClean = false;
-                dictPluginState.Add("Clean", boolClean);
-            }
-
-            //model expects this change to the dt first
-            DataTable tempDt = (DataTable)dictPluginState["DT"];
-            tempDt.Columns[dsControl1.ResponseVarColName].SetOrdinal(1);
-            //filter diabled rows and columns
-            tempDt = dsControl1.filterDataTableRows(tempDt);
-            Utilities.TableUtils tableutils = new Utilities.TableUtils(tempDt);
-            tempDt = tableutils.filterRVHcols(tempDt);
-            dictPluginState.Add("DataSheetDatatable", tempDt);  //for modeling to use
-            
-            return dictPluginState;
-        }*/
 
 
         //event handler for packing state to save project
@@ -399,11 +152,9 @@ namespace VBDatasheet
                 if (dlgr == DialogResult.OK)
                 {
                     boolChangesMadeDS = true;
-
-
-                    correlationData = dsControl1.DT;   //dont see this being used anywhere
-                    //  savedDT = dt;                 //dont see this being used anywhere
-                    dataSheetData = dsControl1.DT;    //dont see this being used anywhere 
+                    //correlationData = dsControl1.DT;   //dont see this being used anywhere
+                    ////  savedDT = dt;                 //dont see this being used anywhere
+                    //dataSheetData = dsControl1.DT;    //dont see this being used anywhere 
                     dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 }
                 else
@@ -411,12 +162,11 @@ namespace VBDatasheet
             }
             else if (boolInitialPass)
             {
-                correlationData = dsControl1.DT;     //dont see this being used anywhere
-                modelData = dsControl1.DT;           //dont see this being used anywhere
+                //correlationData = dsControl1.DT;     //dont see this being used anywhere
+                //modelData = dsControl1.DT;           //dont see this being used anywhere
                 dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 boolInitialPass = false;
-                //   savedDT = dt;                   //dont see this being used anywhere
-                //   savedDGV = dsControl1.dgv;     //dont see this being used anywhere
+
             }
 
             dictPackedDatasheetState = dsControl1.PackState();
@@ -425,35 +175,8 @@ namespace VBDatasheet
             dictPluginState.Add("DSValidated", boolValidated);
 
             //pack the state of the datasheet so model will know if it needs to clear itself
-
             dictPluginState.Add("ChangesMadeDS", boolChangesMadeDS);
-            
-            // THIS IS DONE IN DATASHEETCONTROL.CS
-            //StringWriter sw = null;
-            ////Save Datasheet info as xml string for serialization
-            //sw = null;
-            //if (dsControl1.DT != null)
-            //{
-            //    dsControl1.DT.TableName = "DataSheetData";
-            //    sw = new StringWriter();
-            //    dsControl1.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-            //    strXmlDataTable = sw.ToString();
-            //    sw.Close();
-            //    sw = null;
-            //    dictPluginState.Add("XmlDataTable", strXmlDataTable);
-            //}
 
-            // THIS IS DONE IN DATASHEETCONTROL.CS
-            //if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.clean)
-            //{
-            //    boolClean = true;
-            //}
-            //else
-            //{
-            //    boolClean = false;
-            //}
-
-            //dictPluginState.Add("Clean", boolClean);
             return dictPluginState;
         }
 
@@ -505,6 +228,14 @@ namespace VBDatasheet
             //init in case they've re-imported
             dsControl1.dgv.DataSource = null;
             dsControl1.dgv.DataSource = dsControl1.DT;
+
+            //add col to hold enable/disable state for each row
+            DataColumn dcol = new DataColumn("Enabled", typeof(int));
+            dcol.DefaultValue = "1"; //1 = enabled 2=disabled
+            dsControl1.DT.Columns.Add(dcol);
+
+            dsControl1.dgv.Columns[dsControl1.DT.Columns.Count - 1].Visible = false; // hides enabled col from view
+                        
             //set extendedProperties on columns
             for (int c = 0; c < dsControl1.DT.Columns.Count; c++)
             {
@@ -525,27 +256,25 @@ namespace VBDatasheet
             //initialize cols to all enabled for imported table
             //(builds dictionary of keys, <string>datetime and values <bool>enabled/disabled col)
             dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
- //           dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
-
-            //init the utilities
-            //dsControl1.Utils = new VBCommon.Metadata.Utilities();
-            //dsControl1.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(dsControl1.DT);
-            //dsControl1.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(dsControl1.dgv);
 
             //default col 1 as response
             dsControl1.SelectedColIndex = 1;
             dsControl1.ResponseVarColIndex = 1;
             dsControl1.ResponseVarColName = dsControl1.DT.Columns[1].Caption;
-            
-            //dsControl1.GridUtils.setResponseVarCol(dsControl1.dgv, dsControl1.SelectedColIndex,dsControl1.SelectedColIndex);
-            //dsControl1.GridUtils.setViewOnGrid(dsControl1.dgv);
 
             //initial info for the list
             FileInfo fi = new FileInfo(import.getFileImportedName);
             dsControl1.FileName = fi.Name;
             dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);
+            
+            
+            
+            
+            
 
             dsControl1.dgv.Enabled = false;
+           
+
             boolInitialPass = true;
             boolValidated = false;
             dsControl1.maintainGrid(dsControl1.dgv, dsControl1.DT, dsControl1.SelectedColIndex, dsControl1.ResponseVarColName);
@@ -624,10 +353,11 @@ namespace VBDatasheet
             {
                 dsControl1.DT = savedt;
                 dsControl1.dgv.DataSource = dsControl1.DT;
+                dsControl1.dgv.Columns[dsControl1.DT.Columns.Count - 1].Visible = false;
+
                 dsControl1.dgv.Enabled = false;
                 dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);
                 dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
-  //            dsControl1.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(dsControl1.DT, true);
                 boolValidated = false;
             }
         }

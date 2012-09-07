@@ -679,9 +679,11 @@ namespace VBCommon.Controls
         public void DisableRow(object sender, EventArgs e)
         {
             dtRI.SetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString(), false);
+
             for (int c = 0; c < dgv.Columns.Count; c++)
             {
                 dgv[c, intSelectedRowIndex].Style.ForeColor = Color.Red;
+                dgv["Enabled", intSelectedRowIndex].Value = 2;
             }
             updateListView(listvals.NDISABLEDROWS, ++intNdisabledrows);
             state = dtState.dirty;
@@ -695,10 +697,12 @@ namespace VBCommon.Controls
         public void EnableRow(object sender, EventArgs e)
         {
             dtRI.SetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString(), true);
+
             for (int c = 0; c < dgv.Columns.Count; c++)
             {
                 if (!dtCI.GetColStatus(dgv.Columns[c].Name.ToString())) continue;
                 dgv[c, intSelectedRowIndex].Style.ForeColor = Color.Black;
+                dgv["Enabled", intSelectedRowIndex].Value = 1;
             }
 
             updateListView(listvals.NDISABLEDROWS, --intNdisabledrows);
@@ -899,6 +903,7 @@ namespace VBCommon.Controls
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
 
                 dgv.DataSource = dt;
+                dgv.Columns[DT.Columns.Count - 1].Visible = false;
                 dgv.FirstDisplayedScrollingColumnIndex = gridpos;
                 updateListView(listvals.NCOLS, dt.Columns.Count);
                 updateListView(listvals.NIVS, --intNivs);
@@ -1000,7 +1005,7 @@ namespace VBCommon.Controls
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
         {            
             dtColumnInformation dtCI = new dtColumnInformation(dt);  //maybe this will keep the dictColStatus updated
-            //Utilities utils = new Utilities();
+            
 
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
             int colndx = ht.ColumnIndex;
@@ -1072,6 +1077,7 @@ namespace VBCommon.Controls
             }
             else if (rowndx >= 0 && colndx < 0)
             {
+                dtRowInformation dtRI = new dtRowInformation(dt); //keep the dictRowStatus updated
                 //row header hit, show menu
                 intSelectedRowIndex = rowndx;
                 if (dtRI.GetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString()))
@@ -1192,7 +1198,8 @@ namespace VBCommon.Controls
             this.DT.TableName = "DataSheetData";
             this.dgv.DataSource = null;
             this.dgv.DataSource = this.DT;
-
+            dgv.Columns[DT.Columns.Count - 1].Visible = false;
+            
             //get row information
             this.DTRI = new VBCommon.Metadata.dtRowInformation(this.DT);
             
@@ -1605,9 +1612,14 @@ namespace VBCommon.Controls
                     {
                         dgv[c, r].Style.ForeColor = Color.Red;
                         dtRI.SetRowStatus(dt.Rows[r][0].ToString(), false);  //make sure row status is updated
+
                     }
                 }
-                else dtRI.SetRowStatus(dt.Rows[r][0].ToString(), true);
+                else
+                {
+                    dtRI.SetRowStatus(dt.Rows[r][0].ToString(), true);
+
+                }
             }
 
             //set the numerical precision for display
@@ -1640,6 +1652,7 @@ namespace VBCommon.Controls
                     dgv.Columns[col].ValueType = typeof(System.String);
                 }
             }
+            dgv.Columns[DT.Columns.Count - 1].Visible = false;
         }
 
 
