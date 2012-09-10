@@ -683,8 +683,11 @@ namespace VBCommon.Controls
             for (int c = 0; c < dgv.Columns.Count; c++)
             {
                 dgv[c, intSelectedRowIndex].Style.ForeColor = Color.Red;
-                dgv["Enabled", intSelectedRowIndex].Value = 2;
+                
             }
+
+            dt.Rows[intSelectedRowIndex]["Enabled"] = 2;      //set this invisible col row value to 2 = disabled
+            
             updateListView(listvals.NDISABLEDROWS, ++intNdisabledrows);
             state = dtState.dirty;
             NotifyContainer();
@@ -702,9 +705,10 @@ namespace VBCommon.Controls
             {
                 if (!dtCI.GetColStatus(dgv.Columns[c].Name.ToString())) continue;
                 dgv[c, intSelectedRowIndex].Style.ForeColor = Color.Black;
-                dgv["Enabled", intSelectedRowIndex].Value = 1;
+                
             }
 
+            dt.Rows[intSelectedRowIndex]["Enabled"] = 1;      //set this invisible col row value to 1 = enabled
             updateListView(listvals.NDISABLEDROWS, --intNdisabledrows);
             state = dtState.dirty;
             NotifyContainer();
