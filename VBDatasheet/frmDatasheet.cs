@@ -230,11 +230,11 @@ namespace VBDatasheet
             dsControl1.dgv.DataSource = dsControl1.DT;
 
             //add col to hold enable/disable state for each row
-            DataColumn dcol = new DataColumn("Enabled", typeof(int));
-            dcol.DefaultValue = "1"; //1 = enabled 2=disabled
-            dsControl1.DT.Columns.Add(dcol);
+            //DataColumn dcol = new DataColumn("Enabled", typeof(int));
+            //dcol.DefaultValue = "1"; //1 = enabled 2=disabled
+            //dsControl1.DT.Columns.Add(dcol);
 
-            dsControl1.dgv.Columns[dsControl1.DT.Columns.Count - 1].Visible = false; // hides enabled col from view
+            //dsControl1.dgv.Columns[dsControl1.DT.Columns.Count - 1].Visible = false; // hides enabled col from view
                         
             //set extendedProperties on columns
             for (int c = 0; c < dsControl1.DT.Columns.Count; c++)

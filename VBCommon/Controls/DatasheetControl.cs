@@ -686,8 +686,9 @@ namespace VBCommon.Controls
                 
             }
 
-            dt.Rows[intSelectedRowIndex]["Enabled"] = 2;      //set this invisible col row value to 2 = disabled
-            
+            //set extendedproperties so dtRowInformation can maintain dictDTRI
+            dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), "false");
+
             updateListView(listvals.NDISABLEDROWS, ++intNdisabledrows);
             state = dtState.dirty;
             NotifyContainer();
@@ -708,7 +709,9 @@ namespace VBCommon.Controls
                 
             }
 
-            dt.Rows[intSelectedRowIndex]["Enabled"] = 1;      //set this invisible col row value to 1 = enabled
+            //set extendedproperties so dtRowInformation can maintain dictDTRI
+            dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), "true");
+            
             updateListView(listvals.NDISABLEDROWS, --intNdisabledrows);
             state = dtState.dirty;
             NotifyContainer();
@@ -1009,7 +1012,7 @@ namespace VBCommon.Controls
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
         {            
             dtColumnInformation dtCI = new dtColumnInformation(dt);  //maybe this will keep the dictColStatus updated
-            
+           
 
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
             int colndx = ht.ColumnIndex;
@@ -1081,7 +1084,7 @@ namespace VBCommon.Controls
             }
             else if (rowndx >= 0 && colndx < 0)
             {
-                dtRowInformation dtRI = new dtRowInformation(dt); //keep the dictRowStatus updated
+                dtRowInformation dtRI = new dtRowInformation(dt); //this just sets the dictionary to all true
                 //row header hit, show menu
                 intSelectedRowIndex = rowndx;
                 if (dtRI.GetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString()))
@@ -1124,6 +1127,8 @@ namespace VBCommon.Controls
             dictPackedState.Add("DepVarColName", this.ResponseVarColName);
             dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
             dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
+            dictPackedState.Add("DepVarTransform", this.DependentVariableTransform);
+
 
             //pack up listInfo for model datasheet
             dictPackedState.Add("ColCount", this.DT.Columns.Count);
@@ -1202,7 +1207,7 @@ namespace VBCommon.Controls
             this.DT.TableName = "DataSheetData";
             this.dgv.DataSource = null;
             this.dgv.DataSource = this.DT;
-            dgv.Columns[DT.Columns.Count - 1].Visible = false;
+            
             
             //get row information
             this.DTRI = new VBCommon.Metadata.dtRowInformation(this.DT);
@@ -1223,7 +1228,7 @@ namespace VBCommon.Controls
 
             //get column information
             this.DTCI = new VBCommon.Metadata.dtColumnInformation(this.DT);
-   //       this.DTCI = VBCommon.Metadata.dtColumnInformation.getdtCI(this.DT, true);
+  
             //json deserialize the dictionary first
             object jsonColHolder = (object)dictPackedState["DTColInfo"];
             if (jsonColHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
@@ -1244,22 +1249,16 @@ namespace VBCommon.Controls
             else
                 this.SelectedColIndex = (int)dictPackedState["CurrentColIndex"];
 
+
+            //.....need to change from 1 to the actual type.......
+            this.DependentVariableTransform = (VBCommon.DependentVariableTransforms)dictPackedState["DepVarTransform"];
             this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
             this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
 
-            //this.Utils = new VBCommon.Metadata.Utilities();
-            //this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
-            //this.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(this.dgv);
-
             maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
-            //this.GridUtils.maintainGrid();
 
             //initial info for the list
             this.FileName = (string)dictPackedState["fileName"];
-            
-            //FileInfo fi = new FileInfo(Name);
-            //this.FileName = fi.Name;
-            
 
             //unpack listInfo for model datasheet
             //need to convert if its unpacked from saved project
@@ -1605,7 +1604,7 @@ namespace VBCommon.Controls
             dgv.Columns[responseVarColName].DefaultCellStyle.BackColor = Color.LightBlue;
 
             //reset disable rows
-            //_dtRI = new dtRowInformation(dt);
+            dtRI = new dtRowInformation(dt);
             for (int r = 0; r < dt.Rows.Count; r++)
             {
                 //bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());
@@ -1615,14 +1614,7 @@ namespace VBCommon.Controls
                     for (int c = 0; c < dgv.Columns.Count; c++)
                     {
                         dgv[c, r].Style.ForeColor = Color.Red;
-                        dtRI.SetRowStatus(dt.Rows[r][0].ToString(), false);  //make sure row status is updated
-
                     }
-                }
-                else
-                {
-                    dtRI.SetRowStatus(dt.Rows[r][0].ToString(), true);
-
                 }
             }
 
@@ -1656,7 +1648,6 @@ namespace VBCommon.Controls
                     dgv.Columns[col].ValueType = typeof(System.String);
                 }
             }
-            dgv.Columns[DT.Columns.Count - 1].Visible = false;
         }
 
 

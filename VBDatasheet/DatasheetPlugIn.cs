@@ -132,6 +132,7 @@ namespace VBDatasheet
                 boolVisible = true;
                 //signaller.HidePlugins();
                 App.DockManager.SelectPanel(strPanelKey);
+                _frmDatasheet.Refresh();
             }
         }
 
