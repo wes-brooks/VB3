@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using System.Text;
 using System.ComponentModel.Composition;
 using DotSpatial.Controls;
@@ -14,6 +15,9 @@ namespace VBLocation
 {
     public class LocationPlugin : Extension, IPartImportsSatisfiedNotification, IPlugin, IBeachSite
     {
+        [Import("Shell")]
+        private ContainerControl Shell { get; set; }
+
         private VBCommon.Signaller signaller;
 
         private frmLocation cLocation;
@@ -26,7 +30,6 @@ namespace VBLocation
         //complete and visible flags
         public Boolean boolComplete;
         public Boolean boolVisible = true;
-        private Boolean boolClearModel; //needed for IPlugin
 
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -170,13 +173,6 @@ namespace VBLocation
         public Globals.PluginType PluginType
         {
             get { return pluginType; }
-        }
-
-
-        //return clear model flag
-        public Boolean ClearModel
-        {
-            get { return boolClearModel; }
         }
 
 

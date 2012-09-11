@@ -58,6 +58,7 @@ namespace VBLocation
 
         private LocationPlugin _plugin = null;
 
+        
         public frmLocation(LocationPlugin plugin)
         {
             InitializeComponent();
@@ -394,13 +395,13 @@ namespace VBLocation
         }
 
         // click on some marker
-       // void MainMap_OnMarkerClick(GMapMarker item)
-       // {
-            //MainMap.CurrentPosition = item.Position;
-            //MainMap.Zoom = 5;
-       // }
+        void MainMap_OnMarkerClick(GMapMarker item)
+        {
+            MainMap.CurrentPosition = item.Position;
+            MainMap.Zoom = 5;
+        }
 
-        // loader start loading tiles
+         //loader start loading tiles
         void MainMap_OnTileLoadStart(int loaderId)
         {
             switch (loaderId)

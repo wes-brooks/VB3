@@ -691,6 +691,17 @@ namespace IPyModeling
         //Set column header names in Variable Selection listbox
         public void UpdateData(object source, EventArgs e)
         {
+            if (ipyModel != null)
+            {
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.Cancel)
+                {
+                    //somehow undo the changes...source = datasheetControl. Maybe have a packState call in the NotifyContainer(), add to stack,
+                    //then use that stack here to undo??
+                    return;
+                }
+            }
+
             dt = dsControl1.DT;
             this.correlationData = dsControl1.DT;
 
@@ -1173,10 +1184,10 @@ namespace IPyModeling
             try { dblDecisionThreshold = Convert.ToDouble(DecisionThreshold); }
             catch (InvalidCastException) { dblDecisionThreshold = -1; }
             
-            Dictionary<string, object> dictModel = IPyCommon.Helper.ModelState(model: ipyModel, method: strMethod, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: DependentVariableTransform);
+            Dictionary<string, object> dictModelObject = IPyCommon.Helper.ModelState(model: ipyModel, method: strMethod, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: DependentVariableTransform);
             Dictionary<string, object> dictModelByString = IPyCommon.Helper.ModelState(modelString: strModelString, method: strMethod, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: DependentVariableTransform);
             //add both versions of the model
-            dictPluginState.Add("ModelByObject", dictModel);
+            dictPluginState.Add("ModelByObject", dictModelObject);
             dictPluginState.Add("ModelByString", dictModelByString);
             
             //Save the lists that we use to make the validation chart
@@ -1266,16 +1277,16 @@ namespace IPyModeling
                 this.intThresholdIndex = (int)dictProjectState["ThresholdingIndex"];                             
 
                 //ModelState modelState = (ModelState)dictProjectState["Model"];
-                Dictionary<string, object> dictModel = (Dictionary<string, object>)dictProjectState["ModelByString"];
-                this.ipyModel = ipyInterface.Deserialize(dictModel["ModelString"]);
-                this.Method = (string)dictModel["Method"];
+                Dictionary<string, object> dictModelString = (Dictionary<string, object>)dictProjectState["ModelByString"];
+                this.ipyModel = ipyInterface.Deserialize(dictModelString["ModelString"]);
+                this.Method = (string)dictModelString["Method"];
 
                 //Unpack the contents of the threshold and exponent text boxes
                 Dictionary<string, object> dictTransform = (Dictionary<string,object>)dictProjectState["Transform"];
                 
                 this.tbExponent.Text = dictTransform["Exponent"].ToString();
-                this.tbThreshold.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
-                this.lblDecisionThreshold.Text = ((double)dictModel["DecisionThreshold"]).ToString();
+                this.tbThreshold.Text = ((double)dictModelString["RegulatoryThreshold"]).ToString();
+                this.lblDecisionThreshold.Text = ((double)dictModelString["DecisionThreshold"]).ToString();
 
                 //Unpack the user's selected transformation of the dependent variable.
                 if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(DependentVariableTransforms.none))

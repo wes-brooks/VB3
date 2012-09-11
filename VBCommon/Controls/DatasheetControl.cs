@@ -686,7 +686,10 @@ namespace VBCommon.Controls
                 
             }
 
+            //check to see if this index is already in extendedProps (was set to true before)
             //set extendedproperties so dtRowInformation can maintain dictDTRI
+            if (dt.ExtendedProperties.ContainsKey(intSelectedRowIndex.ToString()))
+                dt.ExtendedProperties.Remove(intSelectedRowIndex.ToString());
             dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), "false");
 
             updateListView(listvals.NDISABLEDROWS, ++intNdisabledrows);
@@ -709,7 +712,10 @@ namespace VBCommon.Controls
                 
             }
 
-            //set extendedproperties so dtRowInformation can maintain dictDTRI
+            //check to see if this index is already in extendedProps (was set to false before)
+            //then set extendedproperties so dtRowInformation can maintain dictDTRI
+            if (dt.ExtendedProperties.ContainsKey(intSelectedRowIndex.ToString()))
+                dt.ExtendedProperties.Remove(intSelectedRowIndex.ToString());
             dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), "true");
             
             updateListView(listvals.NDISABLEDROWS, --intNdisabledrows);
@@ -1251,7 +1257,8 @@ namespace VBCommon.Controls
 
 
             //.....need to change from 1 to the actual type.......
-            this.DependentVariableTransform = (VBCommon.DependentVariableTransforms)dictPackedState["DepVarTransform"];
+            string depVarTran = Convert.ToString(dictPackedState["DepVarTransform"]);
+            this.DependentVariableTransform = (VBCommon.DependentVariableTransforms)Enum.Parse(typeof(VBCommon.DependentVariableTransforms), depVarTran);
             this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
             this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
 

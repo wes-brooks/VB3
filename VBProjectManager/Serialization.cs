@@ -185,6 +185,7 @@ namespace VBProjectManager
 
             //raise unpacke event, sending packed plugins dictionary
             signaller.UnpackProjectState(dictPluginStates);
+
         }
 
 
