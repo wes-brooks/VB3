@@ -49,7 +49,23 @@ namespace IPyModeling
         public Boolean boolStopRun;
         public Boolean boolInitialEntry = true; //first time here flag
      
-        private Boolean boolClearModel; //needed for IPlugin
+        private Boolean boolClearModel; 
+
+        //this plugin was clicked
+        private string strTopPlugin = string.Empty;
+
+
+        //property to update topPlugin and raise event when changed
+        public string TopPlugin
+        {
+            get { return strTopPlugin; }
+            set
+            {
+                strTopPlugin = value;
+                signaller.RaiseStrPluginChange(strTopPlugin);
+            }
+        }
+
 
         //deactivate this plugin
         public override void Deactivate()
@@ -121,6 +137,8 @@ namespace IPyModeling
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
+                //make this the top plugin for ProjMngr to use when opening
+                TopPlugin = strPanelKey;
             }
         }
 
@@ -198,6 +216,8 @@ namespace IPyModeling
             }
             if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
                 Hide();
+            if (e.ActivePanelKey == "IPyPrediction")
+                Show();
         }
 
 
@@ -265,6 +285,7 @@ namespace IPyModeling
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
+          //  signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
@@ -306,7 +327,19 @@ namespace IPyModeling
                     innerIronPythonControl.SetData(e.PackedPluginState);
                 }
             }
+            //if the prediction is broadcasting, this project is opening and needs model to show itself if prediction is complete
+            if (((IPlugin)sender).PluginType == Globals.PluginType.Prediction)
+                if ((bool)e.PackedPluginState["Complete"])
+                    Show();
         }
+
+
+        ////listens for change in pluginKeyString
+        //private void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
+        //{
+
+        //}
+
 
         //only have manipulate datasheet buttons enabled when on Manipulate Datasheet tab
         public void HandleManipulateDataTab(object sender, EventArgs e)

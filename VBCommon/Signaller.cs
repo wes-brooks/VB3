@@ -28,6 +28,10 @@ namespace VBCommon
         public delegate void BroadCastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadCastEventHandler<BroadCastEventArgs> BroadcastState;
 
+        //event for updating strPluginKey for which plugin should be on top when proj opened
+        public delegate void UpdateStrPluginKey<TArgs>(TArgs args) where TArgs : EventArgs;
+        public event UpdateStrPluginKey<UpdateStrPlugOnTopEventArgs> strPluginTopChanged;
+
         public delegate void HidePluginsHandler();
         public event HidePluginsHandler HideTabsEvent;
 
@@ -37,6 +41,15 @@ namespace VBCommon
         }
 
 
+        //update the top plugin str key value for opening projects
+        public void RaiseStrPluginChange(string value)
+        {
+            if (strPluginTopChanged != null)
+            {
+                UpdateStrPlugOnTopEventArgs e = new UpdateStrPlugOnTopEventArgs(value);
+                strPluginTopChanged(e);
+            }
+        }
         //tell plugins to pack their states into a dictionary to pass to other plugins
         public void RaiseBroadcastRequest(object sender, IDictionary<string, object> dictPackedPlugin)
         {

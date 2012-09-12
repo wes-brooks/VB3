@@ -42,6 +42,21 @@ namespace IPyPrediction
         public Boolean boolVisible = false;
         public Boolean boolHasBeenVisible = false;
 
+        //this plugin was clicked
+        private string strTopPlugin = string.Empty;
+
+
+        //property to update topPlugin and raise event when changed
+        public string TopPlugin
+        {
+            get { return strTopPlugin; }
+            set
+            {
+                strTopPlugin = value;
+                signaller.RaiseStrPluginChange(strTopPlugin);
+            }
+        }
+
 
         //Raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -120,8 +135,9 @@ namespace IPyPrediction
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
+                //make this the top plugin for ProjMngr to use when opening
+                TopPlugin = strPanelKey;
             }
-
         }
 
 
@@ -253,10 +269,19 @@ namespace IPyPrediction
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
+            //signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
+
         }
+
+
+        ////listens for change in pluginKeyString
+        //private void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
+        //{
+
+        //}
 
 
         //event listener for plugin broadcasting changes

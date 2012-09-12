@@ -24,6 +24,9 @@ namespace VBProjectManager
         private Dictionary<string, Boolean> dictTabStates;
         private string strPathName;
         private string strProjectName;
+        private string strTopPlugin; //plugin change event changes this value
+        public string openingTopPlugin;
+
         private VBCommon.Signaller signaller = new VBCommon.Signaller();
         private Globals.PluginType _pluginType = VBCommon.Globals.PluginType.ProjectManager;
         private VBLogger logger;
@@ -33,7 +36,7 @@ namespace VBProjectManager
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
         public Stack UndoRedoStack = new Stack();
-
+                
         //constructor
         public VBProjectManager()
         {
@@ -182,6 +185,20 @@ namespace VBProjectManager
         }
 
 
+        //once open, store top plugin value here
+        public string OpeningTopPlugin
+        {
+            get { return openingTopPlugin; }
+            set { openingTopPlugin = value; }
+        }
+
+        //holds top plugin for opening
+        public string TopPlugin
+        {
+            get { return strTopPlugin; }
+            set { strTopPlugin = value; }
+        }
+
         //holds just the project name without path
         public string ProjectName
         {
@@ -248,11 +265,11 @@ namespace VBProjectManager
             
             signaller.MessageReceived += new VBCommon.Signaller.MessageHandler<MessageArgs>(MessageReceived);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
+            signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
             signaller.HideTabsEvent += new VBCommon.Signaller.HidePluginsHandler(HideTabsListener);
         }
-
 
 
         private void HideTabsListener()

@@ -104,6 +104,13 @@ namespace VBProjectManager
         }
 
 
+        //listens for change in pluginKeyString
+        public void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
+        {
+            this.strTopPlugin = value.PluginKeyString;
+        }
+
+
         public void SaveAs(object sender, EventArgs e)
         {
             //save an opened project 
@@ -135,6 +142,7 @@ namespace VBProjectManager
             if (openFile.ShowDialog() == DialogResult.OK)
                 strFileName = openFile.FileName;
             else return;
+
             //Load a project file from disk and then send it out to be unpacked.
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
 
@@ -179,6 +187,7 @@ namespace VBProjectManager
                     //add the newly constructed key value pair, containing correct class types to a dictionary
                     dictPluginState.Add(pair.Key, objDeserialized);
                 }
+
                 //add each plugin dictionary 
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
@@ -186,6 +195,8 @@ namespace VBProjectManager
             //raise unpacke event, sending packed plugins dictionary
             signaller.UnpackProjectState(dictPluginStates);
 
+            //Make the top plugin active
+            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(openingTopPlugin);
         }
 
 
@@ -214,6 +225,7 @@ namespace VBProjectManager
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
+            dictPackedState.Add("TopPlugin", TopPlugin);
             dictPackedState.Add("ProjectName", ProjectName);
             
             return dictPackedState;
@@ -223,6 +235,8 @@ namespace VBProjectManager
         //unpack plugin, assigning values from incoming dictionary
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {  
+            //this.strTopPlugin = (string)dictPackedState["TopPlugin"];
+            this.openingTopPlugin = (string)dictPackedState["TopPlugin"];
             this.strPathName = (string)dictPackedState["ProjectName"];
         }
     }

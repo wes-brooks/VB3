@@ -31,6 +31,22 @@ namespace VBLocation
         public Boolean boolComplete;
         public Boolean boolVisible = true;
 
+        //this plugin was clicked
+        private string strTopPlugin = string.Empty;
+
+
+        //property to update topPlugin and raise event when changed
+        public string TopPlugin
+        {
+            get { return strTopPlugin; }
+            set
+            {
+                strTopPlugin = value;
+                signaller.RaiseStrPluginChange(strTopPlugin);
+            }
+        }
+
+
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageSent;
@@ -158,6 +174,8 @@ namespace VBLocation
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
+                //make this the top plugin for ProjMngr to use when opening
+                TopPlugin = strPanelKey;
             }
         }
 
@@ -204,11 +222,18 @@ namespace VBLocation
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
+            signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener); 
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
 
+
+        //listens for change in pluginKeyString
+        private void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
+        {
+
+        }
 
         private void btnNull_Click(object sender, EventArgs e)
         {

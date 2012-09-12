@@ -29,7 +29,20 @@ namespace VBCommon.PluginSupport
     }
 
 
+    //Define event arguments for updating the strPluginKey on top for opening projects
+    public class UpdateStrPlugOnTopEventArgs : EventArgs
+    {
+        private string strPlugKey;
 
+        public UpdateStrPlugOnTopEventArgs(string pluginString)
+        {
+            this.strPlugKey = pluginString;
+        }
+        public string PluginKeyString
+        {
+            get { return strPlugKey; }
+        }
+    }
 
     //Defines the event arguments used when unpacking a project from its saved state
     public class UnpackEventArgs : EventArgs
