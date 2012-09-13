@@ -24,32 +24,11 @@ namespace VBDatasheet
     [JsonObject]
     public partial class frmDatasheet : UserControl, IFormState
     {
-        private enum AddReplace { Add, Replace };     
-        private AddReplace addreplace;                   
-      
-        private bool boolClean = true;
-
-        public event EventHandler DataImported;
-
-        private DataTable savedDT = null;
-        private DataGridView savedDGV = null;
         private IDictionary<string, object> dictPackedDatasheetState = null;
 
         private bool boolInitialPass = true;
         private bool boolValidated = false;
-                     
-        private string strXmlDataTable = string.Empty;
-        private DataTable dataSheetData = null;
-        private DataTable correlationData = null;
-        private DataTable modelData = null;
-
         
-        // return datatable as xml string
-        public string XmlDataTable
-        {
-            get { return strXmlDataTable; }
-        }
-
 
         // getter/setter for datasheet table
         [JsonProperty]
@@ -60,32 +39,6 @@ namespace VBDatasheet
         }
 
 
-        // getter/setter for datasheet table
-        [JsonProperty]
-        public DataTable DataSheetDataTable
-        {
-            set { dataSheetData = value; }
-            get { return dataSheetData; }
-        }
-
-
-        // getter/setter for correlation data table
-        [JsonProperty]
-        public DataTable CorrelationDataTable
-        {
-            get { return correlationData; }
-            set { correlationData = value; }
-        }
-
-        
-        // getter/setter for model datatable
-        public DataTable ModelDataTable
-        {
-            get { return modelData; }
-            set { modelData = value; }
-        }
-
-
         //returns validated flag
         [JsonProperty]
         public bool DSValidated
@@ -93,14 +46,6 @@ namespace VBDatasheet
             get { return this.boolValidated; }
         }
 
-
-        //returns clean flag
-        [JsonProperty]
-        public bool Clean
-        {
-            get { return this.boolClean; }
-        }
-        
 
         //constructor
         public frmDatasheet()    
@@ -152,9 +97,6 @@ namespace VBDatasheet
                 if (dlgr == DialogResult.OK)
                 {
                     boolChangesMadeDS = true;
-                    //correlationData = dsControl1.DT;   //dont see this being used anywhere
-                    ////  savedDT = dt;                 //dont see this being used anywhere
-                    //dataSheetData = dsControl1.DT;    //dont see this being used anywhere 
                     dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 }
                 else
@@ -162,8 +104,6 @@ namespace VBDatasheet
             }
             else if (boolInitialPass)
             {
-                //correlationData = dsControl1.DT;     //dont see this being used anywhere
-                //modelData = dsControl1.DT;           //dont see this being used anywhere
                 dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 boolInitialPass = false;
 
@@ -178,19 +118,6 @@ namespace VBDatasheet
             dictPluginState.Add("ChangesMadeDS", boolChangesMadeDS);
 
             return dictPluginState;
-        }
-
-
-        /// <summary>
-        /// load the datasheet form, initialize then gridview's menu items/eventhandlers
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void frmDatasheet_Load(object sender, EventArgs e) 
-        {
-
-            //is this where I'd add the DSControl??
-
         }
 
 
@@ -228,13 +155,6 @@ namespace VBDatasheet
             //init in case they've re-imported
             dsControl1.dgv.DataSource = null;
             dsControl1.dgv.DataSource = dsControl1.DT;
-
-            //add col to hold enable/disable state for each row
-            //DataColumn dcol = new DataColumn("Enabled", typeof(int));
-            //dcol.DefaultValue = "1"; //1 = enabled 2=disabled
-            //dsControl1.DT.Columns.Add(dcol);
-
-            //dsControl1.dgv.Columns[dsControl1.DT.Columns.Count - 1].Visible = false; // hides enabled col from view
                         
             //set extendedProperties on columns
             for (int c = 0; c < dsControl1.DT.Columns.Count; c++)
@@ -265,16 +185,10 @@ namespace VBDatasheet
             //initial info for the list
             FileInfo fi = new FileInfo(import.getFileImportedName);
             dsControl1.FileName = fi.Name;
-            dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);
-            
-            
-            
-            
-            
+            dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);            
 
             dsControl1.dgv.Enabled = false;
            
-
             boolInitialPass = true;
             boolValidated = false;
             dsControl1.maintainGrid(dsControl1.dgv, dsControl1.DT, dsControl1.SelectedColIndex, dsControl1.ResponseVarColName);
@@ -294,12 +208,7 @@ namespace VBDatasheet
         }
 
 
-        /// <summary>
-        /// test all cells in the datetime column for uniqueness
-        /// </summary>
-        /// <param name="dt">table to search</param>
-        /// <param name="where">record number of offending timestamp</param>
-        /// <returns>true iff all unique, false otherwise</returns>
+        // test all cells in the datetime column for uniqueness
         private bool recordIndexUnique(DataTable dt, out int where)
         {
             Dictionary<string, int> temp = new Dictionary<string, int>();
@@ -353,7 +262,6 @@ namespace VBDatasheet
             {
                 dsControl1.DT = savedt;
                 dsControl1.dgv.DataSource = dsControl1.DT;
-                dsControl1.dgv.Columns[dsControl1.DT.Columns.Count - 1].Visible = false;
 
                 dsControl1.dgv.Enabled = false;
                 dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);

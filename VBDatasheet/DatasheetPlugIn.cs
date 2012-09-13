@@ -64,18 +64,6 @@ namespace VBDatasheet
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
 
-        //public delegate void HidePluginsHandler();
-        //public event HidePluginsHandler HideTabsEvent;
-
-
-        ////event for hiding plugins when datasheet plugin is selected
-        //private void HidePlugins()
-        //{
-        // if (HideTabsEvent != null)
-        // HideTabsEvent();
-        //}
-
-
         //deactivate this plugin
         public override void Deactivate()
         {
@@ -272,26 +260,18 @@ namespace VBDatasheet
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
-            signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener);
+  //          signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
 
 
-        //listens for change in pluginKeyString
-        private void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
-        {
+        ////listen to other plugin's broadcasting their changes
+        //private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
+        //{
 
-        }
-
-
-        //listen to other plugin's broadcasting their changes
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
-        {
-
-        }
+        //}
 
 
         //broadcast changes to other plugins listening

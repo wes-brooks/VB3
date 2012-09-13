@@ -196,7 +196,59 @@ namespace VBProjectManager
             signaller.UnpackProjectState(dictPluginStates);
 
             //Make the top plugin active
-            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(openingTopPlugin);
+//            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(openingTopPlugin);
+            //if predictions is top, then all IPlugins < than should be shown, and Predictions should be made active
+            //if Modeling is top, then all IPlugins < than should be shown, and Modeling should be made active (if Complete, show Prediction, but Modeling is Active
+            //if Datasheet is top, then make Datasheet Active (already shown)
+            if (openingTopPlugin == "IPyPrediction")
+            {
+                 foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                 {
+                    if (x is VBCommon.Interfaces.IPlugin)
+                    {
+                        //show all less than prediction (all of them)
+                        VBCommon.Interfaces.IPlugin pt = (VBCommon.Interfaces.IPlugin)x;
+                        //if less than prediction and not equal to datasheet or location because those are shown already.
+                        if ((Int32)pt.PluginType <= (Int32)Globals.PluginType.Prediction)
+                            if (!((Int32)pt.PluginType == (Int32)Globals.PluginType.Datasheet || (Int32)pt.PluginType == (Int32)Globals.PluginType.Map))
+                                pt.Show();
+                        if ((Int32)pt.PluginType == (Int32)Globals.PluginType.Prediction)
+                            pt.MakeActive();
+                    }
+                }
+            }
+            //if model was on top when saved...
+            if (openingTopPlugin == "PLSPanel" || openingTopPlugin == "GBMPanel")
+            {
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                {
+                    if (x is VBCommon.Interfaces.IPlugin)
+                    {
+                        //show all less than prediction (all of them)
+                        VBCommon.Interfaces.IPlugin pt = (VBCommon.Interfaces.IPlugin)x;
+                        //if less than model and not equal to datasheet or location because those are shown already.
+                        if ((Int32)pt.PluginType <= (Int32)Globals.PluginType.Modeling)
+                            if (!((Int32)pt.PluginType == (Int32)Globals.PluginType.Datasheet || (Int32)pt.PluginType == (Int32)Globals.PluginType.Map))
+                                pt.Show();
+                        if ((Int32)pt.PluginType == (Int32)Globals.PluginType.Modeling)
+                            pt.MakeActive();
+                    }
+                }
+            }
+            //if datasheet was on top
+            if (openingTopPlugin == "Datasheet")
+            {
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                {
+                    if (x is VBCommon.Interfaces.IPlugin)
+                    {
+                        //just make datasheet active because it is already shown
+                        VBCommon.Interfaces.IPlugin pt = (VBCommon.Interfaces.IPlugin)x;
+                        if ((Int32)pt.PluginType == (Int32)Globals.PluginType.Datasheet)
+                            pt.MakeActive();
+                    }
+                }
+            }
         }
 
 

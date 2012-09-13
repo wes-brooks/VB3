@@ -21,7 +21,7 @@ namespace VBProjectManager
     //class to manage all plugins
     public partial class VBProjectManager : Extension, IFormState, IPartImportsSatisfiedNotification, IPlugin
     {        
-        private Dictionary<string, Boolean> dictTabStates;
+ //       private Dictionary<string, Boolean> dictTabStates;
         private string strPathName;
         private string strProjectName;
         private string strTopPlugin; //plugin change event changes this value
@@ -169,12 +169,12 @@ namespace VBProjectManager
         }
 
 
-        //not sure if used
-        public Dictionary<string, Boolean> TabStates
-        {
-            get { return dictTabStates; }
-            set { dictTabStates = value; }
-        }
+        ////not sure if used
+        //public Dictionary<string, Boolean> TabStates
+        //{
+        //    get { return dictTabStates; }
+        //    set { dictTabStates = value; }
+        //}
 
 
         //holds project full path name

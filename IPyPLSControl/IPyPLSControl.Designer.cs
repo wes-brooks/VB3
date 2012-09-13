@@ -42,11 +42,7 @@
             this.groupBox12.SuspendLayout();
             this.groupBox13.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnSelectModel
-            // 
-            this.btnSelectModel.Visible = false;
-            // 
+            //  
             // lvModel
             // 
             this.lvModel.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {

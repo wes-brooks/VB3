@@ -39,7 +39,7 @@ namespace IPyPrediction
         //only the main effects in the model
         private string[] strArrReferencedVars = null;
         private DataTable corrDT; 
-        private DataTable modelDT = null;
+//        private DataTable modelDT = null;
         private List<ListItem> lstIndVars = null;
         //datatables in prediction
         private DataTable dtVariables = null;
@@ -61,7 +61,7 @@ namespace IPyPrediction
         //Added for IronPython-based modeling:
         public event EventHandler IronPythonInterfaceRequested;
         public event EventHandler ModelRequested;
-        public event EventHandler SelectedIndexChanged;
+//        public event EventHandler SelectedIndexChanged;
 
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
@@ -173,14 +173,11 @@ namespace IPyPrediction
             dictListedModel = (IDictionary<string, object>)dictPackedState["AvailModels"];
             List<string> keys = new List<string>();
             foreach (KeyValuePair<string, object> pair in dictListedModel)
-            { this.lstAvailModels.Items.Add(pair.Key); }
-
-//            this.lstAvailModels.Items.Add(keys.ToString());
+                { this.lstAvailModels.Items.Add(pair.Key); }
             
             this.intSelectedListedModel = (int)dictPackedState["AvailModelsIndex"];
             lstAvailModels.SelectedIndex = intSelectedListedModel;
             this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-
 
             DataSet ds = null;
             //unpack values

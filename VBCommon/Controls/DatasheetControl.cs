@@ -46,10 +46,6 @@ namespace VBCommon.Controls
         public enum dtState { clean, dirty };
         private dtState state = dtState.dirty;
 
-        //private Utilities utils = null;
-        //private Utilities.TableUtils tableutils = null;
-        //private Utilities.GridUtils gridutils = null;
-
         //dealing with transform
         private VBCommon.DependentVariableTransforms depVarTransform;
         private double dblPowerTransformExp = double.NaN;
@@ -112,23 +108,6 @@ namespace VBCommon.Controls
         }
 
 
-        //returns datatable row info
-        //[JsonProperty]
-        //public Dictionary<string, bool> DTRowInfo
-        //{
-        //    get { return this.dtRI.DTRowInfo; }
-        //    set { dtRI.DTRowInfo = value; }
-        //}
-
-
-        //// returns datatable column info
-        //[JsonProperty]
-        //public Dictionary<string, bool> DTColInfo     
-        //{
-        //    get { return this.dtCI.DTColInfo; }
-        //    set { dtCI.DTColInfo = value; }
-        //}
-
         //returns current selected column index
         [JsonProperty]
         public int SelectedColIndex    
@@ -178,51 +157,6 @@ namespace VBCommon.Controls
             get { return this.state; }
             set { state = value; }
         }
-
-
-        /*//return utilities
-        [JsonProperty]
-        public Utilities Utils
-        {
-            get {
-                if (utils == null)
-                {
-                    utils = new Utilities();
-                }
-                return this.utils;
-            }
-            set { utils = value; }
-        }*/
-
-
-        /*//return utilities
-        [JsonProperty]
-        public Utilities.TableUtils TableUtils
-        {
-            get {
-                if (tableutils == null)
-                {
-                    tableutils = new Utilities.TableUtils(dt);
-                } 
-                return this.tableutils;
-            }
-            set { tableutils = value; }
-        }*/
-
-
-        /*//return utilities
-        [JsonProperty]
-        public Utilities.GridUtils GridUtils
-        {
-            get {
-                if (gridutils == null)
-                {
-                    gridutils = new Utilities.GridUtils(dgv);
-                } 
-                return this.gridutils;
-            }
-            set { gridutils = value; }
-        }*/
 
 
         //return Disabled columns
@@ -678,8 +612,8 @@ namespace VBCommon.Controls
         // in the dtRowInformation class
         public void DisableRow(object sender, EventArgs e)
         {
+            //update the dtRowInformation dictionary of disabled/enabled rows
             dtRI.SetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString(), false);
-
             for (int c = 0; c < dgv.Columns.Count; c++)
             {
                 dgv[c, intSelectedRowIndex].Style.ForeColor = Color.Red;
@@ -916,7 +850,6 @@ namespace VBCommon.Controls
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
 
                 dgv.DataSource = dt;
-                dgv.Columns[DT.Columns.Count - 1].Visible = false;
                 dgv.FirstDisplayedScrollingColumnIndex = gridpos;
                 updateListView(listvals.NCOLS, dt.Columns.Count);
                 updateListView(listvals.NIVS, --intNivs);
@@ -951,6 +884,9 @@ namespace VBCommon.Controls
             for (int r = 0; r < dt.Rows.Count; r++)
             {
                 dtRI.SetRowStatus(dt.Rows[r][0].ToString(), true);
+                //update extendedProps for those rows
+                if (dt.ExtendedProperties.ContainsKey(r.ToString()))
+                    dt.ExtendedProperties[r.ToString()] = true;
             }
 
             for (int r = 0; r < dgv.Rows.Count; r++)
@@ -1017,8 +953,7 @@ namespace VBCommon.Controls
         // user click captured - decide what menu items are appropriate and show them
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
         {            
-            dtColumnInformation dtCI = new dtColumnInformation(dt);  //maybe this will keep the dictColStatus updated
-           
+            dtColumnInformation dtCI = new dtColumnInformation(dt);
 
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
             int colndx = ht.ColumnIndex;
@@ -1059,7 +994,6 @@ namespace VBCommon.Controls
                     }
                     else
                     {
-                        
                         //show context menu for ivs
                         if (dtCI.GetColStatus(dt.Columns[intSelectedColIndex].ColumnName.ToString()))
                         {
@@ -1090,7 +1024,7 @@ namespace VBCommon.Controls
             }
             else if (rowndx >= 0 && colndx < 0)
             {
-                dtRowInformation dtRI = new dtRowInformation(dt); //this just sets the dictionary to all true
+                dtRowInformation dtRI = new dtRowInformation(dt);
                 //row header hit, show menu
                 intSelectedRowIndex = rowndx;
                 if (dtRI.GetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString()))
@@ -1172,7 +1106,7 @@ namespace VBCommon.Controls
                 dictPackedState.Add("Clean", boolClean);
             }
 
-            //model expects this change to the dt first
+            //model expects this change to the dt first ... I DON'T SEE THIS USED ANYWHERE ELSE
             DataTable Filtered4ModelDt = this.DT;
             Filtered4ModelDt.Columns[this.ResponseVarColName].SetOrdinal(1);
             //filter diabled rows and columns
@@ -1189,10 +1123,6 @@ namespace VBCommon.Controls
         public void UnhideModelDS(DataTable dt)
         {
             this.DT = dt;
-            //this.Utils = new VBCommon.Metadata.Utilities();
-            //this.TableUtils = new VBCommon.Metadata.Utilities.TableUtils(this.DT);
-            //this.GridUtils = new VBCommon.Metadata.Utilities.GridUtils(this.dgv);
-
             maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
             showListInfo(this.FileName, this.DT);
         }
@@ -1338,7 +1268,6 @@ namespace VBCommon.Controls
             DataTable dtCopy = dt.Copy();
 
             dtColumnInformation dtCI = new dtColumnInformation(dt);
-            //                dtColumnInformation dtCI = dtColumnInformation.getdtCI(dt, false);
             foreach (KeyValuePair<string, bool> kv in dtCI.DTColInfo)
             {
                 if (kv.Value) continue;
@@ -1671,7 +1600,6 @@ namespace VBCommon.Controls
             for (int r = 0; r < dgv.Rows.Count; r++)
             {
                 //set style to black unless the row is disabled
-                //                    if (!dtRI.getRowStatus(dgv[0, r].Value.ToString())) continue;  //error here on Value being null
                 dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
             }
         }

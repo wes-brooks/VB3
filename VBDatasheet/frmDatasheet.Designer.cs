@@ -67,7 +67,6 @@
             this.Name = "frmDatasheet";
             this.Size = new System.Drawing.Size(1066, 494);
             this.Tag = "Data Processing";
-            this.Load += new System.EventHandler(this.frmDatasheet_Load);
             this.ResumeLayout(false);
 
         }

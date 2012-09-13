@@ -49,7 +49,7 @@ namespace IPyModeling
         public Boolean boolStopRun;
         public Boolean boolInitialEntry = true; //first time here flag
      
-        private Boolean boolClearModel; 
+//        private Boolean boolClearModel; 
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
@@ -179,8 +179,6 @@ namespace IPyModeling
             btnTransform.Enabled = true;
             App.HeaderControl.Add(btnTransform);
 
-
-            
             string rGroupCaption = "Model";
 
             btnRun = new SimpleActionItem(strPanelKey, "Run", btnRun_Click);
@@ -216,8 +214,6 @@ namespace IPyModeling
             }
             if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
                 Hide();
-            if (e.ActivePanelKey == "IPyPrediction")
-                Show();
         }
 
 
@@ -250,13 +246,6 @@ namespace IPyModeling
         }
 
 
-        //return clear model flag
-        public Boolean ClearModel
-        {
-            get { return boolClearModel; }
-        }
-
-
         //returns complete flag
         public Boolean Complete
         {
@@ -285,7 +274,6 @@ namespace IPyModeling
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
-          //  signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
@@ -332,13 +320,6 @@ namespace IPyModeling
                 if ((bool)e.PackedPluginState["Complete"])
                     Show();
         }
-
-
-        ////listens for change in pluginKeyString
-        //private void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
-        //{
-
-        //}
 
 
         //only have manipulate datasheet buttons enabled when on Manipulate Datasheet tab
@@ -447,7 +428,6 @@ namespace IPyModeling
      
         public void TestMessage(object sender, EventArgs e)
         {
-            
             SendMessage("Message sent from: " + strPanelKey + "!");
         }
 
@@ -486,10 +466,6 @@ namespace IPyModeling
             if (boolRunCancelled)
                 return;
 
-            ////this model is complete and ready for prediction
-            //boolComplete = true;
-            //Broadcast();
-
             //make modeling the focus again (Broadcast() makes Prediction visible and 'on top')
             MakeActive();
         }
@@ -502,7 +478,6 @@ namespace IPyModeling
             innerIronPythonControl.btnCancel_Click(sender, e);
         }
 
-        
         
         //handle when model boolean Running flag changes
         private void HandleBoolRunChanged(bool val)
@@ -521,6 +496,7 @@ namespace IPyModeling
                 btnCancel.Enabled = false;
             }
         }
+
 
         //change has been made within modeling, need to update
         private void HandleUpdatedModel(object sender, EventArgs e)

@@ -26,15 +26,13 @@ namespace IPyModeling
         private dynamic ipyInterface = IPyInterface.Interface;
         protected dynamic ipyModel = null;
 
-        //private DatasheetTest.frmDatasheet _frmDatasheet = new frmDatasheet();
         //Class member definitions:
         //Events:
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event EventHandler<LogMessageEvent> LogMessageSent;
         public event EventHandler<MessageEvent> MessageSent;
         public event EventHandler ModelUpdated;
-        public event EventHandler ModelSaveRequested;
-        public event EventHandler ResetIPyProject;
+
         public event EventHandler ManipulateDataTab; //event for showing only manipulate datasheet's buttons
         public event EventHandler ModelTab;  //event for showing only model's Run
         public event EventHandler VariableTab; //event for variable tab, no buttons enabled
@@ -84,11 +82,7 @@ namespace IPyModeling
 
         //related to table
         private DataTable correlationData = null;
-        private string strThreshold;
-        public string strExponent;
-        private bool boolThresholdingButtonsVisible;
         private DataTable _dtFull = null;
-        string fn = string.Empty;
         DataTable dt = new DataTable();
         private IDictionary<string, object> dictPackedDatasheetState = null;
 
@@ -104,15 +98,21 @@ namespace IPyModeling
         //holds plugin packed state
         IDictionary<string, object> dictPackedPlugin = new Dictionary<string, object>();
 
+        //clean-up. variables that I don't see being used anywhere. put here until know for sure to delete
+//        string fn = string.Empty;
+//        private string strThreshold;
+//        public string strExponent;
+//        private bool boolThresholdingButtonsVisible;
+//        public event EventHandler ModelSaveRequested;
+//        public event EventHandler ResetIPyProject;
+
+
         //constructor
         public IPyModelingControl()
         {
             InitializeComponent();
             boolVirgin = true;
-            btnSelectModel.Enabled = false;
-
-            
-
+        
             //initialize the regulatory threshold
             EventArgs e = new EventArgs();
             rbValue_CheckedChanged(this, e);
@@ -317,7 +317,6 @@ namespace IPyModeling
         //set the model with incoming datatable information
         public void SetModelData(DataTable data)
         {
-            
             this.model_data = data;
 
             int intI = 0;
@@ -357,13 +356,6 @@ namespace IPyModeling
         }
 
 
-        //if changes to Datasheet occur after model is made, clear model
-        //private void ResetProject(object sender, ClearModelEventArgs e)
-        //{
-        //    Clear();
-        //}
-
-
         //Clear the control
         public void Clear()
         {
@@ -390,7 +382,6 @@ namespace IPyModeling
             lblDecisionThreshold.Text = "";
             lblSpec.Text = "";
 
-            btnSelectModel.Enabled = false;
             pnlThresholdingButtons.Visible = false;
             boolVirgin = true;
         }
@@ -560,67 +551,7 @@ namespace IPyModeling
             });
         }
 
-
-        /*//Set column header names in Variable Selection listbox
-        public void SetData(IDictionary<string,object> packedState)
-        {
-            //Datasheet's packed state coming in
-            dictPackedPlugin = packedState;
-            dt = (DataTable)dictPackedPlugin["DT"];
-            this.correlationData = (DataTable)dictPackedPlugin["CorrelationDataTable"];
-            
-            //init in case they've re-imported
-            dsControl1.dgv.DataSource = null;
-            //set the dgv
-            dsControl1.dgv.DataSource = correlationData;
-            dsControl1.DT = (DataTable)dictPackedPlugin["DT"];
-            dsControl1.SelectedColIndex = (int)dictPackedPlugin["CurrentColIndex"];
-            dsControl1.ResponseVarColName = (string)dictPackedPlugin["DepVarColName"];
-            //dsControl1.DTCI.DTColInfo = (Dictionary<string, bool>)dictPackedPlugin["DTColInfo"];
-            //dsControl1.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPackedPlugin["DTRowInfo"];
-            dsControl1.DisabledRows = (int)dictPackedPlugin["DisabledRwCt"];
-            dsControl1.DisabledCols = (int)dictPackedPlugin["DisabledColCt"];
-            dsControl1.HiddenCols = (int)dictPackedPlugin["HiddenColCt"];
-            dsControl1.NumberIVs = (int)dictPackedPlugin["IndVarCt"];
-            dsControl1.FileName = (string)dictPackedPlugin["fileName"];
-
-            dsControl1.showListInfo(fn, dt);
-            
-            _dtFull = dt;
-            if (_dtFull == null) return;
-
-            tabControl1.SelectedIndex = 0;
-
-            List<string> lstFieldList = new List<string>();
-            for (int i = 2; i < _dtFull.Columns.Count; i++)
-            {
-                if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
-                {
-                    if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
-                        lstFieldList.Add(_dtFull.Columns[i].ColumnName);
-                }
-                else
-                    lstFieldList.Add(_dtFull.Columns[i].ColumnName);
-            }
-
-            intNumObs = _dtFull.Rows.Count;
-            lblNumObs.Text = "Number of Observations: " + intNumObs.ToString();
-
-            lbAvailableVariables.Items.Clear();
-            lbIndVariables.Items.Clear();
-            
-            for (int i = 0; i < lstFieldList.Count; i++)
-            {
-                ListItem li = new ListItem(lstFieldList[i], i.ToString());
-                lbAvailableVariables.Items.Add(li);
-            }
-
-            lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
-            lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
-            lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
-        } */
-
-
+        
         //maintain the model's ds when no changes made to global
         public void UnhideDatasheet(DataTable dt)
         {
@@ -740,17 +671,10 @@ namespace IPyModeling
 
             //clear the model
             Clear();
-            //make sure model's ds redraws correctly
-            //UnhideDatasheet(dsControl1.DT);
-
-            //clear the prediction
-            //if (model_data != null)
-            //{
-                boolClearPrediction = true;
-                UpdatePredictionTab();
-            //}
-            
-            
+           
+            //need to clear the prediction now
+            boolClearPrediction = true;
+            UpdatePredictionTab();            
         }
 
 
@@ -881,9 +805,6 @@ namespace IPyModeling
             //Datasheet's packed state coming in
             DataTable dtCorr_ = dsControl1.DT;  // this should be holding the model's dataset at this point?
             DataView dvCorr_ = dtCorr_.DefaultView;
-
- //           DataTable dtCorr = (DataTable)dictPackedPlugin["CorrelationDataTable"];
- //           DataView dvCorr = dtCorr.DefaultView;
             
             List<string> list = new List<string>();
 
@@ -1053,7 +974,6 @@ namespace IPyModeling
             pnlThresholdingButtons.Visible = true;
             ChangeControlStatus(boolInitialControlStatus);
             ChangeThresholdControlStatus(true);
-            btnSelectModel.Enabled = true;
 
             //Work's done; let's go home.
             if (ModelUpdated != null)
@@ -1214,7 +1134,6 @@ namespace IPyModeling
 
             //Needed by the prediction plugin: 
             //if changing a saved project need to keep the listPredictions the same, because lbIndVariables aren't saved
-            //List<ListItem> listPredictors = new List<ListItem>();
             if (ListPredictors.Count == 0)
             {
                 foreach (ListItem item in lbIndVariables.Items)
@@ -1319,12 +1238,8 @@ namespace IPyModeling
 
                 //Now restore the elements of the user interface.
                 this.pnlThresholdingButtons.Visible = (bool)dictProjectState["ThresholdingButtonsVisible"];
-                this.btnSelectModel.Enabled = (bool)dictProjectState["ThresholdingButtonsVisible"];
-
-                //populate the dgv with the table from the datasheet plugin
-               
-
             }
+
             //rebuild model
             PopulateResults(this.ipyModel);
             InitializeValidationChart();
@@ -1790,79 +1705,6 @@ namespace IPyModeling
         }
 
         /*
-        private void ProjectSavedListener()
-        {
-            //Something must be seriously messed up if this happens.
-            if (_projMgr == null)
-                return;
-
-            _projMgr.IPyResidualAnalysisInfo = new ResidualAnalysisInfo();
-
-            //don't want to save data if datasheet dirty (or another model selected??)
-            if (!_projMgr.DataSheetInfo.Clean)
-                return;
-
-            _projMgr.IPyResidualAnalysisInfo.ReBuildInfo = _residualInfo;
-            _projMgr.IPyResidualAnalysisInfo.ModelIndependentVariables = _projMgr.ModelIndependentVariables;
-            _projMgr.IPyResidualAnalysisInfo.Model = _projMgr.Model;
-            _projMgr.IPyResidualAnalysisInfo.SelectedRebuild = _selectedRebuild;
-
-            if (_state == _residState.clean)
-            {
-                _projMgr.TabStates.TabState["IPyPrediction"] = true;
-            }
-            else
-            {
-                _projMgr.TabStates.TabState["IPyPrediction"] = false;
-            }
-        }
-        
-
-        private void ProjectOpenedListener()
-        {
-            //Something must be seriously messed up if this happens.
-            if (_projMgr == null)
-                return;
-
-            if (_projMgr._projectType == VBTools.Globals.ProjectType.MODEL)
-                return;
-
-            if (_projMgr.IPyResidualAnalysisInfo == null)
-                return;
-
-            _projMgr.Model = null;
-            //_projMgr.ModelDataTable = _projMgr.CorrelationDataTable.Copy();
-
-            if (_projMgr.ModelIndependentVariables == null)
-                return;
-
-            _projectOpened = true;
-
-            //local copy of rebuild info to generate saved rebuilds
-            Dictionary<int, string> residualinfo = _projMgr.ResidualAnalysisInfo.ReBuildInfo;
-
-            //fire events to repopulate the form with selected model...
-            if (_projMgr.CorrelationDataTable != null)
-            {
-                frmResiduals_Enter(null, null);
-                //...and each of the rebuilds.
-                foreach (KeyValuePair<int, string> kv in residualinfo)
-                {
-                    switch (kv.Value.ToString())
-                    {
-                        case ("df"):
-                            btnGoDFFITSRebuild_Click(null, null);
-                            break;
-                        case ("cd"):
-                            btnGoCooksIterative_Click(null, null);
-                            break;
-                    }
-                }
-                listBox1.SelectedIndex = _projMgr.ResidualAnalysisInfo.SelectedRebuild;
-            }
-        }
-
-
         private void frmResiduals_Enter(object sender, EventArgs e)
         {
             if (ipyInterface == null) RequestIronPythonInterface();
