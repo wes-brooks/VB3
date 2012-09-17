@@ -32,6 +32,7 @@ namespace IPyModeling
         public event EventHandler<LogMessageEvent> LogMessageSent;
         public event EventHandler<MessageEvent> MessageSent;
         public event EventHandler ModelUpdated;
+        public event EventHandler ChangeMade4Stack;
 
         public event EventHandler ManipulateDataTab; //event for showing only manipulate datasheet's buttons
         public event EventHandler ModelTab;  //event for showing only model's Run
@@ -624,14 +625,15 @@ namespace IPyModeling
         {
             if (ipyModel != null)
             {
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                if (dlgr == DialogResult.Cancel)
+                //go tell plugin to broadcast to add to stack
+                if (ChangeMade4Stack != null)
                 {
-                    //somehow undo the changes...source = datasheetControl. Maybe have a packState call in the NotifyContainer(), add to stack,
-                    //then use that stack here to undo??
-                    return;
+                    EventArgs ev = new EventArgs();
+                    ChangeMade4Stack(this, ev);
                 }
             }
+                
+            
 
             dt = dsControl1.DT;
             this.correlationData = dsControl1.DT;

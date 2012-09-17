@@ -52,7 +52,7 @@ namespace IPyPrediction
         //has transform occurred
         private bool boolObsTransformed = false;
         //dictionary of packed state coming in from model
-        IDictionary<string, object> dictPackedSt;
+        IDictionary<string, object> dictPackedSt = new Dictionary<string,object>();
         //holds models that are in the listbox
         IDictionary<string, object> dictListedModel = new Dictionary<string, object>();
         //holds the selected model's index
@@ -321,7 +321,7 @@ namespace IPyPrediction
         public void AddModel(IDictionary<string, object> dictPackedState)
         {
             //store the packed state to be used in the SetModel below.
-            dictPackedSt = new Dictionary<string, object>();
+            //dictPackedSt = new Dictionary<string, object>();
             //make sure empty model doesnt run through this method
             if (dictPackedState.Count <= 2)
                 return;

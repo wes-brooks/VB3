@@ -292,8 +292,8 @@ namespace VBProjectManager
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
             //populate stack
-            Dictionary<object, object> dictStackObj = new Dictionary<object, object>();
-            dictStackObj.Add(sender, e.PackedPluginState);
+            Dictionary<string, object> dictStackObj = new Dictionary<string, object>();
+            dictStackObj.Add(((VBCommon.Interfaces.IPlugin)sender).PanelKey.ToString(), e.PackedPluginState);
             UndoRedoStack.Push(dictStackObj);
 
             //flag to tell prediction to show itself after being hidden only if model is complete

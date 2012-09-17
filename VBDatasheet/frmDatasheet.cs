@@ -28,7 +28,8 @@ namespace VBDatasheet
 
         private bool boolInitialPass = true;
         private bool boolValidated = false;
-        
+
+        public event EventHandler ChangeMade4Stack;
 
         // getter/setter for datasheet table
         [JsonProperty]
@@ -51,6 +52,7 @@ namespace VBDatasheet
         public frmDatasheet()    
         {
             InitializeComponent();
+            this.dsControl1.NotifiableChangeEvent +=new EventHandler(this.UpdateData);
          
         }
 
@@ -91,16 +93,10 @@ namespace VBDatasheet
 
             //check to see if this is the first time going to modeling
             if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.dirty && !boolInitialPass)
-            {
+            {      
+                boolChangesMadeDS = true;
+                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                if (dlgr == DialogResult.OK)
-                {
-                    boolChangesMadeDS = true;
-                    dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-                }
-                else
-                { return null; }
             }
             else if (boolInitialPass)
             {
@@ -118,6 +114,18 @@ namespace VBDatasheet
             dictPluginState.Add("ChangesMadeDS", boolChangesMadeDS);
 
             return dictPluginState;
+        }
+
+
+        //listener for notify change event
+        public void UpdateData(object source, EventArgs e)
+        {
+            //broadcast to be added to stack
+            if (ChangeMade4Stack != null)
+            {
+                EventArgs ev = new EventArgs();
+                ChangeMade4Stack(this, ev);
+            }
         }
 
 

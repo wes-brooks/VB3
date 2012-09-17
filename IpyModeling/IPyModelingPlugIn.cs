@@ -126,6 +126,7 @@ namespace IPyModeling
             innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
             innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
             innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
+            innerIronPythonControl.ChangeMade4Stack += new EventHandler(HandleAddToStack);
             
             base.Activate(); //ensures "enabled" is set to true
         }
@@ -365,6 +366,21 @@ namespace IPyModeling
             catch
             { }
         }
+
+
+        //handles broadcasting each change to be added to the stack
+        public void HandleAddToStack(object sender, EventArgs e)
+        {   
+            Broadcast();
+            DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+            if (dlgr == DialogResult.Cancel)
+            {
+                //then use that stack here to undo??
+                return;
+            }
+            
+        }
+
 
         //when modeling makes changes, event broadcasts changes to those listening
         public void Broadcast()

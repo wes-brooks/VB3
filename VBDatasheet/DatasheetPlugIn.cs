@@ -46,7 +46,7 @@ namespace VBDatasheet
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
-
+        
 
         //property to update topPlugin and raise event when changed
         public string TopPlugin
@@ -123,7 +123,7 @@ namespace VBDatasheet
 
             //when root item is selected
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
-
+            _frmDatasheet.ChangeMade4Stack += new EventHandler(HandleAddToStack);
             base.Activate(); //ensures "enabled" is set to true
         }
 
@@ -274,6 +274,14 @@ namespace VBDatasheet
         //}
 
 
+        //handles broadcasting each change to be added to the stack
+        public void HandleAddToStack(object sender, EventArgs e)
+        {
+            Broadcast();
+        }
+
+
+
         //broadcast changes to other plugins listening
         public void Broadcast()
         {
@@ -386,11 +394,15 @@ namespace VBDatasheet
         //ready to go to modeling now
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
-            //datasheet is complete when go to modeling is clicked
-            boolComplete = true;
-
-            //broadcast changes
-            Broadcast();
+            DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+            if (dlgr == DialogResult.OK)
+            {
+                boolClearModel = true;
+                //datasheet is complete when go to modeling is clicked
+                boolComplete = true;
+                //broadcast changes
+                Broadcast();
+            }
         }
     }
 }
