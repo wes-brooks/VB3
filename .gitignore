@@ -21,10 +21,10 @@
 *IPyCommon.dll
 *VBCommon.dll
 *VBLocation.dll
-*VBStatistics.dll
 *VirtualBeach.exe
 *VBDockManager.dll
 *VBControls.dll
 *IPyPLSControl.dll
 *IPyGBMControl.dll
 .svn*
+*.suo
