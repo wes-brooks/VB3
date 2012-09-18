@@ -279,31 +279,55 @@ namespace VBProjectManager
         //pop off last stack for undo
         public void UndoAction(object sender, EventArgs e)
         {
-            //get rid of last push (the change we want to undo)
-
             //check to see if pop is a model first, first undo on model will accidentally send unpack to _frmDatasheet
             object whatAreWePopping = UndoRedoStack.Pop();
-            
             //now pop the last saved change to implement undo
             object lastStackItem = UndoRedoStack.Peek();
-            Dictionary<string, object> dictLastStackItem = new Dictionary<string,object>((Dictionary<string,object>)lastStackItem);
+            Dictionary<string, object> dictLastStackItem = new Dictionary<string, object>((Dictionary<string, object>)lastStackItem);
             string stackKey = string.Empty;
 
-            foreach (KeyValuePair<string, object> pair in dictLastStackItem)
+            if ((bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("PLSPanel") || (bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("GBMPanel"))
             {
-                stackKey = pair.Key;
-            }
+                Dictionary<string, object> modelPop = new Dictionary<string, object>((Dictionary<string, object>)whatAreWePopping);
 
-            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-            {
-                if (x is IPlugin)
+                //ensure the unpack goes to the model, not datasheet
+                foreach (KeyValuePair<string, object> pair in modelPop)
+                { stackKey = pair.Key; }
+
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
                 {
-                    IPlugin thisPlug = (IPlugin)x;
-                    if (thisPlug.PanelKey == stackKey)
-                    { //thisPlug.unpack back 
-                        Dictionary<string, object> dictUnpackThis = new Dictionary<string,object>();
-                        dictUnpackThis = (Dictionary<string,object>)dictLastStackItem[stackKey];
-                        thisPlug.UndoLastChange(dictUnpackThis);
+                    if (x is IPlugin)
+                    {
+                        IPlugin thisPlug = (IPlugin)x;
+                        if (thisPlug.PanelKey == stackKey)
+                        { //thisPlug.unpack back 
+                            Dictionary<string, object> dictUnpackThis = new Dictionary<string, object>();
+                            foreach (KeyValuePair<string, object> getValue in dictLastStackItem)
+                            { dictUnpackThis = (Dictionary<string,object>)getValue.Value; }
+                         
+                            thisPlug.UndoLastChange(dictUnpackThis);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, object> pair in dictLastStackItem)
+                {
+                    stackKey = pair.Key;
+                }
+
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                {
+                    if (x is IPlugin)
+                    {
+                        IPlugin thisPlug = (IPlugin)x;
+                        if (thisPlug.PanelKey == stackKey)
+                        { //thisPlug.unpack back 
+                            Dictionary<string, object> dictUnpackThis = new Dictionary<string, object>();
+                            dictUnpackThis = (Dictionary<string, object>)dictLastStackItem[stackKey];
+                            thisPlug.UndoLastChange(dictUnpackThis);
+                        }
                     }
                 }
             }
