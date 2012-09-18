@@ -48,7 +48,8 @@ namespace IPyModeling
         public Boolean boolRunCancelled;
         public Boolean boolStopRun;
         public Boolean boolInitialEntry = true; //first time here flag
-     
+
+
 //        private Boolean boolClearModel; 
 
         //this plugin was clicked
@@ -284,7 +285,7 @@ namespace IPyModeling
         //undo was hit, send the packed state to be unpacked
         public void UndoLastChange(Dictionary<string, object> packedState)
         {
-            innerIronPythonControl.UnpackProjectState(packedState);
+            innerIronPythonControl.SetData(packedState);
         }
 
 
@@ -381,15 +382,23 @@ namespace IPyModeling
 
         //handles broadcasting each change to be added to the stack
         public void HandleAddToStack(object sender, EventArgs e)
-        {   
-            Broadcast();
-            DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-            if (dlgr == DialogResult.Cancel)
+        {            
+            if (boolComplete)
             {
-                //then use that stack here to undo??
-                return;
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.Cancel)
+                {
+                    //then use that stack here to undo??
+                    return;
+                }
+                else if (dlgr == DialogResult.OK)
+                {
+                    boolComplete = false;
+                    innerIronPythonControl.Clear();
+                }
+
             }
-            
+            Broadcast();
         }
 
 
@@ -478,6 +487,7 @@ namespace IPyModeling
         //request to run the modeling method, and then enable the prediction page.
         void btnRun_Click(object sender, EventArgs e)
         {
+
             if (innerIronPythonControl.lbIndVariables.Items.Count == 0)
             {
                 MessageBox.Show("You must chose variables first and go to model tab before selecting Run", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -485,6 +495,7 @@ namespace IPyModeling
             }
 
             innerIronPythonControl.btnRun_Click(sender, e);
+           
 
             //check to see if run was clicked before model tab was active
             if (boolStopRun)
@@ -495,6 +506,7 @@ namespace IPyModeling
 
             //make modeling the focus again (Broadcast() makes Prediction visible and 'on top')
             MakeActive();
+            boolComplete = true;
         }
 
 
@@ -528,12 +540,16 @@ namespace IPyModeling
         //change has been made within modeling, need to update
         private void HandleUpdatedModel(object sender, EventArgs e)
         {
-            //if here, changes were made and model has been cleared
-            boolComplete = false;
-            Broadcast();
-            //bring the focus back to Modeling away from Prediction
-            MakeActive();
-            Cursor.Current = Cursors.Default;
+            //only need to do this if the model is complete
+            if (boolComplete)
+            {
+                //if here, changes were made and model has been cleared
+                boolComplete = false;
+                Broadcast();
+                //bring the focus back to Modeling away from Prediction
+                MakeActive();
+                Cursor.Current = Cursors.Default;
+            }
         }
     }
 }

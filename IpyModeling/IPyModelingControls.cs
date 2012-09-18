@@ -560,25 +560,42 @@ namespace IPyModeling
         }
 
 
+        //pack up setData info for saving to stack (undo functionality)
+        public IDictionary<string,object> PackSetData()
+        {
+            IDictionary<string, object> packedState = new Dictionary<string, object>();
+
+            packedState.Add("PackedDatasheetState", dsControl1.PackState());
+
+            return packedState;
+        }
+
+
         //Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string, object> packedState)
         {
             //Datasheet's packed state coming in
             dictPackedPlugin = packedState;
 
-            //check to see if we should clear the model
-            if ((bool)packedState["ChangesMadeDS"])
+            //setting data from datasheet will go through, setting data from an undo will catch
+            try
             {
-               
-                //clear the prediction
-                if (model_data != null)
+                //check to see if we should clear the model
+                if ((bool)packedState["ChangesMadeDS"])
                 {
-                    boolClearPrediction = true;
-                    UpdatePredictionTab();
-                } 
-                //clear model
-                Clear();
+
+                    //clear the prediction
+                    if (model_data != null)
+                    {
+                        boolClearPrediction = true;
+                        UpdatePredictionTab();
+                    }
+                    //clear model
+                    Clear();
+                }
             }
+            catch { }
+
 
             dsControl1.UnpackState((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
             
@@ -623,15 +640,10 @@ namespace IPyModeling
         //Set column header names in Variable Selection listbox
         public void UpdateData(object source, EventArgs e)
         {
-            if (ipyModel != null)
-            {
-                //go tell plugin to broadcast to add to stack
-                if (ChangeMade4Stack != null)
-                {
-                    EventArgs ev = new EventArgs();
-                    ChangeMade4Stack(this, ev);
-                }
-            }
+            //if (ipyModel != null)
+            //{
+                
+            //}
                 
             
 
@@ -671,12 +683,22 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
             lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
 
-            //clear the model
-            Clear();
            
+            
+            //was at top of method...should be here? go tell plugin to broadcast to add to stack
+            if (ChangeMade4Stack != null)
+            {
+                EventArgs ev = new EventArgs();
+                ChangeMade4Stack(this, ev);
+            }
+
+            //clear the model
+            //Clear();
             //need to clear the prediction now
             boolClearPrediction = true;
-            UpdatePredictionTab();            
+            UpdatePredictionTab();       
+     
+            
         }
 
 
@@ -1092,8 +1114,12 @@ namespace IPyModeling
         public IDictionary<string, object> PackProjectState()
         {
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
+            //if just adding to stack, go to different pack to be used in setData()
             if (Model == null)
+            {
+                dictPluginState = PackSetData();
                 return dictPluginState;
+            }
 
             //Pack up the model's state in two ways: one with the model represented by a dynamic object, the other with the model represented by a string
             string strModelString = ipyInterface.Serialize(Model);
