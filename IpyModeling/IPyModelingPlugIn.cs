@@ -280,10 +280,21 @@ namespace IPyModeling
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
 
-        
+
+        //undo was hit, send the packed state to be unpacked
+        public void UndoLastChange(Dictionary<string, object> packedState)
+        {
+            innerIronPythonControl.UnpackProjectState(packedState);
+        }
+
+
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
+            //get out of here if global ds is just making changes to be added to the stack
+            if (!(bool)((IPlugin)sender).Complete)
+                return;
+
             //if datasheet updated itself, set data with changes, passing datasheet's plugin packed state
             if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {

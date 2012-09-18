@@ -78,8 +78,15 @@ namespace VBProjectManager
             btnAbout.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnAbout.LargeImage = Resources.About_16x16;
             //btnAbout.SmallImage = Resources.info_16x16;
-            btnAbout.ToolTipText = "Open the 'About VirtualBeach' dialog.";
+            btnAbout.ToolTipText = "Open the 'About VirtualBeach' dialog";
             App.HeaderControl.Add(btnAbout);
+
+            //add an undo button to application ("Edit") menu... ??
+            var btnUndo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Undo", UndoAction);
+            btnUndo.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnUndo.LargeImage = Resources.Undo_16x16;
+            btnUndo.ToolTipText = "Undo the last action";
+            App.HeaderControl.Add(btnUndo);
                        
             //get plugin type for each plugin
             List<Globals.PluginType> lstAllPluginTypes = new List<Globals.PluginType>();
@@ -285,6 +292,47 @@ namespace VBProjectManager
                 }
             }
            
+        }
+
+
+
+        //pop off last stack for undo
+        public void UndoAction(object sender, EventArgs e)
+        {
+            //get rid of last push (the change we want to undo)
+
+            //check to see if pop is a model first, first undo on model will accidentally send unpack to _frmDatasheet
+            object whatAreWePopping = UndoRedoStack.Pop();
+            
+            //now pop the last saved change to implement undo
+            object lastStackItem = UndoRedoStack.Peek();
+            Dictionary<string, object> dictLastStackItem = new Dictionary<string,object>((Dictionary<string,object>)lastStackItem);
+            string stackKey = string.Empty;
+
+            foreach (KeyValuePair<string, object> pair in dictLastStackItem)
+            {
+                stackKey = pair.Key;
+            }
+
+            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+            {
+                if (x is IPlugin)
+                {
+                    IPlugin thisPlug = (IPlugin)x;
+                    if (thisPlug.PanelKey == stackKey)
+                    { //thisPlug.unpack back 
+                        Dictionary<string, object> dictUnpackThis = new Dictionary<string,object>();
+                        dictUnpackThis = (Dictionary<string,object>)dictLastStackItem[stackKey];
+                        thisPlug.UndoLastChange(dictUnpackThis);
+                    }
+                }
+            }
+        }
+
+        //undo was hit, send the packed state to be unpacked
+        public void UndoLastChange(Dictionary<string, object> packedState)
+        {
+            
         }
 
 

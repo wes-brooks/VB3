@@ -110,6 +110,8 @@
   <ItemGroup>
     <Content Include="DatasheetTest.sln" />
     <Content Include="Readme.txt" />
+    <None Include="Resources\Undo_16x16.png" />
+    <None Include="Resources\Undo.png" />
     <None Include="Resources\Save16x16.png" />
     <None Include="Resources\SaveAs16x16.png" />
     <None Include="Resources\Open.png" />

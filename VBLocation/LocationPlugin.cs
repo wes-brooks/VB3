@@ -75,6 +75,13 @@ namespace VBLocation
         }
 
 
+        //undo was hit, send the packed state to be unpacked
+        public void UndoLastChange(Dictionary<string, object> packedState)
+        {
+           
+        }
+
+
         //add a datasheet plugin root item
         public void AddRibbon(string sender)
         {

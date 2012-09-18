@@ -276,6 +276,13 @@ namespace IPyPrediction
         }
 
 
+        //undo was hit, send the packed state to be unpacked
+        public void UndoLastChange(Dictionary<string, object> packedState)
+        {
+            
+        }
+
+
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
          {

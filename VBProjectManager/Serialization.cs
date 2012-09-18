@@ -203,23 +203,9 @@ namespace VBProjectManager
                 {
                     if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == openingTopPlugin)
                     {
-                        //store plugin and it's pluginType
+                        //store plugin
                         VBCommon.Interfaces.IPlugin topPlugin = (VBCommon.Interfaces.IPlugin)x;
-                        int plugType = (int)(Globals.PluginType)topPlugin.PluginType;
-
-                        foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
-                        {
-                            //store each plugin
-                            VBCommon.Interfaces.IPlugin thisPlugin = (VBCommon.Interfaces.IPlugin)ex;
-                            //make sure it's not datasheet or map because those are always shown
-                            if (!(thisPlugin.PluginType == Globals.PluginType.Datasheet || thisPlugin.PluginType == Globals.PluginType.Map))
-                                //ensure all those that are less than the openingTopPlugin are shown
-                                if ((Int32)thisPlugin.PluginType < plugType)
-                                    ((VBCommon.Interfaces.IPlugin)ex).Show();
-                        }
-                        //adding Show(), shows prediction and then makes it active, but model still goes away.
                         //just MakeActive() doesn't work.. makes the panel active, but doesn't show tab and ribbon
-                        topPlugin.Show();
                         topPlugin.MakeActive();
                     }
                 }

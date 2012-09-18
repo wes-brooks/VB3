@@ -40,6 +40,8 @@ namespace VBDatasheet
         //complete and visible flags
         private Boolean boolComplete;
         private Boolean boolVisible = true;
+        //keep track if first time through this plugin or coming back from model
+        private Boolean boolInitialEntry = true;
 
         //clear model flag
         private Boolean boolClearModel;
@@ -164,6 +166,13 @@ namespace VBDatasheet
         }
 
 
+        //return plugin intial entry flag
+        public Boolean InitialEntry
+        {
+            get { return boolInitialEntry; }
+        }
+
+
         //return plugin complete flag
         public Boolean Complete
         {
@@ -274,6 +283,13 @@ namespace VBDatasheet
         //}
 
 
+        //undo was hit, send the packed state to be unpacked
+        public void UndoLastChange(Dictionary<string, object> packedState)
+        {
+            _frmDatasheet.UnpackState(packedState);
+        }
+
+
         //handles broadcasting each change to be added to the stack
         public void HandleAddToStack(object sender, EventArgs e)
         {
@@ -369,6 +385,11 @@ namespace VBDatasheet
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
+            if ((e.ActivePanelKey == "PLSPanel" || e.ActivePanelKey == "GBMPanel") && boolComplete)
+            {
+                boolInitialEntry = false;
+                _frmDatasheet.btnGoToModel_Click(); //set frm's initialPass to false too.
+            }
         }
 
 
@@ -394,15 +415,23 @@ namespace VBDatasheet
         //ready to go to modeling now
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
-            DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-            if (dlgr == DialogResult.OK)
+            //_frmDatasheet.btnGoToModel_Click(sender, e); //go change the initial pass flag
+
+            //only show this dialog if model is complete...check initial entry flag
+            if (!boolInitialEntry)
             {
-                boolClearModel = true;
-                //datasheet is complete when go to modeling is clicked
-                boolComplete = true;
-                //broadcast changes
-                Broadcast();
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.OK)
+                {
+                    boolClearModel = true;
+                }
             }
-        }
+
+            //datasheet is complete when go to modeling is clicked
+            boolComplete = true;
+            //broadcast changes
+            Broadcast();
+
+        }  
     }
 }

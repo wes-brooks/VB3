@@ -18,5 +18,6 @@ namespace VBCommon.Interfaces
         //void AddPanel();
         void Hide();
         void Show();
+        void UndoLastChange(Dictionary<string,object>packedState);
     }
 }

@@ -69,11 +69,17 @@ namespace VBDatasheet
             //get validated flag
             this.boolValidated = (bool)dictPluginState["DSValidated"];
 
-            //if clean, initial pass is false
-            if (dsControl1.State.ToString() == "clean")
+            //if changesMade is true then initialPass is false
+            if ((bool)dictPluginState["ChangesMadeDS"])
                 boolInitialPass = false;
             else
                 boolInitialPass = true;
+           
+            //if clean, initial pass is false
+            //if (dsControl1.State.ToString() == "clean")
+            //    boolInitialPass = false;
+            //else
+            //    boolInitialPass = true;
         }
 
 
@@ -91,19 +97,19 @@ namespace VBDatasheet
 
             bool boolChangesMadeDS = false; ; //holds flag to clear model if changes made to ds
 
-            //check to see if this is the first time going to modeling
-            if (dsControl1.State == VBCommon.Controls.DatasheetControl.dtState.dirty && !boolInitialPass)
+            //have left and come back
+            if (!boolInitialPass)
             {      
                 boolChangesMadeDS = true;
-                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+                //dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
                 
             }
-            else if (boolInitialPass)
-            {
-                dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-                boolInitialPass = false;
+            //else if (boolInitialPass) //haven't left and came back here
+            //{
+            //    dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+            //    boolInitialPass = false;
 
-            }
+            //}
 
             dictPackedDatasheetState = dsControl1.PackState();
             dictPluginState.Add("PackedDatasheetState", dictPackedDatasheetState);
@@ -276,6 +282,13 @@ namespace VBDatasheet
                 dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
                 boolValidated = false;
             }
+        }
+
+
+        //change initialPass value if leaving datasheet
+        public void btnGoToModel_Click()
+        {
+            boolInitialPass = false;
         }
 
 

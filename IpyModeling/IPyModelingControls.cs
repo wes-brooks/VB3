@@ -1169,7 +1169,7 @@ namespace IPyModeling
         public void UnpackProjectState(IDictionary<string, object> dictProjectState)
         {
             this.Show();
-            if (dictProjectState.Count <= 2) return; //if only "Complete" and "Visible" are present
+            if (dictProjectState.Count <= 3) return; //if only "Complete" and "Visible" are present
             
             //Unpack the virgin status of the project
             this.boolVirgin = (bool)dictProjectState["VirginState"];

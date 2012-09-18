@@ -913,6 +913,7 @@ namespace VBCommon.Controls
             dt.AcceptChanges();
             state = dtState.dirty;
             NotifyContainer();
+            maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName); //ensure disabled rows/cols stay red
         }
 
         //response if error
