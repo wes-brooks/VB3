@@ -35,10 +35,7 @@ namespace VBCommon
         public delegate void HidePluginsHandler();
         public event HidePluginsHandler HideTabsEvent;
 
-        public Signaller()
-        {
-
-        }
+        public Signaller() {}
 
 
         //update the top plugin str key value for opening projects

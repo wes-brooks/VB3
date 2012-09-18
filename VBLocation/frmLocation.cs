@@ -55,6 +55,7 @@ namespace VBLocation
         string addMarker = "Add Water Marker";
         string removeMarker = "Remove Water Marker";
         private int zoomlevel = 12;
+        bool isMouseDown = false;
 
         private LocationPlugin _plugin = null;
 
@@ -224,7 +225,6 @@ namespace VBLocation
 
                 // map center
                 center = new GMapMarkerCross(MainMap.CurrentPosition);
-
             }
         }
 
@@ -305,9 +305,9 @@ namespace VBLocation
                 }
 
                 MainMap.ZoomAndCenterMarkers(null);
-
             }
         }
+
 
         void MainMap_OnMapTypeChanged(MapType type)
         {
@@ -345,7 +345,6 @@ namespace VBLocation
             trackBar1.Maximum = MainMap.MaxZoom;
         }
 
-        bool isMouseDown = false;
 
         void MainMap_MouseUp(object sender, MouseEventArgs e)
         {
@@ -355,11 +354,13 @@ namespace VBLocation
             }
         }
 
+
         void UpdateCurrentMarkerPositionText()
         {
             textBoxCurrLat.Text = currentMarker.Position.Lat.ToString(CultureInfo.InvariantCulture);
             textBoxCurrLng.Text = currentMarker.Position.Lng.ToString(CultureInfo.InvariantCulture);
         }
+
 
         void MainMap_MouseDown(object sender, MouseEventArgs e)
         {
@@ -372,6 +373,7 @@ namespace VBLocation
             }
         }
 
+
         // move current marker with left holding
         void MainMap_MouseMove(object sender, MouseEventArgs e)
         {
@@ -382,11 +384,13 @@ namespace VBLocation
             }
         }
 
+
         // MapZoomChanged
         void MainMap_OnMapZoomChanged()
         {
             trackBar1.Value = MainMap.Zoom;
         }
+
 
         // empty tile displayed
         void MainMap_OnEmptyTileError(int zoom, GMap.NET.Point pos)
@@ -394,14 +398,16 @@ namespace VBLocation
             //MessageBox.Show("OnEmptyTileError, Zoom: " + zoom + ", " + pos.ToString(), "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
+
         // click on some marker
         void MainMap_OnMarkerClick(GMapMarker item)
         {
             MainMap.CurrentPosition = item.Position;
             MainMap.Zoom = 5;
         }
+        
 
-         //loader start loading tiles
+        //loader start loading tiles
         void MainMap_OnTileLoadStart(int loaderId)
         {
             switch (loaderId)
@@ -422,6 +428,7 @@ namespace VBLocation
             groupBoxLoading.Invalidate(true);
         }
 
+
         // loader end loading tiles
         void MainMap_OnTileLoadComplete(int loaderId)
         {
@@ -439,9 +446,9 @@ namespace VBLocation
                     progressBar3.Hide();
                     break;
             }
-
             groupBoxLoading.Invalidate(true);
         }
+
 
         // current point changed
         void MainMap_OnCurrentPositionChanged(PointLatLng point)
@@ -449,18 +456,21 @@ namespace VBLocation
             center.Position = point;
         }
 
+
         // change map type
         private void comboBoxMapType_DropDownClosed(object sender, EventArgs e)
         {
             MainMap.MapType = (MapType)comboBoxMapType.SelectedValue;
         }
 
-        // change mdoe
+
+        // change mode
         private void comboBoxMode_DropDownClosed(object sender, EventArgs e)
         {
             //GMaps.Instance.Mode = (AccessMode)comboBoxMode.SelectedValue;
             //MainMap.ReloadMap();
         }
+
 
         // zoom
         private void trackBar1_ValueChanged(object sender, EventArgs e)
@@ -473,6 +483,7 @@ namespace VBLocation
                 btnShowDataSources.Enabled = false;
         }
 
+
         // go to
         private void button8_Click(object sender, EventArgs e)
         {
@@ -481,6 +492,7 @@ namespace VBLocation
 
             MainMap.CurrentPosition = new PointLatLng(lat, lng);
         }
+
 
         // goto by geocoder
         private void textBoxGeo_KeyPress(object sender, KeyPressEventArgs e)
@@ -495,11 +507,13 @@ namespace VBLocation
             }
         }
 
+
         // reload map
         private void button1_Click(object sender, EventArgs e)
         {
             MainMap.ReloadMap();
         }
+
 
         // cache config
         private void checkBoxUseCache_CheckedChanged(object sender, EventArgs e)
@@ -508,6 +522,7 @@ namespace VBLocation
             //GMaps.Instance.UseGeocoderCache = checkBoxUseGeoCache.Checked;
             GMaps.Instance.UsePlacemarkCache = GMaps.Instance.UseGeocoderCache;
         }
+
 
         // clear cache
         private void button2_Click(object sender, EventArgs e)
@@ -524,6 +539,7 @@ namespace VBLocation
                 }
             }
         }
+
 
         // add test route
         private void button3_Click(object sender, EventArgs e)
@@ -559,6 +575,7 @@ namespace VBLocation
             }
         }
 
+
         // add marker on current position
         private void button4_Click(object sender, EventArgs e)
         {
@@ -586,17 +603,20 @@ namespace VBLocation
             objects.Markers.Add(mBorders);
         }
 
+
         // clear routes
         private void button6_Click(object sender, EventArgs e)
         {
             routes.Routes.Clear();
         }
 
+
         // clear markers
         private void button5_Click(object sender, EventArgs e)
         {
             objects.Markers.Clear();
         }
+
 
         // show current marker
         private void checkBoxCurrentMarker_CheckedChanged(object sender, EventArgs e)
@@ -611,6 +631,7 @@ namespace VBLocation
             //}
         }
 
+
         // can drag
         private void checkBoxCanDrag_CheckedChanged(object sender, EventArgs e)
         {
@@ -623,11 +644,13 @@ namespace VBLocation
             start = currentMarker.Position;
         }
 
+
         // set route end
         private void buttonSetEnd_Click(object sender, EventArgs e)
         {
             end = currentMarker.Position;
         }
+
 
         // zoom to max for markers
         private void button7_Click(object sender, EventArgs e)
@@ -635,17 +658,20 @@ namespace VBLocation
             MainMap.ZoomAndCenterMarkers("objects");
         }
 
-        // expord map data
+
+        // export map data
         private void button9_Click(object sender, EventArgs e)
         {
             MainMap.ShowExportDialog();
         }
+
 
         // import map data
         private void button10_Click(object sender, EventArgs e)
         {
             MainMap.ShowImportDialog();
         }
+
 
         // prefetch
         private void button11_Click(object sender, EventArgs e)
@@ -683,6 +709,7 @@ namespace VBLocation
             }
         }
 
+
         // saves current map view 
         private void button12_Click(object sender, EventArgs e)
         {
@@ -711,11 +738,13 @@ namespace VBLocation
             }
         }
 
+
         // debug
         private void checkBoxDebug_CheckedChanged(object sender, EventArgs e)
         {
             //MainMap.ShowTileGridLines = checkBoxDebug.Checked;
         }
+
 
         private void button13_Click(object sender, EventArgs e)
         {
@@ -731,6 +760,7 @@ namespace VBLocation
                 MessageBox.Show("Select map area holding ALT", "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+
 
         public Site saveMapProjectInfo()
         {
@@ -788,9 +818,8 @@ namespace VBLocation
             }
 
             return site;
-
-
         }
+
 
         public void initMarkers()
         {
@@ -799,11 +828,13 @@ namespace VBLocation
             routes.Markers.Clear();
         }
 
+
         private void button3_Click_1(object sender, EventArgs e)
         {
             KeyPressEventArgs kp = new KeyPressEventArgs(Convert.ToChar(Keys.Enter));
             textBoxGeo_KeyPress(sender, kp);
         }
+
 
         private void btnSelectWater_Click(object sender, EventArgs e)
         {
@@ -923,15 +954,14 @@ namespace VBLocation
                     //VBCommon.Interfaces.IBeachSite site = _plugin as VBCommon.Interfaces.IBeachSite;
                     _plugin.Site = _site.Clone();
                 }
-
             }
             catch (Exception ex)
             {
                 string message = ex.Message;
             }
             return;
-
         }
+
 
         private GMap.NET.Point rotatePt(double rotationAngle, GMap.NET.Point pointU)
         {
@@ -940,8 +970,8 @@ namespace VBLocation
             point.X = (int)(pointU.X * Math.Cos(rotationAngle) - pointU.Y * Math.Sin(rotationAngle));
             point.Y = (int) (pointU.X * Math.Sin(rotationAngle) + pointU.Y * Math.Cos(rotationAngle));
             return point;
-            //throw new NotImplementedException();
         }
+
 
         private float RadianToDegree(float angle)
         {
@@ -955,21 +985,12 @@ namespace VBLocation
             return radian;
         }
 
+
         private double CalcAngle(GMap.NET.Point point, GMap.NET.Point point2)
         {
             return 0.0;
         }
 
-        //void MainMap_OnCurrentPositionChanged(PointLatLng point)
-        //{
-        //    currentMarker.Position = point;
-        //    MainMap.UpdateMarkerLocalPosition(currentMarker);
-        //    UpdateCurrentMarkerPositionText();
-
-        //    //PointLatLng northmarker = new PointLatLng(point.Lat+0.001, point.Lng); 
-        //    //MainMap.Markers.Add(new GMapMarkerGoogleRed(northmarker));
-
-        //}
 
         private void btnBeachMarker_Click(object sender, EventArgs e)
         {
@@ -982,9 +1003,7 @@ namespace VBLocation
                 //MainMap.Markers.Add(firstBeachMarker);
                 top.Markers.Add(firstBeachMarker);
                 btnBeachMarker.Text = remove1stMarker;
-            }
-            else
-            {
+            } else {
                 btnBeachMarker.Text = add1stMarker;
 
                 if (firstBeachMarker != null)
@@ -1010,9 +1029,7 @@ namespace VBLocation
                 //MainMap.Markers.Add(secondBeachMarker);
                 top.Markers.Add(secondBeachMarker);
                 btnBeachMarker2.Text = remove2ndMarker;
-            }
-            else
-            {
+            } else {
                 btnBeachMarker2.Text = add2ndMarker;
 
                 if (secondBeachMarker != null)
@@ -1026,8 +1043,8 @@ namespace VBLocation
                 btnSelectWater.Enabled = true;
             else
                 btnSelectWater.Enabled = false;
-
         }
+
 
         private void MainMap_Paint(object sender, PaintEventArgs e)
         {
@@ -1097,10 +1114,10 @@ namespace VBLocation
                         //pointMid.Y = (pointA.Y + pointB.Y) / 2;
                         g.ResetTransform();
                     }
-
                 }
             }
         }
+
 
         //private GMapNET.Point CoordinatePerpendicular()
         private int CoordinatePerpendicular()
@@ -1119,21 +1136,17 @@ namespace VBLocation
             GMap.NET.Point pointTmpA = MainMap.FromLatLngToLocal(firstBeachMarker.Position);
             GMap.NET.Point pointTmpB = MainMap.FromLatLngToLocal(secondBeachMarker.Position);
             GMap.NET.Point pointH20 = MainMap.FromLatLngToLocal(waterMarker.Position);
-
-
+            
             //Order points from left to right
             if (pointTmpA.X <= pointTmpB.X)
             {
                 pointA = pointTmpA;
                 pointB = pointTmpB;
-            }
-            else
-            {
+            } else {
                 pointA = pointTmpB;
                 pointB = pointTmpA;
             }
-
-
+            
             double slope = 0.0;
             double perpSlope = 0.0;
 
@@ -1152,7 +1165,6 @@ namespace VBLocation
                     side = 1;
                 else
                     side = -1;
-
             }
             //added clauses for due N side selection (mog 5/10)
             else if (pointH20.X > pointA.X)
@@ -1167,8 +1179,8 @@ namespace VBLocation
             }
 
             return side;
-
         }
+
 
         private void btnShowDataSources_Click(object sender, EventArgs e)
         {
@@ -1251,8 +1263,7 @@ namespace VBLocation
                 //    stationMarker.TooltipMode = MarkerTooltipMode.OnMouseOver;
                 //    stationMarker.ToolTipText = "Station ID: " + list[i].ID + Environment.NewLine + "Station Name: " + list[i].Name;
                 //    stations.Markers.Add(stationMarker);
-                //}
-                
+                //}                
             }
 
             catch (Exception ex)
@@ -1263,16 +1274,15 @@ namespace VBLocation
             Cursor.Current = current;
         }
 
-
-
+        
         private void btnClearStations_Click(object sender, EventArgs e)
         {
             stations.Markers.Clear();
         }
 
+
         private void frmLocation_HelpRequested(object sender, HelpEventArgs hlpevent)
-        {      
-            
+        {                
             string apppath = Application.StartupPath.ToString();
             VBCommon.VBCSHelp help = new VBCommon.VBCSHelp(apppath, sender);
             if (!help.Status)
@@ -1284,6 +1294,7 @@ namespace VBLocation
                 MessageBoxButtons.OK);
             }
         }
+
 
         private MapType[] GetMapTypes()
         {
@@ -1302,8 +1313,7 @@ namespace VBLocation
             excludedMapTypes.Add(MapType.GoogleMapChina);
             excludedMapTypes.Add(MapType.GoogleSatelliteChina);
             excludedMapTypes.Add(MapType.GoogleTerrainChina);           
-
-
+            
             Array mapTypes = Enum.GetValues(typeof(MapType));
             List<MapType> includedMapTypes = new List<MapType>();
 
@@ -1314,16 +1324,14 @@ namespace VBLocation
                     includedMapTypes.Add((MapType)mapTypes.GetValue(i));
                 }
             }
-
             return includedMapTypes.ToArray();
         }
+
 
         private void frmLocation_Load(object sender, EventArgs e)
         {
             textBoxCurrLat.Text  = MainMap.CurrentPosition.Lat.ToString();
             textBoxCurrLng.Text  = MainMap.CurrentPosition.Lng.ToString();
         }
-
-
     }
 }

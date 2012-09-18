@@ -213,8 +213,8 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
-                Hide();
+            //if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
+            //    Hide();
         }
 
 
@@ -435,18 +435,17 @@ namespace IPyModeling
                 boolComplete = (bool)dictPlugin["Complete"];
                 if (boolComplete)
                     boolInitialEntry = false; //opening projects have been entered before
+                
                 //check to see if there already is a PLS model open, if so, close it before opening a saved project
-                if ((VisiblePlugin) && (Complete))
-                    Hide();
+                //if ((VisiblePlugin) && (Complete))
+                //    Hide();
                 
                 //make model being open active plugin
                 if ((bool)dictPlugin["Visible"])
                     Show();
                
                 innerIronPythonControl.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
-            }
-            else
-            {
+            } else {
                 //Set this plugin to an empty state.
                 Activate();
             }

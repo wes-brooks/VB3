@@ -385,11 +385,11 @@ namespace VBDatasheet
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            if ((e.ActivePanelKey == "PLSPanel" || e.ActivePanelKey == "GBMPanel") && boolComplete)
-            {
-                boolInitialEntry = false;
-                _frmDatasheet.btnGoToModel_Click(); //set frm's initialPass to false too.
-            }
+            //if ((e.ActivePanelKey == "PLSPanel" || e.ActivePanelKey == "GBMPanel") && boolComplete)
+            //{
+            //    boolInitialEntry = false;
+            //    _frmDatasheet.btnGoToModel_Click(); //set frm's initialPass to false too.
+            //}
         }
 
 

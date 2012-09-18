@@ -125,32 +125,12 @@ namespace VBProjectManager
         }
 
 
-        //will always be active (inherits from IPlugin)
-        public void MakeActive()
-        {
-            //App.DockManager.SelectPanel(strPanelKey);
-            //App.HeaderControl.SelectRoot(strPanelKey);
-        }
+        //IPlugin requires that we override these, but they have no purpose for the VBProjectManager.
+        public void MakeActive() {}
+        public void Show() {}
+        public void Hide() {}
+        public void AddRibbon(string sender) {}
 
-
-        //(inherits from IPlugin)
-        public void Show()
-        {
-            
-        }
-
-
-        //(inherits from IPlugin)
-        public void Hide()
-        {
-            
-        }
-
-        //projectManager doesn't have a ribbon, (inherits from IPlugin)
-        public void AddRibbon(string sender)
-        {
-
-        }
 
         //projectManager doesn't get deactivated (inherits from IPlugin)
         public override void Deactivate()
@@ -241,6 +221,7 @@ namespace VBProjectManager
             get { return _pluginType; }
         }
 
+
         //We export this property so that other Plugins can have access to the signaller.
         public VBCommon.Signaller Signaller
         {
@@ -293,8 +274,7 @@ namespace VBProjectManager
             }
            
         }
-
-
+        
 
         //pop off last stack for undo
         public void UndoAction(object sender, EventArgs e)
@@ -328,6 +308,7 @@ namespace VBProjectManager
                 }
             }
         }
+
 
         //undo was hit, send the packed state to be unpacked
         public void UndoLastChange(Dictionary<string, object> packedState)

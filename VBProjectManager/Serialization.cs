@@ -138,14 +138,14 @@ namespace VBProjectManager
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;
             string strFileName = string.Empty;
-            //save file name
+
+            //Get the name of the selected file or return w/o doing anything if no file was selected.
             if (openFile.ShowDialog() == DialogResult.OK)
                 strFileName = openFile.FileName;
             else return;
 
             //Load a project file from disk and then send it out to be unpacked.
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
-
             StreamReader streamreader = new StreamReader(strFileName);
             JsonTextReader jsonreader = new JsonTextReader(streamreader);
             string strProjectStateJson = streamreader.ReadToEnd();
@@ -155,16 +155,14 @@ namespace VBProjectManager
 
             //loop through plugins, deserialize each
             foreach (var plugin in dictPackedProjectState)
-            { 
-                //key in pluginStates dict
-                string strPluginKey = plugin.Key;
-                //hold value
+            {                 
+                //Instantiate some objects for later use.
                 Dictionary<string, string> dictJsonRep = new Dictionary<string, string>();
-                //hold class type of value
                 Dictionary<string, Type> dictObjectType = new Dictionary<string, Type>();
-                //hold plugin state with value/class type assigned
                 Dictionary<string, object> dictPluginState = new Dictionary<string, object>();
-                //store plugin elements as a string for deserializing
+
+                //Convert the serialization string into an array of JSON objects
+                string strPluginKey = plugin.Key;
                 string strPluginStateJson = plugin.Value.ToString();
                 Newtonsoft.Json.Linq.JArray jarray = (Newtonsoft.Json.Linq.JArray)JsonConvert.DeserializeObject(strPluginStateJson);
                 
@@ -176,7 +174,8 @@ namespace VBProjectManager
                 //deserialize value and class type of value
                 dictJsonRep = JsonConvert.DeserializeObject<Dictionary<string, string>>(strJsonDictJson);
                 dictObjectType = JsonConvert.DeserializeObject<Dictionary<string, Type>>(strObjectTypeDictJson);
-                //loop through each pair and deserialize the value to it's class type
+
+                //Convert the plugin's JSON into .NET objects and compile a dictionary of the deserialized objects.
                 foreach (var pair in dictJsonRep)
                 {
                     Type objType = dictObjectType[pair.Key];
@@ -184,18 +183,16 @@ namespace VBProjectManager
                     string jsonRep = pair.Value;
                                        
                     object objDeserialized = JsonConvert.DeserializeObject(jsonRep, jsonType);
-                    //add the newly constructed key value pair, containing correct class types to a dictionary
                     dictPluginState.Add(pair.Key, objDeserialized);
                 }
 
-                //add each plugin dictionary 
+                //Now store the packed plugin state in a dictionary
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
 
-            //raise unpacke event, sending packed plugins dictionary
+            //raise unpack event, sending packed plugins dictionary
             signaller.UnpackProjectState(dictPluginStates);
-
-
+            
             //Make the top plugin active
             foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
             {
@@ -203,7 +200,6 @@ namespace VBProjectManager
                 {
                     if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == openingTopPlugin)
                     {
-                        //store plugin
                         VBCommon.Interfaces.IPlugin topPlugin = (VBCommon.Interfaces.IPlugin)x;
                         //just MakeActive() doesn't work.. makes the panel active, but doesn't show tab and ribbon
                         topPlugin.MakeActive();

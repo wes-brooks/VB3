@@ -135,7 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VBCommon\VBCommon.csproj">
-      <Project>{01086CD1-5D59-4C17-80D4-2E99E99DF62C}</Project>
+      <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
       <Name>VBCommon</Name>
     </ProjectReference>
     <ProjectReference Include="..\VBDockManager\VBDockManager.csproj">

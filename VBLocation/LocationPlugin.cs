@@ -34,6 +34,9 @@ namespace VBLocation
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
 
+        //raise a message
+        public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
+        public event MessageHandler<MessageArgs> MessageSent;
 
         //property to update topPlugin and raise event when changed
         public string TopPlugin
@@ -45,11 +48,6 @@ namespace VBLocation
                 signaller.RaiseStrPluginChange(strTopPlugin);
             }
         }
-
-
-        //raise a message
-        public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event MessageHandler<MessageArgs> MessageSent;
 
 
         public override void Deactivate()
@@ -66,12 +64,9 @@ namespace VBLocation
         //hide this plugin
         public void Hide()
         {
-            //set visible flag to false
-            boolVisible = false;
-            //hide pluginTab
             App.HeaderControl.RemoveAll();
-            //hide plugin panel
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            boolVisible = false;
         }
 
 
@@ -147,14 +142,11 @@ namespace VBLocation
 
         //show this plugin
         public void Show()
-        {
-            //set visible flag to true
-            boolVisible = true;
-            //show the tab
+        {            
             AddRibbon("Show");
-            //show the panel
             ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
+            boolVisible = true;
         }
 
 
@@ -171,7 +163,6 @@ namespace VBLocation
             {
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
-               //RefreshDatabasePath();
             }
         }
 
@@ -242,6 +233,7 @@ namespace VBLocation
 
         }
 
+
         private void btnNull_Click(object sender, EventArgs e)
         {
             //cLocation.btnImport_Click(sender, e);
@@ -253,15 +245,18 @@ namespace VBLocation
             //cLocation.btnImport_Click(sender, e);
         }
 
+
         private void btnValidate_Click(object sender, EventArgs e)
         {
             //cDatasheet.btnValidate_Click(sender, e);
         }
 
+
         private void btnCompute_Click(object sender, EventArgs e)
         {
             //cDatasheet.btnComputeUV_Click(sender, e);
         }
+
 
         private void btnManipulate_Click(object sender, EventArgs e)
         {
@@ -273,11 +268,11 @@ namespace VBLocation
             //cDatasheet.btnTransform_Click(sender, e);
         }
 
+
         private void BroadcastStateListener(object sender, BroadCastEventArgs e)
         {
             //listen to others broadcast..receiving something
             //e.PackedPluginState
-
         }
 
 
@@ -340,11 +335,13 @@ namespace VBLocation
             set { _site.Location = value; }
         }
 
+
         public string BeachName
         {
             get { return _site.BeachName; }
             set { _site.BeachName = value; }
         }
+
 
         public double Orientation
         {
@@ -352,17 +349,20 @@ namespace VBLocation
             set { _site.Orientation  = value; }
         }
 
+
         public VBCommon.Spatial.PointGeo LeftMarker
         {
             get { return _site.LeftMarker; }
             set { _site.LeftMarker = value; }
         }
        
+
         public VBCommon.Spatial.PointGeo RightMarker
         {
             get { return _site.RightMarker; }
             set { _site.RightMarker = value; }
         }
+
 
         public VBCommon.Spatial.PointGeo WaterMarker
         {
@@ -370,10 +370,12 @@ namespace VBLocation
             set { _site.WaterMarker = value; }
         }
 
+
         public IBeachSite Clone()
         {
             return _site.Clone();
         }
+
 
         #endregion
     }
