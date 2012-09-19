@@ -34,9 +34,10 @@ namespace IPyModeling
         public event EventHandler ModelUpdated;
         public event EventHandler ChangeMade4Stack;
 
-        public event EventHandler ManipulateDataTab; //event for showing only manipulate datasheet's buttons
-        public event EventHandler ModelTab;  //event for showing only model's Run
-        public event EventHandler VariableTab; //event for variable tab, no buttons enabled
+
+        public event EventHandler ManipulateDataTab;
+        public event EventHandler ModelTab;
+        public event EventHandler VariableTab;
 
         public delegate void BoolChangedEvent(bool val);
         public event BoolChangedEvent boolRunChanged;
@@ -74,14 +75,12 @@ namespace IPyModeling
         protected string strMethod;
         private bool boolClearPrediction; //if model has changed since prediction ran
 
-        //initialize transform dictionary
         protected Dictionary<string, object> dictTransform = new Dictionary<string, object>()
         {
             {"Type", DependentVariableTransforms.none.ToString()},
             {"Exponent", 1}
         };
 
-        //related to table
         private DataTable correlationData = null;
         private DataTable _dtFull = null;
         DataTable dt = new DataTable();
@@ -96,19 +95,10 @@ namespace IPyModeling
 
         private enum _mlrState { clean, dirty };
         private _mlrState _state = _mlrState.clean;
-        //holds plugin packed state
+
         IDictionary<string, object> dictPackedPlugin = new Dictionary<string, object>();
 
-        //clean-up. variables that I don't see being used anywhere. put here until know for sure to delete
-//        string fn = string.Empty;
-//        private string strThreshold;
-//        public string strExponent;
-//        private bool boolThresholdingButtonsVisible;
-//        public event EventHandler ModelSaveRequested;
-//        public event EventHandler ResetIPyProject;
 
-
-        //constructor
         public IPyModelingControl()
         {
             InitializeComponent();
@@ -560,17 +550,6 @@ namespace IPyModeling
         }
 
 
-        //pack up setData info for saving to stack (undo functionality)
-        public IDictionary<string,object> PackSetData()
-        {
-            IDictionary<string, object> packedState = new Dictionary<string, object>();
-
-            packedState.Add("PackedDatasheetState", dsControl1.PackState());
-
-            return packedState;
-        }
-
-
         //Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string, object> packedState)
         {
@@ -640,13 +619,6 @@ namespace IPyModeling
         //Set column header names in Variable Selection listbox
         public void UpdateData(object source, EventArgs e)
         {
-            //if (ipyModel != null)
-            //{
-                
-            //}
-                
-            
-
             dt = dsControl1.DT;
             this.correlationData = dsControl1.DT;
 
@@ -683,9 +655,7 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
             lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
 
-           
-            
-            //was at top of method...should be here? go tell plugin to broadcast to add to stack
+            //Broadcast the 
             if (ChangeMade4Stack != null)
             {
                 EventArgs ev = new EventArgs();
@@ -696,52 +666,49 @@ namespace IPyModeling
             //Clear();
             //need to clear the prediction now
             boolClearPrediction = true;
-            UpdatePredictionTab();       
-     
-            
+            UpdatePredictionTab(); 
         }
 
 
-        //input variables are selected and ready to be added
-        private void btnAddInputVariable_Click_1(object sender, EventArgs e)
+        private void btnAddInputVariable_Click(object sender, EventArgs e)
         {
             List<ListItem> items = new List<ListItem>();
             int intSelectedIndices = lbAvailableVariables.SelectedIndices.Count;
-            //add each selected variable to items
+            
+            //Make a list of the variables we're adding to the model.
             for (int i = 0; i < intSelectedIndices; i++)
             {
                 ListItem li = (ListItem)lbAvailableVariables.Items[lbAvailableVariables.SelectedIndices[i]];
                 items.Add(li);
             }
-            //remove from available variable list box to independent variable list box
+            
+            //Move the variables from the "Available" box to the "Added" box
             foreach (ListItem li in items)
             {
                 lbAvailableVariables.Items.Remove(li);
                 lbIndVariables.Items.Add(li);
             }
             
-            //SetCombinations();
             lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
-
-            //if model has been completed, clear it
             Clear();
         }
 
 
-        //remove a variable from the independent listbox back to the available listbox
         private void btnRemoveInputVariable_Click(object sender, EventArgs e)
         {
             List<ListItem> items = new List<ListItem>();
-            //add all indep variables to the items list
+
+            //Make a list of the variables we're removing from the model.
             for (int i = 0; i < lbIndVariables.SelectedIndices.Count; i++)
             {
                 ListItem li = (ListItem)lbIndVariables.Items[lbIndVariables.SelectedIndices[i]];
                 items.Add(li);
             }
-            //add the selected variables back into available listbox 
+
+            //Move the variables from the "Added" box to the "Available" box
             foreach (ListItem li in items)
             {
                 lbIndVariables.Items.Remove(li);
@@ -758,17 +725,15 @@ namespace IPyModeling
                         break;
                     }
                 }
+
                 if (boolFoundIdx == false)
                     lbAvailableVariables.Items.Insert(intJ, li);
             }
-            //SetCombinations();
 
             lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             _state = _mlrState.dirty;
-
-            //variable was removed, if model is complete, clear it
             Clear();
         }
 
@@ -827,7 +792,7 @@ namespace IPyModeling
             Cursor.Current = Cursors.WaitCursor;
 
             //Datasheet's packed state coming in
-            DataTable dtCorr_ = dsControl1.DT;  // this should be holding the model's dataset at this point?
+            DataTable dtCorr_ = dsControl1.DT;
             DataView dvCorr_ = dtCorr_.DefaultView;
             
             List<string> list = new List<string>();
@@ -848,10 +813,7 @@ namespace IPyModeling
         //Enable or disable the regulatory threshold control, then raise an event to do the same up the chain in the containing Form.
         protected void ChangeThresholdControlStatus(bool enable)
         {
-            tbThreshold.Invoke((MethodInvoker)delegate
-            {
-                tbThreshold.Enabled = enable;
-            });
+            tbThreshold.Invoke((MethodInvoker)delegate {tbThreshold.Enabled = enable;});
         }
 
 
@@ -1113,28 +1075,58 @@ namespace IPyModeling
         //Pack State for Serializing
         public IDictionary<string, object> PackProjectState()
         {
+            if (dsControl1.DT == null)
+                return null;
+
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
+
+            //save correlationData as xml for serializing to save extendedProperties in tbl
+            /*StringWriter sw = null;
+            sw = new StringWriter();
+            correlationData.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+            string xmlDataTable = sw.ToString();
+            sw.Close();
+            sw = null;
+            dictPluginState.Add("CorrelationDataTable", xmlDataTable);*/
+
+            dictPluginState.Add("PackedDatasheetState", dsControl1.PackState());
+            dictPluginState.Add("Predictors", listPredictors);
+
+            //Save the state of UI elements.
+            dictPluginState.Add("Transform", dictTransform);
+            dictPluginState.Add("VirginState", this.boolVirgin);
+            dictPluginState.Add("ThresholdingButtonsVisible", true);
+
+            //Store the regulatory threshold
+            double dblRegulatoryThreshold;
+            try { dblRegulatoryThreshold = Convert.ToDouble(RegulatoryThreshold); }
+            catch (InvalidCastException) { dblRegulatoryThreshold = -1; }
+
+            //Needed by the prediction plugin: 
+            //if changing a saved project need to keep the listPredictions the same, because lbIndVariables aren't saved
+            if (ListPredictors.Count == 0)
+            {
+                foreach (ListItem item in lbIndVariables.Items)
+                    listPredictors.Add(item);
+            }
+
+            dictPluginState.Add("CleanPredict", this.ClearPrediction);
+
             //if just adding to stack, go to different pack to be used in setData()
             if (Model == null)
-            {
-                dictPluginState = PackSetData();
                 return dictPluginState;
-            }
 
             //Pack up the model's state in two ways: one with the model represented by a dynamic object, the other with the model represented by a string
             string strModelString = ipyInterface.Serialize(Model);
-            double dblRegulatoryThreshold;
+
+            //Store the decision threshold.
             double dblDecisionThreshold;
-            //try to convert reg threshold to double
-            try { dblRegulatoryThreshold = Convert.ToDouble(RegulatoryThreshold); }
-            catch (InvalidCastException) { dblRegulatoryThreshold = -1; }
-            //try to convert dec threshold to double
             try { dblDecisionThreshold = Convert.ToDouble(DecisionThreshold); }
             catch (InvalidCastException) { dblDecisionThreshold = -1; }
-            
+
+            //add both versions of the model
             Dictionary<string, object> dictModelObject = IPyCommon.Helper.ModelState(model: ipyModel, method: strMethod, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: DependentVariableTransform);
             Dictionary<string, object> dictModelByString = IPyCommon.Helper.ModelState(modelString: strModelString, method: strMethod, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: DependentVariableTransform);
-            //add both versions of the model
             dictPluginState.Add("ModelByObject", dictModelObject);
             dictPluginState.Add("ModelByString", dictModelByString);
             
@@ -1154,38 +1146,6 @@ namespace IPyModeling
             dictThresholding.Add("threshold", this.listCandidateThresholds);
             dictPluginState.Add("ThresholdingDictionary", dictThresholding);
             dictPluginState.Add("ThresholdingIndex", this.intThresholdIndex);
-
-            //Save the state of UI elements.
-            dictPluginState.Add("Transform", dictTransform);
-            dictPluginState.Add("VirginState", this.boolVirgin);
-            dictPluginState.Add("ThresholdingButtonsVisible", true); //hard-coding true for reopening project. when save - goes back to initial value of false
-
-            //Needed by the prediction plugin: 
-            //if changing a saved project need to keep the listPredictions the same, because lbIndVariables aren't saved
-            if (ListPredictors.Count == 0)
-            {
-                foreach (ListItem item in lbIndVariables.Items)
-                listPredictors.Add(item);
-            }
-
-            //save correlationData as xml for serializing to save extendedProperties in tbl
-            StringWriter sw = null;
-            sw = new StringWriter();
-            correlationData.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-            string xmlDataTable = sw.ToString();
-            sw.Close();
-            sw = null;
-            dictPluginState.Add("CorrelationDataTable", xmlDataTable);
-
-            //save the model's datasheet
-            dictPackedDatasheetState = dsControl1.PackState();
-            dictPluginState.Add("PackedDatasheetState", dictPackedDatasheetState);
-
-            //save predictors
-            dictPluginState.Add("Predictors", listPredictors);
-
-            //save whether or not the model has been changed, if true prediction should clear)
-            dictPluginState.Add("CleanPredict", this.ClearPrediction);
 
             return dictPluginState;
         }
@@ -1221,7 +1181,7 @@ namespace IPyModeling
                 Dictionary<string, List<double>> dictThresholding = (Dictionary<string, List<double>>)dictProjectState["ThresholdingDictionary"];
                 this.listCandidateSpecificity = dictThresholding["specificity"];
                 this.listCandidateThresholds = dictThresholding["threshold"];
-                this.intThresholdIndex = (int)dictProjectState["ThresholdingIndex"];                             
+                this.intThresholdIndex = (int)dictProjectState["ThresholdingIndex"];
 
                 //ModelState modelState = (ModelState)dictProjectState["Model"];
                 Dictionary<string, object> dictModelString = (Dictionary<string, object>)dictProjectState["ModelByString"];
@@ -1229,8 +1189,8 @@ namespace IPyModeling
                 this.Method = (string)dictModelString["Method"];
 
                 //Unpack the contents of the threshold and exponent text boxes
-                Dictionary<string, object> dictTransform = (Dictionary<string,object>)dictProjectState["Transform"];
-                
+                Dictionary<string, object> dictTransform = (Dictionary<string, object>)dictProjectState["Transform"];
+
                 this.tbExponent.Text = dictTransform["Exponent"].ToString();
                 this.tbThreshold.Text = ((double)dictModelString["RegulatoryThreshold"]).ToString();
                 this.lblDecisionThreshold.Text = ((double)dictModelString["DecisionThreshold"]).ToString();
@@ -1250,12 +1210,12 @@ namespace IPyModeling
                 this.listPredictors = (List<ListItem>)dictProjectState["Predictors"];
 
                 //unpack xmlDataTable and convert back to DataTable
-                string xmlDataTable = (string)dictProjectState["CorrelationDataTable"];
+                /*string xmlDataTable = (string)dictProjectState["CorrelationDataTable"];
                 StringReader sr = new StringReader(xmlDataTable);
                 DataSet ds = new DataSet();
                 ds.ReadXml(sr);
                 sr.Close();
-                this.correlationData = ds.Tables[0];
+                this.correlationData = ds.Tables[0];*/
 
                 //Now make sure the selected transformation is reflected behind the scenes, too.
                 EventArgs e = new EventArgs();
@@ -1266,16 +1226,15 @@ namespace IPyModeling
 
                 //Now restore the elements of the user interface.
                 this.pnlThresholdingButtons.Visible = (bool)dictProjectState["ThresholdingButtonsVisible"];
-            }
 
-            //rebuild model
-            PopulateResults(this.ipyModel);
-            InitializeValidationChart();
-            AnnotateChart();            
+                //rebuild model
+                PopulateResults(this.ipyModel);
+                InitializeValidationChart();
+                AnnotateChart();
+            }
         }
 
 
-        // << clicked, moves all the way left
         protected void btnLeft25_Click(object sender, EventArgs e)
         { 
             boolClearPrediction = true;
@@ -1287,12 +1246,9 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
-            //flag if change made that should clear prediction
-           
         }
         
 
-        // < clicked, move 1 left
         protected void btnLeft1_Click(object sender, EventArgs e)
         {
             boolClearPrediction = true;
@@ -1304,12 +1260,9 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
-            //flag if change made that should clear prediction
-            
         }
 
 
-        // > clicked, move 1 right
         protected void btnRight1_Click(object sender, EventArgs e)
         {
             boolClearPrediction = true;
@@ -1321,12 +1274,9 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
-            //flag if change made that should clear prediction
-            
         }
 
 
-        // >> clicked, move all the way right
         protected void btnRight25_Click(object sender, EventArgs e)
         {
             boolClearPrediction = true;
@@ -1338,12 +1288,9 @@ namespace IPyModeling
             AnnotateChart();
             UpdatePredictionTab();
             boolClean = false;
-            //flag if change made that should clear prediction
-            
         }
 
 
-        //none value checked
         protected void rbValue_CheckedChanged(object sender, EventArgs e)
         {
             if (rbValue.Checked)
@@ -1368,14 +1315,12 @@ namespace IPyModeling
         }
 
 
-        //log10 value checked
         protected void rbLog10Value_CheckedChanged(object sender, EventArgs e)
         {
             if (rbLog10.Checked)
             {
                 double tv = double.NaN;
 
-                //ms has no fp error checking... check for all conditions.
                 try
                 {
                     tv = Math.Log10(Convert.ToDouble(tbThreshold.Text.ToString()));
@@ -1408,14 +1353,12 @@ namespace IPyModeling
         }
 
 
-        //loge value checked
         protected void rbLogeValue_CheckedChanged(object sender, EventArgs e)
         {
             if (rbLoge.Checked)
             {
                 double tv = double.NaN;
 
-                //ms has no fp error checking... check for all conditions.
                 try
                 {
                     tv = Math.Log(Convert.ToDouble(tbThreshold.Text.ToString()));
@@ -1448,7 +1391,6 @@ namespace IPyModeling
         }
 
 
-        //power value checked
         protected void rbPower_CheckedChanged(object sender, EventArgs e)
         {
             if (rbPower.Checked)
@@ -1460,7 +1402,6 @@ namespace IPyModeling
             {
                 double tv = double.NaN;
 
-                //ms has no fp error checking... check for all conditions.
                 try
                 {
                     tv = Math.Pow(Convert.ToDouble(tbThreshold.Text.ToString()), Convert.ToDouble(tbExponent.Text.ToString()));
@@ -1494,11 +1435,10 @@ namespace IPyModeling
         }
 
 
-        //leaving the exponent textbox
         protected void tbExponent_Leave(object sender, EventArgs e)
         {
             double dblExponent;
-            //save the value entered in textbox
+
             if (Double.TryParse(tbExponent.Text, out dblExponent) == false)
             {
                 string msg = @"Exponent must be a numeric value.";
@@ -1514,7 +1454,6 @@ namespace IPyModeling
         }
 
 
-        //changed the value of threshold textbox
         protected void tbThresholdReg_TextChanged(object sender, EventArgs e)
         {
             if (Double.TryParse(tbThreshold.Text, out dblMandateThreshold) == false)
@@ -1539,7 +1478,6 @@ namespace IPyModeling
         }
 
 
-        //changed the value of threshold textbox
         private void tbThreshold_TextChanged(object sender, EventArgs e)
         {
             double tv = double.NaN;
@@ -1558,7 +1496,6 @@ namespace IPyModeling
             }
             else if (rbLog10.Checked)
             {
-                //ms has no fp error checking... check for all conditions.
                 try
                 {
                     tv = Math.Log10(Convert.ToDouble(tbThreshold.Text.ToString()));
@@ -1586,7 +1523,6 @@ namespace IPyModeling
             }
             else if (rbLoge.Checked)
             {
-                //ms has no fp error checking... check for all conditions.
                 try
                 {
                     tv = Math.Log(Convert.ToDouble(tbThreshold.Text.ToString()));
@@ -1614,7 +1550,6 @@ namespace IPyModeling
             }
             else if (rbPower.Checked)
             {
-                //ms has no fp error checking... check for all conditions.
                 try
                 {
                     tv = Math.Pow(Convert.ToDouble(tbThreshold.Text.ToString()), Convert.ToDouble(tbExponent.Text.ToString()));

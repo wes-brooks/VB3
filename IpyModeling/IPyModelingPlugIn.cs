@@ -426,10 +426,14 @@ namespace IPyModeling
         {
             //go pack state, add complete and visible, and add to dictionary of plugins
             IDictionary<string, object> packedState = innerIronPythonControl.PackProjectState();
-            packedState.Add("Complete", boolComplete);
-            packedState.Add("Visible", boolVisible);
 
-            e.PackedPluginStates.Add(strPanelKey, packedState);
+            if (packedState != null)
+            {
+                packedState.Add("Complete", boolComplete);
+                packedState.Add("Visible", boolVisible);
+
+                e.PackedPluginStates.Add(strPanelKey, packedState);
+            }
         }
 
 
@@ -452,6 +456,8 @@ namespace IPyModeling
                 //make model being open active plugin
                 if ((bool)dictPlugin["Visible"])
                     Show();
+                else
+                    Hide();
                
                 innerIronPythonControl.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
             } else {

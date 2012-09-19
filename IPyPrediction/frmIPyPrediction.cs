@@ -39,7 +39,7 @@ namespace IPyPrediction
         //only the main effects in the model
         private string[] strArrReferencedVars = null;
         private DataTable corrDT; 
-//        private DataTable modelDT = null;
+        //private DataTable modelDT = null;
         private List<ListItem> lstIndVars = null;
         //datatables in prediction
         private DataTable dtVariables = null;
@@ -52,16 +52,16 @@ namespace IPyPrediction
         //has transform occurred
         private bool boolObsTransformed = false;
         //dictionary of packed state coming in from model
-        IDictionary<string, object> dictPackedSt = new Dictionary<string,object>();
+        //IDictionary<string, object> dictPackedSt = new Dictionary<string,object>();
         //holds models that are in the listbox
-        IDictionary<string, object> dictListedModel = new Dictionary<string, object>();
+        IDictionary<string, object> dictModels = new Dictionary<string, object>();
         //holds the selected model's index
         private int intSelectedListedModel; 
 
         //Added for IronPython-based modeling:
         public event EventHandler IronPythonInterfaceRequested;
         public event EventHandler ModelRequested;
-//        public event EventHandler SelectedIndexChanged;
+        //public event EventHandler SelectedIndexChanged;
 
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
@@ -110,11 +110,11 @@ namespace IPyPrediction
         }
 
 
-        //returns the packed state of the model coming in
+        /*//returns the packed state of the model coming in
         public IDictionary<string, object> PackedSt
         {
             get { return dictPackedSt; }
-        }
+        }*/
 
 
         //returns datatable for correlation data
@@ -129,8 +129,8 @@ namespace IPyPrediction
         [JsonProperty]
         public IDictionary<string, object> ListedModelsDict
         {
-            get { return dictListedModel; }
-            set { dictListedModel = value; }
+            get { return dictModels; }
+            set { dictModels = value; }
         }
 
 
@@ -146,15 +146,14 @@ namespace IPyPrediction
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {
             if (dictPackedState.Count == 0) return;
-            //unpack model
+            
             Dictionary<string, object> dictModelStr = (Dictionary<string, object>)dictPackedState["ModelByString"];
             if (dictModelStr["ModelString"] == null)
                 return;
-            //deserialize model
+            
             ipyModel = ipyInterface.Deserialize(dictModelStr["ModelString"]);
-            //unpack transform type
+            
             dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
-            //determine which box to check
             if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.none))
                 rbNone.Checked = true;
             else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.Log10))
@@ -163,24 +162,24 @@ namespace IPyPrediction
                 rbLn.Checked = true;
             else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.Power))
                 rbPower.Checked = true;
-            //unpack exponent and thresholds textboxes
+            
             txtPower.Text = dictTransform["Exponent"].ToString();
             txtRegStd.Text = Convert.ToDouble(dictModelStr["RegulatoryThreshold"]).ToString();
             txtDecCrit.Text = Convert.ToDouble(dictModelStr["DecisionThreshold"]).ToString();
 
-            //unpack contents of listbox holding available models
+            //Unpack contents of listbox holding available models
             this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-            dictListedModel = (IDictionary<string, object>)dictPackedState["AvailModels"];
+            dictModels = (IDictionary<string, object>)dictPackedState["AvailableModels"];
             List<string> keys = new List<string>();
-            foreach (KeyValuePair<string, object> pair in dictListedModel)
+            foreach (KeyValuePair<string, object> pair in dictModels)
                 { this.lstAvailModels.Items.Add(pair.Key); }
             
-            this.intSelectedListedModel = (int)dictPackedState["AvailModelsIndex"];
+            this.intSelectedListedModel = (int)dictPackedState["AvailableModelsIndex"];
             lstAvailModels.SelectedIndex = intSelectedListedModel;
             this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
 
             DataSet ds = null;
-            //unpack values
+            
             string swIVVals = string.Empty;
             if (dictPackedState.ContainsKey("IVData"))
                 swIVVals = (string)dictPackedState["IVData"];
@@ -217,7 +216,7 @@ namespace IPyPrediction
                 dgvStats.DataSource = dtStats;
                 setViewOnGrid(dgvStats);
             }
-            //rebuild txtModel text
+            
             strModelExpression = ipyInterface.GetModelExpression(ipyModel).Replace("[", "(").Replace("]", ")");
             txtModel.Text = strModelExpression;
 
@@ -228,12 +227,12 @@ namespace IPyPrediction
         //Pack State for Serializing
         public IDictionary<string, object> PackState()
         {
-            //to hold packed state
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
 
             if (ipyModel == null)
                 return null;
-            //serialize the model
+
+            //Serialize the model
             string strModelString = ipyInterface.Serialize(Model);
             double dblRegulatoryThreshold;
             double dblDecisionThreshold;
@@ -243,7 +242,6 @@ namespace IPyPrediction
             try { dblTransformExponent = Convert.ToDouble(txtPower.Text); }
             catch { } //If the textbox can't be converted to a number, then leave the exponent as 1
 
-            //pack transform type
             Dictionary<string, object> dictTfrmDependentVariableTransform = new Dictionary<string,object>();
             dictTfrmDependentVariableTransform.Add("Exponent", dblTransformExponent);
 
@@ -261,7 +259,8 @@ namespace IPyPrediction
 
             try { dblDecisionThreshold = Convert.ToDouble(txtDecCrit.Text); }
             catch (InvalidCastException) { dblDecisionThreshold = -1; }
-            //pack model as string and as model for serializing. need to versions for Json.net serialization (doesn't recognize ironpython characters)
+
+            //Pack model as string and as model for serializing. need to versions for Json.net serialization (which can't serialize IronPython objects)
             Dictionary<string, object> dictModelObject = IPyCommon.Helper.ModelState(model: ipyModel, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: dictTfrmDependentVariableTransform);
             Dictionary<string, object> dictModelByString = IPyCommon.Helper.ModelState(modelString: strModelString, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: dictTfrmDependentVariableTransform);
 
@@ -269,9 +268,17 @@ namespace IPyPrediction
             dictPluginState.Add("ModelByString", dictModelByString);
             dictPluginState.Add("Transform", dictTfrmDependentVariableTransform);
 
-            //pack contents of listbox holding available models
-            dictPluginState.Add("AvailModels", dictListedModel);
-            dictPluginState.Add("AvailModelsIndex", intSelectedListedModel);
+            //Remove the unserializable IronPython model objects:
+            foreach (KeyValuePair<string, object> model in dictModels)
+            {
+                IDictionary<string, object> dictModel = (IDictionary<string, object>)(model.Value);
+                dictModel.Remove("ModelByObject");
+                dictModels[model.Key] = dictModel;
+            }
+
+            //Now add the lists to the packed state dictionary
+            dictPluginState.Add("AvailableModels", dictModels);
+            dictPluginState.Add("AvailableModelsIndex", intSelectedListedModel);
 
             StringWriter sw = null;
             //pack values
@@ -330,20 +337,20 @@ namespace IPyPrediction
             //populate the listbox of available models
             string modelName = (string)dictModelObj["Model"].ToString();
             //if there is a model with same name remove it... Or should we increment the names, so they can have more than 1 pls model to choose from?
-            
-            if (dictListedModel.ContainsKey(modelName))
+
+            if (dictModels.ContainsKey(modelName))
             {
                 this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-                dictListedModel.Remove(modelName);
+                dictModels.Remove(modelName);
                 lstAvailModels.Items.Remove(modelName);
                 this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
             }
             
             //remove the modelbyObject before adding to dictListedModel for packing
-            IDictionary<string, object> dictPartialPackedSt = new Dictionary<string, object>(dictPackedState);
-            dictPartialPackedSt.Remove("ModelByObject");
-            dictListedModel.Add(modelName, dictPartialPackedSt);  //adds this model's packed state to separate dictionary linked to listbox ...for pack/unpack
-            dictPackedSt.Add(modelName, dictPackedState); //for SetModel
+            //IDictionary<string, object> dictModelState = new Dictionary<string, object>(dictPackedState);
+            //dictModelState.Remove("ModelByObject");
+            dictModels.Add(modelName, dictPackedState);  //adds this model's packed state to separate dictionary linked to listbox ...for pack/unpack
+            //dictPackedSt.Add(modelName, dictPackedState); //for SetModel
             lstAvailModels.Items.Add(modelName);  //adds the model's string name to the listbox
         }
 
@@ -353,11 +360,11 @@ namespace IPyPrediction
         {
            
             //get the model that's selected and send it to SetModel()
-            string curItem = lstAvailModels.SelectedItem.ToString();
+            string strSelectedItem = lstAvailModels.SelectedItem.ToString();
             intSelectedListedModel = lstAvailModels.SelectedIndex;
 
             //didn't select a model
-            if (curItem == null)
+            if (strSelectedItem == null)
                 return;
 
             //clear the grids if another model's info has been used
@@ -368,7 +375,7 @@ namespace IPyPrediction
                 this.dgvVariables.DataSource = null;
             }
 
-            SetModel((IDictionary<string, object>)dictPackedSt[curItem]);
+            SetModel((IDictionary<string, object>)dictModels[strSelectedItem]);
         }
 
 

@@ -75,10 +75,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="VBDockManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\VB3\VBDockManager\bin\Debug\VBDockManager.dll</HintPath>
-    </Reference>
     <Reference Include="WeifenLuo.WinFormsUI.Docking">
       <HintPath>..\Externals\WeifenLuo.WinformsUI.Docking\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
@@ -126,6 +122,10 @@
     <ProjectReference Include="..\VBCommon\VBCommon.csproj">
       <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
       <Name>VBCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VBDockManager\VBDockManager.csproj">
+      <Project>{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}</Project>
+      <Name>VBDockManager</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
