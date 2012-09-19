@@ -24,7 +24,8 @@ namespace VBProjectManager
  //       private Dictionary<string, Boolean> dictTabStates;
         private string strPathName;
         private string strProjectName;
-        private string strTopPlugin; //plugin change event changes this value
+        //plugin change event changes this value
+        private string strTopPlugin; 
         public string openingTopPlugin;
 
         private VBCommon.Signaller signaller = new VBCommon.Signaller();
@@ -54,14 +55,12 @@ namespace VBProjectManager
             var btnOpen = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
             btnOpen.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnOpen.LargeImage = Resources.open_16x16;
-            //btnOpen.SmallImage = Resources.open_16x16;
             btnOpen.ToolTipText = "Open a saved project.";
             App.HeaderControl.Add(btnOpen);                
             //Add a Save button to the application ("File") menu.
             var btnSave = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", Save);
             btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSave.LargeImage = Resources.Save16x16;
-            //btnSave.SmallImage = Resources.save_16x16;
             btnSave.ToolTipText = "Save the current project state.";
             App.HeaderControl.Add(btnSave);
 
@@ -69,7 +68,6 @@ namespace VBProjectManager
             var btnSaveAs = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As", SaveAs);
             btnSaveAs.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSaveAs.LargeImage = Resources.SaveAs16x16;
-            //btnSaveAs.SmallImage = Resources.open_16x16;
             btnSaveAs.ToolTipText = "test hide panel";
             App.HeaderControl.Add(btnSaveAs);
             
@@ -77,7 +75,6 @@ namespace VBProjectManager
             var btnAbout = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             btnAbout.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnAbout.LargeImage = Resources.About_16x16;
-            //btnAbout.SmallImage = Resources.info_16x16;
             btnAbout.ToolTipText = "Open the 'About VirtualBeach' dialog";
             App.HeaderControl.Add(btnAbout);
 
@@ -114,7 +111,6 @@ namespace VBProjectManager
             {
                 if (x is IPlugin)
                 {
-                    //hide the rest
                     IPlugin pt = (IPlugin)x;
                     if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
                         pt.Hide();
@@ -154,15 +150,7 @@ namespace VBProjectManager
         {
             System.Windows.Forms.MessageBox.Show("this is a test.");
         }
-
-
-        ////not sure if used
-        //public Dictionary<string, Boolean> TabStates
-        //{
-        //    get { return dictTabStates; }
-        //    set { dictTabStates = value; }
-        //}
-
+        
 
         //holds project full path name
         public string ProjectPathName
@@ -266,7 +254,6 @@ namespace VBProjectManager
             {
                 if (x is IPlugin)
                 {
-                    //hide the rest
                     IPlugin pt = (IPlugin)x;
                     if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
                         pt.Hide();
@@ -305,7 +292,8 @@ namespace VBProjectManager
                             foreach (KeyValuePair<string, object> getValue in dictLastStackItem)
                             { dictUnpackThis = (Dictionary<string,object>)getValue.Value; }
                          
-                            thisPlug.UndoLastChange(dictUnpackThis);
+
+                           // Broadcast(this, dictUnpackThis);
                         }
                     }
                 }
@@ -326,18 +314,11 @@ namespace VBProjectManager
                         { //thisPlug.unpack back 
                             Dictionary<string, object> dictUnpackThis = new Dictionary<string, object>();
                             dictUnpackThis = (Dictionary<string, object>)dictLastStackItem[stackKey];
-                            thisPlug.UndoLastChange(dictUnpackThis);
+                            //thisPlug.UndoLastChange(dictUnpackThis);
                         }
                     }
                 }
             }
-        }
-
-
-        //undo was hit, send the packed state to be unpacked
-        public void UndoLastChange(Dictionary<string, object> packedState)
-        {
-            
         }
 
 
@@ -381,13 +362,13 @@ namespace VBProjectManager
                         }
                     if (plugin.PluginType.ToString() == "Prediction")
                     {
-                        //check to see if hte modeling is complete and it hasn't been cleared by any datasheet changes
+                        //check to see if the modeling is complete and it hasn't been cleared by any datasheet changes
                         if (boolModelComplete && !boolClearModel)
                         {
                             plugin.Show();
-                            if (plugin.Complete) //if the prediction is also complete
+                            if (plugin.Complete)
                             {
-                                plugin.MakeActive(); //need this or Location becomes selectedRoot
+                                plugin.MakeActive();
                             }
                             else
                             {

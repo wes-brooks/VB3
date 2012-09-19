@@ -12,7 +12,6 @@ using WeifenLuo.WinFormsUI.Docking;
 using System.Globalization;
 using IPyCommon;
 using VBCommon;
-//using Combinatorics;
 using System.Threading;
 using Newtonsoft.Json;
 using VBDatasheet;
@@ -64,16 +63,15 @@ namespace IPyModeling
         protected bool boolControlStatus = true;
         protected bool boolInitialControlStatus = true;
         private List<ListItem> listPredictors = new List<ListItem>();
-        private bool boolRunning = false;       //stop run when cancel is clicked
-        private bool boolStopRunning = false;   //stop run when model tab isn't active
-
-        //check to see if cancel was clicked during run
+        //flags for run/cancel model
+        private bool boolRunning = false;
+        private bool boolStopRunning = false;
         private volatile bool stopRun = false;
-       
         //Related to underlying model:
         protected double dblMandateThreshold;
-        protected string strMethod;
-        private bool boolClearPrediction; //if model has changed since prediction ran
+        protected string strMethod; 
+        //if model has changed since prediction ran
+        private bool boolClearPrediction;
 
         protected Dictionary<string, object> dictTransform = new Dictionary<string, object>()
         {
@@ -275,7 +273,7 @@ namespace IPyModeling
         }
 
         
-        //Return a flag indicating whether this modeling tab has been modified since the model was last exported. (false : modified)
+        //Return a flag indicating whether this has been modified since the model was last exported. (false : modified)
         public bool Clean
         {
             get { return this.boolClean; }
@@ -392,21 +390,20 @@ namespace IPyModeling
         //Handle a request from an IronPython-based modeling tab to begin the modeling process.
         private void ProvideData(object sender, ModelingCallback CallbackObject)
         {
-            //make cursor hourglass
             Cursor.Current = Cursors.WaitCursor;
 
             DataTable modelDataTable;
-            //first check to see if cancel was hit
            
             modelDataTable = CreateModelDataTable();
             CallbackObject.MakeModel(modelDataTable);
         }
 
+
+        //control ribbon active buttons depending on which tab
         protected void DataTabEnter(object sender, EventArgs args)
         {
             if (((TabPage)sender).Text == "Data Manipulation")
             {
-                //event for enabling only manipulate buttons
                 if (ManipulateDataTab != null)
                 {
                     EventArgs e = new EventArgs();
@@ -416,7 +413,6 @@ namespace IPyModeling
             }
             if (((TabPage)sender).Text == "Variable Selection")
             {
-                //event for ensuring no buttons are enabled
                 if (VariableTab != null)
                 {
                     EventArgs e = new EventArgs();
@@ -424,6 +420,7 @@ namespace IPyModeling
                 }
             }
         }
+
 
         //Raise a request for access to the model data - should be raised when the Model tab is entered.
         protected void RequestModelData(object sender, EventArgs args)
@@ -444,7 +441,6 @@ namespace IPyModeling
                     ModelingCallback e = new ModelingCallback(SetModelData);
                     DataRequested(this, e);
                 }
-               
             } 
         }
 
@@ -460,7 +456,7 @@ namespace IPyModeling
         }
 
 
-        //this method alerts the plugin that the boolean Running property has changed. This changes the text in the Run button
+        //this method alerts the plugin that the boolean Running property has changed. Determines which button to enable
         protected void NotifyPropChanged(bool val)
         {
             if (boolRunChanged != null)
@@ -553,23 +549,19 @@ namespace IPyModeling
         //Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string, object> packedState)
         {
-            //Datasheet's packed state coming in
             dictPackedPlugin = packedState;
 
-            //setting data from datasheet will go through, setting data from an undo will catch
+            //setting data from datasheet will go through, setting data from an Undo will catch
             try
             {
                 //check to see if we should clear the model
                 if ((bool)packedState["ChangesMadeDS"])
                 {
-
-                    //clear the prediction
                     if (model_data != null)
                     {
                         boolClearPrediction = true;
                         UpdatePredictionTab();
                     }
-                    //clear model
                     Clear();
                 }
             }
@@ -580,7 +572,6 @@ namespace IPyModeling
             
             dt = dsControl1.DT;
             this.correlationData = dsControl1.DT;
-
             _dtFull = dt;
             if (_dtFull == null) return;
             
@@ -621,7 +612,6 @@ namespace IPyModeling
         {
             dt = dsControl1.DT;
             this.correlationData = dsControl1.DT;
-
             _dtFull = dt;
             if (_dtFull == null) return;
 
@@ -655,16 +645,13 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
             lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
 
-            //Broadcast the 
+            //Broadcast for stack
             if (ChangeMade4Stack != null)
             {
                 EventArgs ev = new EventArgs();
                 ChangeMade4Stack(this, ev);
             }
 
-            //clear the model
-            //Clear();
-            //need to clear the prediction now
             boolClearPrediction = true;
             UpdatePredictionTab(); 
         }
@@ -817,20 +804,16 @@ namespace IPyModeling
         }
 
 
-        //This button runs or cancels the modeling method associated with this pane.
+        //This button runs the modeling method associated with this pane.
         public void btnRun_Click(object sender, EventArgs e)
         {
-            //clear the model before running a model
             Clear();
-
-            //show it's doing something
             Cursor.Current = Cursors.WaitCursor;
 
             //check to see if the model tab was clicked first (otherwise will get error half way thru model run)
             if (model_data == null)
             {
                 MessageBox.Show("You must select the model tab before running the model.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                //throw flag to exit out of broadcasting anything
                 boolStopRunning = true;
                 StopRunning(boolStopRunning);
                 return;
@@ -877,7 +860,6 @@ namespace IPyModeling
         //Cancel in-progress model-building
         public void btnCancel_Click(Object sender, EventArgs e)
         {  
-            //the model run has been canceled
             stopRun = true;
             boolRunning = false;
             NotifyPropChanged(boolRunning);
@@ -1080,15 +1062,6 @@ namespace IPyModeling
 
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
 
-            //save correlationData as xml for serializing to save extendedProperties in tbl
-            /*StringWriter sw = null;
-            sw = new StringWriter();
-            correlationData.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-            string xmlDataTable = sw.ToString();
-            sw.Close();
-            sw = null;
-            dictPluginState.Add("CorrelationDataTable", xmlDataTable);*/
-
             dictPluginState.Add("PackedDatasheetState", dsControl1.PackState());
             dictPluginState.Add("Predictors", listPredictors);
 
@@ -1155,17 +1128,15 @@ namespace IPyModeling
         public void UnpackProjectState(IDictionary<string, object> dictProjectState)
         {
             this.Show();
-            if (dictProjectState.Count <= 3) return; //if only "Complete" and "Visible" are present
-            
-            //Unpack the virgin status of the project
+            if (dictProjectState.Count <= 3) return; //if only plugin props are here
+
             this.boolVirgin = (bool)dictProjectState["VirginState"];
 
-            //unpack the model's datasheet
             PackedDatasheetState = (IDictionary<string, object>)dictProjectState["PackedDatasheetState"];
             dsControl1.UnpackState(PackedDatasheetState);
 
             //unpack the saved state of PLS modeling control
-            tabControl1.SelectedTab = tabControl1.TabPages[2]; //model
+            tabControl1.SelectedTab = tabControl1.TabPages[2]; 
 
             if (!boolVirgin)
             {
@@ -1208,14 +1179,6 @@ namespace IPyModeling
                     this.rbValue.Checked = true;
                 //unpack predictors
                 this.listPredictors = (List<ListItem>)dictProjectState["Predictors"];
-
-                //unpack xmlDataTable and convert back to DataTable
-                /*string xmlDataTable = (string)dictProjectState["CorrelationDataTable"];
-                StringReader sr = new StringReader(xmlDataTable);
-                DataSet ds = new DataSet();
-                ds.ReadXml(sr);
-                sr.Close();
-                this.correlationData = ds.Tables[0];*/
 
                 //Now make sure the selected transformation is reflected behind the scenes, too.
                 EventArgs e = new EventArgs();

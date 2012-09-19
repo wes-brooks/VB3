@@ -38,9 +38,8 @@ namespace IPyPrediction
 
         private RootItem rootIPyPredictionTab;
         //complete and visible flags
-        public Boolean boolComplete = false;
-        public Boolean boolVisible = false;
-        public Boolean boolHasBeenVisible = false;
+        public Boolean boolComplete;
+        public Boolean boolVisible;
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
@@ -78,11 +77,8 @@ namespace IPyPrediction
         //hide this plugin
         public void Hide()
         {
-            //set visible to false
             boolVisible = false;
-            //remove pluginTab
             App.HeaderControl.RemoveAll();
-            //hide bottom tab
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
         }
 
@@ -90,12 +86,8 @@ namespace IPyPrediction
         //show this plugin
         public void Show()
         {
-            //set visible to true
             boolVisible = true;
-            boolHasBeenVisible = true;
-            //add the ribbon
             AddRibbon("Show");
-            //add the panel
             if (boolComplete)
             {
                 ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
@@ -107,7 +99,6 @@ namespace IPyPrediction
         //make this plugin the active one
         public void MakeActive()
         {
-            //set it to visible
             boolVisible = true;
             App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
@@ -125,7 +116,7 @@ namespace IPyPrediction
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
 
-            base.Activate(); //ensures "enabled" is set to true
+            base.Activate(); 
         }
 
 
@@ -135,13 +126,12 @@ namespace IPyPrediction
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
-                //make this the top plugin for ProjMngr to use when opening
                 TopPlugin = strPanelKey;
             }
         }
 
 
-        //add a datasheet plugin root item
+        //add a root item
         public void AddRibbon(string sender)
         {
             rootIPyPredictionTab = new RootItem(strPanelKey, strPanelCaption);
@@ -151,7 +141,6 @@ namespace IPyPrediction
             //tell ProjMngr if this is being Shown
             if (sender == "Show")
             {
-                //make this the selected root
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
 
@@ -286,10 +275,9 @@ namespace IPyPrediction
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
          {
-            //listen to others broadcast..receiving something
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {
-                //add the model to the listbox
+                //add the model to list of Available Models
                 if (((IPlugin)sender).Complete)
                     _frmIPyPred.AddModel(e.PackedPluginState);
 
@@ -298,16 +286,14 @@ namespace IPyPrediction
                 {
                     _frmIPyPred.ClearDataGridViews();
                     boolComplete = false;
-                }             
-   
-                //if the model was changed (not cleared) = (Complete=true), and need to clear predict, still add model
-                if (boolComplete && (bool)e.PackedPluginState["Complete"] && (bool)e.PackedPluginState["CleanPredict"])
-                {
-                    _frmIPyPred.ClearDataGridViews();
-                    boolComplete = false;
-                    _frmIPyPred.AddModel(e.PackedPluginState);
+                    //add the modified model to list of Available Models if just changed (not cleared)
+                    if ((bool)e.PackedPluginState["Complete"])
+                        _frmIPyPred.AddModel(e.PackedPluginState);
                 }
             }
+            if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
+                if (boolComplete)
+                    Show();
         }
 
 
@@ -345,36 +331,15 @@ namespace IPyPrediction
                 /*if (VisiblePlugin)
                     Hide();
                 */
-                //make prediction active plugin
-                if ((bool)dictPlugin["Visible"])
+
+                boolVisible = (bool)dictPlugin["Visible"];
+                boolComplete = (bool)dictPlugin["Complete"];
+
+                if (boolVisible)
                     Show();
                 else 
                     Hide();
                 
-                //repopulate plugin complete flags from saved project
-                boolComplete = (bool)dictPlugin["Complete"];
-                /*if (!boolComplete)
-                {
-                    //if model is complete, make it active
-                    if (e.PackedPluginStates.ContainsKey("PLSPanel") || e.PackedPluginStates.ContainsKey("GBMPanel"))
-                    {
-                        IDictionary<string, object> dictPLSModel = e.PackedPluginStates["PLSPanel"];
-                        IDictionary<string, object> dictGBMModel = e.PackedPluginStates["GBMPanel"];
-                        if ((bool)dictPLSModel["Complete"] || (bool)dictGBMModel["Complete"])
-                        {
-                            //loop through the extensions to get the modeling plugin to MakeActive()
-                            foreach (DotSpatial.Extensions.IExtension X in App.Extensions)
-                            {
-                                IPlugin modelPlug = (IPlugin)X;
-                                if (modelPlug.PluginType.ToString() == "Modeling")
-                                    modelPlug.MakeActive();
-                            }
-                        }                       
-                        return;
-                    }
-                }*/
-                
-                //Unpack the state of this plugin.
                 _frmIPyPred.UnpackState(e.PackedPluginStates[strPanelKey]);
                 MakeActive();
             }
@@ -388,7 +353,7 @@ namespace IPyPrediction
 
         private void SendMessage(string message)
         {
-            if (MessageSent != null) //Has some method been told to handle this event?
+            if (MessageSent != null)
             {
                 VBCommon.PluginSupport.MessageArgs e = new VBCommon.PluginSupport.MessageArgs(message);
                 MessageSent(this, e);
@@ -441,6 +406,7 @@ namespace IPyPrediction
         {
             _frmIPyPred.btnClearTable_Click(sender, e);
         }
+
 
         //export table, sends to form click event
         void btnExportTable_Ck(object sender, EventArgs e)
