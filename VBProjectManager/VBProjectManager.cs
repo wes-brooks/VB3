@@ -25,7 +25,7 @@ namespace VBProjectManager
         private string strPathName;
         private string strProjectName;
         private string strTopPlugin; //plugin change event changes this value
-        public string openingTopPlugin;
+        //public string openingTopPlugin;
 
         private VBCommon.Signaller signaller = new VBCommon.Signaller();
         private Globals.PluginType _pluginType = VBCommon.Globals.PluginType.ProjectManager;
@@ -87,7 +87,7 @@ namespace VBProjectManager
             btnUndo.LargeImage = Resources.Undo_16x16;
             btnUndo.ToolTipText = "Undo the last action";
             App.HeaderControl.Add(btnUndo);
-                       
+
             //get plugin type for each plugin
             List<Globals.PluginType> lstAllPluginTypes = new List<Globals.PluginType>();
             Globals.PluginType PType;
@@ -102,7 +102,10 @@ namespace VBProjectManager
                     lstAllPluginTypes.Add(PType); 
                 }
             }
-            
+
+            //Hook up the event handler that fires when the user clicks on a new plugin.
+            App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
+
             //if PType is smallest (datasheet/map), set as activated when open
             int pos = lstAllPluginTypes.IndexOf(lstAllPluginTypes.Min());
             DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
@@ -143,8 +146,7 @@ namespace VBProjectManager
 
         //Write any messages we receive from the plugins directly to the debug console.
         private void MessageReceived(object sender, MessageArgs args)
-        {
-            
+        {            
             System.Diagnostics.Debug.WriteLine(args.Message);
         }
 
@@ -172,7 +174,7 @@ namespace VBProjectManager
         }
 
 
-        //once open, store top plugin value here
+        /*//once open, store top plugin value here
         public string OpeningTopPlugin
         {
             get { return openingTopPlugin; }
@@ -184,9 +186,9 @@ namespace VBProjectManager
         {
             get { return strTopPlugin; }
             set { strTopPlugin = value; }
-        }
+        }*/
 
-        //holds just the project name without path
+
         public string ProjectName
         {
             get { return strProjectName; }
@@ -202,7 +204,7 @@ namespace VBProjectManager
 
 
         //inherits from IPlugin, ProjectManager's visible flag doesn't change
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -250,10 +252,10 @@ namespace VBProjectManager
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            
+
             signaller.MessageReceived += new VBCommon.Signaller.MessageHandler<MessageArgs>(MessageReceived);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
-            signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener);
+            //signaller.TopPluginChanged += new System.EventHandler(RegisterTopPlugin);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
             signaller.HideTabsEvent += new VBCommon.Signaller.HidePluginsHandler(HideTabsListener);
@@ -274,19 +276,35 @@ namespace VBProjectManager
             }
            
         }
+
+
+        /*private void RegisterTopPlugin(object sender, EventArgs e)
+        {
+            strTopPlugin = ((IPlugin)sender).PanelKey;
+        }*/
+
+
+        //event handler when a plugin is selected from tabs
+        void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
+        {
+            strTopPlugin = e.ActivePanelKey;
+
+        }
         
 
         //pop off last stack for undo
         public void UndoAction(object sender, EventArgs e)
         {
             //check to see if pop is a model first, first undo on model will accidentally send unpack to _frmDatasheet
-            object whatAreWePopping = UndoRedoStack.Pop();
-            //now pop the last saved change to implement undo
-            object lastStackItem = UndoRedoStack.Peek();
-            Dictionary<string, object> dictLastStackItem = new Dictionary<string, object>((Dictionary<string, object>)lastStackItem);
-            string stackKey = string.Empty;
+            object objCurrentState = UndoRedoStack.Pop();
+            object objLastState = UndoRedoStack.Peek();
 
-            if ((bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("PLSPanel") || (bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("GBMPanel"))
+            IDictionary<string, object> dictLastState = (IDictionary<string, object>)objLastState;
+            string strKey;
+
+            signaller.RaiseBroadcastRequest(this, dictLastState);
+
+            /*if ((bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("PLSPanel") || (bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("GBMPanel"))
             {
                 Dictionary<string, object> modelPop = new Dictionary<string, object>((Dictionary<string, object>)whatAreWePopping);
 
@@ -330,95 +348,25 @@ namespace VBProjectManager
                         }
                     }
                 }
-            }
+            }*/
         }
 
 
-        //undo was hit, send the packed state to be unpacked
+        /*//undo was hit, send the packed state to be unpacked
         public void UndoLastChange(Dictionary<string, object> packedState)
         {
             
-        }
+        }*/
 
 
         //listen to plugin's broadcast in order to update other plugins
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
-            //populate stack
-            Dictionary<string, object> dictStackObj = new Dictionary<string, object>();
-            dictStackObj.Add(((VBCommon.Interfaces.IPlugin)sender).PanelKey.ToString(), e.PackedPluginState);
-            UndoRedoStack.Push(dictStackObj);
-
-            //flag to tell prediction to show itself after being hidden only if model is complete
-            bool boolModelComplete = false;
-            //flag to determine if prediction or model should be MakeActive()
-            bool boolClearModel = false;
-            //store the sender plugin from the broadcast
-            string strPluginType = (((IPlugin)sender).PluginType).ToString();
-
-            //if datasheet is broadcasting any changes
-            if (strPluginType == "Datasheet")
+            if (((IPlugin)sender).PluginType != Globals.PluginType.ProjectManager)
             {
-                IPlugin dsplugin = (IPlugin)sender;
-                //determine if the datasheet has changed causing the model to clear
-                boolClearModel = (bool)e.PackedPluginState["ChangesMadeDS"];
-
-                //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
-                {
-                    IPlugin plugin = (IPlugin)ex;
-                    
-                    if (plugin.PluginType.ToString() == "Modeling")
-                        //already visible, just update not show again
-                        if (plugin.VisiblePlugin)
-                            return;
-                        //if datasheet is complete, show modeling
-                        else if (((IPlugin)sender).Complete)
-                        {
-                            //store if model is complete
-                            boolModelComplete = plugin.Complete ? true : false;
-                            plugin.Show();
-                        }
-                    if (plugin.PluginType.ToString() == "Prediction")
-                    {
-                        //check to see if hte modeling is complete and it hasn't been cleared by any datasheet changes
-                        if (boolModelComplete && !boolClearModel)
-                        {
-                            plugin.Show();
-                            if (plugin.Complete) //if the prediction is also complete
-                            {
-                                plugin.MakeActive(); //need this or Location becomes selectedRoot
-                            }
-                            else
-                            {
-                                //loop through the extensions to get the modeling plugin to MakeActive()
-                                foreach (DotSpatial.Extensions.IExtension X in App.Extensions)
-                                {
-                                    IPlugin modelPlug = (IPlugin)X;
-                                    if (modelPlug.PluginType.ToString() == "Modeling")
-                                        modelPlug.MakeActive();
-                                }
-                            }
-                        }
-                    }
-                }
-            } //if modeling is broadcasting itself
-            else if (strPluginType == "Modeling")
-            {
-                //find prediction plugin, needs to show itself once modeling broadcasts itself with complete flag raised
-                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
-                {
-                    IPlugin plugin = (IPlugin)ex;
-                    if (plugin.PluginType.ToString() == "Prediction")
-                        //already visible, just update not show again
-                        if (plugin.VisiblePlugin)
-                            return;
-                        else
-                            //modeling is complete, show prediction
-                            if (((IPlugin)sender).Complete)
-                                plugin.Show();
-                }
-            }                
+                KeyValuePair<string, object> kvpStackObj = new KeyValuePair<string, object>(((VBCommon.Interfaces.IPlugin)sender).PanelKey, e.PackedPluginState);
+                UndoRedoStack.Push(kvpStackObj);    
+            }
         }
 
 
@@ -426,13 +374,13 @@ namespace VBProjectManager
         public void Broadcast()
         {
             IDictionary<string, object> packedState = PackState();
-            signaller.RaiseBroadcastRequest(_pluginType, packedState);
+            signaller.RaiseBroadcastRequest(this, packedState);
         }
 
     }
     
     
-    public class ProjectChangedStatus : EventArgs
+    /*public class ProjectChangedStatus : EventArgs
     {
         private string _status;
         public string Status
@@ -440,5 +388,5 @@ namespace VBProjectManager
             set { _status = value; }
             get { return _status; }
         }
-    }
+    }*/
 }

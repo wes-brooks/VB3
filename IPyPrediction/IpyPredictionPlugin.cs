@@ -40,22 +40,10 @@ namespace IPyPrediction
         //complete and visible flags
         public Boolean boolComplete = false;
         public Boolean boolVisible = false;
-        public Boolean boolHasBeenVisible = false;
+        //public Boolean boolHasBeenVisible = false;
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
-
-
-        //property to update topPlugin and raise event when changed
-        public string TopPlugin
-        {
-            get { return strTopPlugin; }
-            set
-            {
-                strTopPlugin = value;
-                signaller.RaiseStrPluginChange(strTopPlugin);
-            }
-        }
 
 
         //Raise a message
@@ -66,9 +54,7 @@ namespace IPyPrediction
         //deactivate this plugin
         public override void Deactivate()
         {
-            //remove ribbon tab
             App.HeaderControl.RemoveAll();
-            //remove plugin panel
             App.DockManager.Remove(strPanelKey);            
             _frmIPyPred = null;
             base.Deactivate();
@@ -77,38 +63,37 @@ namespace IPyPrediction
 
         //hide this plugin
         public void Hide()
-        {
-            //set visible to false
-            boolVisible = false;
-            //remove pluginTab
+        {       
             App.HeaderControl.RemoveAll();
-            //hide bottom tab
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            boolVisible = false;
         }
 
 
-        //show this plugin
         public void Show()
         {
-            //set visible to true
-            boolVisible = true;
-            boolHasBeenVisible = true;
-            //add the ribbon
-            AddRibbon("Show");
-            //add the panel
-            if (boolComplete)
+            if (this.Visible)
             {
-                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-                App.HeaderControl.SelectRoot(strPanelKey);
+                //If this plugin is already visible, then do nothing.
+                return;
+            }
+            else
+            {                
+                //boolHasBeenVisible = true;
+                AddRibbon("Show");
+
+                if (boolComplete)
+                {
+                    ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                    App.HeaderControl.SelectRoot(strPanelKey);
+                }
+                boolVisible = true;
             }
         }
 
 
-        //make this plugin the active one
         public void MakeActive()
         {
-            //set it to visible
-            boolVisible = true;
             App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
         }
@@ -135,8 +120,6 @@ namespace IPyPrediction
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
-                //make this the top plugin for ProjMngr to use when opening
-                TopPlugin = strPanelKey;
             }
         }
 
@@ -249,7 +232,7 @@ namespace IPyPrediction
 
 
         //return the visible flag
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -276,20 +259,12 @@ namespace IPyPrediction
         }
 
 
-        //undo was hit, send the packed state to be unpacked
-        public void UndoLastChange(Dictionary<string, object> packedState)
-        {
-            
-        }
-
-
-        //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
-         {
-            //listen to others broadcast..receiving something
+         {              
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {
-                //add the model to the listbox
+                //Handle a broadcast from a modeling plugin:
+                //Add the model to the listbox
                 if (((IPlugin)sender).Complete)
                     _frmIPyPred.AddModel(e.PackedPluginState);
 

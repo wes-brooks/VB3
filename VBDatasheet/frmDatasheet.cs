@@ -29,24 +29,7 @@ namespace VBDatasheet
         private bool boolInitialPass = true;
         private bool boolValidated = false;
 
-        public event EventHandler ChangeMade4Stack;
-
-        // getter/setter for datasheet table
-        [JsonProperty]
-        public IDictionary<string, object> PackedDatasheetState
-        {
-            set { dictPackedDatasheetState = value; }
-            get { return dictPackedDatasheetState; }
-        }
-
-
-        //returns validated flag
-        [JsonProperty]
-        public bool DSValidated
-        {
-            get { return this.boolValidated; }
-        }
-
+        public event EventHandler NotifiableDataEvent;
 
         //constructor
         public frmDatasheet()    
@@ -60,11 +43,8 @@ namespace VBDatasheet
         //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
         public void UnpackState(IDictionary<string, object> dictPluginState)
         {
-            //unpack datasheet control
-           
-            PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
-
-            dsControl1.UnpackState(PackedDatasheetState);
+            IDictionary<string, object> dictDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
+            dsControl1.UnpackState(dictDatasheetState);
 
             //get validated flag
             this.boolValidated = (bool)dictPluginState["DSValidated"];
@@ -113,34 +93,29 @@ namespace VBDatasheet
 
             dictPackedDatasheetState = dsControl1.PackState();
             dictPluginState.Add("PackedDatasheetState", dictPackedDatasheetState);
-            
             dictPluginState.Add("DSValidated", boolValidated);
-
-            //pack the state of the datasheet so model will know if it needs to clear itself
             dictPluginState.Add("ChangesMadeDS", boolChangesMadeDS);
 
             return dictPluginState;
         }
 
 
-        //listener for notify change event
         public void UpdateData(object source, EventArgs e)
         {
-            //broadcast to be added to stack
-            if (ChangeMade4Stack != null)
+            //Re-raise the event to be handled at the plugin level
+            if (NotifiableDataEvent != null)
             {
-                EventArgs ev = new EventArgs();
-                ChangeMade4Stack(this, ev);
+                NotifiableDataEvent(source, e);
             }
         }
 
 
-        //import datatable
         public void btnImportData_Click(object sender, EventArgs e)
         {
             DataTable dataDT = new DataTable("Imported Data");
             VBCommon.IO.ImportExport import = new VBCommon.IO.ImportExport();
             if ((dataDT = import.Input) == null) return;
+
             //check for unique records or blanks
             string errcolname = string.Empty;
             int errndx = 0;
@@ -199,8 +174,7 @@ namespace VBDatasheet
             //initial info for the list
             FileInfo fi = new FileInfo(import.getFileImportedName);
             dsControl1.FileName = fi.Name;
-            dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);            
-
+            dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);
             dsControl1.dgv.Enabled = false;
            
             boolInitialPass = true;

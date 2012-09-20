@@ -13,11 +13,10 @@ namespace VBCommon
         public event SerializationEventHandler<SerializationEventArgs> ProjectSaved;
         public event SerializationEventHandler<SerializationEventArgs> ProjectOpened;
 
-        //Request that plugins unpack their state... why?
+        //Request that plugins unpack their state
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event EventHandler<UnpackEventArgs> UnpackRequest;
 
-        //event for when a project is saved
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageReceived;
 
@@ -28,9 +27,8 @@ namespace VBCommon
         public delegate void BroadCastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadCastEventHandler<BroadCastEventArgs> BroadcastState;
 
-        //event for updating strPluginKey for which plugin should be on top when proj opened
-        public delegate void UpdateStrPluginKey<TArgs>(TArgs args) where TArgs : EventArgs;
-        public event UpdateStrPluginKey<UpdateStrPlugOnTopEventArgs> strPluginTopChanged;
+        //This event allows the VBProjectManager to keep track of the topmost plugin.
+        //public event EventHandler TopPluginChanged;
 
         public delegate void HidePluginsHandler();
         public event HidePluginsHandler HideTabsEvent;
@@ -39,15 +37,16 @@ namespace VBCommon
 
 
         //update the top plugin str key value for opening projects
-        public void RaiseStrPluginChange(string value)
+        /*public void ChangeTopPlugin(object sender)
         {
-            if (strPluginTopChanged != null)
+            if (TopPluginChanged != null)
             {
-                UpdateStrPlugOnTopEventArgs e = new UpdateStrPlugOnTopEventArgs(value);
-                strPluginTopChanged(e);
+                EventArgs e = new EventArgs();
+                TopPluginChanged(sender, e);
             }
-        }
-        //tell plugins to pack their states into a dictionary to pass to other plugins
+        }*/
+
+
         public void RaiseBroadcastRequest(object sender, IDictionary<string, object> dictPackedPlugin)
         {
             if (BroadcastState != null) //has some method been told to handle this event?

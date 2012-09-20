@@ -26,7 +26,7 @@ namespace IPyModeling
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Modeling;
         private RootItem rootHeaderItem;
 
-        IDictionary<string, object> dictPlugin = null;
+        //IDictionary<string, object> dictPlugin = null;
 
         //instance of  class
         protected IPyModeling.IPyModelingControl innerIronPythonControl;
@@ -47,28 +47,11 @@ namespace IPyModeling
         public Boolean boolVisible;
         public Boolean boolRunCancelled;
         public Boolean boolStopRun;
-        public Boolean boolInitialEntry = true; //first time here flag
+        public Boolean boolInitialEntry = true;
 
-
-//        private Boolean boolClearModel; 
-
-        //this plugin was clicked
         private string strTopPlugin = string.Empty;
 
 
-        //property to update topPlugin and raise event when changed
-        public string TopPlugin
-        {
-            get { return strTopPlugin; }
-            set
-            {
-                strTopPlugin = value;
-                signaller.RaiseStrPluginChange(strTopPlugin);
-            }
-        }
-
-
-        //deactivate this plugin
         public override void Deactivate()
         {
             App.HeaderControl.RemoveAll();
@@ -78,41 +61,38 @@ namespace IPyModeling
         }
 
 
-        //hide this plugin
         public void Hide()
-        {
-            //set visible flag to false
-            boolVisible = false;
-            //hide pluginTab
+        {            
             App.HeaderControl.RemoveAll();
-            //hide plugin panel
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            boolVisible = false;
         }
 
 
-        //show this plugin
         public void Show()
         {
-            //set visible flag to true
-            boolVisible = true;
-            //show the tab
-            AddRibbon("Show");
-            //show the panel
-            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);   
+            if (this.Visible)
+            {
+                //If this plugin is already visible, then do nothing.
+                return;
+            }
+            else
+            {                
+                AddRibbon("Show");
+                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                App.HeaderControl.SelectRoot(strPanelKey);
+                boolVisible = true;
+            }
         }
 
 
-        //make this plugin the active one
         public void MakeActive()
-        {
-            boolVisible = true;
+        {            
             App.DockManager.SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);
+            App.HeaderControl.SelectRoot(strPanelKey);            
         }
 
 
-        //initial activate method when loaded
         public override void Activate()
         {
             AddPanel();
@@ -139,8 +119,6 @@ namespace IPyModeling
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
-                //make this the top plugin for ProjMngr to use when opening
-                TopPlugin = strPanelKey;
             }
         }
 
@@ -226,12 +204,12 @@ namespace IPyModeling
         }
 
 
-        //returns this model's packed state
+        /*//returns this model's packed state
         public IDictionary<string, object> PackedPlugin
         {
             get { return dictPlugin; }
             set { dictPlugin = value; }
-        }
+        }*/
 
 
         //returns plugin type (Modeling)
@@ -256,7 +234,7 @@ namespace IPyModeling
 
 
         //returns visible flag
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -282,39 +260,41 @@ namespace IPyModeling
         }
 
 
-        //undo was hit, send the packed state to be unpacked
+        /*//undo was hit, send the packed state to be unpacked
         public void UndoLastChange(Dictionary<string, object> packedState)
         {
             innerIronPythonControl.SetData(packedState);
-        }
+        }*/
 
 
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
-            //get out of here if global ds is just making changes to be added to the stack
-            if (!(bool)((IPlugin)sender).Complete)
-                return;
-
-            //if datasheet updated itself, set data with changes, passing datasheet's plugin packed state
             if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {
-                //no changes made, and not first time here = don't set the data, just show what was there
-                if (!(bool)e.PackedPluginState["ChangesMadeDS"] && !InitialEntry)
+                IDictionary<string, object> dictPluginState = (IDictionary<string, object>)(e.PackedPluginState);
+                if (!(bool)dictPluginState["Complete"])
                 {
-                    if (dictPlugin != null)
+                    this.Hide();
+                    return;
+                }
+                else if (InitialEntry)
+                {
+                    if (dictPluginState != null)
                     {
-                        if (dictPlugin.Count > 3)
+                        if (dictPluginState.Count > 3)
                         {
-                            Dictionary<string, object> dictDatasheet = (Dictionary<string, object>)dictPlugin["PackedDatasheetState"];
-                            string xmlDT = (string)dictDatasheet["XmlDataTable"];
+                            //Dictionary<string, object> dictDatasheet = (Dictionary<string, object>)dictPluginState["PackedDatasheetState"];
+                            /*string xmlDT = (string)dictDatasheet["XmlDataTable"];
                             StringReader sr = new StringReader(xmlDT);
                             DataSet ds = new DataSet();
                             ds.ReadXml(sr);
                             sr.Close();
                             DataTable dt = ds.Tables[0];
-                            innerIronPythonControl.UnhideDatasheet(dt);
-                            MakeActive();
+                            innerIronPythonControl.UnhideDatasheet(dt);*/
+
+                            innerIronPythonControl.SetData(e.PackedPluginState);
+                            Show();
                         }
                     }
                 }
@@ -324,20 +304,21 @@ namespace IPyModeling
                     //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
                     if ((bool)e.PackedPluginState["ChangesMadeDS"])
                         boolComplete = false;
-                    
+
                     innerIronPythonControl.SetData(e.PackedPluginState);
                 }
             }
-            //if the prediction is broadcasting, this project is opening and needs model to show itself if prediction is complete
+            /*//if the prediction is broadcasting, this project is opening and needs model to show itself if prediction is complete
             if (((IPlugin)sender).PluginType == Globals.PluginType.Prediction)
                 if ((bool)e.PackedPluginState["Complete"])
                     Show();
+            */
         }
 
-
-        //only have manipulate datasheet buttons enabled when on Manipulate Datasheet tab
+        
         public void HandleManipulateDataTab(object sender, EventArgs e)
         {
+            //only have manipulate datasheet buttons enabled when on Manipulate Datasheet tab
             try
             {
                 btnComputeAO.Enabled = true;
@@ -349,10 +330,10 @@ namespace IPyModeling
             { }
         }
 
-
-        // only have model buttons enabled
+        
         public void HandleModelTab(object sender, EventArgs e)
         {
+            // only have model buttons enabled
             try
             {
                 btnComputeAO.Enabled = false;
@@ -364,10 +345,10 @@ namespace IPyModeling
             { }
         }
 
-
-        //no buttons enabled for the variable selection tab
+        
         public void HandleVariableTab(object sender, EventArgs e)
         {
+            //no buttons enabled for the variable selection tab
             try
             {
                 btnComputeAO.Enabled = false;
@@ -406,14 +387,14 @@ namespace IPyModeling
         public void Broadcast()
         {
             //get packed state, add complete and visible and raise broadcast event
-            IDictionary<string, object> dictPackedState = innerIronPythonControl.PackProjectState();
+            IDictionary<string, object> dictPackedState = innerIronPythonControl.PackState();
             if (dictPackedState.ContainsKey("ModelByObject"))
             {
                 if (dictPackedState["ModelByObject"] != null)
                     boolComplete = true;
             }
-            else
-                dictPackedState.Add("CleanPredict", true); //if the model has been cleared, lets clear the prediction too
+            /*else
+                dictPackedState.Add("CleanPredict", true); //if the model has been cleared, lets clear the prediction too*/
 
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
@@ -425,7 +406,7 @@ namespace IPyModeling
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             //go pack state, add complete and visible, and add to dictionary of plugins
-            IDictionary<string, object> packedState = innerIronPythonControl.PackProjectState();
+            IDictionary<string, object> packedState = innerIronPythonControl.PackState();
 
             if (packedState != null)
             {
@@ -437,15 +418,13 @@ namespace IPyModeling
         }
 
 
-        //event handler for opening project state
         private void ProjectOpenedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            //if modeling is in the list of packed plugins, go unpack 
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
-                dictPlugin = e.PackedPluginStates[strPanelKey];
+                IDictionary<string, object> dictPluginState = e.PackedPluginStates[strPanelKey];
                 //repopulate plugin Complete flags from saved project
-                boolComplete = (bool)dictPlugin["Complete"];
+                boolComplete = (bool)dictPluginState["Complete"];
                 if (boolComplete)
                     boolInitialEntry = false; //opening projects have been entered before
                 
@@ -454,12 +433,12 @@ namespace IPyModeling
                 //    Hide();
                 
                 //make model being open active plugin
-                if ((bool)dictPlugin["Visible"])
+                if ((bool)dictPluginState["Visible"])
                     Show();
                 else
                     Hide();
                
-                innerIronPythonControl.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
+                innerIronPythonControl.UnpackState(e.PackedPluginStates[strPanelKey]);
             } else {
                 //Set this plugin to an empty state.
                 Activate();
@@ -489,7 +468,6 @@ namespace IPyModeling
         }
             
 
-        //request to run the modeling method, and then enable the prediction page.
         void btnRun_Click(object sender, EventArgs e)
         {
 
@@ -515,7 +493,6 @@ namespace IPyModeling
         }
 
 
-        //cancel the running model
         void btnCancel_Click(object sender, EventArgs e)
         {
             boolRunCancelled = true;
@@ -523,18 +500,15 @@ namespace IPyModeling
         }
 
         
-        //handle when model boolean Running flag changes
-        private void HandleBoolRunChanged(bool val)
+        private void HandleBoolRunChanged(bool running)
         {
-            if (val)
-            //make cancel button enabled
+            if (running)
             {
                 Cursor.Current = Cursors.WaitCursor;
                 btnRun.Enabled = false;
                 btnCancel.Enabled = true;
             }
             else
-            //make run button enabled
             {
                 btnRun.Enabled = true;
                 btnCancel.Enabled = false;
@@ -548,10 +522,8 @@ namespace IPyModeling
             //only need to do this if the model is complete
             if (boolComplete)
             {
-                //if here, changes were made and model has been cleared
                 boolComplete = false;
                 Broadcast();
-                //bring the focus back to Modeling away from Prediction
                 MakeActive();
                 Cursor.Current = Cursors.Default;
             }

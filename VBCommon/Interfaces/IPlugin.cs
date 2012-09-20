@@ -13,11 +13,11 @@ namespace VBCommon.Interfaces
         void MakeActive();
         void Broadcast();
         Boolean Complete { get; }
-        Boolean VisiblePlugin { get; }
+        Boolean Visible { get; }
         void AddRibbon(string sender);
         //void AddPanel();
         void Hide();
         void Show();
-        void UndoLastChange(Dictionary<string,object>packedState);
+        //void UndoLastChange(Dictionary<string,object>packedState);
     }
 }

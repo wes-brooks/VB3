@@ -104,13 +104,6 @@ namespace VBProjectManager
         }
 
 
-        //listens for change in pluginKeyString
-        public void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
-        {
-            this.strTopPlugin = value.PluginKeyString;
-        }
-
-
         public void SaveAs(object sender, EventArgs e)
         {
             //save an opened project 
@@ -192,17 +185,16 @@ namespace VBProjectManager
 
             //raise unpack event, sending packed plugins dictionary
             signaller.UnpackProjectState(dictPluginStates);
-            
-            //Make the top plugin active
-            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+
+            //Restore the top plugin
+            if (dictPluginStates.ContainsKey(this.strPluginKey) && dictPluginStates[this.strPluginKey].ContainsKey("TopPlugin"))
             {
-                if (x is VBCommon.Interfaces.IPlugin)
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
                 {
-                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == openingTopPlugin)
+                    if (x is VBCommon.Interfaces.IPlugin)
                     {
-                        VBCommon.Interfaces.IPlugin topPlugin = (VBCommon.Interfaces.IPlugin)x;
-                        //just MakeActive() doesn't work.. makes the panel active, but doesn't show tab and ribbon
-                        topPlugin.MakeActive();
+                        if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[this.strPluginKey]["TopPlugin"].ToString())
+                            ((VBCommon.Interfaces.IPlugin)x).MakeActive();
                     }
                 }
             }
@@ -234,7 +226,7 @@ namespace VBProjectManager
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
-            dictPackedState.Add("TopPlugin", TopPlugin);
+            dictPackedState.Add("TopPlugin", strTopPlugin);
             dictPackedState.Add("ProjectName", ProjectName);
             
             return dictPackedState;
@@ -245,8 +237,18 @@ namespace VBProjectManager
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {  
             //this.strTopPlugin = (string)dictPackedState["TopPlugin"];
-            this.openingTopPlugin = (string)dictPackedState["TopPlugin"];
+            this.strTopPlugin = (string)dictPackedState["TopPlugin"];
             this.strPathName = (string)dictPackedState["ProjectName"];
+
+            /*//Make the top plugin active
+            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+            {
+                if (x is VBCommon.Interfaces.IPlugin)
+                {
+                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == strTopPlugin)
+                        ((VBCommon.Interfaces.IPlugin)x).MakeActive();
+                }
+            }*/
         }
     }
 }
