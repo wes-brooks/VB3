@@ -39,8 +39,7 @@ namespace VBDatasheet
 
         private Boolean boolComplete;
         private Boolean boolVisible = true;
-        //keep track if first time through this plugin or coming back from model
-        private Boolean boolInitialEntry = true;
+        
         //is model complete
         private Boolean boolModelComplete;
         private Boolean boolChangesMadeDS;
@@ -140,13 +139,6 @@ namespace VBDatasheet
         public Globals.PluginType PluginType
         {
             get { return pluginType; }
-        }
-
-
-        //return plugin intial entry flag
-        public Boolean InitialEntry
-        {
-            get { return boolInitialEntry; }
         }
 
 
@@ -260,7 +252,7 @@ namespace VBDatasheet
 
 
         
-        //listen to other plugin's broadcasting their changes
+        //listen to Model's complete status
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
@@ -305,10 +297,10 @@ namespace VBDatasheet
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             IDictionary<string, object> packedState = _frmDatasheet.PackState();
-            if ((bool)packedState["DSValidated"])
-                boolComplete = true;
+
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
+
             e.PackedPluginStates.Add(strPanelKey, packedState);
         }
 
@@ -327,7 +319,6 @@ namespace VBDatasheet
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];
 
-                
                 if (boolVisible)
                 {
                     Show();
@@ -367,11 +358,6 @@ namespace VBDatasheet
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             } 
-            //if ((e.ActivePanelKey == "PLSPanel" || e.ActivePanelKey == "GBMPanel") && boolComplete)
-            //{
-            //    boolInitialEntry = false;
-            //    _frmDatasheet.btnGoToModel_Click(); //set frm's initialPass to false too.
-            //}
         }
 
 
@@ -397,10 +383,11 @@ namespace VBDatasheet
         //ready to go to modeling now
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
-            //only show this dialog if model is complete
-            if (boolModelComplete)
+            //only show this dialog if model is complete and changes were made to the datasheet
+            if (boolModelComplete && boolChangesMadeDS)
             {
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", 
+                    "Proceed to Modeling.", MessageBoxButtons.OKCancel);
                 if (dlgr == DialogResult.OK)
                 {
                     boolModelComplete = false;

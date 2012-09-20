@@ -37,13 +37,11 @@ namespace IPyModeling
         public event EventHandler ManipulateDataTab;
         public event EventHandler ModelTab;
         public event EventHandler VariableTab;
-
-        public delegate void BoolChangedEvent(bool val);
-        public event BoolChangedEvent boolRunChanged;
         
-        public delegate void BoolStopEvent(bool val);
-        public event BoolStopEvent boolStopRun;
-
+        //RunChanged = true:running, false:canceled
+        public delegate void BoolChangedEvent(bool val);
+        public event BoolChangedEvent boolRunChanged; 
+        
         //Delegates to get data from Virtual Beach
         public delegate void RequestData(object sender, EventArgs args);
         public RequestData TabPageEntered;
@@ -65,7 +63,7 @@ namespace IPyModeling
         private List<ListItem> listPredictors = new List<ListItem>();
         //flags for run/cancel model
         private bool boolRunning = false;
-        private bool boolStopRunning = false;
+        //flag when cancel is hit during a run
         private volatile bool stopRun = false;
         //Related to underlying model:
         protected double dblMandateThreshold;
@@ -456,22 +454,12 @@ namespace IPyModeling
         }
 
 
-        //this method alerts the plugin that the boolean Running property has changed. Determines which button to enable
+        //this method alerts the plugin if Run or Cancel were clicked. changes enabled run/cancel button
         protected void NotifyPropChanged(bool val)
         {
             if (boolRunChanged != null)
             {
                 boolRunChanged(val);
-            }
-        }
-
-        
-        //this method alerts the plugin that run has been canceled. used to test before setting boolComplete to true in plugin
-        protected void StopRunning(bool val)
-        {
-            if (boolStopRun != null)
-            {
-                boolStopRun(val);
             }
         }
 
@@ -539,11 +527,11 @@ namespace IPyModeling
         }
 
         
-        //maintain the model's ds when no changes made to global
-        public void UnhideDatasheet(DataTable dt)
-        {
-            dsControl1.UnhideModelDS(dt);
-        }
+        ////maintain the model's ds when no changes made to global
+        //public void UnhideDatasheet(DataTable dt)
+        //{
+        //    dsControl1.UnhideModelDS(dt);
+        //}
 
 
         //Set column header names in Variable Selection listbox
@@ -652,8 +640,12 @@ namespace IPyModeling
                 ChangeMade4Stack(this, ev);
             }
 
-            boolClearPrediction = true;
-            UpdatePredictionTab(); 
+            if (model_data != null)
+            {
+                boolClearPrediction = true;
+                UpdatePredictionTab();
+            }
+            
         }
 
 
@@ -814,8 +806,6 @@ namespace IPyModeling
             if (model_data == null)
             {
                 MessageBox.Show("You must select the model tab before running the model.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                boolStopRunning = true;
-                StopRunning(boolStopRunning);
                 return;
             }
 
@@ -841,6 +831,7 @@ namespace IPyModeling
             if (stopRun)
             {
                 NotifyPropChanged(boolRunning);
+                stopRun = false;
                 return;
             }
 
@@ -867,6 +858,7 @@ namespace IPyModeling
             ChangeControlStatus(boolInitialControlStatus);
             ChangeThresholdControlStatus(true);
             Application.DoEvents();
+            
             return;
             
         }
@@ -895,6 +887,7 @@ namespace IPyModeling
             if (stopRun)
             {
                 NotifyPropChanged(boolRunning);
+                
                 return;
             }
             
@@ -932,6 +925,7 @@ namespace IPyModeling
             if (stopRun)
             {
                 NotifyPropChanged(boolRunning);
+                stopRun = false;
                 return;
             }
 

@@ -25,8 +25,7 @@ namespace VBDatasheet
     public partial class frmDatasheet : UserControl, IFormState
     {
         private IDictionary<string, object> dictPackedDatasheetState = null;
-
-        private bool boolInitialPass = true;
+        //stored but not used.
         private bool boolValidated;
 
         public event EventHandler ChangeMade4Stack;
@@ -41,11 +40,11 @@ namespace VBDatasheet
 
 
         //returns validated flag
-        [JsonProperty]
-        public bool DSValidated
-        {
-            get { return this.boolValidated; }
-        }
+        //[JsonProperty]
+        //public bool DSValidated
+        //{
+        //    get { return this.boolValidated; }
+        //}
 
 
         //constructor
@@ -62,8 +61,8 @@ namespace VBDatasheet
             PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
             dsControl1.UnpackState(PackedDatasheetState);
 
-            this.boolValidated = (bool)dictPluginState["DSValidated"];
-            this.boolInitialPass = (bool)dictPluginState["InitialPass"];
+ //           this.boolValidated = (bool)dictPluginState["DSValidated"];
+ //           this.boolInitialPass = (bool)dictPluginState["InitialPass"];
         }
 
 
@@ -81,8 +80,8 @@ namespace VBDatasheet
            
             dictPackedDatasheetState = dsControl1.PackState();
             dictPluginState.Add("PackedDatasheetState", dictPackedDatasheetState);
-            dictPluginState.Add("InitialPass", boolInitialPass);
-            dictPluginState.Add("DSValidated", boolValidated);
+   //         dictPluginState.Add("InitialPass", boolInitialPass);
+   //         dictPluginState.Add("DSValidated", boolValidated);
 
             return dictPluginState;
         }
@@ -167,9 +166,7 @@ namespace VBDatasheet
             dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);            
 
             dsControl1.dgv.Enabled = false;
-           
-            boolInitialPass = true;
-            boolValidated = false;
+
             dsControl1.maintainGrid(dsControl1.dgv, dsControl1.DT, dsControl1.SelectedColIndex, dsControl1.ResponseVarColName);
         }
 
@@ -245,13 +242,6 @@ namespace VBDatasheet
                 dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
                 boolValidated = false;
             }
-        }
-
-
-        //change initialPass value if leaving datasheet
-        public void btnGoToModel_Click()
-        {
-            boolInitialPass = false;
         }
 
 

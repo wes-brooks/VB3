@@ -291,9 +291,9 @@ namespace IPyPrediction
                         _frmIPyPred.AddModel(e.PackedPluginState);
                 }
             }
-            if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
-                if (boolComplete)
-                    Show();
+            //if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
+            //    if (boolComplete)
+            //        Show();
         }
 
 

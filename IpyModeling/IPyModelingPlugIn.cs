@@ -46,7 +46,6 @@ namespace IPyModeling
         public Boolean boolComplete;
         public Boolean boolVisible;
         public Boolean boolRunCancelled;
-        public Boolean boolStopRun;
         public Boolean boolInitialEntry = true;
         
         //this plugin was clicked
@@ -113,8 +112,8 @@ namespace IPyModeling
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
             innerIronPythonControl.ModelUpdated += new EventHandler(HandleUpdatedModel);
-            innerIronPythonControl.boolRunChanged += new IPyModelingControl.BoolChangedEvent(HandleBoolRunChanged);
-            innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
+            innerIronPythonControl.boolRunChanged += new IPyModelingControl.BoolChangedEvent(HandleRunCancelEnableState);
+ //           innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
             innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
             innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
             innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
@@ -203,9 +202,9 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            //this allows going to the datasheet plugin to hide the other plugins.
-            //if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
-            //    Hide();
+            //hide this plugin when going back to global datasheet
+            if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
+                Hide();
         }
 
 
@@ -292,21 +291,8 @@ namespace IPyModeling
                 //no changes made, and not first time here = don't set the data, just show what was there
                 if (!(bool)e.PackedPluginState["ChangesMadeDS"] && !InitialEntry)
                 {
-                    if (dictPlugin != null)
-                    {
-                        if (dictPlugin.Count > 3)
-                        {
-                            Dictionary<string, object> dictDatasheet = (Dictionary<string, object>)dictPlugin["PackedDatasheetState"];
-                            string xmlDT = (string)dictDatasheet["XmlDataTable"];
-                            StringReader sr = new StringReader(xmlDT);
-                            DataSet ds = new DataSet();
-                            ds.ReadXml(sr);
-                            sr.Close();
-                            DataTable dt = ds.Tables[0];
-                            innerIronPythonControl.UnhideDatasheet(dt);
-                            MakeActive();
-                        }
-                    }
+                    innerIronPythonControl.Refresh();
+                    MakeActive();
                 }
                 else
                 {
@@ -467,12 +453,6 @@ namespace IPyModeling
             }
         }
 
-        
-        private void HandleBoolStopRun(bool val)
-        {
-            boolStopRun = val;
-        }
-            
 
         //request to run the modeling method, and then enable the prediction page.
         void btnRun_Click(object sender, EventArgs e)
@@ -483,9 +463,7 @@ namespace IPyModeling
                 return;
             }
             innerIronPythonControl.btnRun_Click(sender, e);
-           
-            if (boolStopRun)
-                return;
+
             if (boolRunCancelled)
                 return;
 
@@ -503,7 +481,7 @@ namespace IPyModeling
 
         
         //handle when model boolean Running flag changes
-        private void HandleBoolRunChanged(bool val)
+        private void HandleRunCancelEnableState(bool val)
         {
             if (val)
             {

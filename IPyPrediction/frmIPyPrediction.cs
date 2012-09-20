@@ -338,7 +338,10 @@ namespace IPyPrediction
             Dictionary<string, object> dictModelObj = (Dictionary<string, object>)dictPackedState["ModelByObject"];
 
             //populate the listbox of available models
-            string modelName = (string)dictModelObj["Model"].ToString();
+            //say 'PLS Model'/'IronPythonNew....' or 'PLS'/'GBM'
+  //          string modelName = (string)dictModelObj["Model"].ToString();
+            
+            string modelName = (string)dictModelObj["Method"].ToString();
             if (dictModels.ContainsKey(modelName))
             {
                 this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
