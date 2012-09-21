@@ -546,11 +546,12 @@ namespace IPyModeling
                 if ((bool)packedState["ChangesMadeDS"])
                 {
                     if (model_data != null)
-                    {
+                    {   
+                        Clear();
                         boolClearPrediction = true;
                         UpdatePredictionTab();
                     }
-                    Clear();
+                    
                 }
             }
             catch { }

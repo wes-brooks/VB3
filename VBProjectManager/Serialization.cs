@@ -191,6 +191,12 @@ namespace VBProjectManager
             signaller.UnpackProjectState(dictPluginStates);
             
             //Make the top plugin active
+            //this isn't working correctly. If a prediction is the topPlugin, it works with the added code to make Modeling show, 
+            //if a modeling is the topPlugin, it works with the addition of making the other model show
+            //if a datasheet is the topPlugin, I need to make it just Make Active and not show, because by default it already shows.
+            //Something is going on with the Location plugin. Once the code gets back from unpacking, I have to show the plugins AGAIN that are needed.
+            //Its as if something is getting hit that makes it the default setting of Location and Datasheet tabs only, no matter what came before that,
+            //and I can't find where that's happening.
             foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
             {
                 if (x is VBCommon.Interfaces.IPlugin)
@@ -198,7 +204,44 @@ namespace VBProjectManager
                     if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == openingTopPlugin)
                     {
                         VBCommon.Interfaces.IPlugin topPlugin = (VBCommon.Interfaces.IPlugin)x;
+
+                        //if modeling, need both PLS and GBM
+                        if (topPlugin.PluginType == Globals.PluginType.Modeling)
+                        {
+                            if (topPlugin.PanelKey.ToString() == "PLSPanel") //if top is PLS, need to show GBM
+                            {
+                                foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
+                                {
+                                    if (x is VBCommon.Interfaces.IPlugin)
+                                    {
+                                        if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "GBMPanel")
+                                        {
+                                            {
+                                                ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
+                                                return;
+                                            }
+                                        }
+                                     }
+                                }
+                            }
+                            else if (topPlugin.PanelKey.ToString() == "GBMPanel") //if top is GBM, need to show PLS
+                            {
+                                foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
+                                {
+                                    if (x is VBCommon.Interfaces.IPlugin)
+                                    {
+                                        if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "PLSPanel")
+                                        {
+                                            ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                         }
                         //just MakeActive() doesn't work.. makes the panel active, but doesn't show tab and ribbon
+                        //need to add showing the model too if prediction is top..getting wiped out (removed).. something with location still resetting it.
+
                         topPlugin.Show();
                         topPlugin.MakeActive();
                     }

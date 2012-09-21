@@ -273,7 +273,19 @@ namespace VBDatasheet
         public void HandleAddToStack(object sender, EventArgs e)
         {
             if (boolModelComplete)
-                boolChangesMadeDS = true;
+            {
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?",
+                    "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.OK)
+                {
+                    boolModelComplete = false;
+                    boolChangesMadeDS = true;
+                    boolComplete = false;
+                }
+                else if (dlgr == DialogResult.Cancel)
+                    return;
+            }
+
             Broadcast();
         }
 
@@ -310,6 +322,16 @@ namespace VBDatasheet
         {
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
+                //store whether the model is complete. (Will get caught if only datasheet was saved)
+                try
+                {
+                    IDictionary<string, object> dictPLSModelPlugin = e.PackedPluginStates["PLSPanel"];
+                    IDictionary<string, object> dictGBMModelPlugin = e.PackedPluginStates["GBMPanel"];
+                    if ((bool)dictPLSModelPlugin["Complete"] || (bool)dictGBMModelPlugin["Complete"])
+                        boolModelComplete = true;
+                }
+                catch { }
+
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
 
                 //check to see if there already is a datasheet open, if so, close it before opening a saved project
@@ -317,7 +339,8 @@ namespace VBDatasheet
                     Hide();
 
                 boolVisible = (bool)dictPlugin["Visible"];
-                boolComplete = (bool)dictPlugin["Complete"];
+                //when opening a saved project that has a datasheet, it will be complete.
+                boolComplete = boolVisible; 
 
                 if (boolVisible)
                 {
@@ -332,10 +355,6 @@ namespace VBDatasheet
                     }
                 }
                 _frmDatasheet.UnpackState(e.PackedPluginStates[strPanelKey]);
-            }
-            else
-            {
-                Activate();
             }
         }
 
@@ -395,6 +414,8 @@ namespace VBDatasheet
             }
             boolComplete = true;
             Broadcast();
+            //once you leave here, changes made to ds clear for next time here
+            boolChangesMadeDS = false;
         }  
     }
 }

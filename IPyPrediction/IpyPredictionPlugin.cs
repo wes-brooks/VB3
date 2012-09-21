@@ -275,25 +275,22 @@ namespace IPyPrediction
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
          {
-            if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
-            {
-                //add the model to list of Available Models
-                if (((IPlugin)sender).Complete)
-                    _frmIPyPred.AddModel(e.PackedPluginState);
+             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
+             {
+                 //add the model to list of Available Models
+                 if (((IPlugin)sender).Complete)
+                     _frmIPyPred.AddModel(e.PackedPluginState);
 
-                //if the prediction is complete and the model was cleared, clear the prediction
-                if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
-                {
-                    _frmIPyPred.ClearDataGridViews();
-                    boolComplete = false;
-                    //add the modified model to list of Available Models if just changed (not cleared)
-                    if ((bool)e.PackedPluginState["Complete"])
-                        _frmIPyPred.AddModel(e.PackedPluginState);
-                }
-            }
-            //if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
-            //    if (boolComplete)
-            //        Show();
+                 //if the prediction is complete and the model was cleared, clear the prediction
+                 if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
+                 {
+                     _frmIPyPred.ClearDataGridViews();
+                     boolComplete = false;
+                     //add the modified model to list of Available Models if just changed (not cleared)
+                     if ((bool)e.PackedPluginState["Complete"])
+                         _frmIPyPred.AddModel(e.PackedPluginState);
+                 }
+             }
         }
 
 
@@ -327,11 +324,7 @@ namespace IPyPrediction
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-                //check to see if there already is a prediction, if so, close it and open the saved project
-                /*if (VisiblePlugin)
-                    Hide();
-                */
-
+               
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];
 
@@ -342,11 +335,6 @@ namespace IPyPrediction
                 
                 _frmIPyPred.UnpackState(e.PackedPluginStates[strPanelKey]);
                 MakeActive();
-            }
-            else
-            {
-                //Activate();
-                //Set this plugin to an empty state.
             }
         }
 

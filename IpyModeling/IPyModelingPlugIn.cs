@@ -387,8 +387,6 @@ namespace IPyModeling
                 if (dictPackedState["ModelByObject"] != null)
                     boolComplete = true;
             }
-            //else
-                //dictPackedState.Add("CleanPredict", true); already in packedState from Control
 
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
@@ -416,13 +414,8 @@ namespace IPyModeling
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 dictPlugin = e.PackedPluginStates[strPanelKey];
-               
-                //check to see if there already is a PLS model open, if so, close it before opening a saved project
-                //if ((VisiblePlugin) && (Complete))
-                //    Hide();
-
-                 boolComplete = (bool)dictPlugin["Complete"];
-                 boolVisible = (bool)dictPlugin["Visible"];
+                boolComplete = (bool)dictPlugin["Complete"];
+                boolVisible = (bool)dictPlugin["Visible"];
 
                 if (boolComplete)
                     boolInitialEntry = false;
@@ -433,8 +426,7 @@ namespace IPyModeling
                     Hide();
                
                 innerIronPythonControl.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
-            } 
-            else { Activate(); }
+            }
         }
 
      
