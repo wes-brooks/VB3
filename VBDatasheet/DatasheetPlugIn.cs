@@ -272,20 +272,17 @@ namespace VBDatasheet
         //handles broadcasting each change to be added to the stack
         public void HandleAddToStack(object sender, EventArgs e)
         {
-            if (boolModelComplete)
+            if (boolComplete)
             {
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?",
-                    "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                if (dlgr == DialogResult.OK)
-                {
+                //don't want message box coming up until go to model is clicked...
+                //DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?",
+                //    "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                //if (dlgr == DialogResult.OK)
+                //{
                     boolModelComplete = false;
                     boolChangesMadeDS = true;
                     boolComplete = false;
-                }
-                else if (dlgr == DialogResult.Cancel)
-                    return;
             }
-
             Broadcast();
         }
 
@@ -403,7 +400,8 @@ namespace VBDatasheet
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
             //only show this dialog if model is complete and changes were made to the datasheet
-            if (boolModelComplete && boolChangesMadeDS)
+            //if (boolModelComplete && boolChangesMadeDS)
+            if (boolChangesMadeDS)
             {
                 DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", 
                     "Proceed to Modeling.", MessageBoxButtons.OKCancel);
