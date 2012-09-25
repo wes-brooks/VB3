@@ -329,29 +329,21 @@ namespace VBDatasheet
                 }
                 catch { }
 
+                _frmDatasheet.UnpackState(e.PackedPluginStates[strPanelKey]);
+                
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-
-                //check to see if there already is a datasheet open, if so, close it before opening a saved project
-                if (VisiblePlugin)
-                    Hide();
 
                 boolVisible = (bool)dictPlugin["Visible"];
                 //when opening a saved project that has a datasheet, it will be complete.
                 boolComplete = boolVisible; 
 
-                if (boolVisible)
+                if (boolComplete)
                 {
-                    Show();
-
-                    if (boolComplete)
-                    {
-                        btnComputeAO.Enabled = true;
-                        btnGoToModeling.Enabled = true;
-                        btnManipulate.Enabled = true;
-                        btnTransform.Enabled = true;
-                    }
+                    btnComputeAO.Enabled = true;
+                    btnGoToModeling.Enabled = true;
+                    btnManipulate.Enabled = true;
+                    btnTransform.Enabled = true;
                 }
-                _frmDatasheet.UnpackState(e.PackedPluginStates[strPanelKey]);
             }
         }
 

@@ -100,12 +100,12 @@ namespace VBLocation
 
             ////Console.WriteLine("\n*** Location: project opened.***\n");
 
-            if (_site == null)
-                showDefaultMap();
-            else
-                showMap();
+            //if (_site == null)
+            //    showDefaultMap();
+            //else
+            //    showMap();
 
-            this.Show();
+            //this.Show();
         }
 
 

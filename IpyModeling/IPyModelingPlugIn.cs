@@ -47,7 +47,7 @@ namespace IPyModeling
         public Boolean boolVisible;
         public Boolean boolRunCancelled;
         public Boolean boolInitialEntry = true;
-        
+
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
 
@@ -402,7 +402,7 @@ namespace IPyModeling
             {
                 packedState.Add("Complete", boolComplete);
                 packedState.Add("Visible", boolVisible);
-
+                
                 e.PackedPluginStates.Add(strPanelKey, packedState);
             }
         }
@@ -416,7 +416,7 @@ namespace IPyModeling
                 dictPlugin = e.PackedPluginStates[strPanelKey];
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolVisible = (bool)dictPlugin["Visible"];
-
+               
                 if (boolComplete)
                     boolInitialEntry = false;
 

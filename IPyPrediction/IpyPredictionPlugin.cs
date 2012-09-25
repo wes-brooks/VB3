@@ -312,7 +312,7 @@ namespace IPyPrediction
             {
                 dictPackedState.Add("Complete", boolComplete);
                 dictPackedState.Add("Visible", boolVisible);
-
+              
                 e.PackedPluginStates.Add(strPanelKey, dictPackedState);
             }
         }

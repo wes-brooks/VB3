@@ -206,43 +206,43 @@ namespace VBProjectManager
                         VBCommon.Interfaces.IPlugin topPlugin = (VBCommon.Interfaces.IPlugin)x;
 
                         //if modeling, need both PLS and GBM
-                        if (topPlugin.PluginType == Globals.PluginType.Modeling)
-                        {
-                            if (topPlugin.PanelKey.ToString() == "PLSPanel") //if top is PLS, need to show GBM
-                            {
-                                foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
-                                {
-                                    if (x is VBCommon.Interfaces.IPlugin)
-                                    {
-                                        if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "GBMPanel")
-                                        {
-                                            {
-                                                ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
-                                                return;
-                                            }
-                                        }
-                                     }
-                                }
-                            }
-                            else if (topPlugin.PanelKey.ToString() == "GBMPanel") //if top is GBM, need to show PLS
-                            {
-                                foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
-                                {
-                                    if (x is VBCommon.Interfaces.IPlugin)
-                                    {
-                                        if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "PLSPanel")
-                                        {
-                                            ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                         }
+                        //if (topPlugin.PluginType == Globals.PluginType.Modeling)
+                        //{
+                        //    if (topPlugin.PanelKey.ToString() == "PLSPanel") //if top is PLS, need to show GBM
+                        //    {
+                        //        foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
+                        //        {
+                        //            if (x is VBCommon.Interfaces.IPlugin)
+                        //            {
+                        //                if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "GBMPanel")
+                        //                {
+                        //                    {
+                        //                        ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
+                        //                        return;
+                        //                    }
+                        //                }
+                        //             }
+                        //        }
+                        //    }
+                        //    else if (topPlugin.PanelKey.ToString() == "GBMPanel") //if top is GBM, need to show PLS
+                        //    {
+                        //        foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
+                        //        {
+                        //            if (x is VBCommon.Interfaces.IPlugin)
+                        //            {
+                        //                if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "PLSPanel")
+                        //                {
+                        //                    ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
+                        //                    return;
+                        //                }
+                        //            }
+                        //        }
+                        //    }
+                        // }
                         //just MakeActive() doesn't work.. makes the panel active, but doesn't show tab and ribbon
                         //need to add showing the model too if prediction is top..getting wiped out (removed).. something with location still resetting it.
 
-                        topPlugin.Show();
+                       // topPlugin.Show();
                         topPlugin.MakeActive();
                     }
                 }
