@@ -23,6 +23,7 @@ namespace VBProjectManager
         public delegate void MessageLoggedEventHandler(String message, Globals.targetSStrip target);
         public event MessageLoggedEventHandler MessageEventLogged;
 
+
         private bool lastsession;
 
         public bool LastSessionClosed

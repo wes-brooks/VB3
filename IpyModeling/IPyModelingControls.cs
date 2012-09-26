@@ -15,6 +15,7 @@ using VBCommon;
 using System.Threading;
 using Newtonsoft.Json;
 using VBDatasheet;
+using VBProjectManager;
 
 
 namespace IPyModeling
@@ -389,7 +390,6 @@ namespace IPyModeling
         private void ProvideData(object sender, ModelingCallback CallbackObject)
         {
             Cursor.Current = Cursors.WaitCursor;
-
             DataTable modelDataTable;
            
             modelDataTable = CreateModelDataTable();
@@ -467,13 +467,16 @@ namespace IPyModeling
         //This method alerts the container that we need data. The container should then use the Set property of sender.data
         protected void StartModeling()
         {
+            VBLogger.GetLogger().LogEvent("40", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
 
+            VBLogger.GetLogger().LogEvent("50", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             if (DataRequested != null)
             {
                 ModelingCallback e = new ModelingCallback(MakeModel);
                 DataRequested(this, e);
             }
+            VBLogger.GetLogger().LogEvent("60", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
         }
 
 
@@ -785,7 +788,7 @@ namespace IPyModeling
                 list.Add(lbIndVariables.Items[i].ToString());
             
             DataTable dtModel = dvCorr_.ToTable("ModelData", false, list.ToArray());
-
+            
             return dtModel;
         }
 
@@ -800,9 +803,12 @@ namespace IPyModeling
         //This button runs the modeling method associated with this pane.
         public void btnRun_Click(object sender, EventArgs e)
         {
+            VBLogger.GetLogger().LogEvent("0", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Clear();
             Cursor.Current = Cursors.WaitCursor;
-
+            
+            VBLogger.GetLogger().LogEvent("10", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            
             //check to see if the model tab was clicked first (otherwise will get error half way thru model run)
             if (model_data == null)
             {
@@ -819,12 +825,14 @@ namespace IPyModeling
 
             //Start running the model-building code.
             if (ipyInterface == null) RequestIronPythonInterface();
-            
+
+            VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+
             boolInitialControlStatus = boolControlStatus;
             ChangeControlStatus(false);
-
+            VBLogger.GetLogger().LogEvent("30", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             StartModeling();
-
+            VBLogger.GetLogger().LogEvent("70", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             //keep waiting..
             Cursor.Current = Cursors.WaitCursor;
 
@@ -836,15 +844,17 @@ namespace IPyModeling
                 return;
             }
 
-            Log("0", LogMessageEvent.Intents.UserOnly, LogMessageEvent.Targets.ProgressBar);
+            VBLogger.GetLogger().LogEvent("80", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+//            Log("0", LogMessageEvent.Intents.UserOnly, LogMessageEvent.Targets.ProgressBar);
             Application.DoEvents();
-
+            VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             //Now the model is done running, disable cancel/enable run buttons
             boolRunning = false;
             NotifyPropChanged(boolRunning);
-
+            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             //all done
             Cursor.Current = Cursors.Default;
+            
         }
 
 

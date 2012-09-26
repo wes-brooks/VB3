@@ -17,6 +17,7 @@ using VBCommon.Interfaces;
 using Ciloci.Flee;
 using IPyCommon;
 using IPyModeling;
+using VBProjectManager;
 using DotSpatial.Controls;
 using Newtonsoft.Json;
 
@@ -663,6 +664,7 @@ namespace IPyPrediction
         public void btnMakePredictions_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
+            VBLogger.GetLogger().LogEvent("0", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
             if (ipyInterface == null) RequestIronPythonInterface();
             if (ipyModel == null) RequestModel();
@@ -676,15 +678,17 @@ namespace IPyPrediction
             //end edits and accept changes on ob and iv tables
             dgvVariables.EndEdit();
             dtVariables.AcceptChanges();
+            dgvObs.EndEdit();      
 
-            dgvObs.EndEdit();            
+            VBLogger.GetLogger().LogEvent("10", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);      
             dtObs = (DataTable)dgvObs.DataSource;
             if (dtObs != null)
                 dtObs.AcceptChanges();
             //create table used for prediction
             DataTable tblForPrediction = dtVariables.AsDataView().ToTable();
             tblForPrediction.Columns.Remove("ID");
-            
+
+            VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             //formatting
             string[] strArrExpressions = strModelExpression.Split('+');
             foreach(string var in strArrExpressions)
@@ -696,13 +700,16 @@ namespace IPyPrediction
                         intIndx=0;
             }
 
+            VBLogger.GetLogger().LogEvent("30", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            
             //This pattern should match any variable transformation
             string pattern = @"(MAX|MEAN|PROD|SUM|MIN)\(([^\+]*)\)";
             Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
             Match m = r.Match(strModelExpression);
 
             Cursor.Current = Cursors.WaitCursor;
-                        
+            VBLogger.GetLogger().LogEvent("40", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+
             if(m.Success)
             {
                 //Create a list that will hold any matched transformations.
@@ -736,18 +743,23 @@ namespace IPyPrediction
                     m = m.NextMatch();
                 }
             }
+
+            VBLogger.GetLogger().LogEvent("50", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+
             //make prediction
             dynamic dynPredictions = ipyInterface.Predict(ipyModel, tblForPrediction);
             List<double> lstPredictions = ((IList<object>)dynPredictions).Cast<double>().ToList();
 
+            VBLogger.GetLogger().LogEvent("60", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
 
             //create prediction table to show prediction
             DataTable dtPredictions = new DataTable();
-
             dtPredictions.Columns.Add("ID", typeof(string));
             dtPredictions.Columns.Add("CalcValue", typeof(double));
 
+            VBLogger.GetLogger().LogEvent("70", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            
             for (int i = 0; i < lstPredictions.Count; i++)
             {
                 DataRow dr = dtPredictions.NewRow();
@@ -756,8 +768,11 @@ namespace IPyPrediction
                 dtPredictions.Rows.Add(dr);
             }
 
-            dtStats = GeneratePredStats(dtPredictions, dtObs, tblForPrediction);
+            VBLogger.GetLogger().LogEvent("80", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             
+            dtStats = GeneratePredStats(dtPredictions, dtObs, tblForPrediction);
+
+            VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
 
              if (dtStats == null)
@@ -767,7 +782,11 @@ namespace IPyPrediction
             foreach (DataGridViewColumn dvgCol in dgvStats.Columns)
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
 
-            setViewOnGrid(dgvStats);            
+            
+            setViewOnGrid(dgvStats);
+
+            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            
         }
 
 

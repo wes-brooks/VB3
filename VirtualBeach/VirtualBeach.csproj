@@ -124,6 +124,10 @@
     <None Include="Resources\map_16x16.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IpyModeling\IPyModeling.csproj">
+      <Project>{ADE70E49-1CEB-4526-A7BB-D8A99246D718}</Project>
+      <Name>IPyModeling</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VBCommon\VBCommon.csproj">
       <Project>{01086CD1-5D59-4C17-80D4-2E99E99DF62C}</Project>
       <Name>VBCommon</Name>
@@ -136,6 +140,9 @@
       <Project>{56A96878-2E76-41B4-858A-6AAB61F99CE8}</Project>
       <Name>VBProjectManager</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

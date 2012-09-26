@@ -196,6 +196,10 @@
       <Project>{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}</Project>
       <Name>VBDockManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VBProjectManager\VBProjectManager.csproj">
+      <Project>{56A96878-2E76-41B4-858A-6AAB61F99CE8}</Project>
+      <Name>VBProjectManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
