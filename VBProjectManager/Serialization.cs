@@ -35,7 +35,6 @@ namespace VBProjectManager
                 if (dr != DialogResult.OK)
                 { return; }
 
-                //save the file name and path
                 strPathName = saveFile.FileName;
                 FileInfo fi = new FileInfo(strPathName);
                 strProjectName = fi.Name;
@@ -43,7 +42,6 @@ namespace VBProjectManager
 
             //Dictionary to store each plugin's state for saving
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
-            //raise the save request sending dictionary to store plugin's state
             signaller.RaiseSaveRequest(dictPluginStates);
 
             //loop through plugins to get values and types
@@ -58,7 +56,6 @@ namespace VBProjectManager
                 Dictionary<string, Type> dictObjectType = new Dictionary<string, Type>(); 
                 //holds all of the dictionaries
                 List<object> lstContainer = new List<object>();  
-
                 string strPluginKey = plugin.Key;                
                 //holds the packed plugin
                 IDictionary<string, object> dictPluginState = plugin.Value;
@@ -193,8 +190,15 @@ namespace VBProjectManager
                 {
                     if (x is VBCommon.Interfaces.IPlugin)
                     {
+<<<<<<< HEAD
                         if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[this.strPluginKey]["TopPlugin"].ToString())
                             ((VBCommon.Interfaces.IPlugin)x).MakeActive();
+=======
+                        VBCommon.Interfaces.IPlugin topPlugin = (VBCommon.Interfaces.IPlugin)x;
+                        //just MakeActive() doesn't work.. makes the panel active, but doesn't show tab and ribbon
+                        topPlugin.Show();
+                        topPlugin.MakeActive();
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
                     }
                 }
             }
@@ -215,10 +219,6 @@ namespace VBProjectManager
             {
                 this.UnpackState(e.PackedPluginStates[strPluginKey]);
             }
-            else
-            {
-                //Set this plugin to an empty state.
-            }
         }
 
                
@@ -236,8 +236,12 @@ namespace VBProjectManager
         //unpack plugin, assigning values from incoming dictionary
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {  
+<<<<<<< HEAD
             //this.strTopPlugin = (string)dictPackedState["TopPlugin"];
             this.strTopPlugin = (string)dictPackedState["TopPlugin"];
+=======
+            this.openingTopPlugin = (string)dictPackedState["TopPlugin"];
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             this.strPathName = (string)dictPackedState["ProjectName"];
 
             /*//Make the top plugin active

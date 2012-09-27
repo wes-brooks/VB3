@@ -24,8 +24,14 @@ namespace VBProjectManager
  //       private Dictionary<string, Boolean> dictTabStates;
         private string strPathName;
         private string strProjectName;
+<<<<<<< HEAD
         private string strTopPlugin; //plugin change event changes this value
         //public string openingTopPlugin;
+=======
+        //plugin change event changes this value
+        private string strTopPlugin; 
+        public string openingTopPlugin;
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
 
         private VBCommon.Signaller signaller = new VBCommon.Signaller();
         private Globals.PluginType _pluginType = VBCommon.Globals.PluginType.ProjectManager;
@@ -54,14 +60,12 @@ namespace VBProjectManager
             var btnOpen = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
             btnOpen.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnOpen.LargeImage = Resources.open_16x16;
-            //btnOpen.SmallImage = Resources.open_16x16;
             btnOpen.ToolTipText = "Open a saved project.";
             App.HeaderControl.Add(btnOpen);                
             //Add a Save button to the application ("File") menu.
             var btnSave = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", Save);
             btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSave.LargeImage = Resources.Save16x16;
-            //btnSave.SmallImage = Resources.save_16x16;
             btnSave.ToolTipText = "Save the current project state.";
             App.HeaderControl.Add(btnSave);
 
@@ -69,7 +73,6 @@ namespace VBProjectManager
             var btnSaveAs = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As", SaveAs);
             btnSaveAs.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSaveAs.LargeImage = Resources.SaveAs16x16;
-            //btnSaveAs.SmallImage = Resources.open_16x16;
             btnSaveAs.ToolTipText = "test hide panel";
             App.HeaderControl.Add(btnSaveAs);
             
@@ -77,7 +80,6 @@ namespace VBProjectManager
             var btnAbout = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             btnAbout.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnAbout.LargeImage = Resources.About_16x16;
-            //btnAbout.SmallImage = Resources.info_16x16;
             btnAbout.ToolTipText = "Open the 'About VirtualBeach' dialog";
             App.HeaderControl.Add(btnAbout);
 
@@ -117,7 +119,6 @@ namespace VBProjectManager
             {
                 if (x is IPlugin)
                 {
-                    //hide the rest
                     IPlugin pt = (IPlugin)x;
                     if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
                         pt.Hide();
@@ -156,15 +157,7 @@ namespace VBProjectManager
         {
             System.Windows.Forms.MessageBox.Show("this is a test.");
         }
-
-
-        ////not sure if used
-        //public Dictionary<string, Boolean> TabStates
-        //{
-        //    get { return dictTabStates; }
-        //    set { dictTabStates = value; }
-        //}
-
+        
 
         //holds project full path name
         public string ProjectPathName
@@ -268,7 +261,6 @@ namespace VBProjectManager
             {
                 if (x is IPlugin)
                 {
-                    //hide the rest
                     IPlugin pt = (IPlugin)x;
                     if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
                         pt.Hide();
@@ -323,7 +315,8 @@ namespace VBProjectManager
                             foreach (KeyValuePair<string, object> getValue in dictLastStackItem)
                             { dictUnpackThis = (Dictionary<string,object>)getValue.Value; }
                          
-                            thisPlug.UndoLastChange(dictUnpackThis);
+
+                           // Broadcast(this, dictUnpackThis);
                         }
                     }
                 }
@@ -344,7 +337,7 @@ namespace VBProjectManager
                         { //thisPlug.unpack back 
                             Dictionary<string, object> dictUnpackThis = new Dictionary<string, object>();
                             dictUnpackThis = (Dictionary<string, object>)dictLastStackItem[stackKey];
-                            thisPlug.UndoLastChange(dictUnpackThis);
+                            //thisPlug.UndoLastChange(dictUnpackThis);
                         }
                     }
                 }
@@ -352,6 +345,7 @@ namespace VBProjectManager
         }
 
 
+<<<<<<< HEAD
         /*//undo was hit, send the packed state to be unpacked
         public void UndoLastChange(Dictionary<string, object> packedState)
         {
@@ -359,14 +353,79 @@ namespace VBProjectManager
         }*/
 
 
+=======
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
         //listen to plugin's broadcast in order to update other plugins
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
             if (((IPlugin)sender).PluginType != Globals.PluginType.ProjectManager)
             {
+<<<<<<< HEAD
                 KeyValuePair<string, object> kvpStackObj = new KeyValuePair<string, object>(((VBCommon.Interfaces.IPlugin)sender).PanelKey, e.PackedPluginState);
                 UndoRedoStack.Push(kvpStackObj);    
             }
+=======
+                IPlugin dsplugin = (IPlugin)sender;
+                //determine if the datasheet has changed causing the model to clear
+                boolClearModel = (bool)e.PackedPluginState["ChangesMadeDS"];
+
+                //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
+                {
+                    IPlugin plugin = (IPlugin)ex;
+                    
+                    if (plugin.PluginType.ToString() == "Modeling")
+                        //already visible, just update not show again
+                        if (plugin.VisiblePlugin)
+                            return;
+                        //if datasheet is complete, show modeling
+                        else if (((IPlugin)sender).Complete)
+                        {
+                            //store if model is complete
+                            boolModelComplete = plugin.Complete ? true : false;
+                            plugin.Show();
+                        }
+                    if (plugin.PluginType.ToString() == "Prediction")
+                    {
+                        //check to see if the modeling is complete and it hasn't been cleared by any datasheet changes
+                        if (boolModelComplete && !boolClearModel)
+                        {
+                            plugin.Show();
+                            if (plugin.Complete)
+                            {
+                                plugin.MakeActive();
+                            }
+                            else
+                            {
+                                //loop through the extensions to get the modeling plugin to MakeActive()
+                                foreach (DotSpatial.Extensions.IExtension X in App.Extensions)
+                                {
+                                    IPlugin modelPlug = (IPlugin)X;
+                                    if (modelPlug.PluginType.ToString() == "Modeling")
+                                        modelPlug.MakeActive();
+                                }
+                            }
+                        }
+                    }
+                }
+            } //if modeling is broadcasting itself
+            else if (strPluginType == "Modeling")
+            {
+                //find prediction plugin, needs to show itself once modeling broadcasts itself with complete flag raised
+                foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
+                {
+                    IPlugin plugin = (IPlugin)ex;
+                    if (plugin.PluginType.ToString() == "Prediction")
+                        //already visible, just update not show again
+                        if (plugin.VisiblePlugin)
+                            return;
+                        else
+                            //modeling is complete, show prediction
+                            if (((IPlugin)sender).Complete)
+                                plugin.Show();
+                }
+            }                
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
         }
 
 

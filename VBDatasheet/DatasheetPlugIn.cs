@@ -35,12 +35,33 @@ namespace VBDatasheet
         private SimpleActionItem btnManipulate;
         private SimpleActionItem btnTransform;
         private SimpleActionItem btnGoToModeling;
-
         private RootItem rootDatasheetTab;
 
         private Boolean boolComplete;
         private Boolean boolVisible = true;
+<<<<<<< HEAD
         private Boolean boolInitialPass = true;
+=======
+        //keep track if first time through this plugin or coming back from model
+        private Boolean boolInitialEntry = true;
+        //is model complete
+        private Boolean boolModelComplete;
+        private Boolean boolChangesMadeDS;
+        //this plugin was clicked
+        private string strTopPlugin = string.Empty;
+        
+        //property to update topPlugin and raise event when changed
+        public string TopPlugin
+        {
+            get { return strTopPlugin; }
+            set
+            {
+                strTopPlugin = value;
+                signaller.RaiseStrPluginChange(strTopPlugin);
+            }
+        }
+
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
 
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -51,17 +72,27 @@ namespace VBDatasheet
             App.HeaderControl.RemoveAll();
             App.DockManager.Remove(strPanelKey);
             _frmDatasheet = null;
+<<<<<<< HEAD
 
+=======
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             base.Deactivate();
         }
 
 
         //hide plugin
         public void Hide()
+<<<<<<< HEAD
         {            
             App.HeaderControl.RemoveAll();
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
             boolVisible = false;
+=======
+        {
+            boolVisible = false;
+            App.HeaderControl.RemoveAll();
+            ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
         }
 
 
@@ -76,6 +107,10 @@ namespace VBDatasheet
         //make this plugin the active plugin
         public void MakeActive()
         {
+<<<<<<< HEAD
+=======
+            boolVisible = true;
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
         }
@@ -93,8 +128,13 @@ namespace VBDatasheet
 
             //when root item is selected
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
+<<<<<<< HEAD
             _frmDatasheet.NotifiableDataEvent += new EventHandler(NotifiableDataEventHandler);
             base.Activate(); //ensures "enabled" is set to true
+=======
+            _frmDatasheet.ChangeMade4Stack += new EventHandler(HandleAddToStack);
+            base.Activate();
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
         }
 
 
@@ -104,9 +144,12 @@ namespace VBDatasheet
             if (e.SelectedRootKey == strPanelKey)
             {
                 boolVisible = true;
-                //signaller.HidePlugins();
                 App.DockManager.SelectPanel(strPanelKey);
                 _frmDatasheet.Refresh();
+<<<<<<< HEAD
+=======
+                TopPlugin = strPanelKey;
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             }
         }
 
@@ -125,6 +168,7 @@ namespace VBDatasheet
         }
 
 
+<<<<<<< HEAD
         /*//return clear model flag
         public Boolean ClearModel
         {
@@ -137,6 +181,20 @@ namespace VBDatasheet
         {
             get { return boolInitialEntry; }
         }*/
+=======
+        //return plugin intial entry flag
+        public Boolean InitialEntry
+        {
+            get { return boolInitialEntry; }
+        }
+
+
+        //return whether model is complete
+        public Boolean ModelComplete
+        {
+            get { return boolModelComplete; }
+        }
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
 
 
         //return plugin complete flag
@@ -163,7 +221,6 @@ namespace VBDatasheet
             //tell ProjMngr if this is being Shown
             if (sender == "Show")
             {
-                //make this the selected root
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
 
@@ -242,6 +299,21 @@ namespace VBDatasheet
         }
 
 
+<<<<<<< HEAD
+=======
+        
+        //listen to other plugin's broadcasting their changes
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
+        {
+            if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
+                if ((bool)e.PackedPluginState["Complete"])
+                    boolModelComplete = true;
+        }
+        
+
+
+        //undo was hit, send the packed state to be unpacked
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
         public void UndoLastChange(Dictionary<string, object> packedState)
         {
             _frmDatasheet.UnpackState(packedState);
@@ -250,12 +322,21 @@ namespace VBDatasheet
 
         public void NotifiableDataEventHandler(object sender, EventArgs e)
         {
+<<<<<<< HEAD
             //We are handling a re-raised NotifiableDataEvent. The plugin's state is not considered complete b/c the user hasn't pressed the "Go To Modeling" button.
             boolComplete = false;
+=======
+            if (boolModelComplete)
+                boolChangesMadeDS = true;
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             Broadcast();
         }
 
 
+<<<<<<< HEAD
+=======
+        //broadcast changes to other plugins listening
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
         public void Broadcast()
         {
             IDictionary<string, object> packedState = new Dictionary<string, object>();
@@ -263,8 +344,12 @@ namespace VBDatasheet
 
             if (packedState == null)
                 return;
+<<<<<<< HEAD
             
             //boolClearModel = (bool)packedState["ChangesMadeDS"]; //needed for projectManager BroadcastListener
+=======
+            packedState.Add("ChangesMadeDS", boolChangesMadeDS);
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, packedState);
@@ -285,6 +370,7 @@ namespace VBDatasheet
 
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
+<<<<<<< HEAD
             IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
             //if ((bool)packedState["DSValidated"])
             //    boolComplete = true;
@@ -294,6 +380,14 @@ namespace VBDatasheet
             dictPackedState.Add("InitialPass", boolInitialPass);
 
             e.PackedPluginStates.Add(strPanelKey, dictPackedState);
+=======
+            IDictionary<string, object> packedState = _frmDatasheet.PackState();
+            if ((bool)packedState["DSValidated"])
+                boolComplete = true;
+            packedState.Add("Complete", boolComplete);
+            packedState.Add("Visible", boolVisible);
+            e.PackedPluginStates.Add(strPanelKey, packedState);
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
         }
 
 
@@ -302,6 +396,7 @@ namespace VBDatasheet
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
+<<<<<<< HEAD
 
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolInitialPass = (bool)dictPlugin["InitialPass"];
@@ -312,6 +407,18 @@ namespace VBDatasheet
 
                 //then show the opening project datasheet
                 if ((bool)dictPlugin["Visible"])
+=======
+
+                //check to see if there already is a datasheet open, if so, close it before opening a saved project
+                if (VisiblePlugin)
+                    Hide();
+
+                boolVisible = (bool)dictPlugin["Visible"];
+                boolComplete = (bool)dictPlugin["Complete"];
+
+                
+                if (boolVisible)
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
                 {
                     this.Show();
 
@@ -323,11 +430,14 @@ namespace VBDatasheet
                         btnTransform.Enabled = true;
                     }
                 }
+<<<<<<< HEAD
                 _frmDatasheet.UnpackState(dictPlugin);
+=======
+                _frmDatasheet.UnpackState(e.PackedPluginStates[strPanelKey]);
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             }
             else
             {
-                //Set this plugin to an empty state.
                 Activate();
             }
         }
@@ -335,7 +445,7 @@ namespace VBDatasheet
 
         private void SendMessage(string message)
         {
-            if (MessageSent != null) //Has some method been told to handle this event?
+            if (MessageSent != null)
             {
                 VBCommon.PluginSupport.MessageArgs e = new VBCommon.PluginSupport.MessageArgs(message);
                 MessageSent(this, e);
@@ -349,7 +459,7 @@ namespace VBDatasheet
             {
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
-            }
+            } 
             //if ((e.ActivePanelKey == "PLSPanel" || e.ActivePanelKey == "GBMPanel") && boolComplete)
             //{
             //    boolInitialEntry = false;
@@ -377,12 +487,18 @@ namespace VBDatasheet
 
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
+<<<<<<< HEAD
             if (!boolInitialPass)
+=======
+            //only show this dialog if model is complete
+            if (boolModelComplete)
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             {
                 //Ask whether the user wants to clobber the modeling and prediction tabs by modifying the data.
                 DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
                 if (dlgr == DialogResult.Cancel)
                 {
+<<<<<<< HEAD
                     return;
                 }
             }
@@ -390,6 +506,12 @@ namespace VBDatasheet
             //Datasheet is complete when go to modeling is clicked
             boolComplete = true;
             boolInitialPass = false;
+=======
+                    boolModelComplete = false;
+                }
+            }
+            boolComplete = true;
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             Broadcast();
         }  
     }

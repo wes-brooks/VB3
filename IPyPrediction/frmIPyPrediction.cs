@@ -39,7 +39,6 @@ namespace IPyPrediction
         //only the main effects in the model
         private string[] strArrReferencedVars = null;
         private DataTable corrDT; 
-        //private DataTable modelDT = null;
         private List<ListItem> lstIndVars = null;
         //datatables in prediction
         private DataTable dtVariables = null;
@@ -141,6 +140,7 @@ namespace IPyPrediction
             get { return intSelectedListedModel; }
             set { intSelectedListedModel = value; }
         }
+
 
         //Reconstruct the saved prediction state
         public void UnpackState(IDictionary<string, object> dictPackedState)
@@ -269,15 +269,18 @@ namespace IPyPrediction
             dictPluginState.Add("Transform", dictTfrmDependentVariableTransform);
 
             //Remove the unserializable IronPython model objects:
+            //can't make changes inside a loop to the thing you are looping through
+            Dictionary<string,object> dictModelsSerialize = new Dictionary<string,object>();
+
             foreach (KeyValuePair<string, object> model in dictModels)
             {
                 IDictionary<string, object> dictModel = (IDictionary<string, object>)(model.Value);
                 dictModel.Remove("ModelByObject");
-                dictModels[model.Key] = dictModel;
+                dictModelsSerialize.Add(model.Key, dictModel); 
             }
 
             //Now add the lists to the packed state dictionary
-            dictPluginState.Add("AvailableModels", dictModels);
+            dictPluginState.Add("AvailableModels", dictModelsSerialize);
             dictPluginState.Add("AvailableModelsIndex", intSelectedListedModel);
 
             StringWriter sw = null;
@@ -336,8 +339,6 @@ namespace IPyPrediction
 
             //populate the listbox of available models
             string modelName = (string)dictModelObj["Model"].ToString();
-            //if there is a model with same name remove it... Or should we increment the names, so they can have more than 1 pls model to choose from?
-
             if (dictModels.ContainsKey(modelName))
             {
                 this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
@@ -358,8 +359,6 @@ namespace IPyPrediction
         //when user selects model to use, send it to SetModel()
         private void lstAvailModels_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-           
-            //get the model that's selected and send it to SetModel()
             string strSelectedItem = lstAvailModels.SelectedItem.ToString();
             intSelectedListedModel = lstAvailModels.SelectedIndex;
 
@@ -379,7 +378,6 @@ namespace IPyPrediction
         }
 
 
-
         //set the model using chosen model from listbox
         public void SetModel(IDictionary<string,object> dictPackedState)
         {
@@ -395,8 +393,10 @@ namespace IPyPrediction
 
             if (dictModel != null)
             {
+                Dictionary<string,object> packedDatasheet = new Dictionary<string,object>((Dictionary<string,object>)dictPackedState["PackedDatasheetState"]);
+
                 //datatables serialized as xml string to maintain extendedProperty values
-                string strXmlDataTable = (string)dictPackedState["CorrelationDataTable"];
+                string strXmlDataTable = (string)packedDatasheet["XmlDataTable"];
                 StringReader sr = new StringReader(strXmlDataTable);
                 DataSet ds = new DataSet();
                 ds.ReadXml(sr);
@@ -463,7 +463,6 @@ namespace IPyPrediction
             else
                 ipyModel = null;
         }
-
 
 
         private void dgvVariables_Scroll(object sender, ScrollEventArgs e)
@@ -552,7 +551,6 @@ namespace IPyPrediction
             if (dr == DialogResult.OK)
             {
                 dt = colMapper.MappedTable;
-
                 int errndx = 0;
                 if (!recordIndexUnique(dt, out errndx))
                 {
@@ -622,9 +620,8 @@ namespace IPyPrediction
             this.dgvStats.DataSource = null;
             this.dgvObs.DataSource = null;
             this.dgvVariables.DataSource = null;
-            //clear listbox
+
             lstAvailModels.Items.Clear();
-            //clear txtModel
             txtModel.Text = "";
             txtDecCrit.Text = "";
         }
@@ -1631,14 +1628,18 @@ namespace IPyPrediction
                 if (intColndx == 1)
                 {
                     if (!boolObsTransformed)
-                    {
-                        cmforResponseVar.MenuItems[0].Enabled = true; //we can transform a response variable
-                        cmforResponseVar.MenuItems[1].Enabled = false; //but we cannot untransform an untransformed variable
+                    { 
+                        //we can transform a response variable
+                        cmforResponseVar.MenuItems[0].Enabled = true;
+                        //but we cannot untransform an untransformed variable
+                        cmforResponseVar.MenuItems[1].Enabled = false;
                     }
                     else
                     {
-                        cmforResponseVar.MenuItems[0].Enabled = false; //but we cannot transform a transformed response
-                        cmforResponseVar.MenuItems[1].Enabled = true; //but we can untransform a transformed response
+                        //but we cannot transform a transformed response
+                        cmforResponseVar.MenuItems[0].Enabled = false; 
+                        //but we can untransform a transformed response
+                        cmforResponseVar.MenuItems[1].Enabled = true;
                     }
                     cmforResponseVar.Show(dgv, new Point(me.X, me.Y));
                 }
@@ -1688,8 +1689,6 @@ namespace IPyPrediction
         public string ModelTabState
         {
             set { strModelTabClean = value; }
-        }
-
-  
+        }         
     }
 }

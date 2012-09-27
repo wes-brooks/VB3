@@ -41,8 +41,6 @@ namespace VBCommon.Controls
         private AddReplace addreplace;
 
         //data state relative to data used in modeling/residuals/prediction
-        //state is dirty until the project manager's version of the datatable
-        //matches the filtered "gotomodeling" datatable version
         public enum dtState { clean, dirty };
         private dtState state = dtState.dirty;
 
@@ -93,7 +91,8 @@ namespace VBCommon.Controls
             set { dt = value; }
         }
 
-
+        
+        // getter/setter for DTRowInformation
         public dtRowInformation DTRI
         {
             get { return this.dtRI; }
@@ -101,6 +100,7 @@ namespace VBCommon.Controls
         }
 
 
+        // getter/setter for DTColumnInformation
         public dtColumnInformation DTCI
         {
             get { return this.dtCI; }
@@ -258,39 +258,39 @@ namespace VBCommon.Controls
             listView1.View = View.Details;
 
             ListViewItem lvi;
-            //add column counts to listView
+            //add column counts
             lvi = new ListViewItem("Column Count");
             lvi.SubItems.Add(intNcols.ToString());
             listView1.Items.Add(lvi);
-            //add row counts to listView
+            //add row counts
             lvi = new ListViewItem("Row Count");
             lvi.SubItems.Add(intNrows.ToString());
             listView1.Items.Add(lvi);
-            //add datetime to listView
+            //add datetime
             lvi = new ListViewItem("Date-Time Index");
             lvi.SubItems.Add(strDtname);
             listView1.Items.Add(lvi);
-            //add resp var to listView
+            //add resp var
             lvi = new ListViewItem("Response Variable");
             lvi.SubItems.Add(strDepvarname);
             listView1.Items.Add(lvi);
-            //add space to listView
+            //add space
             lvi = new ListViewItem("");
             lvi.SubItems.Add("");
             listView1.Items.Add(lvi);
-            //add disabled row counts to listView
+            //add disabled row counts
             lvi = new ListViewItem("Disabled Row Count");
             lvi.SubItems.Add(intNdisabledrows.ToString());
             listView1.Items.Add(lvi);
-            //add disabled column counts to listView
+            //add disabled column counts
             lvi = new ListViewItem("Disabled Column Count");
             lvi.SubItems.Add(intNdisabledcols.ToString());
             listView1.Items.Add(lvi);
-            //add hidden column counts to listView
+            //add hidden column counts
             lvi = new ListViewItem("Hidden Column Count");
             lvi.SubItems.Add(intNhiddencols.ToString());
             listView1.Items.Add(lvi);
-            //add indep var counts to listView
+            //add indep var counts
             lvi = new ListViewItem("Independent Variable Count");
             lvi.SubItems.Add(intNivs.ToString());
             listView1.Items.Add(lvi);
@@ -457,10 +457,9 @@ namespace VBCommon.Controls
             return false;
         }
 
-        /// <summary>
-        /// determine if the table has manipulated (interacted) data columns
-        /// </summary>
-        /// <returns>true if table has manipulated columns, false otherwise</returns>
+
+        // determine if the table has manipulated (interacted) data columns
+        //true if table has manipulated columns, false otherwise</returns>
         public bool hasOCols()
         {
             foreach (DataColumn c in dt.Columns)
@@ -569,7 +568,6 @@ namespace VBCommon.Controls
                 DisableRow(null, null);
                 found = true;
 
-                //updateListView(_listvals.NDISABLEDROWS, ++_ndisabledrows);
                 break;
             }
             if (!found)
@@ -608,8 +606,6 @@ namespace VBCommon.Controls
 
 
         // set grid/listview properties for the user-selected row menu item Disable
-        // note that there are no table row extended properties - row status is tracked
-        // in the dtRowInformation class
         public void DisableRow(object sender, EventArgs e)
         {
             //update the dtRowInformation dictionary of disabled/enabled rows
@@ -633,8 +629,6 @@ namespace VBCommon.Controls
 
        
         // set grid/listview properties for the user-selected row menu item Enable
-        // note that there are no table row extended properties - row status is tracked
-        // in the dtRowInformation class
         public void EnableRow(object sender, EventArgs e)
         {
             dtRI.SetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString(), true);
@@ -774,19 +768,13 @@ namespace VBCommon.Controls
         }
 
 
-        /// <summary>
-        /// set table/grid/listview properties for the user-selected column menu item SetResponse.
-        /// pick this variable as the response variable, and if the previous response variable was a 
-        /// transform, delete it from the table and unhide its original column.  Further, if
-        /// independent variable transforms are present in the table remove them from the table (with 
-        /// user permission)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // set table/grid/listview properties for the user-selected column menu item SetResponse.
+        // pick this variable as the response variable, and if the previous response variable was a 
+        // transform, delete it from the table and unhide its original column.  Further, if
+        // independent variable transforms are present in the table remove them from the table (with 
+        // user permission)
         public void SetResponse(object sender, EventArgs e)
         {
-            //gridutils = new Utilities.GridUtils(dgv); //otherwise getting error at line 838 
-
             DialogResult dlgr = DialogResult.Yes;
             if (hasTCols())
             {
@@ -858,6 +846,7 @@ namespace VBCommon.Controls
                 NotifyContainer();
             }
         }
+
 
         public void EnableAllCols(object sender, EventArgs e)
         {
@@ -1060,7 +1049,6 @@ namespace VBCommon.Controls
         //event handler for packing state to save project
         public IDictionary<string, object> PackState()
         {
-            //save packed state to a dictionary
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
             
             //pack up mainEffect columns for Prediction
@@ -1114,7 +1102,7 @@ namespace VBCommon.Controls
             Filtered4ModelDt = this.filterDataTableRows(Filtered4ModelDt);
             Utilities.TableUtils tableutils = new Utilities.TableUtils(Filtered4ModelDt);
             Filtered4ModelDt = tableutils.filterRVHcols(Filtered4ModelDt);
-            dictPackedState.Add("DataSheetDatatable", Filtered4ModelDt);  //for modeling to use
+            dictPackedState.Add("DataSheetDatatable", Filtered4ModelDt);
 
             return dictPackedState;
         }
@@ -1186,8 +1174,7 @@ namespace VBCommon.Controls
             else
                 this.SelectedColIndex = (int)dictPackedState["CurrentColIndex"];
 
-
-            //.....need to change from 1 to the actual type.......
+            //need to change from 1 to the actual type
             string depVarTran = Convert.ToString(dictPackedState["DepVarTransform"]);
             this.DependentVariableTransform = (VBCommon.DependentVariableTransforms)Enum.Parse(typeof(VBCommon.DependentVariableTransforms), depVarTran);
             this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
@@ -1195,7 +1182,6 @@ namespace VBCommon.Controls
 
             maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
 
-            //initial info for the list
             this.FileName = (string)dictPackedState["fileName"];
 
             //unpack listInfo for model datasheet
@@ -1544,7 +1530,6 @@ namespace VBCommon.Controls
             dtRI = new dtRowInformation(dt);
             for (int r = 0; r < dt.Rows.Count; r++)
             {
-                //bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());
                 bool enabled = dtRI.GetRowStatus(dt.Rows[r][0].ToString());
                 if (!enabled)
                 {
@@ -1573,7 +1558,7 @@ namespace VBCommon.Controls
             {
                 //skips col 0 (date/time/string/whatever)
                 testcellval = dgv[col, 0].Value.ToString();
-                bool isNum = Information.IsNumeric(testcellval); //try a little visualbasic magic
+                bool isNum = Information.IsNumeric(testcellval); 
 
                 if (isNum)
                 {
@@ -1600,7 +1585,6 @@ namespace VBCommon.Controls
             dtRowInformation dtRI = new dtRowInformation(dt);
             for (int r = 0; r < dgv.Rows.Count; r++)
             {
-                //set style to black unless the row is disabled
                 dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
             }
         }
@@ -1631,10 +1615,8 @@ namespace VBCommon.Controls
             }
 
             //reset disable rows
-            //_dtRI = new dtRowInformation(dt);
             for (int r = 0; r < dt.Rows.Count; r++)
             {
-                //bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());
                 bool enabled = dtRI.GetRowStatus(dt.Rows[r][0].ToString());
                 if (!enabled)
                 {
@@ -1660,19 +1642,6 @@ namespace VBCommon.Controls
                     }
                 }
             }
-        }
-
-
-        public void btnComputeAO_Click(object sender, EventArgs e)
-        {
-        }
-
-        public void btnManipulate_Click(object sender, EventArgs e)
-        {
-        }
-
-        public void btnTransform_Click(object sender, EventArgs e)
-        {
         }
 
     }

@@ -27,7 +27,7 @@ namespace VBDatasheet
         private IDictionary<string, object> dictPackedDatasheetState = null;
 
         private bool boolInitialPass = true;
-        private bool boolValidated = false;
+        private bool boolValidated;
 
         public event EventHandler NotifiableDataEvent;
 
@@ -36,30 +36,22 @@ namespace VBDatasheet
         {
             InitializeComponent();
             this.dsControl1.NotifiableChangeEvent +=new EventHandler(this.UpdateData);
-         
         }
 
 
         //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
         public void UnpackState(IDictionary<string, object> dictPluginState)
         {
+<<<<<<< HEAD
             IDictionary<string, object> dictDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
             dsControl1.UnpackState(dictDatasheetState);
+=======
+            PackedDatasheetState = (IDictionary<string, object>)dictPluginState["PackedDatasheetState"];
+            dsControl1.UnpackState(PackedDatasheetState);
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
 
-            //get validated flag
             this.boolValidated = (bool)dictPluginState["DSValidated"];
-
-            //if changesMade is true then initialPass is false
-            if ((bool)dictPluginState["ChangesMadeDS"])
-                boolInitialPass = false;
-            else
-                boolInitialPass = true;
-           
-            //if clean, initial pass is false
-            //if (dsControl1.State.ToString() == "clean")
-            //    boolInitialPass = false;
-            //else
-            //    boolInitialPass = true;
+            this.boolInitialPass = (bool)dictPluginState["InitialPass"];
         }
 
 
@@ -72,29 +64,18 @@ namespace VBDatasheet
                 MessageBox.Show("You must define the transformation on the response variable before continuing");
                 return null;
             }
-            //save packed state to a dictionary
+
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
-
-            bool boolChangesMadeDS = false; ; //holds flag to clear model if changes made to ds
-
-            //have left and come back
-            if (!boolInitialPass)
-            {      
-                boolChangesMadeDS = true;
-                //dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-                
-            }
-            //else if (boolInitialPass) //haven't left and came back here
-            //{
-            //    dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-            //    boolInitialPass = false;
-
-            //}
-
+           
             dictPackedDatasheetState = dsControl1.PackState();
             dictPluginState.Add("PackedDatasheetState", dictPackedDatasheetState);
+<<<<<<< HEAD
             dictPluginState.Add("DSValidated", boolValidated);
             dictPluginState.Add("ChangesMadeDS", boolChangesMadeDS);
+=======
+            dictPluginState.Add("InitialPass", boolInitialPass);
+            dictPluginState.Add("DSValidated", boolValidated);
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
 
             return dictPluginState;
         }
@@ -102,8 +83,13 @@ namespace VBDatasheet
 
         public void UpdateData(object source, EventArgs e)
         {
+<<<<<<< HEAD
             //Re-raise the event to be handled at the plugin level
             if (NotifiableDataEvent != null)
+=======
+            
+             if (ChangeMade4Stack != null)
+>>>>>>> a6b2f91fbf737b2a211f552c2c51c015a079edcb
             {
                 NotifiableDataEvent(source, e);
             }
@@ -152,7 +138,7 @@ namespace VBDatasheet
                 if (c == 0)
                 {
                     dsControl1.DT.Columns[c].ExtendedProperties[VBCommon.Globals.DATETIMESTAMP] = true;
-                    dsControl1.dgv.Columns[c].ReadOnly = true; //cannot edit this puppy..... editable makes it breakable
+                    dsControl1.dgv.Columns[c].ReadOnly = true; //cannot edit this
                 }
                 if (c == 1) dsControl1.DT.Columns[c].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
                 dsControl1.dgv.Columns[c].SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -233,7 +219,7 @@ namespace VBDatasheet
             //when whatever checks we're doing are good, enable the manipulation buttons
             if (frmMissing.Status)
             {
-                dsControl1.DT = frmMissing.ValidatedDT; //keep the grid (updated in tool) data but update the global table
+                dsControl1.DT = frmMissing.ValidatedDT;
                 dsControl1.dgv.Enabled = true;
                 //update list in case they've deleted cols/rows
                 dsControl1.updateListView(VBCommon.Controls.DatasheetControl.listvals.NCOLS, dsControl1.DT.Columns.Count);
@@ -242,7 +228,6 @@ namespace VBDatasheet
                 dsControl1.updateListView(VBCommon.Controls.DatasheetControl.listvals.NIVS, dsControl1.NumberIVs);
                 int recount = dsControl1.DT.Rows.Count;
                 dsControl1.updateListView(VBCommon.Controls.DatasheetControl.listvals.NROWS, recount);
-                //_state = _dtState.clean;
                 dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
                 boolValidated = true;
             }
@@ -250,7 +235,6 @@ namespace VBDatasheet
             {
                 dsControl1.DT = savedt;
                 dsControl1.dgv.DataSource = dsControl1.DT;
-
                 dsControl1.dgv.Enabled = false;
                 dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);
                 dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);

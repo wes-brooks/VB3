@@ -46,35 +46,10 @@ namespace VBCommon.Metadata
                         else
                             dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
                     }
-                    //check to see if enabled col has been added yet first
-                    //if (_dt.Columns.Contains("Enabled"))
-                    //{
-                    //    if (_dt.Rows[r]["Enabled"].ToString() == Convert.ToString(1)) //the row is enabled
-                    //        dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
-                    //    else //the row is disabled
-                    //        dictRowStatus.Add(_dt.Rows[r][0].ToString(), false);
-                    //}
                     else  dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
                 }
             }
         }
-
-
-        /*/// <summary>
-        /// constructor optionally calls method to init the row information structure 
-        /// and return the itself - singleton
-        /// </summary>
-        /// <param name="dt">table to gather info on</param>
-        /// <param name="init">if true, initialize; for example, on import</param>
-        /// <returns></returns>
-        public static dtRowInformation getdtRI(DataTable dt, bool init)
-        {
-            //pass null after initialization to access the DTRowInfo property
-            //or pass init=true (after import) to initialize
-            if (this == null || init) dtRI = new dtRowInformation(dt);
-            return dtRI;
-        }*/
-
 
         /// <summary>
         /// method returns the enable/disable status of the row name (key)

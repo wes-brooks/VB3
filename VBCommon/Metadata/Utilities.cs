@@ -59,7 +59,6 @@ namespace VBCommon.Metadata
             public void registerNewCols(DataTable dt)
             {
                 _dtCI = new dtColumnInformation(dt);
-      //          _dtCI = dtColumnInformation.getdtCI(dt, false);
                 foreach (DataColumn c in dt.Columns)
                 {
                     if (!_dtCI.GetColStatus(c.ColumnName))
@@ -77,7 +76,6 @@ namespace VBCommon.Metadata
                 DataTable dtCopy = dt.Copy();
 
                 dtColumnInformation dtCI = new dtColumnInformation(dt);
-//                dtColumnInformation dtCI = dtColumnInformation.getdtCI(dt, false);
                 foreach (KeyValuePair<string, bool> kv in dtCI.DTColInfo)
                 {
                     if (kv.Value) continue; 
@@ -324,7 +322,6 @@ namespace VBCommon.Metadata
         /// </summary>
         public class GridUtils
         {
-            //private dtRowInformation _dtRI = null;
 
             public GridUtils(DataGridView dgv)
             {
@@ -364,13 +361,13 @@ namespace VBCommon.Metadata
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
-                            _dtCI.SetColStatus(c.ColumnName.ToString(), false);   //make sure col status is updated
+                            _dtCI.SetColStatus(c.ColumnName.ToString(), false);
                         }
                         else
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
-                            _dtCI.SetColStatus(c.ColumnName.ToString(), true);   //make sure col status is updated
+                            _dtCI.SetColStatus(c.ColumnName.ToString(), true); 
                         }
                     }
                 }
@@ -379,7 +376,6 @@ namespace VBCommon.Metadata
                 dgv.Columns[responseVarColName].DefaultCellStyle.BackColor = Color.LightBlue;
 
                 //reset disable rows
-                //_dtRI = new dtRowInformation(dt);
                 for (int r = 0; r < dt.Rows.Count; r++)
                 {
                     bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());
@@ -436,8 +432,6 @@ namespace VBCommon.Metadata
                 dtRowInformation dtRI = new dtRowInformation(dt);
                 for (int r = 0; r < dgv.Rows.Count; r++)
                 {
-                    //set style to black unless the row is disabled
-//                    if (!dtRI.getRowStatus(dgv[0, r].Value.ToString())) continue;  //error here on Value being null
                     dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
                 }
             }
