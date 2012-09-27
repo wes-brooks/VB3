@@ -1,5 +1,6 @@
 ﻿using DotSpatial.Controls;
 using DotSpatial.Controls.Docking;
+using DotSpatial.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -29,13 +30,11 @@ namespace VirtualBeach
             //Set the main application window to be the "Shell" 
             Shell = this;
             appManager.LoadExtensions();
-            
-
-            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.writeMessage));
+            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));
         }
 
         public AppManager appManager { get; set; }
-
+        
 
          ///<summary>
          ///method is UI message displayer from application components
@@ -43,7 +42,7 @@ namespace VirtualBeach
          ///</summary>
          ///<param name="message"></param>
          ///<param name="target"></param>
-        private void writeMessage(string message, Globals.targetSStrip target)
+        private void WriteMessage(string message, Globals.targetSStrip target)
         {
             switch (target)
             {
@@ -60,7 +59,7 @@ namespace VirtualBeach
                     int value = (int)Convert.ToInt32(message);
                     //int value = (int) Convert.ToSingle(message);
                     toolStripProgressBar1.Value = value;
-                    if (value == 110)
+                    if (value == 100)
                         toolStripProgressBar1.Value = 0;
                     break;
                 default:
