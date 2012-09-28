@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Drawing;
 using System.Windows.Forms;
 using VBProjectManager;
 using VBCommon;
@@ -29,7 +31,9 @@ namespace VirtualBeach
             
             //Set the main application window to be the "Shell" 
             Shell = this;
+            this.statusBar.Dock = DockStyle.Bottom;
             appManager.LoadExtensions();
+
             VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));
         }
 
@@ -66,6 +70,5 @@ namespace VirtualBeach
                     break;
             }
         }
-
     }
 }
