@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,12 +26,12 @@ namespace VBCommon
         //public event PluginMessageHandler<PluginArgs> PluginMessageReceived;
 
         //event for broadcasting
-        public delegate void BroadCastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event BroadCastEventHandler<BroadCastEventArgs> BroadcastState;
+        public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
+        public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
 
-        //event for updating strPluginKey for which plugin should be on top when proj opened
-        public delegate void UpdateStrPluginKey<TArgs>(TArgs args) where TArgs : EventArgs;
-        public event UpdateStrPluginKey<UpdateStrPlugOnTopEventArgs> strPluginTopChanged;
+        //event for broadcasting
+        public delegate void CompositionCatalogRequestHandler<TArgs>(object sender, ref TArgs args) where TArgs : EventArgs;
+        public event CompositionCatalogRequestHandler<CompositionCatalogRequestArgs> CompositionCatalogRequest;
 
         public delegate void HidePluginsHandler();
         public event HidePluginsHandler HideTabsEvent;
@@ -38,22 +39,23 @@ namespace VBCommon
         public Signaller() {}
 
 
-        //update the top plugin str key value for opening projects
-        public void RaiseStrPluginChange(string value)
-        {
-            if (strPluginTopChanged != null)
-            {
-                UpdateStrPlugOnTopEventArgs e = new UpdateStrPlugOnTopEventArgs(value);
-                strPluginTopChanged(e);
-            }
-        }
         //tell plugins to pack their states into a dictionary to pass to other plugins
         public void RaiseBroadcastRequest(object sender, IDictionary<string, object> dictPackedPlugin)
         {
             if (BroadcastState != null) //has some method been told to handle this event?
             {
-                BroadCastEventArgs e = new BroadCastEventArgs(sender, dictPackedPlugin);
+                BroadcastEventArgs e = new BroadcastEventArgs(sender, dictPackedPlugin);
                 BroadcastState(sender, e);
+            }
+        }
+
+
+        public void SolicitCatalogs(System.ComponentModel.Composition.Hosting.AggregateCatalog catalog, VBCommon.Globals.PluginType typeTargeted)
+        {
+            if (CompositionCatalogRequest != null)
+            {
+                CompositionCatalogRequestArgs e = new CompositionCatalogRequestArgs(catalog, typeTargeted);
+                CompositionCatalogRequest(this, ref e);
             }
         }
 

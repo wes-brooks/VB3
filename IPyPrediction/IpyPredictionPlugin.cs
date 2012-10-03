@@ -35,6 +35,7 @@ namespace IPyPrediction
         private SimpleActionItem btnPlot;
         private SimpleActionItem btnClear;
         private SimpleActionItem btnExportCSV;
+        private SimpleActionItem btnExportMEF;
 
         private RootItem rootIPyPredictionTab;
         //complete and visible flags
@@ -43,18 +44,6 @@ namespace IPyPrediction
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
-
-
-        //property to update topPlugin and raise event when changed
-        public string TopPlugin
-        {
-            get { return strTopPlugin; }
-            set
-            {
-                strTopPlugin = value;
-                signaller.RaiseStrPluginChange(strTopPlugin);
-            }
-        }
 
 
         //Raise a message
@@ -109,6 +98,8 @@ namespace IPyPrediction
         public override void Activate()
         {
             _frmIPyPred = new frmIPyPrediction();
+            _frmIPyPred.RequestCompositionCatalogs += new frmIPyPrediction.CompositionCatalogRequestHandler<VBCommon.PluginSupport.CompositionCatalogRequestArgs>(_frmIPyPred_RequestCompositionCatalogs);
+            
             AddPanel();
             AddRibbon("Activate");
 
@@ -126,7 +117,6 @@ namespace IPyPrediction
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
-                TopPlugin = strPanelKey;
             }
         }
 
@@ -191,6 +181,13 @@ namespace IPyPrediction
             btnExportCSV.GroupCaption = sGroupCaption;
             btnExportCSV.Enabled = true;
             App.HeaderControl.Add(btnExportCSV);
+
+
+            btnExportMEF = new SimpleActionItem(strPanelKey, "Import MEF", _frmIPyPred.MatchCompositionCatalogs);
+            btnExportMEF.LargeImage = Properties.Resources.ExportAsCSV;
+            btnExportMEF.GroupCaption = sGroupCaption;
+            btnExportMEF.Enabled = true;
+            App.HeaderControl.Add(btnExportMEF);
         }
 
 
@@ -216,6 +213,12 @@ namespace IPyPrediction
         }
 
 
+        private void _frmIPyPred_RequestCompositionCatalogs(object sender, ref VBCommon.PluginSupport.CompositionCatalogRequestArgs args)
+        {
+            signaller.SolicitCatalogs(args.Catalog, args.Type);
+        }
+
+
         //return the plugin type (Prediction)
         public Globals.PluginType PluginType
         {
@@ -238,7 +241,7 @@ namespace IPyPrediction
 
 
         //return the visible flag
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -257,23 +260,15 @@ namespace IPyPrediction
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
+            signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
-
-        }
-
-
-        //undo was hit, send the packed state to be unpacked
-        public void UndoLastChange(Dictionary<string, object> packedState)
-        {
-            
         }
 
 
         //event listener for plugin broadcasting changes
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
          {
              if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
              {

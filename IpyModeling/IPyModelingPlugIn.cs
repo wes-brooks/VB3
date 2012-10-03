@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.IO;
+using System.ComponentModel.Composition;
 using System.Windows.Forms;
 using System.Drawing;
 using DotSpatial.Controls;
@@ -50,18 +51,6 @@ namespace IPyModeling
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
-
-
-        //property to update topPlugin and raise event when changed
-        public string TopPlugin
-        {
-            get { return strTopPlugin; }
-            set
-            {
-                strTopPlugin = value;
-                signaller.RaiseStrPluginChange(strTopPlugin);
-            }
-        }
 
 
         //deactivate this plugin
@@ -113,7 +102,7 @@ namespace IPyModeling
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
             innerIronPythonControl.ModelUpdated += new EventHandler(HandleUpdatedModel);
             innerIronPythonControl.boolRunChanged += new IPyModelingControl.BoolChangedEvent(HandleRunCancelEnableState);
- //           innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
+            //innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
             innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
             innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
             innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
@@ -129,7 +118,6 @@ namespace IPyModeling
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
-                TopPlugin = strPanelKey;
             }
         }
 
@@ -245,7 +233,7 @@ namespace IPyModeling
 
 
         //returns visible flag
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -264,10 +252,29 @@ namespace IPyModeling
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
+            signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
+            signaller.CompositionCatalogRequest += new VBCommon.Signaller.CompositionCatalogRequestHandler<VBCommon.PluginSupport.CompositionCatalogRequestArgs>(MatchCompositionCatalog);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
+        }
+
+
+        //Add the current plugin's composition catalog to the AggregateCatalog that's being passed around.
+        public void MatchCompositionCatalog(object sender, ref VBCommon.PluginSupport.CompositionCatalogRequestArgs args)
+        {
+            if (args.Type == this.PluginType)
+            {
+                args.Catalog.Catalogs.Add(new System.ComponentModel.Composition.Hosting.AssemblyCatalog(System.Reflection.Assembly.GetExecutingAssembly()));
+            }
+        }
+
+
+        //This function imports the signaller from the VBProjectManager
+        [System.ComponentModel.Composition.Export("Predict")]
+        public int Predict()
+        {
+            return (17);
         }
 
 
@@ -279,7 +286,7 @@ namespace IPyModeling
 
 
         //event listener for plugin broadcasting changes
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
             //get out of here if global ds is just making changes to be added to the stack
             if (!(bool)((IPlugin)sender).Complete)

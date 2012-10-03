@@ -38,17 +38,6 @@ namespace VBLocation
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageSent;
 
-        //property to update topPlugin and raise event when changed
-        public string TopPlugin
-        {
-            get { return strTopPlugin; }
-            set
-            {
-                strTopPlugin = value;
-                signaller.RaiseStrPluginChange(strTopPlugin);
-            }
-        }
-
 
         public override void Deactivate()
         {
@@ -172,8 +161,6 @@ namespace VBLocation
             if (e.SelectedRootKey == strPanelKey)
             {
                 App.DockManager.SelectPanel(strPanelKey);
-                //make this the top plugin for ProjMngr to use when opening
-                TopPlugin = strPanelKey;
             }
         }
 
@@ -200,7 +187,7 @@ namespace VBLocation
 
 
         //returns visible flag
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -219,18 +206,10 @@ namespace VBLocation
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
-            signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener); 
+            signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
-        }
-
-
-        //listens for change in pluginKeyString
-        private void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
-        {
-
         }
 
 
@@ -269,7 +248,7 @@ namespace VBLocation
         }
 
 
-        private void BroadcastStateListener(object sender, BroadCastEventArgs e)
+        private void BroadcastStateListener(object sender, BroadcastEventArgs e)
         {
             //listen to others broadcast..receiving something
             //e.PackedPluginState

@@ -45,17 +45,6 @@ namespace VBDatasheet
         private Boolean boolChangesMadeDS;
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
-        
-        //property to update topPlugin and raise event when changed
-        public string TopPlugin
-        {
-            get { return strTopPlugin; }
-            set
-            {
-                strTopPlugin = value;
-                signaller.RaiseStrPluginChange(strTopPlugin);
-            }
-        }
 
 
         //raise a message
@@ -123,7 +112,6 @@ namespace VBDatasheet
                 boolVisible = true;
                 App.DockManager.SelectPanel(strPanelKey);
                 _frmDatasheet.Refresh();
-                TopPlugin = strPanelKey;
             }
         }
 
@@ -157,7 +145,7 @@ namespace VBDatasheet
 
 
         //return plugin visible flag
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -244,7 +232,7 @@ namespace VBDatasheet
         {
             //If we've successfully imported a Signaller, then connect its events to our handlers.
             signaller = GetSignaller();
-            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
+            signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
@@ -253,7 +241,7 @@ namespace VBDatasheet
 
         
         //listen to Model's complete status
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
                 if ((bool)e.PackedPluginState["Complete"])

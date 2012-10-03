@@ -24,7 +24,7 @@ namespace VBProjectManager
             if (ProjectPathName == null)
             {
                 //set up location for saved project to be stored
-                string strFilterstring = @"VB2 Project Files|*.vbpx|All Files|*.*";
+                string strFilterstring = @"VB3 Project Files|*.vbpx|All Files|*.*";
                 SaveFileDialog saveFile = new SaveFileDialog();
                 saveFile.Title = "Enter a file name to save your project information in.";
                 saveFile.Filter = strFilterstring;
@@ -101,13 +101,6 @@ namespace VBProjectManager
         }
 
 
-        //listens for change in pluginKeyString
-        public void strPluginTopChgdListener(VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs value)
-        {
-            this.strTopPlugin = value.PluginKeyString;
-        }
-
-
         public void SaveAs(object sender, EventArgs e)
         {
             //save an opened project 
@@ -180,9 +173,9 @@ namespace VBProjectManager
                     string jsonRep = pair.Value;
                                        
                     object objDeserialized = JsonConvert.DeserializeObject(jsonRep, jsonType);
+                    //add the newly constructed key value pair, containing correct class types to a dictionary
                     dictPluginState.Add(pair.Key, objDeserialized);
                 }
-
                 //Now store the packed plugin state in a dictionary
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
@@ -263,6 +256,10 @@ namespace VBProjectManager
             if (e.PackedPluginStates.ContainsKey(strPluginKey))
             {
                 this.UnpackState(e.PackedPluginStates[strPluginKey]);
+            }
+            else
+            {
+                //Set this plugin to an empty state.
             }
         }
 

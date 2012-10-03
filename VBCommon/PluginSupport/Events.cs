@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,12 @@ using System.Text;
 namespace VBCommon.PluginSupport
 {
     //Defines the event arguments used when broadcasting plugin
-    public class BroadCastEventArgs : EventArgs
+    public class BroadcastEventArgs : EventArgs
     {
         private object plugin;
         private IDictionary<string, object> packedPlugin;
 
-        public BroadCastEventArgs(object sender, IDictionary<string, object> dictBroadcast)
+        public BroadcastEventArgs(object sender, IDictionary<string, object> dictBroadcast)
         {
             this.plugin = sender;
             this.packedPlugin = dictBroadcast;
@@ -29,20 +30,31 @@ namespace VBCommon.PluginSupport
     }
 
 
-    //Define event arguments for updating the strPluginKey on top for opening projects
-    public class UpdateStrPlugOnTopEventArgs : EventArgs
+    //Defines the event arguments used when broadcasting plugin
+    public class CompositionCatalogRequestArgs : EventArgs
     {
-        private string strPlugKey;
+        private VBCommon.Globals.PluginType typeTargeted;
+        private System.ComponentModel.Composition.Hosting.AggregateCatalog catalog;
 
-        public UpdateStrPlugOnTopEventArgs(string pluginString)
+        public CompositionCatalogRequestArgs(System.ComponentModel.Composition.Hosting.AggregateCatalog catalog, VBCommon.Globals.PluginType typeTargeted)
         {
-            this.strPlugKey = pluginString;
+            this.catalog = catalog;
+            this.typeTargeted = typeTargeted;
         }
-        public string PluginKeyString
+
+        public VBCommon.Globals.PluginType Type
         {
-            get { return strPlugKey; }
+            get { return typeTargeted; }
+            set { typeTargeted = value; }
+        }
+
+        public System.ComponentModel.Composition.Hosting.AggregateCatalog Catalog
+        {
+            get { return catalog; }
+            set { catalog = value; }
         }
     }
+
 
     //Defines the event arguments used when unpacking a project from its saved state
     public class UnpackEventArgs : EventArgs

@@ -104,7 +104,8 @@ namespace VBProjectManager
             int pos = lstAllPluginTypes.IndexOf(lstAllPluginTypes.Min());
             DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
             IPlugin ex = (IPlugin)extension;
-            ex.MakeActive();
+            if (ex != null)
+                ex.MakeActive();
             
             //initialize only Datasheet is shown, all others are hidden
             foreach(DotSpatial.Extensions.IExtension x in App.Extensions)
@@ -190,7 +191,7 @@ namespace VBProjectManager
 
 
         //inherits from IPlugin, ProjectManager's visible flag doesn't change
-        public Boolean VisiblePlugin
+        public Boolean Visible
         {
             get { return boolVisible; }
         }
@@ -241,9 +242,8 @@ namespace VBProjectManager
             
             signaller.MessageReceived += new VBCommon.Signaller.MessageHandler<MessageArgs>(MessageReceived);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
-            signaller.strPluginTopChanged += new VBCommon.Signaller.UpdateStrPluginKey<VBCommon.PluginSupport.UpdateStrPlugOnTopEventArgs>(strPluginTopChgdListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
-            signaller.BroadcastState += new VBCommon.Signaller.BroadCastEventHandler<VBCommon.PluginSupport.BroadCastEventArgs>(BroadcastStateListener);
+            signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.HideTabsEvent += new VBCommon.Signaller.HidePluginsHandler(HideTabsListener);
         }
 
@@ -323,7 +323,7 @@ namespace VBProjectManager
 
 
         //listen to plugin's broadcast in order to update other plugins
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
             //populate stack
             Dictionary<string, object> dictStackObj = new Dictionary<string, object>();
@@ -347,11 +347,13 @@ namespace VBProjectManager
                 //find modeling plugin, needs to show itself once datasheet broadcasts itself with complete flag raised
                 foreach (DotSpatial.Extensions.IExtension ex in App.Extensions)
                 {
-                    IPlugin plugin = (IPlugin)ex;
+                    IPlugin plugin = ex as IPlugin;
+                    if (plugin == null)
+                        continue;
                     
                     if (plugin.PluginType.ToString() == "Modeling")
                         //already visible, just update not show again
-                        if (plugin.VisiblePlugin)
+                        if (plugin.Visible)
                             return;
                         //if datasheet is complete, show modeling
                         else if (((IPlugin)sender).Complete)
@@ -392,7 +394,7 @@ namespace VBProjectManager
                     IPlugin plugin = (IPlugin)ex;
                     if (plugin.PluginType.ToString() == "Prediction")
                         //already visible, just update not show again
-                        if (plugin.VisiblePlugin)
+                        if (plugin.Visible)
                             return;
                         else
                             //modeling is complete, show prediction

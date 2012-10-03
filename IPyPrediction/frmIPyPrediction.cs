@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Windows.Forms;
+using System.ComponentModel.Composition;
 using WeifenLuo.WinFormsUI.Docking;
 using VBCommon;
 using VBCommon.IO;
@@ -26,7 +27,7 @@ namespace IPyPrediction
 {
     //Prediction class.
     [JsonObject]
-    public partial class frmIPyPrediction : UserControl, IFormState
+    public partial class frmIPyPrediction : UserControl, IFormState, IPartImportsSatisfiedNotification
     {
         //Get access to the IronPython interface:
         private dynamic ipyInterface = IPyInterface.Interface;
@@ -62,6 +63,10 @@ namespace IPyPrediction
         public event EventHandler IronPythonInterfaceRequested;
         public event EventHandler ModelRequested;
         //public event EventHandler SelectedIndexChanged;
+
+        //Event requesting the CompositionCatalogs from modeling plugins
+        public delegate void CompositionCatalogRequestHandler<TArgs>(object sender, ref TArgs args) where TArgs : EventArgs;
+        public event CompositionCatalogRequestHandler<VBCommon.PluginSupport.CompositionCatalogRequestArgs> RequestCompositionCatalogs;
 
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
@@ -141,6 +146,32 @@ namespace IPyPrediction
             get { return intSelectedListedModel; }
             set { intSelectedListedModel = value; }
         }
+
+
+        //This function imports the signaller from the VBProjectManager
+        [System.ComponentModel.Composition.ImportMany("Predict", AllowRecomposition=true )]
+        public Func<int> GetPredict
+        {
+            get;
+            set;
+        }
+
+        public void OnImportsSatisfied()
+        {
+        }
+
+
+        public void MatchCompositionCatalogs(object sender, EventArgs e)
+        {
+            if (RequestCompositionCatalogs != null)
+            {
+                System.ComponentModel.Composition.Hosting.AggregateCatalog catalog = new System.ComponentModel.Composition.Hosting.AggregateCatalog();
+                catalog.Catalogs.Add(new System.ComponentModel.Composition.Hosting.AssemblyCatalog(System.Reflection.Assembly.GetCallingAssembly()));
+                VBCommon.PluginSupport.CompositionCatalogRequestArgs args = new VBCommon.PluginSupport.CompositionCatalogRequestArgs(catalog, VBCommon.Globals.PluginType.Modeling);
+                RequestCompositionCatalogs(this, ref args);
+            }
+        }
+
 
 
         //Reconstruct the saved prediction state
