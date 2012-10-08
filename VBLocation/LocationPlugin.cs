@@ -59,11 +59,11 @@ namespace VBLocation
         }
 
 
-        //undo was hit, send the packed state to be unpacked
+        /*//undo was hit, send the packed state to be unpacked
         public void UndoLastChange(Dictionary<string, object> packedState)
         {
            
-        }
+        }*/
 
 
         //add a datasheet plugin root item
@@ -110,17 +110,13 @@ namespace VBLocation
             AddRibbon("Activate");
             AddPanel();
 
-            //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
-
-            //when root item is selected
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
 
-            base.Activate(); //ensures "enabled" is set to true
+            base.Activate();
         }
 
 
-        //add a datasheet panel
         public void AddPanel()
         {
             var dp = new DockablePanel(strPanelKey, strPanelCaption, cLocation, System.Windows.Forms.DockStyle.Fill);
@@ -129,7 +125,6 @@ namespace VBLocation
         }
 
 
-        //show this plugin
         public void Show()
         {            
             AddRibbon("Show");
@@ -250,8 +245,6 @@ namespace VBLocation
 
         private void BroadcastStateListener(object sender, BroadcastEventArgs e)
         {
-            //listen to others broadcast..receiving something
-            //e.PackedPluginState
         }
 
 

@@ -15,8 +15,7 @@ namespace VBCommon.Interfaces
         Boolean Complete { get; }
         Boolean Visible { get; }
         void AddRibbon(string sender);
-        //void AddPanel();
         void Hide();
-        void Show();       
+        void Show();
     }
 }

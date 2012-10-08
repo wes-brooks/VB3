@@ -14,11 +14,10 @@ namespace VBCommon
         public event SerializationEventHandler<SerializationEventArgs> ProjectSaved;
         public event SerializationEventHandler<SerializationEventArgs> ProjectOpened;
 
-        //Request that plugins unpack their state... why?
+        //Request that plugins unpack their state
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event EventHandler<UnpackEventArgs> UnpackRequest;
 
-        //event for when a project is saved
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageReceived;
 
@@ -28,10 +27,6 @@ namespace VBCommon
         //event for broadcasting
         public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
-
-        //event for broadcasting
-        public delegate void CompositionCatalogRequestHandler<TArgs>(object sender, ref TArgs args) where TArgs : EventArgs;
-        public event CompositionCatalogRequestHandler<CompositionCatalogRequestArgs> CompositionCatalogRequest;
 
         public delegate void HidePluginsHandler();
         public event HidePluginsHandler HideTabsEvent;

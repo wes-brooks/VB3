@@ -192,51 +192,12 @@ namespace VBProjectManager
             //and I can't find where that's happening.
             foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
             {
-                if (x is VBCommon.Interfaces.IPlugin)
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
                 {
-                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == openingTopPlugin)
+                    if (x is VBCommon.Interfaces.IPlugin)
                     {
-                        VBCommon.Interfaces.IPlugin topPlugin = (VBCommon.Interfaces.IPlugin)x;
-
-                        //if modeling, need both PLS and GBM
-                        //if (topPlugin.PluginType == Globals.PluginType.Modeling)
-                        //{
-                        //    if (topPlugin.PanelKey.ToString() == "PLSPanel") //if top is PLS, need to show GBM
-                        //    {
-                        //        foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
-                        //        {
-                        //            if (x is VBCommon.Interfaces.IPlugin)
-                        //            {
-                        //                if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "GBMPanel")
-                        //                {
-                        //                    {
-                        //                        ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
-                        //                        return;
-                        //                    }
-                        //                }
-                        //             }
-                        //        }
-                        //    }
-                        //    else if (topPlugin.PanelKey.ToString() == "GBMPanel") //if top is GBM, need to show PLS
-                        //    {
-                        //        foreach (DotSpatial.Extensions.IExtension findOtherModel in App.Extensions)
-                        //        {
-                        //            if (x is VBCommon.Interfaces.IPlugin)
-                        //            {
-                        //                if (((VBCommon.Interfaces.IPlugin)findOtherModel).PanelKey.ToString() == "PLSPanel")
-                        //                {
-                        //                    ((VBCommon.Interfaces.IPlugin)findOtherModel).Show();
-                        //                    return;
-                        //                }
-                        //            }
-                        //        }
-                        //    }
-                        // }
-                        //just MakeActive() doesn't work.. makes the panel active, but doesn't show tab and ribbon
-                        //need to add showing the model too if prediction is top..getting wiped out (removed).. something with location still resetting it.
-
-                       // topPlugin.Show();
-                        topPlugin.MakeActive();
+                        if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[this.strPluginKey]["TopPlugin"].ToString())
+                            ((VBCommon.Interfaces.IPlugin)x).MakeActive();
                     }
                 }
             }
@@ -268,7 +229,7 @@ namespace VBProjectManager
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
-            dictPackedState.Add("TopPlugin", TopPlugin);
+            dictPackedState.Add("TopPlugin", strTopPlugin);
             dictPackedState.Add("ProjectName", ProjectName);
             
             return dictPackedState;
@@ -278,8 +239,19 @@ namespace VBProjectManager
         //unpack plugin, assigning values from incoming dictionary
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {  
-            this.openingTopPlugin = (string)dictPackedState["TopPlugin"];
+            //this.strTopPlugin = (string)dictPackedState["TopPlugin"];
+            this.strTopPlugin = (string)dictPackedState["TopPlugin"];
             this.strPathName = (string)dictPackedState["ProjectName"];
+
+            /*//Make the top plugin active
+            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+            {
+                if (x is VBCommon.Interfaces.IPlugin)
+                {
+                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == strTopPlugin)
+                        ((VBCommon.Interfaces.IPlugin)x).MakeActive();
+                }
+            }*/
         }
     }
 }

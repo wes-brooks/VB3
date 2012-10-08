@@ -138,12 +138,12 @@ namespace IPyModeling
         }
 
 
-        //get flag on whether prediction should clear
+        /*//get flag on whether prediction should clear
         [JsonProperty]
         public Boolean ClearPrediction
         {
             get { return boolClearPrediction; }
-        }
+        }*/
 
 
         //Get the list of the number of true positives
@@ -154,13 +154,13 @@ namespace IPyModeling
         }
 
 
-        // getter/setter for datasheet table
+        /*// getter/setter for datasheet table
         [JsonProperty]
         public IDictionary<string, object> PackedDatasheetState
         {
             set { dictPackedDatasheetState = value; }
             get { return dictPackedDatasheetState; }
-        }
+        }*/
 
 
         //Get the list of the number of true negatives
@@ -529,23 +529,11 @@ namespace IPyModeling
             });
         }
 
-        
-        ////maintain the model's ds when no changes made to global
-        //public void UnhideDatasheet(DataTable dt)
-        //{
-        //    dsControl1.UnhideModelDS(dt);
-        //}
-
 
         //Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string, object> packedState)
         {
-            dictPackedPlugin = packedState;
-
-            //setting data from datasheet will go through, setting data from an Undo will catch
-            try
             {
-                //check to see if we should clear the model
                 if ((bool)packedState["ChangesMadeDS"])
                 {
                     if (model_data != null)
@@ -557,10 +545,10 @@ namespace IPyModeling
                     
                 }
             }
-            catch { }
+            catch { }*/
 
 
-            dsControl1.UnpackState((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
+            dsControl1.UnpackState((IDictionary<string, object>)packedState["PackedDatasheetState"]); //((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
             
             dt = dsControl1.DT;
             this.correlationData = dsControl1.DT;
@@ -1058,7 +1046,7 @@ namespace IPyModeling
 
 
         //Pack State for Serializing
-        public IDictionary<string, object> PackProjectState()
+        public IDictionary<string, object> PackState()
         {
             if (dsControl1.DT == null)
                 return null;
@@ -1072,6 +1060,7 @@ namespace IPyModeling
             dictPluginState.Add("Transform", dictTransform);
             dictPluginState.Add("VirginState", this.boolVirgin);
             dictPluginState.Add("ThresholdingButtonsVisible", true);
+            dictPluginState.Add("ActiveTab", tabControl1.SelectedIndex);
 
             //Store the regulatory threshold
             double dblRegulatoryThreshold;
@@ -1086,7 +1075,7 @@ namespace IPyModeling
                     listPredictors.Add(item);
             }
 
-            dictPluginState.Add("CleanPredict", this.ClearPrediction);
+            //dictPluginState.Add("CleanPredict", this.ClearPrediction);
 
             //if just adding to stack, go to different pack to be used in setData()
             if (Model == null)
@@ -1128,18 +1117,19 @@ namespace IPyModeling
 
         
         //Reconstruct the saved modeling state - without the IronPython Model
-        public void UnpackProjectState(IDictionary<string, object> dictProjectState)
+        public void UnpackState(IDictionary<string, object> dictProjectState)
         {
             this.Show();
             if (dictProjectState.Count <= 3) return; //if only plugin props are here
 
             this.boolVirgin = (bool)dictProjectState["VirginState"];
 
-            PackedDatasheetState = (IDictionary<string, object>)dictProjectState["PackedDatasheetState"];
-            dsControl1.UnpackState(PackedDatasheetState);
+            //unpack the model's datasheet
+            this.SetData(dictProjectState);
 
             //unpack the saved state of PLS modeling control
-            tabControl1.SelectedTab = tabControl1.TabPages[2]; 
+            tabControl1.SelectedIndex = (int)(dictProjectState["ActiveTab"]); //model
+            //tabControl1.
 
             if (!boolVirgin)
             {

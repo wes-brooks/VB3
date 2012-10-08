@@ -39,19 +39,16 @@ namespace VBDatasheet
 
         private Boolean boolComplete;
         private Boolean boolVisible = true;
-        
+        private Boolean boolInitialPass = true;
+
         //is model complete
         private Boolean boolModelComplete;
         private Boolean boolChangesMadeDS;
-        //this plugin was clicked
-        private string strTopPlugin = string.Empty;
-
 
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
 
-        //deactivate this plugin
         public override void Deactivate()
         {
             App.HeaderControl.RemoveAll();
@@ -72,16 +69,15 @@ namespace VBDatasheet
 
         //show plugin
         public void Show()
-        {
-            boolVisible = true;
+        {            
             AddRibbon("Show");
+            boolVisible = true;
         }
 
 
         //make this plugin the active plugin
         public void MakeActive()
         {
-            boolVisible = true;
             App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
         }
@@ -99,8 +95,8 @@ namespace VBDatasheet
 
             //when root item is selected
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
-            _frmDatasheet.ChangeMade4Stack += new EventHandler(HandleAddToStack);
-            base.Activate();
+            _frmDatasheet.NotifiableDataEvent += new EventHandler(NotifiableDataEventHandler);
+            base.Activate(); //ensures "enabled" is set to true
         }
 
 
@@ -128,14 +124,7 @@ namespace VBDatasheet
         {
             get { return pluginType; }
         }
-
-
-        //return whether model is complete
-        public Boolean ModelComplete
-        {
-            get { return boolModelComplete; }
-        }
-
+        
 
         //return plugin complete flag
         public Boolean Complete
@@ -239,7 +228,7 @@ namespace VBDatasheet
         }
 
 
-        
+
         //listen to Model's complete status
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
@@ -247,42 +236,28 @@ namespace VBDatasheet
                 if ((bool)e.PackedPluginState["Complete"])
                     boolModelComplete = true;
         }
-        
 
 
-        //undo was hit, send the packed state to be unpacked
-        public void UndoLastChange(Dictionary<string, object> packedState)
+        public void NotifiableDataEventHandler(object sender, EventArgs e)
         {
-            _frmDatasheet.UnpackState(packedState);
-        }
+            //We are handling a re-raised NotifiableDataEvent. The plugin's state is not considered complete b/c the user hasn't pressed the "Go To Modeling" button.
+            boolComplete = false;
 
-
-        //handles broadcasting each change to be added to the stack
-        public void HandleAddToStack(object sender, EventArgs e)
-        {
-            if (boolComplete)
-            {
-                //don't want message box coming up until go to model is clicked...
-                //DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?",
-                //    "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                //if (dlgr == DialogResult.OK)
-                //{
-                    boolModelComplete = false;
-                    boolChangesMadeDS = true;
-                    boolComplete = false;
-            }
+            if (boolModelComplete)
+                boolChangesMadeDS = true;
+                
             Broadcast();
         }
 
 
-        //broadcast changes to other plugins listening
         public void Broadcast()
         {
             IDictionary<string, object> packedState = new Dictionary<string, object>();
             packedState = _frmDatasheet.PackState();
-            //if null, response var wasn't transformed
+
             if (packedState == null)
                 return;
+                
             packedState.Add("ChangesMadeDS", boolChangesMadeDS);
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
@@ -290,48 +265,67 @@ namespace VBDatasheet
         }
 
 
-        //event listener for saving packed state of datasheet
-        private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
         {
-            IDictionary<string, object> packedState = _frmDatasheet.PackState();
+            if (((IPlugin)sender).PluginType == Globals.PluginType.ProjectManager)
+            {
+                //Test whether this plugin is meant to restore the packed state.
+                //if (e.PackedPluginState.Keys == this.strPanelKey)
+                //{
 
-            packedState.Add("Complete", boolComplete);
-            packedState.Add("Visible", boolVisible);
-
-            e.PackedPluginStates.Add(strPanelKey, packedState);
+            }
         }
 
 
-        //Unpack the state of this plugin.
+        private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
+        {
+            IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
+
+            dictPackedState.Add("Complete", boolComplete);
+            dictPackedState.Add("Visible", boolVisible);
+            dictPackedState.Add("InitialPass", boolInitialPass);
+
+            e.PackedPluginStates.Add(strPanelKey, dictPackedState);
+        }
+
+
         private void ProjectOpenedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
-                //store whether the model is complete. (Will get caught if only datasheet was saved)
-                try
-                {
-                    IDictionary<string, object> dictPLSModelPlugin = e.PackedPluginStates["PLSPanel"];
-                    IDictionary<string, object> dictGBMModelPlugin = e.PackedPluginStates["GBMPanel"];
-                    if ((bool)dictPLSModelPlugin["Complete"] || (bool)dictGBMModelPlugin["Complete"])
-                        boolModelComplete = true;
-                }
-                catch { }
-
-                _frmDatasheet.UnpackState(e.PackedPluginStates[strPanelKey]);
-                
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
+
+                boolComplete = (bool)dictPlugin["Complete"];
+                boolInitialPass = (bool)dictPlugin["InitialPass"];
+
+                //check to see if there already is a datasheet open, if so, close it before opening a saved project
+                if (this.Visible)
+                    this.Hide();
+
+                IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
+                _frmDatasheet.UnpackState(dictPlugin);               
 
                 boolVisible = (bool)dictPlugin["Visible"];
                 //when opening a saved project that has a datasheet, it will be complete.
                 boolComplete = boolVisible; 
 
-                if (boolComplete)
+                if (boolVisible)
                 {
-                    btnComputeAO.Enabled = true;
-                    btnGoToModeling.Enabled = true;
-                    btnManipulate.Enabled = true;
-                    btnTransform.Enabled = true;
+                    this.Show();
+
+                    if (boolComplete)
+                    {
+                        btnComputeAO.Enabled = true;
+                        btnGoToModeling.Enabled = true;
+                        btnManipulate.Enabled = true;
+                        btnTransform.Enabled = true;
+                    }
                 }
+                _frmDatasheet.UnpackState(dictPlugin);
+            }
+            else
+            {
+                Activate();
             }
         }
 
@@ -346,7 +340,6 @@ namespace VBDatasheet
         }
 
 
-        //event triggered when another panel is selected from tabs
         void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
             if (e.ActivePanelKey == strPanelKey)
@@ -357,7 +350,6 @@ namespace VBDatasheet
         }
 
 
-        //importing datasheet
         void btnImport_Click(object sender, EventArgs e)
         {
             _frmDatasheet.btnImportData_Click(sender, e);
@@ -365,7 +357,6 @@ namespace VBDatasheet
         }
 
 
-        //validate datasheet
         void btnValidate_Click(object sender, EventArgs e)
         {
             _frmDatasheet.btnValidateData_Click(sender, e);
@@ -376,22 +367,23 @@ namespace VBDatasheet
         }
 
 
-        //ready to go to modeling now
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
-            //only show this dialog if model is complete and changes were made to the datasheet
-            //if (boolModelComplete && boolChangesMadeDS)
-            if (boolChangesMadeDS)
+            if (!boolInitialPass)
             {
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", 
-                    "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                if (dlgr == DialogResult.OK)
+                //Ask whether the user wants to clobber the modeling and prediction tabs by modifying the data.
+                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.Cancel)
                 {
-                    boolModelComplete = false;
+                    return;
                 }
             }
+
+            //Datasheet is complete when go to modeling is clicked
             boolComplete = true;
+            boolInitialPass = false;
             Broadcast();
+            
             //once you leave here, changes made to ds clear for next time here
             boolChangesMadeDS = false;
         }  

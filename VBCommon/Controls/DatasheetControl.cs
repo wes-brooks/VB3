@@ -798,7 +798,7 @@ namespace VBCommon.Controls
                 {
                     dt.Columns.Remove(dt.Columns[strResponseVarColName].Caption);
                     dt.AcceptChanges();
-                    unHideHiddenCols(dgv, dt);
+                    UnhideHiddenCols(dgv, dt);
 
                     updateListView(listvals.NHIDDENCOLS, --intNhiddencols);
                 }
@@ -1108,13 +1108,13 @@ namespace VBCommon.Controls
         }
 
 
-        //show the modeling datasheet when no changes made to global
+        /*//show the modeling datasheet when no changes made to global
         public void UnhideModelDS(DataTable dt)
         {
             this.DT = dt;
             maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
             showListInfo(this.FileName, this.DT);
-        }
+        }*/
 
 
         //unpack event handler. unpacks packed state in dictionary to repopulate datasheet
@@ -1627,7 +1627,7 @@ namespace VBCommon.Controls
         }
 
 
-        public void unHideHiddenCols(DataGridView dgv, DataTable dt)
+        public void UnhideHiddenCols(DataGridView dgv, DataTable dt)
         {
             foreach (DataColumn dc in dt.Columns)
             {

@@ -37,6 +37,7 @@ namespace IPyPrediction
         private SimpleActionItem btnExportCSV;
 
         private RootItem rootIPyPredictionTab;
+        
         //complete and visible flags
         public Boolean boolComplete;
         public Boolean boolVisible;
@@ -53,9 +54,7 @@ namespace IPyPrediction
         //deactivate this plugin
         public override void Deactivate()
         {
-            //remove ribbon tab
             App.HeaderControl.RemoveAll();
-            //remove plugin panel
             App.DockManager.Remove(strPanelKey);            
             _frmIPyPred = null;
             base.Deactivate();
@@ -68,26 +67,36 @@ namespace IPyPrediction
             boolVisible = false;
             App.HeaderControl.RemoveAll();
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            boolVisible = false;
         }
 
 
-        //show this plugin
         public void Show()
         {
             boolVisible = true;
             AddRibbon("Show");
             if (boolComplete)
             {
-                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-                App.HeaderControl.SelectRoot(strPanelKey);
+                //If this plugin is already visible, then do nothing.
+                return;
+            }
+            else
+            {                
+                //boolHasBeenVisible = true;
+                AddRibbon("Show");
+
+                if (boolComplete)
+                {
+                    ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                    App.HeaderControl.SelectRoot(strPanelKey);
+                }
+                boolVisible = true;
             }
         }
 
 
-        //make this plugin the active one
         public void MakeActive()
         {
-            boolVisible = true;
             App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
         }
@@ -282,22 +291,25 @@ namespace IPyPrediction
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
          {
-             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
-             {
-                 //add the model to list of Available Models
-                 if (((IPlugin)sender).Complete)
-                     _frmIPyPred.AddModel(e.PackedPluginState);
+            if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
+            {
+                //add the model to list of Available Models
+                if (((IPlugin)sender).Complete)
+                    _frmIPyPred.AddModel(e.PackedPluginState);
 
-                 //if the prediction is complete and the model was cleared, clear the prediction
-                 if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
-                 {
-                     _frmIPyPred.ClearDataGridViews();
-                     boolComplete = false;
-                     //add the modified model to list of Available Models if just changed (not cleared)
-                     if ((bool)e.PackedPluginState["Complete"])
-                         _frmIPyPred.AddModel(e.PackedPluginState);
-                 }
-             }
+                //if the prediction is complete and the model was cleared, clear the prediction
+                if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
+                {
+                    _frmIPyPred.ClearDataGridViews();
+                    boolComplete = false;
+                    //add the modified model to list of Available Models if just changed (not cleared)
+                    if ((bool)e.PackedPluginState["Complete"])
+                        _frmIPyPred.AddModel(e.PackedPluginState);
+                }
+            }
+            if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
+                if (boolComplete)
+                    Show();
         }
 
 
