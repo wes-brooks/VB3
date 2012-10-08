@@ -255,26 +255,7 @@ namespace IPyModeling
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
-            signaller.CompositionCatalogRequest += new VBCommon.Signaller.CompositionCatalogRequestHandler<VBCommon.PluginSupport.CompositionCatalogRequestArgs>(MatchCompositionCatalog);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
-        }
-
-
-        //Add the current plugin's composition catalog to the AggregateCatalog that's being passed around.
-        public void MatchCompositionCatalog(object sender, ref VBCommon.PluginSupport.CompositionCatalogRequestArgs args)
-        {
-            if (args.Type == this.PluginType)
-            {
-                args.Catalog.Catalogs.Add(new System.ComponentModel.Composition.Hosting.AssemblyCatalog(System.Reflection.Assembly.GetExecutingAssembly()));
-            }
-        }
-
-
-        //This function imports the signaller from the VBProjectManager
-        [System.ComponentModel.Composition.Export("Predict")]
-        public int Predict()
-        {
-            return (17);
         }
 
 

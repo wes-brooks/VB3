@@ -1616,6 +1616,15 @@ namespace IPyModeling
                 ipyModel = null;
         }
 
+
+        public List<double> Predict(DataTable tblForPrediction)
+        {
+            dynamic dynPredictions = ipyInterface.Predict(ipyModel, tblForPrediction);
+            List<double> lstPredictions = ((IList<object>)dynPredictions).Cast<double>().ToList();
+            return (lstPredictions);
+        }
+
+
         public void btnComputeAO_Click(object sender, EventArgs e)
         {
 

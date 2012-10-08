@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LogUtilities">
-      <HintPath>..\Externals\LogUtilities\LogUtilities.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -71,6 +68,7 @@
     <Compile Include="Controls\DatasheetControl.designer.cs">
       <DependentUpon>DatasheetControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IModel.cs" />
     <Compile Include="Metadata\dtColumnInformation.cs" />
     <Compile Include="Metadata\dtRowInformation.cs" />
     <Compile Include="Controls\frmMissingValues.cs">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -27,50 +28,40 @@ namespace IPyPrediction
 {
     //Prediction class.
     [JsonObject]
-    public partial class frmIPyPrediction : UserControl, IFormState, IPartImportsSatisfiedNotification
+    public partial class frmIPyPrediction : UserControl, IFormState
     {
         //Get access to the IronPython interface:
         private dynamic ipyInterface = IPyInterface.Interface;
         protected dynamic ipyModel = null;
-        //menu to hold transform types
         private ContextMenu cmforResponseVar = new ContextMenu();
-        //main effect variables
         private Dictionary<string, string> dictMainEffects;
-        //txtModel text
         private string strModelExpression = "";
-        //only the main effects in the model
+
+        private IModel model = null;
+        public List<Lazy<IModel, IDictionary<string, object>>> models;
+
         private string[] strArrReferencedVars = null;
         private DataTable corrDT; 
         private List<ListItem> lstIndVars = null;
-        //datatables in prediction
+
         private DataTable dtVariables = null;
         private DataTable dtObs = null;
         private DataTable dtStats = null;
-        //transform types
+
         private Dictionary<string, object> dictTransform = new Dictionary<string, object>();
-        //holds datatable for transform types
         private DataTable dtObsOrig = null;
-        //has transform occurred
         private bool boolObsTransformed = false;
-        //dictionary of packed state coming in from model
-        //IDictionary<string, object> dictPackedSt = new Dictionary<string,object>();
-        //holds models that are in the listbox
+        
         IDictionary<string, object> dictModels = new Dictionary<string, object>();
-        //holds the selected model's index
         private int intSelectedListedModel; 
 
         //Added for IronPython-based modeling:
         public event EventHandler IronPythonInterfaceRequested;
         public event EventHandler ModelRequested;
-        //public event EventHandler SelectedIndexChanged;
-
-        //Event requesting the CompositionCatalogs from modeling plugins
-        public delegate void CompositionCatalogRequestHandler<TArgs>(object sender, ref TArgs args) where TArgs : EventArgs;
-        public event CompositionCatalogRequestHandler<VBCommon.PluginSupport.CompositionCatalogRequestArgs> RequestCompositionCatalogs;
+        public event EventHandler RequestModelPluginList;
 
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
-
 
         //constructor
         public frmIPyPrediction()
@@ -148,32 +139,6 @@ namespace IPyPrediction
         }
 
 
-        //This function imports the signaller from the VBProjectManager
-        [System.ComponentModel.Composition.ImportMany("Predict", AllowRecomposition=true )]
-        public Func<int> GetPredict
-        {
-            get;
-            set;
-        }
-
-        public void OnImportsSatisfied()
-        {
-        }
-
-
-        public void MatchCompositionCatalogs(object sender, EventArgs e)
-        {
-            if (RequestCompositionCatalogs != null)
-            {
-                System.ComponentModel.Composition.Hosting.AggregateCatalog catalog = new System.ComponentModel.Composition.Hosting.AggregateCatalog();
-                catalog.Catalogs.Add(new System.ComponentModel.Composition.Hosting.AssemblyCatalog(System.Reflection.Assembly.GetCallingAssembly()));
-                VBCommon.PluginSupport.CompositionCatalogRequestArgs args = new VBCommon.PluginSupport.CompositionCatalogRequestArgs(catalog, VBCommon.Globals.PluginType.Modeling);
-                RequestCompositionCatalogs(this, ref args);
-            }
-        }
-
-
-
         //Reconstruct the saved prediction state
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {
@@ -184,6 +149,7 @@ namespace IPyPrediction
                 return;
             
             ipyModel = ipyInterface.Deserialize(dictModelStr["ModelString"]);
+            
             
             dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
             if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.none))
@@ -410,6 +376,17 @@ namespace IPyPrediction
             }
 
             SetModel((IDictionary<string, object>)dictModels[strSelectedItem]);
+
+            foreach (Lazy<IModel, IDictionary<string, object>> module in models)
+            {
+                if (module.Metadata["PluginKey"].ToString() == strSelectedItem)
+                {
+                    //Debug.WriteLine("Module loaded: " + module.Metadata.Name);
+                    model = module.Value; //Will create an instance
+                }
+            }
+            //models
+            //model = models[];
         }
 
 
@@ -445,10 +422,10 @@ namespace IPyPrediction
                 
                 //This is how VB makes predictions in IronPython:
                 ipyModel = dictModel["Model"];
-                //format txtModel textbox
+                
                 strModelExpression = ipyInterface.GetModelExpression(ipyModel).Replace("[", "(").Replace("]", ")");
                 txtModel.Text = strModelExpression;
-                //add first 2 column names to list
+
                 List<string> list = new List<string>();
                 list.Add(corrDT.Columns[0].ColumnName);
                 list.Add(corrDT.Columns[1].ColumnName);
@@ -812,12 +789,10 @@ namespace IPyPrediction
             dgvStats.DataSource = dtStats;
             foreach (DataGridViewColumn dvgCol in dgvStats.Columns)
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-
-            
+                        
             setViewOnGrid(dgvStats);
 
-            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            
+            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);            
         }
 
 
@@ -983,6 +958,13 @@ namespace IPyPrediction
             cmforResponseVar.MenuItems[0].MenuItems.Add("Ln", new EventHandler(LnT));
             cmforResponseVar.MenuItems[0].MenuItems.Add("Power", new EventHandler(PowerT));
             cmforResponseVar.MenuItems.Add("Untransform", new EventHandler(Untransform));
+
+            //Request that the prediction plugin pass along its list of modeling plugins.
+            if (RequestModelPluginList != null)
+            {
+                EventArgs args = new EventArgs();
+                RequestModelPluginList(this, args);
+            }
         }
 
 

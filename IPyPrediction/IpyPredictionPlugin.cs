@@ -35,7 +35,6 @@ namespace IPyPrediction
         private SimpleActionItem btnPlot;
         private SimpleActionItem btnClear;
         private SimpleActionItem btnExportCSV;
-        private SimpleActionItem btnExportMEF;
 
         private RootItem rootIPyPredictionTab;
         //complete and visible flags
@@ -98,7 +97,7 @@ namespace IPyPrediction
         public override void Activate()
         {
             _frmIPyPred = new frmIPyPrediction();
-            _frmIPyPred.RequestCompositionCatalogs += new frmIPyPrediction.CompositionCatalogRequestHandler<VBCommon.PluginSupport.CompositionCatalogRequestArgs>(_frmIPyPred_RequestCompositionCatalogs);
+            _frmIPyPred.RequestModelPluginList += new EventHandler(PassModelPluginList);
             
             AddPanel();
             AddRibbon("Activate");
@@ -181,13 +180,6 @@ namespace IPyPrediction
             btnExportCSV.GroupCaption = sGroupCaption;
             btnExportCSV.Enabled = true;
             App.HeaderControl.Add(btnExportCSV);
-
-
-            btnExportMEF = new SimpleActionItem(strPanelKey, "Import MEF", _frmIPyPred.MatchCompositionCatalogs);
-            btnExportMEF.LargeImage = Properties.Resources.ExportAsCSV;
-            btnExportMEF.GroupCaption = sGroupCaption;
-            btnExportMEF.Enabled = true;
-            App.HeaderControl.Add(btnExportMEF);
         }
 
 
@@ -264,6 +256,26 @@ namespace IPyPrediction
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
+
+            int z = models.Count();
+        }
+
+
+        //This function imports the signaller from the VBProjectManager
+        [System.ComponentModel.Composition.ImportMany(typeof(VBCommon.Interfaces.IModel))]
+        private List<Lazy<IModel, IDictionary<string, object>>> models = null;
+
+
+        //Expose the list of models via a property so that the control form can pull it out.
+        public List<Lazy<IModel, IDictionary<string, object>>> Models
+        {
+            get { return (models); }
+        }
+
+
+        private void PassModelPluginList(object sender, EventArgs e)
+        {
+            ((frmIPyPrediction)sender).models = models;
         }
 
 
