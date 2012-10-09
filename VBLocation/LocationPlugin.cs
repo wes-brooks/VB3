@@ -106,14 +106,16 @@ namespace VBLocation
 
         public override void Activate()
         {
-            cLocation = new frmLocation(this) { Dock = System.Windows.Forms.DockStyle.Fill };
-            AddRibbon("Activate");
-            AddPanel();
+            cLocation = new frmLocation();
 
+            AddPanel();
+            AddRibbon("Activate");
+
+            //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
 
-            base.Activate();
+            base.Activate(); 
         }
 
 

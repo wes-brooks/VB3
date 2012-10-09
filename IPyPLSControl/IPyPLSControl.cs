@@ -30,7 +30,7 @@ namespace IPyPLSControl
             lblDecisionThreshold.Text = "";
             lblNcomp.Text = "";
 
-            base.Clear();
+            base.ClearModelingTab();
         }
 
 

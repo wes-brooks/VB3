@@ -89,12 +89,28 @@ namespace IPyModeling
         {
             this.funcRunModeling = callback;
         }
-
-
+        
         //Public property to read the message
         public void MakeModel(DataTable Data)
         {
             this.funcRunModeling(Data);
+        }
+    }
+
+
+    //This event is raised to pass a message to the container's project manager.
+    public class RunButtonStatusArgs : EventArgs
+    {
+        private bool boolRunButtonStatus;
+
+        public RunButtonStatusArgs(bool status)
+        {
+            this.boolRunButtonStatus = status;
+        }
+        
+        public bool Status 
+        {
+            get { return(boolRunButtonStatus); }
         }
     }
 }

@@ -60,12 +60,12 @@ namespace VBLocation
         private LocationPlugin _plugin = null;
 
         
-        public frmLocation(LocationPlugin plugin)
+        public frmLocation()//LocationPlugin plugin)
         {
             InitializeComponent();
             String strPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             MainMap.CacheLocation = strPath + "\\cache";
-            _plugin = plugin;
+            //_plugin = plugin;
             InitMap();
             showDefaultMap();
         }

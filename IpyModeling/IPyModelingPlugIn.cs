@@ -34,7 +34,7 @@ namespace IPyModeling
         private VBCommon.Signaller signaller;
         //ribbon buttons
         private SimpleActionItem btnRun;
-        private SimpleActionItem btnCancel;
+        //private SimpleActionItem btnCancel;
         private SimpleActionItem btnComputeAO;
         private SimpleActionItem btnManipulate;
         private SimpleActionItem btnTransform;
@@ -102,13 +102,12 @@ namespace IPyModeling
             //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
-            innerIronPythonControl.ModelUpdated += new EventHandler(HandleUpdatedModel);
+            innerIronPythonControl.ModelUpdated += new EventHandler(HandleUpdate);
             innerIronPythonControl.boolRunChanged += new IPyModelingControl.BoolChangedEvent(HandleRunCancelEnableState);
             //innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
             innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
             innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
             innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
-            innerIronPythonControl.ChangeMade4Stack += new EventHandler(HandleAddToStack);
             
             base.Activate();
         }
@@ -167,11 +166,11 @@ namespace IPyModeling
             btnRun.Enabled = false;
             App.HeaderControl.Add(btnRun);
 
-            btnCancel = new SimpleActionItem(strPanelKey, "Cancel", btnCancel_Click);
+            /*btnCancel = new SimpleActionItem(strPanelKey, "Cancel", btnCancel_Click);
             btnCancel.LargeImage = Properties.Resources.Cancel;
             btnCancel.GroupCaption = rGroupCaption;
             btnCancel.Enabled = false;
-            App.HeaderControl.Add(btnCancel);
+            App.HeaderControl.Add(btnCancel);*/
         }
 
 
@@ -373,7 +372,7 @@ namespace IPyModeling
                 else if (dlgr == DialogResult.OK)
                 {
                     boolComplete = false;
-                    innerIronPythonControl.Clear();
+                    innerIronPythonControl.ClearModelingTab();
                 }
             }
             Broadcast();
@@ -385,7 +384,7 @@ namespace IPyModeling
         {
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = innerIronPythonControl.PackState();
-            bool boolComplete = false;
+            dictPackedState["Origin"] = strPanelKey;
 
             if (dictPackedState.ContainsKey("Model"))
             {
@@ -393,7 +392,7 @@ namespace IPyModeling
                     boolComplete = true;
             }
 
-            dictPackedState.Add("Complete", boolComplete);
+            dictPackedState.Add("Complete", innerIronPythonControl.Complete);
             dictPackedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, dictPackedState);
         }
@@ -420,28 +419,32 @@ namespace IPyModeling
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
+
+                Show();
+                MakeActive();
+
+                innerIronPythonControl.UnpackState(dictPlugin);
+
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolVisible = (bool)dictPlugin["Visible"];
                
                 if (boolComplete)
                     boolInitialEntry = false;
 
+                /*Show();
+                MakeActive();
+
+                innerIronPythonControl.UnpackState(dictPlugin);*/
+
                 if (boolVisible)
                     Show();
                 else
                     Hide();
                
-                innerIronPythonControl.UnpackState(dictPlugin);
             } else {
                 //Set this plugin to an empty state.
                 Activate();
             }
-        }
-
-     
-        public void TestMessage(object sender, EventArgs e)
-        {
-            SendMessage("Message sent from: " + strPanelKey + "!");
         }
 
 
@@ -472,11 +475,11 @@ namespace IPyModeling
         }
 
 
-        void btnCancel_Click(object sender, EventArgs e)
+        /*void btnCancel_Click(object sender, EventArgs e)
         {
             boolRunning = false;
             innerIronPythonControl.btnCancel_Click(sender, e);
-        }
+        }*/
 
         
         //handle when model boolean Running flag changes
@@ -486,25 +489,25 @@ namespace IPyModeling
             {
                 Cursor.Current = Cursors.WaitCursor;
                 btnRun.Enabled = false;
-                btnCancel.Enabled = true;
+                //btnCancel.Enabled = true;
             }
             else
             {
                 btnRun.Enabled = true;
-                btnCancel.Enabled = false;
+                //btnCancel.Enabled = false;
             }
         }
 
 
         //change has been made within modeling, need to update
-        private void HandleUpdatedModel(object sender, EventArgs e)
+        private void HandleUpdate(object sender, EventArgs e)
         {
-            if (boolComplete)
+            /*if (boolComplete)
             {
                 boolComplete = false;
                 MakeActive();
                 Cursor.Current = Cursors.Default;
-            }
+            }*/
             Broadcast();
         }
     }

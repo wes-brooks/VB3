@@ -268,7 +268,6 @@ namespace VBProjectManager
         void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
             strTopPlugin = e.ActivePanelKey;
-
         }
         
 

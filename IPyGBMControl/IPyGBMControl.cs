@@ -29,7 +29,7 @@ namespace IPyGBMControl
         {
             lvModel.Items.Clear();
             lblDecisionThreshold.Text = "";
-            base.Clear();
+            base.ClearModelingTab();
         }
 
 

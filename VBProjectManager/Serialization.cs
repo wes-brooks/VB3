@@ -194,7 +194,7 @@ namespace VBProjectManager
             {
                 if (x is VBCommon.Interfaces.IPlugin)
                 {
-                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[this.strPluginKey]["TopPlugin"].ToString())
+                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[strPluginKey]["TopPlugin"].ToString())
                         ((VBCommon.Interfaces.IPlugin)x).MakeActive();
                 }
             }

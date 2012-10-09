@@ -72,10 +72,8 @@ namespace IPyPrediction
 
 
         public void Show()
-        {
-            boolVisible = true;
-            AddRibbon("Show");
-            if (boolComplete)
+        {            
+            if (boolVisible)
             {
                 //If this plugin is already visible, then do nothing.
                 return;
@@ -90,8 +88,8 @@ namespace IPyPrediction
                     ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
                     App.HeaderControl.SelectRoot(strPanelKey);
                 }
-                boolVisible = true;
             }
+            boolVisible = true;
         }
 
 
@@ -292,6 +290,13 @@ namespace IPyPrediction
                     if (!boolVisible)
                         Show();
                 }
+                else
+                {
+                    int intValidModels = _frmIPyPred.ClearModel(e.PackedPluginState);
+                    if (intValidModels == 0)
+                        Hide();
+                }
+                    
 
                 //if the prediction is complete and the model was cleared, clear the prediction
                 if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])

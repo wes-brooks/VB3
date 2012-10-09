@@ -145,9 +145,9 @@ namespace IPyPrediction
         {
             if (dictPackedState.Count == 0) return;
             
-            Dictionary<string, object> dictModelStr = (Dictionary<string, object>)dictPackedState["ModelByString"];
-            if (dictModelStr["ModelString"] == null)
-                return;
+            Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];
+            /*if (dictModel["ModelString"] == null)
+                return;*/
             
             //ipyModel = ipyInterface.Deserialize(dictModelStr["ModelString"]);
             
@@ -163,8 +163,8 @@ namespace IPyPrediction
                 rbPower.Checked = true;
             
             txtPower.Text = dictTransform["Exponent"].ToString();
-            txtRegStd.Text = Convert.ToDouble(dictModelStr["RegulatoryThreshold"]).ToString();
-            txtDecCrit.Text = Convert.ToDouble(dictModelStr["DecisionThreshold"]).ToString();
+            txtRegStd.Text = Convert.ToDouble(dictModel["RegulatoryThreshold"]).ToString();
+            txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
 
             //Unpack contents of listbox holding available models
             this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
@@ -173,8 +173,7 @@ namespace IPyPrediction
             foreach (KeyValuePair<string, object> pair in dictModels)
                 { this.lstAvailModels.Items.Add(pair.Key); }
             
-            this.intSelectedListedModel = (int)dictPackedState["AvailableModelsIndex"];
-            lstAvailModels.SelectedIndex = intSelectedListedModel;
+            lstAvailModels.SelectedIndex = (int)dictPackedState["AvailableModelsIndex"];
             this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
 
             DataSet ds = null;
@@ -216,10 +215,16 @@ namespace IPyPrediction
                 setViewOnGrid(dgvStats);
             }
 
-            strModelExpression = model.ModelString();
-            txtModel.Text = strModelExpression;
-
-            ds = null;
+            if (model != null)
+            {
+                strModelExpression = model.ModelString();
+                txtModel.Text = strModelExpression;
+            }
+            else
+            {
+                strModelExpression = "";
+                txtModel.Text = "";
+            }
         }
 
 
@@ -261,7 +266,6 @@ namespace IPyPrediction
 
             //Pack model as string and as model for serializing. need to versions for Json.net serialization (which can't serialize IronPython objects)
             Dictionary<string, object> dictModelState = new Dictionary<string, object>();
-            //dictModelState.Add("ModelString", strModelString);
             dictModelState.Add("Method", strMethod);
             dictModelState.Add("Transform", dictTransform);
             dictModelState.Add("RegulatoryThreshold", dblRegulatoryThreshold);
@@ -337,7 +341,7 @@ namespace IPyPrediction
                 return;
 
             IDictionary<string, object> dictModel = (IDictionary<string, object>)dictPackedState["Model"];
-            string strModelName = (string)dictModel["Method"].ToString();
+            string strModelName = dictModel["Method"].ToString();
 
             //If there is already a model from this plugin in the listBox, then remove it.
             if (dictModels.ContainsKey(strModelName))
@@ -351,6 +355,25 @@ namespace IPyPrediction
             //Now add the model to the listBox
             dictModels.Add(strModelName, dictPackedState);
             lstAvailModels.Items.Add(strModelName);
+        }
+
+
+        public int ClearModel(IDictionary<string, object> dictPackedState)
+        {           
+            //If we have a model from this plugin, clear it
+            string strMethod = dictPackedState["Method"].ToString();
+
+            //If there is already a model from this plugin in the listBox, then remove it.
+            if (dictModels.ContainsKey(strMethod))
+            {
+                this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+                dictModels.Remove(strMethod);
+                lstAvailModels.Items.Remove(strMethod);
+                this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+            }
+
+            int intValidModels = dictModels.Count();
+            return (intValidModels);
         }
 
 
