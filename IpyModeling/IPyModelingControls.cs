@@ -533,21 +533,6 @@ namespace IPyModeling
         //Set column header names in Variable Selection listbox
         public void SetData(IDictionary<string, object> packedState)
         {
-            {
-                if ((bool)packedState["ChangesMadeDS"])
-                {
-                    if (model_data != null)
-                    {   
-                        Clear();
-                        boolClearPrediction = true;
-                        UpdatePredictionTab();
-                    }
-                    
-                }
-            }
-            catch { }*/
-
-
             dsControl1.UnpackState((IDictionary<string, object>)packedState["PackedDatasheetState"]); //((IDictionary<string, object>)dictPackedPlugin["PackedDatasheetState"]);
             
             dt = dsControl1.DT;
@@ -1075,8 +1060,6 @@ namespace IPyModeling
                     listPredictors.Add(item);
             }
 
-            //dictPluginState.Add("CleanPredict", this.ClearPrediction);
-
             //if just adding to stack, go to different pack to be used in setData()
             if (Model == null)
                 return dictPluginState;
@@ -1089,11 +1072,14 @@ namespace IPyModeling
             try { dblDecisionThreshold = Convert.ToDouble(DecisionThreshold); }
             catch (InvalidCastException) { dblDecisionThreshold = -1; }
 
-            //add both versions of the model
-            Dictionary<string, object> dictModelObject = IPyCommon.Helper.ModelState(model: ipyModel, method: strMethod, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: DependentVariableTransform);
-            Dictionary<string, object> dictModelByString = IPyCommon.Helper.ModelState(modelString: strModelString, method: strMethod, dblRegulatoryThreshold: dblRegulatoryThreshold, decisionThreshold: dblDecisionThreshold, transform: DependentVariableTransform);
-            dictPluginState.Add("ModelByObject", dictModelObject);
-            dictPluginState.Add("ModelByString", dictModelByString);
+            Dictionary<string, object> dictModelState = new Dictionary<string, object>();
+            dictModelState.Add("ModelString", strModelString);
+            dictModelState.Add("Method", strMethod);
+            dictModelState.Add("Transform", DependentVariableTransform);
+            dictModelState.Add("RegulatoryThreshold", dblRegulatoryThreshold);
+            dictModelState.Add("DecisionThreshold", dblDecisionThreshold);
+
+            dictPluginState.Add("Model", dictModelState);
             
             //Save the lists that we use to make the validation chart
             Dictionary<string, List<double>> dictValidation = new SerializableDictionary<string, List<double>>();
@@ -1612,6 +1598,20 @@ namespace IPyModeling
             dynamic dynPredictions = ipyInterface.Predict(ipyModel, tblForPrediction);
             List<double> lstPredictions = ((IList<object>)dynPredictions).Cast<double>().ToList();
             return (lstPredictions);
+        }
+
+
+        public List<double> PredictExceedanceProbability(DataTable tblForPrediction)
+        {
+            dynamic dynPredictions = ipyInterface.PredictExceedanceProbability(ipyModel, tblForPrediction);
+            List<double> lstExceedanceProbability = ((IList<object>)dynPredictions).Cast<double>().ToList();
+            return (lstExceedanceProbability);
+        }
+
+
+        public string ModelString()
+        {
+            return(ipyInterface.GetModelExpression(ipyModel).Replace("[", "(").Replace("]", ")"));
         }
 
 

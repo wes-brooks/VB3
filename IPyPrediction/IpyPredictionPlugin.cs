@@ -214,12 +214,6 @@ namespace IPyPrediction
         }
 
 
-        private void _frmIPyPred_RequestCompositionCatalogs(object sender, ref VBCommon.PluginSupport.CompositionCatalogRequestArgs args)
-        {
-            signaller.SolicitCatalogs(args.Catalog, args.Type);
-        }
-
-
         //return the plugin type (Prediction)
         public Globals.PluginType PluginType
         {
@@ -265,8 +259,6 @@ namespace IPyPrediction
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
-
-            int z = models.Count();
         }
 
 
@@ -294,14 +286,19 @@ namespace IPyPrediction
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {
                 //add the model to list of Available Models
-                if (((IPlugin)sender).Complete)
+                if ((bool)e.PackedPluginState["Complete"])
+                {
                     _frmIPyPred.AddModel(e.PackedPluginState);
+                    if (!boolVisible)
+                        Show();
+                }
 
                 //if the prediction is complete and the model was cleared, clear the prediction
                 if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
                 {
                     _frmIPyPred.ClearDataGridViews();
                     boolComplete = false;
+
                     //add the modified model to list of Available Models if just changed (not cleared)
                     if ((bool)e.PackedPluginState["Complete"])
                         _frmIPyPred.AddModel(e.PackedPluginState);

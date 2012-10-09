@@ -38,30 +38,6 @@ namespace IPyCommon
             get { return ipyInterface; }
         }
     }
-
-
-    public static class Helper
-    {
-        public static Dictionary<string, object> ModelState (dynamic model=null, string modelString=null, string method=null,
-            double dblRegulatoryThreshold=-1, double decisionThreshold=-1, Dictionary<string,object> transform=null)
-        {
-            Dictionary<string, object> dictModelState = new Dictionary<string, object>();
-
-            if (model != null)
-                dictModelState.Add("Model", model);
-            if (modelString != null)
-                dictModelState.Add("ModelString", modelString);
-            if (method != null)
-                dictModelState.Add("Method", method);
-            if (transform != null)
-                dictModelState.Add("Transform", transform);
-
-            dictModelState.Add("RegulatoryThreshold", dblRegulatoryThreshold);
-            dictModelState.Add("DecisionThreshold", decisionThreshold);
-
-            return dictModelState;           
-        }
-    }
 }
 
 

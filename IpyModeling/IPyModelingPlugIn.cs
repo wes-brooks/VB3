@@ -46,7 +46,7 @@ namespace IPyModeling
         //complete and visible flags
         public Boolean boolComplete;
         public Boolean boolVisible;
-        public Boolean boolRunCancelled;
+        public Boolean boolRunning;
         public Boolean boolInitialEntry = true;
 
         private string strTopPlugin = string.Empty;
@@ -385,10 +385,11 @@ namespace IPyModeling
         {
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = innerIronPythonControl.PackState();
+            bool boolComplete = false;
 
-            if (dictPackedState.ContainsKey("ModelByObject"))
+            if (dictPackedState.ContainsKey("Model"))
             {
-                if (dictPackedState["ModelByObject"] != null)
+                if (dictPackedState["Model"] != null)
                     boolComplete = true;
             }
 
@@ -418,7 +419,7 @@ namespace IPyModeling
         {
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
-                dictPlugin = e.PackedPluginStates[strPanelKey];
+                IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolVisible = (bool)dictPlugin["Visible"];
                
@@ -430,7 +431,7 @@ namespace IPyModeling
                 else
                     Hide();
                
-                innerIronPythonControl.UnpackState(e.PackedPluginStates[strPanelKey]);
+                innerIronPythonControl.UnpackState(dictPlugin);
             } else {
                 //Set this plugin to an empty state.
                 Activate();
@@ -463,7 +464,7 @@ namespace IPyModeling
             }
             innerIronPythonControl.btnRun_Click(sender, e);
 
-            if (boolRunCancelled)
+            if (boolRunning)
                 return;
 
             MakeActive();
@@ -473,7 +474,7 @@ namespace IPyModeling
 
         void btnCancel_Click(object sender, EventArgs e)
         {
-            boolRunCancelled = true;
+            boolRunning = false;
             innerIronPythonControl.btnCancel_Click(sender, e);
         }
 

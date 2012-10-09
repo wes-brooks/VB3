@@ -25,7 +25,7 @@ namespace VBDatasheet
     public partial class frmDatasheet : UserControl, IFormState
     {
         private IDictionary<string, object> dictPackedDatasheetState = null;
-
+        private bool boolInitialPass;
         private bool boolValidated;
         
         public event EventHandler NotifiableDataEvent;
@@ -127,11 +127,8 @@ namespace VBDatasheet
                 dsControl1.dgv.Columns[c].DefaultCellStyle.ForeColor = Color.Black;
             }
 
-            //initialize rows to all enabled for imported table
-            //(builds dictionary of keys, <string>datetime and values <bool>enabled/disabled row)
+            //RowInformation and ColumnInformation to track which rows, columns are enabled/disabled.
             dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);
-            //initialize cols to all enabled for imported table
-            //(builds dictionary of keys, <string>datetime and values <bool>enabled/disabled col)
             dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
 
             //default col 1 as response

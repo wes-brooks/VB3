@@ -45,16 +45,6 @@ namespace VBCommon
         }
 
 
-        public void SolicitCatalogs(System.ComponentModel.Composition.Hosting.AggregateCatalog catalog, VBCommon.Globals.PluginType typeTargeted)
-        {
-            if (CompositionCatalogRequest != null)
-            {
-                CompositionCatalogRequestArgs e = new CompositionCatalogRequestArgs(catalog, typeTargeted);
-                CompositionCatalogRequest(this, ref e);
-            }
-        }
-
-
         //event for hiding plugins when datasheet plugin is selected
         public void HidePlugins()
         {

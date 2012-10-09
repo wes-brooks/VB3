@@ -226,8 +226,7 @@ namespace VBDatasheet
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
-
-
+        
 
         //listen to Model's complete status
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
@@ -265,25 +264,12 @@ namespace VBDatasheet
         }
 
 
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadCastEventArgs e)
-        {
-            if (((IPlugin)sender).PluginType == Globals.PluginType.ProjectManager)
-            {
-                //Test whether this plugin is meant to restore the packed state.
-                //if (e.PackedPluginState.Keys == this.strPanelKey)
-                //{
-
-            }
-        }
-
-
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
 
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
-            dictPackedState.Add("InitialPass", boolInitialPass);
 
             e.PackedPluginStates.Add(strPanelKey, dictPackedState);
         }
@@ -302,7 +288,6 @@ namespace VBDatasheet
                 if (this.Visible)
                     this.Hide();
 
-                IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
                 _frmDatasheet.UnpackState(dictPlugin);               
 
                 boolVisible = (bool)dictPlugin["Visible"];

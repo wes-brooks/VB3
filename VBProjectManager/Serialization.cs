@@ -192,13 +192,10 @@ namespace VBProjectManager
             //and I can't find where that's happening.
             foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
             {
-                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                if (x is VBCommon.Interfaces.IPlugin)
                 {
-                    if (x is VBCommon.Interfaces.IPlugin)
-                    {
-                        if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[this.strPluginKey]["TopPlugin"].ToString())
-                            ((VBCommon.Interfaces.IPlugin)x).MakeActive();
-                    }
+                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[this.strPluginKey]["TopPlugin"].ToString())
+                        ((VBCommon.Interfaces.IPlugin)x).MakeActive();
                 }
             }
         }
