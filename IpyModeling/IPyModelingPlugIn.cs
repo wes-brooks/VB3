@@ -66,13 +66,12 @@ namespace IPyModeling
             boolVisible = false;
             App.HeaderControl.RemoveAll();
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
-            boolVisible = false;
         }
 
 
         public void Show()
         {
-            if (this.Visible)
+            if (boolVisible)
             {
                 //If this plugin is already visible, then do nothing.
                 return;
@@ -80,8 +79,8 @@ namespace IPyModeling
             else
             {                
                 AddRibbon("Show");
-                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-                App.HeaderControl.SelectRoot(strPanelKey);
+                //((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                //App.HeaderControl.SelectRoot(strPanelKey);
                 boolVisible = true;
             }
         }
@@ -98,6 +97,7 @@ namespace IPyModeling
         {
             AddPanel();
             AddRibbon("Activate");
+            boolVisible = true;
 
             //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
@@ -135,7 +135,6 @@ namespace IPyModeling
             {
                 App.HeaderControl.SelectRoot(strPanelKey); 
             }
-
             
             //add sub-ribbon
             string grpManipulate = "Manipulate Data";
@@ -191,9 +190,9 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            //hide this plugin when going back to global datasheet
+            /*//hide this plugin when going back to global datasheet
             if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
-                Hide();
+                Hide();*/
         }
 
 
@@ -299,7 +298,7 @@ namespace IPyModeling
                     //if changes were made or it is initial pass, set the data
                     boolInitialEntry = false;
                     //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
-                    if ((bool)e.PackedPluginState["ChangesMadeDS"])
+                    if (!(bool)e.PackedPluginState["Clean"])
                         boolComplete = false;
 
                     innerIronPythonControl.SetData(e.PackedPluginState);
@@ -441,10 +440,10 @@ namespace IPyModeling
                 else
                     Hide();
                
-            } else {
+            } /*else {
                 //Set this plugin to an empty state.
                 Activate();
-            }
+            }*/
         }
 
 

@@ -142,17 +142,7 @@ namespace VBLocation
                 MainMap.MapType = MapType.YahooMap;
 
                 // map events
-                MainMap.OnCurrentPositionChanged += new CurrentPositionChanged(MainMap_OnCurrentPositionChanged);
-                MainMap.OnTileLoadStart += new TileLoadStart(MainMap_OnTileLoadStart);
-                MainMap.OnTileLoadComplete += new TileLoadComplete(MainMap_OnTileLoadComplete);
-                MainMap.OnEmptyTileError += new EmptyTileError(MainMap_OnEmptyTileError);
-                MainMap.OnMapZoomChanged += new MapZoomChanged(MainMap_OnMapZoomChanged);
-                MainMap.OnMapTypeChanged += new MapTypeChanged(MainMap_OnMapTypeChanged);
-                MainMap.MouseMove += new MouseEventHandler(MainMap_MouseMove);
-                MainMap.MouseDown += new MouseEventHandler(MainMap_MouseDown);
-                MainMap.MouseUp += new MouseEventHandler(MainMap_MouseUp);
-                // custom: to paint the water
-                MainMap.Paint += new PaintEventHandler(MainMap_Paint);
+                ConnectMapEvents();
 
                 // get map type
                 comboBoxMapType.DataSource = Enum.GetValues(typeof(MapType));
@@ -172,6 +162,38 @@ namespace VBLocation
                 
                 MainMap.Overlays.Add(stations);
             }
+        }
+
+
+        public void ConnectMapEvents()
+        {
+            MainMap.OnCurrentPositionChanged += new CurrentPositionChanged(MainMap_OnCurrentPositionChanged);
+            MainMap.OnTileLoadStart += new TileLoadStart(MainMap_OnTileLoadStart);
+            MainMap.OnTileLoadComplete += new TileLoadComplete(MainMap_OnTileLoadComplete);
+            MainMap.OnEmptyTileError += new EmptyTileError(MainMap_OnEmptyTileError);
+            MainMap.OnMapZoomChanged += new MapZoomChanged(MainMap_OnMapZoomChanged);
+            MainMap.OnMapTypeChanged += new MapTypeChanged(MainMap_OnMapTypeChanged);
+            MainMap.MouseMove += new MouseEventHandler(MainMap_MouseMove);
+            MainMap.MouseDown += new MouseEventHandler(MainMap_MouseDown);
+            MainMap.MouseUp += new MouseEventHandler(MainMap_MouseUp);
+            // custom: to paint the water
+            MainMap.Paint += new PaintEventHandler(MainMap_Paint);
+        }
+
+
+        public void DisconnectMapEvents()
+        {
+            MainMap.OnCurrentPositionChanged -= MainMap_OnCurrentPositionChanged;
+            MainMap.OnTileLoadStart -= MainMap_OnTileLoadStart;
+            MainMap.OnTileLoadComplete -= MainMap_OnTileLoadComplete;
+            MainMap.OnEmptyTileError -= MainMap_OnEmptyTileError;
+            MainMap.OnMapZoomChanged -= MainMap_OnMapZoomChanged;
+            MainMap.OnMapTypeChanged -= MainMap_OnMapTypeChanged;
+            MainMap.MouseMove -= MainMap_MouseMove;
+            MainMap.MouseDown -= MainMap_MouseDown;
+            MainMap.MouseUp -= MainMap_MouseUp;
+            // custom: to paint the water
+            MainMap.Paint -= MainMap_Paint;
         }
 
 

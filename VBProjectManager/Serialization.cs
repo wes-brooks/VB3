@@ -123,7 +123,7 @@ namespace VBProjectManager
         {
             //open project
             OpenFileDialog openFile = new OpenFileDialog();
-            openFile.InitialDirectory = VB2projectsPath;
+            openFile.InitialDirectory = VBProjectsPath;
             openFile.Filter = @"VB3 Project Files|*.vbpx|All Files|*.*";
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;

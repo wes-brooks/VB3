@@ -49,12 +49,12 @@ namespace VBDatasheet
         //event handler for packing state to save project
         public IDictionary<string, object> PackState()
         {
-            //make sure user chose transformation on response var
+            /*//make sure user chose transformation on response var
             if (dsControl1.DependentVariableTransform == VBCommon.DependentVariableTransforms.none)
             {
                 MessageBox.Show("You must define the transformation on the response variable before continuing");
                 return null;
-            }
+            }*/
 
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
            

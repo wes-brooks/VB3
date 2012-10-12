@@ -1050,59 +1050,62 @@ namespace VBCommon.Controls
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
-            
-            //pack up mainEffect columns for Prediction
-            dictPackedState.Add("CurrentColIndex", this.SelectedColIndex);
-            dictPackedState.Add("DepVarColName", this.ResponseVarColName);
-            dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
-            dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
-            dictPackedState.Add("DepVarTransform", this.DependentVariableTransform);
 
-
-            //pack up listInfo for model datasheet
-            dictPackedState.Add("ColCount", this.DT.Columns.Count);
-            dictPackedState.Add("RowCount", this.DT.Rows.Count);
-            dictPackedState.Add("DateIndex", this.DT.Columns[0].ColumnName.ToString());
-            dictPackedState.Add("ResponseVar", this.DT.Columns[1].ColumnName.ToString());
-            dictPackedState.Add("DisabledRwCt", this.DisabledRows);
-            dictPackedState.Add("DisabledColCt", this.DisabledCols);
-            dictPackedState.Add("HiddenColCt", this.HiddenCols);
-            dictPackedState.Add("IndVarCt", this.NumberIVs);
-            dictPackedState.Add("fileName", this.FileName);
-
-            
-            //Save Datasheet info as xml string for serialization
-            StringWriter sw = null;
             if (this.DT != null)
             {
-                this.DT.TableName = "DataSheetData";
-                sw = new StringWriter();
-                this.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                string strXmlDataTable = sw.ToString();
-                sw.Close();
-                sw = null;
-                dictPackedState.Add("XmlDataTable", strXmlDataTable);
-            }
+                //pack up mainEffect columns for Prediction
+                dictPackedState.Add("CurrentColIndex", this.SelectedColIndex);
+                dictPackedState.Add("DepVarColName", this.ResponseVarColName);
+                dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
+                dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
+                dictPackedState.Add("DepVarTransform", this.DependentVariableTransform);
 
-            if (this.State == VBCommon.Controls.DatasheetControl.dtState.clean)
-            {
-                bool boolClean = true;
-                dictPackedState.Add("Clean", boolClean);
-            }
-            else
-            {
-                bool boolClean = false;
-                dictPackedState.Add("Clean", boolClean);
-            }
 
-            //model expects this change to the dt first ... I DON'T SEE THIS USED ANYWHERE ELSE
-            DataTable Filtered4ModelDt = this.DT;
-            Filtered4ModelDt.Columns[this.ResponseVarColName].SetOrdinal(1);
-            //filter diabled rows and columns
-            Filtered4ModelDt = this.filterDataTableRows(Filtered4ModelDt);
-            Utilities.TableUtils tableutils = new Utilities.TableUtils(Filtered4ModelDt);
-            Filtered4ModelDt = tableutils.filterRVHcols(Filtered4ModelDt);
-            dictPackedState.Add("DataSheetDatatable", Filtered4ModelDt);
+                //pack up listInfo for model datasheet
+                dictPackedState.Add("ColCount", this.DT.Columns.Count);
+                dictPackedState.Add("RowCount", this.DT.Rows.Count);
+                dictPackedState.Add("DateIndex", this.DT.Columns[0].ColumnName.ToString());
+                dictPackedState.Add("ResponseVar", this.DT.Columns[1].ColumnName.ToString());
+                dictPackedState.Add("DisabledRwCt", this.DisabledRows);
+                dictPackedState.Add("DisabledColCt", this.DisabledCols);
+                dictPackedState.Add("HiddenColCt", this.HiddenCols);
+                dictPackedState.Add("IndVarCt", this.NumberIVs);
+                dictPackedState.Add("fileName", this.FileName);
+
+
+                //Save Datasheet info as xml string for serialization
+                StringWriter sw = null;
+                if (this.DT != null)
+                {
+                    this.DT.TableName = "DataSheetData";
+                    sw = new StringWriter();
+                    this.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+                    string strXmlDataTable = sw.ToString();
+                    sw.Close();
+                    sw = null;
+                    dictPackedState.Add("XmlDataTable", strXmlDataTable);
+                }
+
+                if (this.State == VBCommon.Controls.DatasheetControl.dtState.clean)
+                {
+                    bool boolClean = true;
+                    dictPackedState.Add("Clean", boolClean);
+                }
+                else
+                {
+                    bool boolClean = false;
+                    dictPackedState.Add("Clean", boolClean);
+                }
+
+                //model expects this change to the dt first ... I DON'T SEE THIS USED ANYWHERE ELSE
+                DataTable Filtered4ModelDt = this.DT;
+                Filtered4ModelDt.Columns[this.ResponseVarColName].SetOrdinal(1);
+                //filter diabled rows and columns
+                Filtered4ModelDt = this.filterDataTableRows(Filtered4ModelDt);
+                Utilities.TableUtils tableutils = new Utilities.TableUtils(Filtered4ModelDt);
+                Filtered4ModelDt = tableutils.filterRVHcols(Filtered4ModelDt);
+                dictPackedState.Add("DataSheetDatatable", Filtered4ModelDt);
+            }
 
             return dictPackedState;
         }

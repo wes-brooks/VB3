@@ -43,7 +43,7 @@ namespace VBDatasheet
 
         //is model complete
         private Boolean boolModelComplete;
-        private Boolean boolChangesMadeDS;
+        private Boolean boolClean;
 
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -199,6 +199,7 @@ namespace VBDatasheet
             App.HeaderControl.Add(btnGoToModeling);
         }
 
+
         //add a datasheet panel
         public void AddPanel()
         {
@@ -231,9 +232,9 @@ namespace VBDatasheet
         //listen to Model's complete status
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
-            if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
+            /*if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
                 if ((bool)e.PackedPluginState["Complete"])
-                    boolModelComplete = true;
+                    boolModelComplete = true;*/
         }
 
 
@@ -241,9 +242,7 @@ namespace VBDatasheet
         {
             //We are handling a re-raised NotifiableDataEvent. The plugin's state is not considered complete b/c the user hasn't pressed the "Go To Modeling" button.
             boolComplete = false;
-
-            if (boolModelComplete)
-                boolChangesMadeDS = true;
+            boolClean = false;
                 
             Broadcast();
         }
@@ -257,7 +256,7 @@ namespace VBDatasheet
             if (packedState == null)
                 return;
                 
-            packedState.Add("ChangesMadeDS", boolChangesMadeDS);
+            packedState.Add("Clean", boolClean);
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, packedState);
@@ -268,6 +267,7 @@ namespace VBDatasheet
         {
             IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
 
+            dictPackedState.Add("Clean", boolClean);
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
 
@@ -354,7 +354,7 @@ namespace VBDatasheet
 
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
-            if (!boolInitialPass)
+            if (!boolInitialPass && !boolClean)
             {
                 //Ask whether the user wants to clobber the modeling and prediction tabs by modifying the data.
                 DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
@@ -365,12 +365,12 @@ namespace VBDatasheet
             }
 
             //Datasheet is complete when go to modeling is clicked
-            boolComplete = true;
-            boolInitialPass = false;
+            boolComplete = true;            
             Broadcast();
             
             //once you leave here, changes made to ds clear for next time here
-            boolChangesMadeDS = false;
+            boolInitialPass = false;
+            boolClean = true;
         }  
     }
 }

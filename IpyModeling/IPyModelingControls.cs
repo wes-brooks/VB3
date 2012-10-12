@@ -874,7 +874,7 @@ namespace IPyModeling
                 return;
             }*/
 
-            tabControl1.SelectTab(1);
+            tabControl1.SelectTab(2);
 
 
             //Set the threshold with the given specificity.

@@ -31,7 +31,7 @@ namespace VBProjectManager
         private VBLogger logger;
         private string strLogFile;
         private string strPluginKey = "Project Manager";
-        public static string VB2projectsPath = null;
+        public static string VBProjectsPath = null;
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
         public Stack UndoRedoStack = new Stack();
@@ -86,16 +86,13 @@ namespace VBProjectManager
 
             //get plugin type for each plugin
             List<Globals.PluginType> lstAllPluginTypes = new List<Globals.PluginType>();
-            Globals.PluginType PType;
 
             foreach(DotSpatial.Extensions.IExtension ext in App.Extensions)  
             {
                 if (ext is IPlugin)    
-                {
-                    IPlugin plugType = (IPlugin)ext;  
-                    //store pluginType
-                    PType = plugType.PluginType;  
-                    lstAllPluginTypes.Add(PType); 
+                {               
+                    if (((IPlugin)ext).PluginType >= 0)
+                        lstAllPluginTypes.Add(((IPlugin)ext).PluginType); 
                 }
             }
 
@@ -109,7 +106,7 @@ namespace VBProjectManager
             if (ex != null)
                 ex.MakeActive();
             
-            //initialize only Datasheet is shown, all others are hidden
+            /*//initialize only Datasheet is shown, all others are hidden
             foreach(DotSpatial.Extensions.IExtension x in App.Extensions)
             {
                 if (x is IPlugin)
@@ -118,7 +115,7 @@ namespace VBProjectManager
                     if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
                         pt.Hide();
                 }
-            }
+            }*/
                     
             base.Activate();
         }
@@ -134,8 +131,7 @@ namespace VBProjectManager
         //projectManager doesn't get deactivated (inherits from IPlugin)
         public override void Deactivate()
         {
-            App.HeaderControl.RemoveAll();
-            
+            App.HeaderControl.RemoveAll();            
             base.Deactivate();
         }
 
@@ -245,22 +241,6 @@ namespace VBProjectManager
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
-            signaller.HideTabsEvent += new VBCommon.Signaller.HidePluginsHandler(HideTabsListener);
-        }
-
-
-        private void HideTabsListener()
-        {
-            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-            {
-                if (x is IPlugin)
-                {
-                    IPlugin pt = (IPlugin)x;
-                    if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
-                        pt.Hide();
-                }
-            }
-           
         }
 
 
@@ -268,6 +248,21 @@ namespace VBProjectManager
         void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
             strTopPlugin = e.ActivePanelKey;
+
+            bool boolHideModeling = false;
+
+            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+            {
+                if (x is VBCommon.Interfaces.IPlugin)
+                {
+                    if (((VBCommon.Interfaces.IPlugin)x).PluginType == VBCommon.Globals.PluginType.Datasheet && ((VBCommon.Interfaces.IPlugin)x).PanelKey == e.ActivePanelKey)
+                        boolHideModeling = true;
+                }
+            }
+
+            if (boolHideModeling)
+            {
+            }
         }
         
 

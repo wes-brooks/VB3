@@ -147,8 +147,13 @@ namespace VBLocation
         {
             if (e.ActivePanelKey == strPanelKey)
             {
+                cLocation.ConnectMapEvents();
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
+            }
+            else
+            {
+                cLocation.DisconnectMapEvents();
             }
         }
 
@@ -247,6 +252,11 @@ namespace VBLocation
 
         private void BroadcastStateListener(object sender, BroadcastEventArgs e)
         {
+            if (((IPlugin)(e.Sender)).PanelKey == "DataSheetPanel")
+            {
+                //Unpack the state of this plugin.
+                cLocation.UnpackState(new Dictionary<string, object>());
+            }
         }
 
 

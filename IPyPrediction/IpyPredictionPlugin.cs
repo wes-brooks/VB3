@@ -24,8 +24,8 @@ namespace IPyPrediction
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Prediction;
         
         private VBCommon.Signaller signaller;
-        protected string strPanelKey = "IPyPrediction";
-        protected string strPanelCaption = "Prediction";
+        protected string strPanelKey;
+        protected string strPanelCaption;
         
         //ribbon buttons
         private SimpleActionItem btnImportIV;
@@ -50,6 +50,14 @@ namespace IPyPrediction
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
 
+
+        public IpyPredictionPlugin()
+        {
+            _frmIPyPred = new frmIPyPrediction();
+            strPanelKey = "IPyPrediction";
+            strPanelCaption = "Prediction";
+        }
+
         
         //deactivate this plugin
         public override void Deactivate()
@@ -64,7 +72,6 @@ namespace IPyPrediction
         //hide this plugin
         public void Hide()
         {
-            boolVisible = false;
             App.HeaderControl.RemoveAll();
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
             boolVisible = false;
@@ -103,17 +110,17 @@ namespace IPyPrediction
         //initial activation
         public override void Activate()
         {
-            _frmIPyPred = new frmIPyPrediction();
             _frmIPyPred.RequestModelPluginList += new EventHandler(PassModelPluginList);
             
             AddPanel();
             AddRibbon("Activate");
+            boolVisible = true;
 
             //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
 
-            base.Activate(); 
+            base.Activate();
         }
 
 
@@ -207,8 +214,8 @@ namespace IPyPrediction
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
-                Hide();
+            /*if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
+                Hide();*/
         }
 
 
@@ -280,7 +287,7 @@ namespace IPyPrediction
 
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
-         {
+        {
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {
                 //add the model to list of Available Models
@@ -295,8 +302,7 @@ namespace IPyPrediction
                     int intValidModels = _frmIPyPred.ClearModel(e.PackedPluginState);
                     if (intValidModels == 0)
                         Hide();
-                }
-                    
+                }                    
 
                 //if the prediction is complete and the model was cleared, clear the prediction
                 if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
@@ -309,9 +315,9 @@ namespace IPyPrediction
                         _frmIPyPred.AddModel(e.PackedPluginState);
                 }
             }
-            if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
-                if (boolComplete)
-                    Show();
+            //if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
+            //    if (boolComplete)
+            //        Show();
         }
 
 
@@ -355,7 +361,6 @@ namespace IPyPrediction
                     Hide();
                 
                 _frmIPyPred.UnpackState(e.PackedPluginStates[strPanelKey]);
-                MakeActive();
             }
         }
 

@@ -28,9 +28,6 @@ namespace VBCommon
         public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
 
-        public delegate void HidePluginsHandler();
-        public event HidePluginsHandler HideTabsEvent;
-
         public Signaller() {}
 
 
@@ -42,14 +39,6 @@ namespace VBCommon
                 BroadcastEventArgs e = new BroadcastEventArgs(sender, dictPackedPlugin);
                 BroadcastState(sender, e);
             }
-        }
-
-
-        //event for hiding plugins when datasheet plugin is selected
-        public void HidePlugins()
-        {
-            if (HideTabsEvent != null)
-                HideTabsEvent();
         }
 
 
