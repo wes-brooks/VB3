@@ -30,15 +30,13 @@ namespace IPyPrediction
     [JsonObject]
     public partial class frmIPyPrediction : UserControl, IFormState
     {
-        //Get access to the IronPython interface:
-        private dynamic ipyInterface = IPyInterface.Interface;
-        //protected dynamic ipyModel = null;
         private ContextMenu cmforResponseVar = new ContextMenu();
         private Dictionary<string, string> dictMainEffects;
         private string strModelExpression = "";
 
         private IModel model = null;
         public List<Lazy<IModel, IDictionary<string, object>>> models;
+        public event EventHandler RequestModelPluginList;
 
         private string[] strArrReferencedVars = null;
         private DataTable corrDT; 
@@ -55,12 +53,7 @@ namespace IPyPrediction
         IDictionary<string, object> dictModels = new Dictionary<string, object>();
         private int intSelectedListedModel;
         private string strMethod;
-
-        //Added for IronPython-based modeling:
-        public event EventHandler IronPythonInterfaceRequested;
-        public event EventHandler ModelRequested;
-        public event EventHandler RequestModelPluginList;
-
+        
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
 
@@ -68,35 +61,6 @@ namespace IPyPrediction
         public frmIPyPrediction()
         {
             InitializeComponent();
-        }
-
-
-        //Raise a request for access to the IronPython interface - should be raised when the control is created.
-        private void RequestIronPythonInterface()
-        {
-            if (IronPythonInterfaceRequested != null)
-            {
-                EventArgs e = new EventArgs();
-                IronPythonInterfaceRequested(this, e);
-            }
-        }
-
-
-        //Raise a request for an IronPython modeling object that we can work on.
-        private void RequestModel()
-        {
-            if (ModelRequested != null)
-            {
-                EventArgs e = new EventArgs();
-                ModelRequested(this, e);
-            }
-        }
-
-
-        //return ironpython interface
-        public dynamic IronPythonInterface
-        {
-            get { return ipyInterface.Interface; }
         }
 
 

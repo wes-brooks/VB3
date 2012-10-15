@@ -11,6 +11,7 @@ using DotSpatial.Controls.Header;
 using DotSpatial.Controls.Docking;
 using VBCommon;
 using VBCommon.Interfaces;
+using VBCommon.PluginSupport;
 using VBCommon.Controls;
 using VBProjectManager;
 
@@ -37,13 +38,10 @@ namespace VBDatasheet
         private SimpleActionItem btnGoToModeling;
         private RootItem rootDatasheetTab;
 
-        private Boolean boolComplete;
+        private Boolean boolComplete = false;
         private Boolean boolVisible = true;
-        private Boolean boolInitialPass = true;
-
-        //is model complete
-        private Boolean boolModelComplete;
-        private Boolean boolClean;
+        private Boolean boolFirstPass = true;
+        private Boolean boolClean = true;
 
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -110,6 +108,13 @@ namespace VBDatasheet
                 _frmDatasheet.Refresh();
             }
         }
+
+
+        /*public void ActivePluginChanged(object sender, ActivePluginChangedArgs e)
+        {
+            if (e.Plugin.PanelKey != this.PanelKey && e.Plugin.PluginType <= this.PluginType)
+                MakeInvisible();
+        }*/
 
 
         //return panel key name
@@ -232,9 +237,6 @@ namespace VBDatasheet
         //listen to Model's complete status
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
-            /*if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
-                if ((bool)e.PackedPluginState["Complete"])
-                    boolModelComplete = true;*/
         }
 
 
@@ -250,16 +252,17 @@ namespace VBDatasheet
 
         public void Broadcast()
         {
-            IDictionary<string, object> packedState = new Dictionary<string, object>();
-            packedState = _frmDatasheet.PackState();
+            IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
 
-            if (packedState == null)
+            if (dictPackedState == null)
                 return;
-                
-            packedState.Add("Clean", boolClean);
-            packedState.Add("Complete", boolComplete);
-            packedState.Add("Visible", boolVisible);
-            signaller.RaiseBroadcastRequest(this, packedState);
+
+            dictPackedState.Add("Clean", boolClean);
+            dictPackedState.Add("Complete", boolComplete);
+            dictPackedState.Add("Visible", boolVisible);
+            dictPackedState.Add("FirstPass", boolFirstPass);
+
+            signaller.RaiseBroadcastRequest(this, dictPackedState);
         }
 
 
@@ -270,6 +273,7 @@ namespace VBDatasheet
             dictPackedState.Add("Clean", boolClean);
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
+            dictPackedState.Add("FirstPass", boolFirstPass);
 
             e.PackedPluginStates.Add(strPanelKey, dictPackedState);
         }
@@ -281,18 +285,14 @@ namespace VBDatasheet
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
 
-                boolComplete = (bool)dictPlugin["Complete"];
-                boolInitialPass = (bool)dictPlugin["InitialPass"];
-
                 //check to see if there already is a datasheet open, if so, close it before opening a saved project
                 if (this.Visible)
                     this.Hide();
 
-                _frmDatasheet.UnpackState(dictPlugin);               
-
                 boolVisible = (bool)dictPlugin["Visible"];
-                //when opening a saved project that has a datasheet, it will be complete.
-                boolComplete = boolVisible; 
+                boolComplete = (bool)dictPlugin["Complete"];
+                boolClean = (bool)dictPlugin["Clean"];
+                boolFirstPass = (bool)dictPlugin["FirstPass"];
 
                 if (boolVisible)
                 {
@@ -354,7 +354,7 @@ namespace VBDatasheet
 
         void btnGoToModeling_Click(object sender, EventArgs e)
         {
-            if (!boolInitialPass && !boolClean)
+            if (!boolFirstPass && !boolClean)
             {
                 //Ask whether the user wants to clobber the modeling and prediction tabs by modifying the data.
                 DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
@@ -369,7 +369,7 @@ namespace VBDatasheet
             Broadcast();
             
             //once you leave here, changes made to ds clear for next time here
-            boolInitialPass = false;
+            boolFirstPass = false;
             boolClean = true;
         }  
     }

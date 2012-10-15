@@ -114,25 +114,19 @@ namespace VBCommon.PluginSupport
         }
     }
 
-    //public class PluginArgs : EventArgs
-    //{
-    //    private Globals.PluginType pType;
-    //    private string sndr;
 
-    //    public PluginArgs(string sender, Globals.PluginType plugType)
-    //    {
-    //        this.sndr = sender;
-    //        this.pType = plugType;
-    //    }
+    public class ActivePluginChangedArgs : EventArgs
+    {
+        private VBCommon.Interfaces.IPlugin newActivePlugin;
 
-    //    public string Sender
-    //    {
-    //        get { return sndr; }
-    //    }
+        public ActivePluginChangedArgs(VBCommon.Interfaces.IPlugin Plugin)
+        {
+            this.newActivePlugin = Plugin;
+        }
 
-    //    public Globals.PluginType PType
-    //    {
-    //        get { return pType; }
-    //    }
-    //}
+        public VBCommon.Interfaces.IPlugin Plugin
+        {
+            get { return newActivePlugin; }
+        }
+    }
 }

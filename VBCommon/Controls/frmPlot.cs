@@ -237,13 +237,13 @@ namespace VBCommon.Controls
             //GraphPane gpXY = addPlotXY(response, iv, tags); <--
             GraphPane gpTS = addPlotTS(iv, tags);
             GraphPane gpBW = addPlotBW(iv, tags);
-            //GraphPane gpSV = addPlotSV(iv, tags);
+            GraphPane gpSV = addPlotXY(response, iv, tags);
             GraphPane gpFQ = addPlotFQ(iv);
 
             //master.Add(gpXY); <--
             master.Add(gpTS);
             master.Add(gpBW);
-            //master.Add(gpSV);
+            master.Add(gpSV);
             master.Add(gpFQ);
 
             using (Graphics g = this.CreateGraphics())
@@ -349,7 +349,8 @@ namespace VBCommon.Controls
                 //double pval = Statistics.Pvalue4Correlation(pcoeff, _dt.Rows.Count);  <--
 
                 string[] ivname = new string[] { _dt.Columns[intSelectedcol].Caption };
-                VBCommon.Statistics.MultipleRegression mlr = new MultipleRegression(_dt, _dt.Columns[intResponsevarcol].Caption, ivname);
+                VBCommon.Statistics.MultipleRegression mlr = new MultipleRegression(response, iv, _dt.Columns[intResponsevarcol].Caption, ivname[0]);
+                //VBCommon.Statistics.MultipleRegression mlr = new MultipleRegression(_dt, _dt.Columns[intResponsevarcol].Caption, ivname);
                 mlr.Compute();
 
                 PointPairList ppl2 = new PointPairList(iv, mlr.PredictedValues);

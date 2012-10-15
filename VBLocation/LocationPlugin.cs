@@ -111,9 +111,7 @@ namespace VBLocation
             AddPanel();
             AddRibbon("Activate");
 
-            //when panel is selected activate seriesview and ribbon tab
-            App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
-            App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
+
 
             base.Activate(); 
         }
@@ -147,13 +145,8 @@ namespace VBLocation
         {
             if (e.ActivePanelKey == strPanelKey)
             {
-                cLocation.ConnectMapEvents();
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
-            }
-            else
-            {
-                cLocation.DisconnectMapEvents();
             }
         }
 
@@ -165,6 +158,13 @@ namespace VBLocation
                 App.DockManager.SelectPanel(strPanelKey);
             }
         }
+        
+
+        /*public void ActivePluginChanged(object sender, ActivePluginChangedArgs e)
+        {
+            if (e.Plugin.PanelKey != this.PanelKey && e.Plugin.PluginType <= this.PluginType)
+                MakeInvisible();
+        }*/
 
 
         //returns panel key name
@@ -211,6 +211,14 @@ namespace VBLocation
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
+
+            //when panel is selected activate seriesview and ribbon tab
+            //App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
+            //App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
+            //when panel is selected activate seriesview and ribbon tab
+            signaller.ActivePluginChangedEvent += new VBCommon.Signaller.ActivePluginChangedHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
+            signaller.HeaderClickEvent += new VBCommon.Signaller.HeaderClickEventHandler<DotSpatial.Controls.Header.RootItemEventArgs>(HeaderControl_RootItemSelected);
+
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
 
@@ -252,7 +260,7 @@ namespace VBLocation
 
         private void BroadcastStateListener(object sender, BroadcastEventArgs e)
         {
-            if (((IPlugin)(e.Sender)).PanelKey == "DataSheetPanel")
+            if (((IPlugin)(e.Sender)).PanelKey == strPanelKey)
             {
                 //Unpack the state of this plugin.
                 cLocation.UnpackState(new Dictionary<string, object>());

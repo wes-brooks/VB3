@@ -33,7 +33,7 @@ namespace VBProjectManager
         private string strPluginKey = "Project Manager";
         public static string VBProjectsPath = null;
         private Boolean boolComplete = false;
-        private Boolean boolVisible = false;
+        private Boolean boolVisible = false;        
         public Stack UndoRedoStack = new Stack();
                 
         //constructor
@@ -97,7 +97,8 @@ namespace VBProjectManager
             }
 
             //Hook up the event handler that fires when the user clicks on a new plugin.
-            App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
+            //App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
+            //App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
 
             //if PType is smallest (datasheet/map), set as activated when open
             int pos = lstAllPluginTypes.IndexOf(lstAllPluginTypes.Min());
@@ -105,18 +106,7 @@ namespace VBProjectManager
             IPlugin ex = (IPlugin)extension;
             if (ex != null)
                 ex.MakeActive();
-            
-            /*//initialize only Datasheet is shown, all others are hidden
-            foreach(DotSpatial.Extensions.IExtension x in App.Extensions)
-            {
-                if (x is IPlugin)
-                {
-                    IPlugin pt = (IPlugin)x;
-                    if ((Int32)pt.PluginType > (Int32)Globals.PluginType.Datasheet)
-                        pt.Hide();
-                }
-            }*/
-                    
+                               
             base.Activate();
         }
 
@@ -245,25 +235,31 @@ namespace VBProjectManager
 
 
         //event handler when a plugin is selected from tabs
-        void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
+        /*void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
-            strTopPlugin = e.ActivePanelKey;
-
-            bool boolHideModeling = false;
-
-            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+            if (signaller.ActivePluginEventsConnected)
             {
-                if (x is VBCommon.Interfaces.IPlugin)
-                {
-                    if (((VBCommon.Interfaces.IPlugin)x).PluginType == VBCommon.Globals.PluginType.Datasheet && ((VBCommon.Interfaces.IPlugin)x).PanelKey == e.ActivePanelKey)
-                        boolHideModeling = true;
-                }
-            }
+                signaller.DisconnectActivePluginEvents();
+                signaller.DisconnectHeaderClickEvents();
 
-            if (boolHideModeling)
-            {
+                signaller.ActivePluginChanged(e);
+                
+                signaller.ConnectActivePluginEvents();
+                signaller.ConnectHeaderClickEvents();
             }
         }
+
+
+        //a root item (plugin) has been selected
+        void HeaderControl_RootItemSelected(object sender, RootItemEventArgs e)
+        {
+            if (signaller.HeaderClickEventsConnected)
+            {
+                signaller.DisconnectHeaderClickEvents();
+                signaller.HeaderClicked(e);
+                signaller.ConnectHeaderClickEvents();
+            }
+        }*/
         
 
         //pop off last stack for undo

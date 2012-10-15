@@ -21,12 +21,53 @@ namespace VBCommon
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageReceived;
 
+        public delegate void ActivePluginChangedHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
+        public event ActivePluginChangedHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs> ActivePluginChangedEvent;
+
+        public delegate void HeaderClickEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
+        public event HeaderClickEventHandler<DotSpatial.Controls.Header.RootItemEventArgs> HeaderClickEvent;
+
         public delegate void PluginMessageHandler<TArgs>(string sender, TArgs args) where TArgs : EventArgs;
         //public event PluginMessageHandler<PluginArgs> PluginMessageReceived;
 
         //event for broadcasting
         public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
+
+
+        /*private Boolean boolConnectActivePluginEvents = true;
+        public Boolean ActivePluginEventsConnected
+        {
+            get { return (boolConnectActivePluginEvents); }
+        }
+
+        public void ConnectActivePluginEvents()
+        {
+            boolConnectActivePluginEvents = true;
+        }
+
+        public void DisconnectActivePluginEvents()
+        {
+            boolConnectActivePluginEvents = false;
+        }
+
+
+        private Boolean boolHeaderClickEventsConnected = true;
+        public Boolean HeaderClickEventsConnected
+        {
+            get { return (boolHeaderClickEventsConnected); }
+        }
+
+        public void ConnectHeaderClickEvents()
+        {
+            boolHeaderClickEventsConnected = true;
+        }
+
+        public void DisconnectHeaderClickEvents()
+        {
+            boolHeaderClickEventsConnected = false;
+        }*/
+
 
         public Signaller() {}
 
@@ -71,6 +112,24 @@ namespace VBCommon
             {
                 UnpackEventArgs e = new UnpackEventArgs(key, value);
                 UnpackRequest(this, e);
+            }
+        }
+
+
+        public void ActivePluginChanged(DotSpatial.Controls.Docking.DockablePanelEventArgs Args)
+        {
+            if (ActivePluginChangedEvent != null)
+            {
+                ActivePluginChangedEvent(this, Args);
+            }
+        }
+
+
+        public void HeaderClicked(DotSpatial.Controls.Header.RootItemEventArgs Args)
+        {
+            if (HeaderClickEvent != null)
+            {
+                HeaderClickEvent(this, Args);
             }
         }
 

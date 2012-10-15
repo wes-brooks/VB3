@@ -9,6 +9,7 @@ using System.ComponentModel.Composition;
 using DotSpatial.Controls.Header;
 using DotSpatial.Controls.Docking;
 using VBCommon;
+using VBCommon.PluginSupport;
 using VBCommon.Interfaces;
 
 
@@ -214,8 +215,17 @@ namespace IPyPrediction
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            /*if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
-                Hide();*/
+            /*else
+            {
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                {
+                    if (x is IPlugin)
+                    {
+                        if (((IPlugin)x).PanelKey == e.ActivePanelKey && ((IPlugin)x).PluginType <= VBCommon.Globals.PluginType.Datasheet)
+                            Hide();
+                    }
+                }
+            }*/
         }
 
 

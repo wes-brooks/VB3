@@ -12,6 +12,7 @@ using System.ComponentModel.Composition;
 using DotSpatial.Controls.Header;
 using DotSpatial.Controls.Docking;
 using VBCommon;
+using VBCommon.PluginSupport;
 using VBCommon.Interfaces;
 
 namespace IPyModeling
@@ -44,10 +45,10 @@ namespace IPyModeling
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
 
         //complete and visible flags
-        public Boolean boolComplete;
+        public Boolean boolComplete = false;
         public Boolean boolVisible;
         public Boolean boolRunning;
-        public Boolean boolInitialEntry = true;
+        public Boolean boolVirgin = true;
 
         private string strTopPlugin = string.Empty;
 
@@ -86,10 +87,31 @@ namespace IPyModeling
         }
 
 
+        public void ActivePluginChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
+        {
+            if (e.ActivePanelKey == strPanelKey)
+            {                
+                App.DockManager.SelectPanel(strPanelKey);
+                App.HeaderControl.SelectRoot(strPanelKey);
+            }
+            else
+            {
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                {
+                    if (x is IPlugin)
+                    {
+                        if (((IPlugin)x).PanelKey == e.ActivePanelKey && ((IPlugin)x).PluginType <= VBCommon.Globals.PluginType.Datasheet)
+                            Hide();
+                    }
+                }
+            }
+        }
+
+
         public void MakeActive()
-        {            
-            App.DockManager.SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);            
+        {
+            App.HeaderControl.SelectRoot(strPanelKey); 
+            App.DockManager.SelectPanel(strPanelKey);                       
         }
 
 
@@ -118,7 +140,8 @@ namespace IPyModeling
         {
             if (e.SelectedRootKey == strPanelKey)
             {
-                App.DockManager.SelectPanel(strPanelKey);
+                this.MakeActive();
+                //App.DockManager.SelectPanel(strPanelKey);
             }
         }
 
@@ -176,6 +199,7 @@ namespace IPyModeling
         //add the panel content within the plugin
         public void AddPanel()
         {
+            //App.DockManager.SelectPanel(strPanelKey);
             var dp = new DockablePanel(strPanelKey, strPanelCaption, innerIronPythonControl, DockStyle.Fill);
             dp.DefaultSortOrder = (short)pluginType;
             App.DockManager.Add(dp);
@@ -190,9 +214,6 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            /*//hide this plugin when going back to global datasheet
-            if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
-                Hide();*/
         }
 
 
@@ -218,11 +239,11 @@ namespace IPyModeling
         }
 
 
-        //keep track if model already has a datasheet
+        /*//keep track if model already has a datasheet
         public Boolean InitialEntry
         {
             get { return boolInitialEntry; }
-        }
+        }*/
 
 
         //returns complete flag
@@ -255,6 +276,9 @@ namespace IPyModeling
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
+            //signaller.ActivePluginChangedEvent += new VBCommon.Signaller.ActivePluginChangedHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(ActivePluginChanged);
+            //signaller.HeaderClickEvent += new VBCommon.Signaller.HeaderClickEventHandler<DotSpatial.Controls.Header.RootItemEventArgs>(HeaderControl_RootItemSelected);
+
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
 
@@ -268,8 +292,7 @@ namespace IPyModeling
 
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
-        {
-            //get out of here if global ds is just making changes to be added to the stack
+        {            
             if (!(bool)((IPlugin)sender).Complete)
                 return;
 
@@ -282,12 +305,13 @@ namespace IPyModeling
                     this.Hide();
                     return;
                 }
-                else if (InitialEntry)
+                else if (boolVirgin)
                 {
                     if (dictPluginState != null)
                     {
                         if (dictPluginState.Count > 3)
                         {
+                            boolVirgin = false;
                             innerIronPythonControl.SetData(e.PackedPluginState);
                             Show();
                         }
@@ -295,20 +319,14 @@ namespace IPyModeling
                 }
                 else
                 {
-                    //if changes were made or it is initial pass, set the data
-                    boolInitialEntry = false;
-                    //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
                     if (!(bool)e.PackedPluginState["Clean"])
+                    {
                         boolComplete = false;
-
-                    innerIronPythonControl.SetData(e.PackedPluginState);
+                        innerIronPythonControl.SetData(e.PackedPluginState);
+                    }
+                    Show();
                 }
             }
-            /*//if the prediction is broadcasting, this project is opening and needs model to show itself if prediction is complete
-            if (((IPlugin)sender).PluginType == Globals.PluginType.Prediction)
-                if ((bool)e.PackedPluginState["Complete"])
-                    Show();
-            */
         }
 
         
@@ -357,7 +375,7 @@ namespace IPyModeling
         }
 
 
-        //handles broadcasting each change to be added to the stack
+        /*//handles broadcasting each change to be added to the stack
         public void HandleAddToStack(object sender, EventArgs e)
         {            
             if (boolComplete)
@@ -375,7 +393,7 @@ namespace IPyModeling
                 }
             }
             Broadcast();
-        }
+        }*/
 
 
         //when modeling makes changes, event broadcasts changes to those listening
@@ -407,6 +425,7 @@ namespace IPyModeling
             {
                 packedState.Add("Complete", boolComplete);
                 packedState.Add("Visible", boolVisible);
+                packedState.Add("Virgin", boolVirgin);
                 
                 e.PackedPluginStates.Add(strPanelKey, packedState);
             }
@@ -426,14 +445,7 @@ namespace IPyModeling
 
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolVisible = (bool)dictPlugin["Visible"];
-               
-                if (boolComplete)
-                    boolInitialEntry = false;
-
-                /*Show();
-                MakeActive();
-
-                innerIronPythonControl.UnpackState(dictPlugin);*/
+                boolVirgin = (bool)dictPlugin["Virgin"];
 
                 if (boolVisible)
                     Show();
