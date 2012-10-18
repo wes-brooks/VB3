@@ -37,6 +37,10 @@
     <Reference Include="Accord.Controls">
       <HintPath>..\..\Program Files\Accord.NET\Framework\Release\Accord.Controls.dll</HintPath>
     </Reference>
+    <Reference Include="Accord.Math, Version=2.7.1.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Externals\Accord.NET\Accord.Math.dll</HintPath>
+    </Reference>
     <Reference Include="Accord.Statistics, Version=2.7.1.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Program Files\Accord.NET\Framework\Release\Accord.Statistics.dll</HintPath>

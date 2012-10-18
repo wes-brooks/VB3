@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using Accord.Statistics;
+using Accord.Math;
+using Accord.Math.Decompositions;
 //using Extreme.Statistics;
 //using Extreme.Mathematics.LinearAlgebra;
 //using Extreme.Statistics.Tests;
@@ -65,6 +67,8 @@ namespace VBCommon.Statistics
 
             strOutputName = OutputName;
             strInputName = InputName;
+
+            _independentVars = new string[1] { InputName };
 
             //_model = new MultipleRegression(
         }
@@ -178,9 +182,13 @@ namespace VBCommon.Statistics
             // containing all variables.
             //LinearRegressionModel model = new LinearRegressionModel(_dataTable, _dependentVar, _independentVars);
             double[][] input = new double[arrInputData.Length][]; // {arrInputData};
+            double[,] input2 = new double[arrInputData.Length,2]; // {arrInputData};
             for(int i=0; i<arrInputData.Length; i++)
             {
                 input[i] = new double[] {arrInputData[i]};
+
+                input2[i,0] = 1;
+                input2[i,1] = arrInputData[i];
             }
 
             string[] inputNames = new string[] {strInputName};
@@ -193,86 +201,141 @@ namespace VBCommon.Statistics
 
             // We can set model options now, such as whether to include a constant:
             _model.NoIntercept = false;
-
+            */
             // The Compute method performs the actual regression analysis.
-            _model.Compute();            
-            _adjR2 = _model.AdjustedRSquared;
-            _R2 = _model.RSquared;
-            _RMSE = _model.StandardError;
+            //_model.Compute();            
+            _adjR2 = M2.RSquareAdjusted;
+            _R2 = M2.RSquared;
+            _RMSE = Math.Sqrt(M2.Table[M2.Table.Count - 2].MeanSquares);
             
-
             //_AIC = model.GetAkaikeInformationCriterion();
             //_BIC = model.GetBayesianInformationCriterion();            
 
             
             //Calculate the Corrected AIC
-            double sse = _model.AnovaTable.ErrorRow.SumOfSquares;            
-            double n = _dataTable.Rows.Count;
-            double p = _independentVars.Length + 1;
+            double sse = M2.Table[M2.Table.Count-2].SumOfSquares;            
+            int n = Convert.ToInt32(M2.Results.Length);
+            double p = M2.CoefficientValues.Length;
+            double[,] H = input2.Multiply((input2.Transpose().Multiply(input2)).Inverse().Multiply(input2.Transpose()));
+
+            double[] SquaredResiduals = new double[M2.Results.Length];
+            double[] Residuals = new double[M2.Results.Length];
+            double[] Leverage = new double[M2.Results.Length];
+            for (int i=0; i<M2.Results.Length; i++)
+            {
+                SquaredResiduals[i] = Math.Pow(M2.Outputs[i] - M2.Results[i], 2);
+                Residuals[i] = M2.Outputs[i] - M2.Results[i];
+                Leverage[i] = H[i,i];
+            }
+
+            double SSR = SquaredResiduals.Sum();
+            double sigma = SSR/(n-p);
+
+            double[] ExternallyStudentizedResiduals = new double[M2.Results.Length];
+            _dffits = new double[M2.Results.Length];
+            _cooks = new double[M2.Results.Length];
+            for (int i=0; i<M2.Results.Length; i++)
+            {
+                ExternallyStudentizedResiduals[i] = (SSR - SquaredResiduals[i])/(n-p-1);
+                _dffits[i] = ExternallyStudentizedResiduals[i] * Math.Sqrt(H[i, i] * (1 - H[i, i]));
+                _cooks[i] = SquaredResiduals[i] / (p * M2.Table[M2.Table.Count - 2].MeanSquares) * H[i, i] / (1 - H[i, i]);
+            }
 
             _AIC = n * Math.Log(sse / n) + (2 * p) + n + 2;
             //_AICC = 1 + (Math.Log(sse / n)) + (2)*(p + 1)/ (n - p - 1);
             _AICC = _AIC + (2 * (p + 1) * (p + 2)) / (n - p - 2);
             _BIC = n * (Math.Log(sse / n)) + (p * Math.Log(n));
 
-
+            
             _Press = 0.0;
-            GeneralVector vecLeverage = _model.GetLeverage();
-            GeneralVector vecResiduals = _model.Residuals;
+            //GeneralVector vecLeverage = _model.GetLeverage();
+            //GeneralVector vecResiduals = _model.Residuals;
             double leverage = 0.0;
-            for (int i = 0; i < _dataTable.Rows.Count; i++)
+            for (int i = 0; i < M2.Results.Length; i++)
             {
-                leverage = Math.Min(vecLeverage[i], 0.99);
-                //_Press += ((vecResiduals[i])* (vecResiduals[i])) / ((1 - vecLeverage[i]) * (1 - vecLeverage[i]));
-                _Press += Math.Pow((vecResiduals[i]) / (1 - leverage),2);
+                leverage = Math.Min(Leverage[i], 0.99);
+                //_Press += ((Residuals[i])* (Residuals[i])) / ((1 - Leverage[i]) * (1 - Leverage[i]));
+                _Press += Math.Pow((Residuals[i]) / (1 - leverage),2);
             }
 
-
+            
             _parameters = createParametersDataTable();
             DataRow dr = null;
-            foreach (Parameter param in _model.Parameters)
+            foreach (Accord.Statistics.Analysis.LinearRegressionCoefficient param in M2.Coefficients)
             {
                 dr = _parameters.NewRow();
                 dr["Name"] = param.Name;
                 dr["Value"] = param.Value;
                 dr["StandardError"] = param.StandardError;
-                dr["TStatistic"] = param.Statistic;
-                dr["PValue"] = param.PValue;
+                dr["TStatistic"] = param.Value / param.StandardError;
+                dr["PValue"] = param.TTest.PValue;
                 dr["StandardizedCoefficient"] = getStandardCoeff(param.Name, param.Value);
                 _parameters.Rows.Add(dr);
             }
 
-            _predictedValues = _model.PredictedValues.ToArray();            
-            _observedValues = _model.DependentVariable.ToArray() as double[];
-            _dffits = _model.GetDffits().ToArray<double>();
-            _cooks = _model.GetCooksDistance().ToArray<double>();
-            _studentizedResiduals = _model.GetStudentizedResiduals().ToArray<double>();
+            
+            _predictedValues = M2.Results;            
+            _observedValues = M2.Outputs;            
+            _studentizedResiduals = ExternallyStudentizedResiduals;
 
+            Accord.Statistics.Distributions.Univariate.NormalDistribution distribution = new Accord.Statistics.Distributions.Univariate.NormalDistribution(0, 1);
+
+            double[] standardizedResid = new double[M2.Results.Length];
+            for (int i = 0; i < M2.Results.Length; i++)
+            {
+                standardizedResid[i] = (Residuals[i] - Residuals.Mean()) / Residuals.StandardDeviation();
+            }
+            Array.Sort(standardizedResid);
+
+
+            double AD_stat = 0;
+            for (int i = 0; i < M2.Results.Length; i++)
+            {
+                AD_stat += (2 * i + 1) * (Math.Log(distribution.DistributionFunction(standardizedResid[i])) + Math.Log(1-distribution.DistributionFunction(standardizedResid[n-1-i])));
+            }
+
+            AD_stat = -Convert.ToDouble(n) - AD_stat / Convert.ToDouble(n);
 
             //AndersonDarlingTest adtest = new AndersonDarlingTest((NumericalVariable)vecResiduals);
            
-            Extreme.Statistics.Tests.OneSampleTest ADtest = _model.GetNormalityOfResidualsTest(TestOfNormality.AndersonDarling);
-            Extreme.Statistics.Tests.OneSampleTest WStest = _model.GetNormalityOfResidualsTest(TestOfNormality.ShapiroWilk);
-            _ADresidPvalue = ADtest.PValue;
-            _ADresidNormStatVal = ADtest.Statistic;
+            
+            //Extreme.Statistics.Tests.OneSampleTest ADtest = _model.GetNormalityOfResidualsTest(TestOfNormality.AndersonDarling);
+            //Extreme.Statistics.Tests.OneSampleTest WStest = _model.GetNormalityOfResidualsTest(TestOfNormality.ShapiroWilk);
+            //_ADresidPvalue = ADtest.PValue;
+            _ADresidNormStatVal = AD_stat;
             //_WSresidPvalue = WStest.PValue;
             //_WSresidNormStatVal = WStest.Statistic;
 
-            Extreme.Mathematics.LinearAlgebra.SymmetricMatrix matrix = _model.GetCorrelationMatrix();
-            Extreme.Mathematics.LinearAlgebra.SymmetricMatrix corrMatrix = new SymmetricMatrix(matrix.ColumnCount -1);
+            double[,] centered = new double[arrInputData.Length, _independentVars.Length];
+            for (int i=0; i<M2.Results.Length; i++)
+            {
+                for(int j=0; j<_independentVars.Length; j++)
+                {
+                    centered[i, j] = input2[i, j + 1];
+                }
+            }
+
+
+            double[,] matrix = input2.Transpose().Multiply(input2);
+
+            //Extreme.Mathematics.LinearAlgebra.SymmetricMatrix matrix = _model.GetCorrelationMatrix();
+            //Extreme.Mathematics.LinearAlgebra.SymmetricMatrix corrMatrix = new SymmetricMatrix(matrix.ColumnCount -1);
 
             //Extreme Opt returns a Correlation matrix that contains an extra row and column
             //Looks like these are related to the intercept
             //We are carving out the std correlation matrix
-            for (int row=1;row < matrix.ColumnCount; row++)
-            {
-                for (int col=1;col < matrix.ColumnCount; col++)
-                {
-                    corrMatrix[row-1,col-1] = matrix[row,col];
-                }
-            }           
+            //for (int row=1;row < matrix.ColumnCount; row++)
+            //{
+            //    for (int col=1;col < matrix.ColumnCount; col++)
+            //    {
+            //        corrMatrix[row-1,col-1] = matrix[row,col];
+            //    }
+            //}           
             
-            Extreme.Mathematics.Matrix InvCorrMatrix = corrMatrix.GetInverse();
+            double[,] corrMatrix = matrix;
+            double[,] InvCorrMatrix = corrMatrix.Inverse();
+            
+            /*Extreme.Mathematics.Matrix InvCorrMatrix = corrMatrix.GetInverse();
             Extreme.Mathematics.Vector VIFVector = InvCorrMatrix.GetDiagonal();
             Extreme.Mathematics.Vector vifs = InvCorrMatrix.GetDiagonal().ToArray();
 
@@ -281,22 +344,22 @@ namespace VBCommon.Statistics
                 _VIF.Add(_independentVars[i].ToString(), vifs.GetValue(i));
 
             _maxVIF = VIFVector.AbsoluteMax();
-            _maxVIFParameter = _independentVars[VIFVector.AbsoluteMaxIndex()]; 
-
-            */
+            _maxVIFParameter = _independentVars[VIFVector.AbsoluteMaxIndex()];           */      
+      
 
         }
 
-        //private double getStandardCoeff(string paramName, double coeff)
-        //{
-        //    //throw new NotImplementedException();
-        //    if (paramName == "(Intercept)") return double.NaN;
-        //    NumericalVariable nv = new NumericalVariable(_dataTable.Columns[_dependentVar]);
-        //    double stdevY = nv.StandardDeviation;
-        //    nv = new NumericalVariable(_dataTable.Columns[paramName]);
-        //    double stdevX = nv.StandardDeviation;
-        //    return coeff * stdevX / stdevY;
-        //}
+        private double getStandardCoeff(string paramName, double coeff)
+        {
+            //throw new NotImplementedException();
+            if (paramName == "(Intercept)") return double.NaN;
+            //double[] nv = new double[] (_dataTable.Columns[_dependentVar]);
+            //double stdevY = nv.StandardDeviation;
+            //nv = new NumericalVariable(_dataTable.Columns[paramName]);
+            //double stdevX = nv.StandardDeviation;
+            //return coeff * stdevX / stdevY;
+            return (0);
+        }
 
         //public double Predict(DataRow independentValues)
         //{
