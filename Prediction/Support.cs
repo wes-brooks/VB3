@@ -5,7 +5,7 @@ using System.Text;
 using System.Data;
 using VBCommon;
 
-namespace IPyPrediction
+namespace Prediction
 {
     public class Support
     {                

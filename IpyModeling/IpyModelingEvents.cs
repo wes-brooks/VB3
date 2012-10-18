@@ -4,7 +4,7 @@ using System.Data;
 
 namespace IPyModeling
 {
-    //This event is raised to pass a message to the container's logger.
+    /*//This event is raised to pass a message to the container's logger.
     public class LogMessageEvent : EventArgs
     {
         private string strMessage;
@@ -97,7 +97,7 @@ namespace IPyModeling
         }
     }
 
-
+    */
     //This event is raised to pass a message to the container's project manager.
     public class RunButtonStatusArgs : EventArgs
     {

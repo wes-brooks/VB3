@@ -8,8 +8,8 @@
     <ProjectGuid>{13B5B93B-EA91-491D-A423-8D89C5838EBC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IPyPrediction</RootNamespace>
-    <AssemblyName>IPyPrediction</AssemblyName>
+    <RootNamespace>Prediction</RootNamespace>
+    <AssemblyName>Prediction</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
@@ -104,11 +104,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomFunctions.cs" />
-    <Compile Include="frmIPyPrediction.cs">
+    <Compile Include="frmPrediction.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="frmIPyPrediction.Designer.cs">
-      <DependentUpon>frmIPyPrediction.cs</DependentUpon>
+    <Compile Include="frmPrediction.Designer.cs">
+      <DependentUpon>frmPrediction.cs</DependentUpon>
     </Compile>
     <Compile Include="ExpressionEvaluator.cs" />
     <Compile Include="frmColumnMapper.cs">
@@ -123,7 +123,7 @@
     <Compile Include="frmPredictionScatterPlot.designer.cs">
       <DependentUpon>frmPredictionScatterPlot.cs</DependentUpon>
     </Compile>
-    <Compile Include="IpyPredictionPlugin.cs" />
+    <Compile Include="PredictionPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -135,8 +135,8 @@
     <Compile Include="WindComponents.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmIPyPrediction.resx">
-      <DependentUpon>frmIPyPrediction.cs</DependentUpon>
+    <EmbeddedResource Include="frmPrediction.resx">
+      <DependentUpon>frmPrediction.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmColumnMapper.resx">
       <DependentUpon>frmColumnMapper.cs</DependentUpon>
@@ -180,14 +180,6 @@
     <None Include="Resources\MakePrediction.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IPyCommon\IPyCommon.csproj">
-      <Project>{6BF34EC4-522C-4B55-8517-E8B02E2A3B04}</Project>
-      <Name>IPyCommon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\IpyModeling\IPyModeling.csproj">
-      <Project>{ADE70E49-1CEB-4526-A7BB-D8A99246D718}</Project>
-      <Name>IPyModeling</Name>
-    </ProjectReference>
     <ProjectReference Include="..\VBCommon\VBCommon.csproj">
       <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
       <Name>VBCommon</Name>

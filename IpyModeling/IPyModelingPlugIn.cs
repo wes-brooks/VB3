@@ -125,11 +125,11 @@ namespace IPyModeling
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
             innerIronPythonControl.ModelUpdated += new EventHandler(HandleUpdate);
-            innerIronPythonControl.boolRunChanged += new IPyModelingControl.BoolChangedEvent(HandleRunCancelEnableState);
+            innerIronPythonControl.ModelingTabControl.SelectedIndexChanged += new EventHandler(UpdateControlStatus);
             //innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
-            innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
-            innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
-            innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
+            //innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
+            //innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
+            //innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
             
             base.Activate();
         }
@@ -224,26 +224,11 @@ namespace IPyModeling
         }
 
 
-        /*//returns this model's packed state
-        public IDictionary<string, object> PackedPlugin
-        {
-            get { return dictPlugin; }
-            set { dictPlugin = value; }
-        }*/
-
-
         //returns plugin type (Modeling)
         public Globals.PluginType PluginType
         {
             get { return pluginType; }
         }
-
-
-        /*//keep track if model already has a datasheet
-        public Boolean InitialEntry
-        {
-            get { return boolInitialEntry; }
-        }*/
 
 
         //returns complete flag
@@ -276,18 +261,9 @@ namespace IPyModeling
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
-            //signaller.ActivePluginChangedEvent += new VBCommon.Signaller.ActivePluginChangedHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(ActivePluginChanged);
-            //signaller.HeaderClickEvent += new VBCommon.Signaller.HeaderClickEventHandler<DotSpatial.Controls.Header.RootItemEventArgs>(HeaderControl_RootItemSelected);
 
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
-
-
-        /*//undo was hit, send the packed state to be unpacked
-        public void UndoLastChange(Dictionary<string, object> packedState)
-        {
-            innerIronPythonControl.SetData(packedState);
-        }*/
 
 
         //event listener for plugin broadcasting changes
@@ -327,10 +303,81 @@ namespace IPyModeling
                     Show();
                 }
             }
+            else
+            {
+                //This handles an undo:
+                try
+                {
+                    if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
+                    {
+                        if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
+                        {
+                            IDictionary<string, object> dictPlugin = e.PackedPluginState;
+
+                            Show();
+                            MakeActive();
+
+                            innerIronPythonControl.UnpackState(dictPlugin);
+
+                            boolComplete = (bool)dictPlugin["Complete"];
+                            boolVisible = (bool)dictPlugin["Visible"];
+                            boolVirgin = (bool)dictPlugin["Virgin"];
+
+                            if (boolVisible)
+                                Show();
+                            else
+                                Hide();
+                        }
+                    }
+                }
+                catch { }
+            }       
         }
 
-        
-        public void HandleManipulateDataTab(object sender, EventArgs e)
+
+
+        public void UpdateControlStatus(object sender, EventArgs e)
+        {
+            try
+            {
+                string strActiveTabName  =innerIronPythonControl.ModelingTabControl.SelectedTab.Name.ToString();
+
+                if (strActiveTabName == "DatasheetTab")
+                {
+                    btnComputeAO.Enabled = true;
+                    btnManipulate.Enabled = true;
+                    btnTransform.Enabled = true;
+                    btnRun.Enabled = false;
+                }
+                else if (strActiveTabName == "VariableSelectionTab")
+                {
+                    btnComputeAO.Enabled = false;
+                    btnManipulate.Enabled = false;
+                    btnTransform.Enabled = false;
+                    btnRun.Enabled = false;
+                }
+                else if (strActiveTabName == "ModelingTab")
+                {
+                    btnComputeAO.Enabled = false;
+                    btnManipulate.Enabled = false;
+                    btnTransform.Enabled = false;
+                    btnRun.Enabled = true;
+                    innerIronPythonControl.SetModelData();
+                }
+                else if (strActiveTabName == "DiagnosticTab")
+                {
+                    btnComputeAO.Enabled = false;
+                    btnManipulate.Enabled = false;
+                    btnTransform.Enabled = false;
+                    btnRun.Enabled = false;
+                }
+            }
+            catch
+            { }
+        }
+
+
+        /*public void HandleManipulateDataTab(object sender, EventArgs e)
         {
             //only have manipulate datasheet buttons enabled when on Manipulate Datasheet tab
             try
@@ -372,7 +419,7 @@ namespace IPyModeling
             }
             catch
             { }
-        }
+        }*/
 
 
         /*//handles broadcasting each change to be added to the stack
@@ -450,12 +497,12 @@ namespace IPyModeling
                 if (boolVisible)
                     Show();
                 else
-                    Hide();
-               
-            } /*else {
-                //Set this plugin to an empty state.
+                    Hide();               
+            }
+            else
+            {
                 Activate();
-            }*/
+            }
         }
 
 
@@ -493,7 +540,7 @@ namespace IPyModeling
         }*/
 
         
-        //handle when model boolean Running flag changes
+        /*//handle when model boolean Running flag changes
         private void HandleRunCancelEnableState(bool val)
         {
             if (boolRunning)
@@ -507,7 +554,7 @@ namespace IPyModeling
                 btnRun.Enabled = true;
                 //btnCancel.Enabled = false;
             }
-        }
+        }*/
 
 
         //change has been made within modeling, need to update

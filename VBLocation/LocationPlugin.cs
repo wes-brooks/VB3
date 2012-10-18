@@ -253,6 +253,21 @@ namespace VBLocation
                 //Unpack the state of this plugin.
                 cLocation.UnpackState(new Dictionary<string, object>());
             }
+            else
+            {
+                //This handles an undo:
+                try
+                {
+                    if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
+                    {
+                        if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
+                        {
+                            //Unpack the undo dictionary here
+                        }
+                    }
+                }
+                catch { }
+            }            
         }
 
 

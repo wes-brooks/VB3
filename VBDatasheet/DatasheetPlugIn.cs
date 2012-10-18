@@ -67,9 +67,12 @@ namespace VBDatasheet
 
         //show plugin
         public void Show()
-        {            
-            AddRibbon("Show");
-            boolVisible = true;
+        {
+            if (!boolVisible)
+            {
+                AddRibbon("Show");
+                boolVisible = true;
+            }
         }
 
 
@@ -107,13 +110,6 @@ namespace VBDatasheet
                 _frmDatasheet.Refresh();
             }
         }
-
-
-        /*public void ActivePluginChanged(object sender, ActivePluginChangedArgs e)
-        {
-            if (e.Plugin.PanelKey != this.PanelKey && e.Plugin.PluginType <= this.PluginType)
-                MakeInvisible();
-        }*/
 
 
         //return panel key name
@@ -236,6 +232,23 @@ namespace VBDatasheet
         //listen to Model's complete status
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
+            //This handles an undo:
+            try
+            {
+                if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
+                {
+                    if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
+                    {
+                        boolVisible = (bool)e.PackedPluginState["Visible"];
+                        boolComplete = (bool)e.PackedPluginState["Complete"];
+                        boolClean = (bool)e.PackedPluginState["Clean"];
+                        boolFirstPass = (bool)e.PackedPluginState["FirstPass"];
+
+                        _frmDatasheet.UnpackState(e.PackedPluginState);
+                    }
+                }
+            }
+            catch { }
         }
 
 
@@ -285,8 +298,8 @@ namespace VBDatasheet
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
 
                 //check to see if there already is a datasheet open, if so, close it before opening a saved project
-                if (this.Visible)
-                    this.Hide();
+                /*if (this.Visible)
+                    this.Hide();*/
 
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];

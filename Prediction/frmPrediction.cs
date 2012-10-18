@@ -17,18 +17,16 @@ using VBCommon.Statistics;
 using VBCommon.Controls;
 using VBCommon.Interfaces;
 using Ciloci.Flee;
-using IPyCommon;
-using IPyModeling;
 using VBProjectManager;
 using DotSpatial.Controls;
 using Newtonsoft.Json;
 
 
-namespace IPyPrediction
+namespace Prediction
 {
     //Prediction class.
     [JsonObject]
-    public partial class frmIPyPrediction : UserControl, IFormState
+    public partial class frmPrediction : UserControl, IFormState
     {
         private ContextMenu cmforResponseVar = new ContextMenu();
         private Dictionary<string, string> dictMainEffects;
@@ -57,25 +55,12 @@ namespace IPyPrediction
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
 
+
         //constructor
-        public frmIPyPrediction()
+        public frmPrediction()
         {
             InitializeComponent();
         }
-
-
-        /*//Return the IronPython model object
-        public dynamic Model
-        {
-            get { return this.ipyModel; }
-        }*/
-
-
-        /*//returns the packed state of the model coming in
-        public IDictionary<string, object> PackedSt
-        {
-            get { return dictPackedSt; }
-        }*/
 
 
         //returns datatable for correlation data
@@ -452,8 +437,6 @@ namespace IPyPrediction
                 lstRefVar.AddRange(strArrRefvars);
                 strArrReferencedVars = lstRefVar.ToArray();
             }
-            //else
-                //ipyModel = null;
         }
 
 
@@ -653,17 +636,14 @@ namespace IPyPrediction
         {
             Cursor.Current = Cursors.WaitCursor;
             VBLogger.GetLogger().LogEvent("0", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-
-            //if (ipyInterface == null) RequestIronPythonInterface();
-            //if (ipyModel == null) RequestModel();
-
+            
             dtVariables = (DataTable)dgvVariables.DataSource;
             if (dtVariables == null)
                 return;
 
             if (dtVariables.Rows.Count < 1)
                 return;
-            //end edits and accept changes on ob and iv tables
+
             dgvVariables.EndEdit();
             dtVariables.AcceptChanges();
             dgvObs.EndEdit();      
@@ -672,12 +652,12 @@ namespace IPyPrediction
             dtObs = (DataTable)dgvObs.DataSource;
             if (dtObs != null)
                 dtObs.AcceptChanges();
-            //create table used for prediction
+
             DataTable tblForPrediction = dtVariables.AsDataView().ToTable();
             tblForPrediction.Columns.Remove("ID");
 
             VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            //formatting
+
             string[] strArrExpressions = strModelExpression.Split('+');
             foreach(string var in strArrExpressions)
             {
@@ -802,15 +782,14 @@ namespace IPyPrediction
                 if (ValidateNumericTextBox(txtPower) == false)
                     return null;
             }
-            //store decCrit as dbl
+
             double dblCrit = Convert.ToDouble(txtDecCrit.Text);
             dblCrit = GetTransformedValue(dblCrit);
-            //store reg std as dbl
+
             double regStd = Convert.ToDouble(txtRegStd.Text);
             regStd = GetTransformedValue(regStd);
 
             DataTable dt = new DataTable();
-            //add columns
             dt.Columns.Add("ID", typeof(string));
             dt.Columns.Add("Model_Prediction", typeof(double));
             dt.Columns.Add("Decision_Criterion", typeof(double));

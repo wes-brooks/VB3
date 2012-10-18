@@ -33,10 +33,10 @@
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.DatasheetTab = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
             this.dsControl1 = new VBCommon.Controls.DatasheetControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.VariableSelectionTab = new System.Windows.Forms.TabPage();
             this.lblAvailVars = new System.Windows.Forms.Label();
             this.lblDepVars = new System.Windows.Forms.Label();
             this.lblNumObs = new System.Windows.Forms.Label();
@@ -48,7 +48,7 @@
             this.lbIndVariables = new System.Windows.Forms.ListBox();
             this.label9 = new System.Windows.Forms.Label();
             this.lbAvailableVariables = new System.Windows.Forms.ListBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.ModelingTab = new System.Windows.Forms.TabPage();
             this.lblDecisionThreshold = new System.Windows.Forms.Label();
             this.pnlThresholdingButtons = new System.Windows.Forms.Panel();
             this.btnRight25 = new System.Windows.Forms.Button();
@@ -83,7 +83,7 @@
             this.label37 = new System.Windows.Forms.Label();
             this.label39 = new System.Windows.Forms.Label();
             this.tbThreshold = new System.Windows.Forms.TextBox();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.DiagnosticTab = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabResults = new System.Windows.Forms.TabPage();
             this.label8 = new System.Windows.Forms.Label();
@@ -107,9 +107,9 @@
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabControl1.SuspendLayout();
-            this.tabPage4.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.DatasheetTab.SuspendLayout();
+            this.VariableSelectionTab.SuspendLayout();
+            this.ModelingTab.SuspendLayout();
             this.pnlThresholdingButtons.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartValidation)).BeginInit();
             this.groupBox10.SuspendLayout();
@@ -117,7 +117,7 @@
             this.groupBox11.SuspendLayout();
             this.groupBox12.SuspendLayout();
             this.groupBox13.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.DiagnosticTab.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabResults.SuspendLayout();
             this.tabObsPred.SuspendLayout();
@@ -131,28 +131,28 @@
             this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.DatasheetTab);
+            this.tabControl1.Controls.Add(this.VariableSelectionTab);
+            this.tabControl1.Controls.Add(this.ModelingTab);
+            this.tabControl1.Controls.Add(this.DiagnosticTab);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1102, 645);
             this.tabControl1.TabIndex = 0;
             // 
-            // tabPage4
+            // DatasheetTab
             // 
-            this.tabPage4.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage4.Controls.Add(this.label3);
-            this.tabPage4.Controls.Add(this.dsControl1);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1094, 619);
-            this.tabPage4.TabIndex = 0;
-            this.tabPage4.Text = "Data Manipulation";
-            this.tabPage4.Enter += new System.EventHandler(this.DataTabEnter);
+            this.DatasheetTab.BackColor = System.Drawing.SystemColors.Control;
+            this.DatasheetTab.Controls.Add(this.label3);
+            this.DatasheetTab.Controls.Add(this.dsControl1);
+            this.DatasheetTab.Location = new System.Drawing.Point(4, 22);
+            this.DatasheetTab.Name = "DatasheetTab";
+            this.DatasheetTab.Padding = new System.Windows.Forms.Padding(3);
+            this.DatasheetTab.Size = new System.Drawing.Size(1094, 619);
+            this.DatasheetTab.TabIndex = 0;
+            this.DatasheetTab.Text = "Data Manipulation";
+            //this.DatasheetTab.Enter += new System.EventHandler(this.DataTabEnter);
             // 
             // label3
             // 
@@ -190,26 +190,26 @@
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
             // 
-            // tabPage1
+            // VariableSelectionTab
             // 
-            this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage1.Controls.Add(this.lblAvailVars);
-            this.tabPage1.Controls.Add(this.lblDepVars);
-            this.tabPage1.Controls.Add(this.lblNumObs);
-            this.tabPage1.Controls.Add(this.btnRemoveInputVariable);
-            this.tabPage1.Controls.Add(this.btnAddInputVariable);
-            this.tabPage1.Controls.Add(this.lbDepVarName);
-            this.tabPage1.Controls.Add(this.lblDepVariable);
-            this.tabPage1.Controls.Add(this.label14);
-            this.tabPage1.Controls.Add(this.lbIndVariables);
-            this.tabPage1.Controls.Add(this.label9);
-            this.tabPage1.Controls.Add(this.lbAvailableVariables);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1094, 619);
-            this.tabPage1.TabIndex = 1;
-            this.tabPage1.Text = "Variable Selection";
+            this.VariableSelectionTab.BackColor = System.Drawing.SystemColors.Control;
+            this.VariableSelectionTab.Controls.Add(this.lblAvailVars);
+            this.VariableSelectionTab.Controls.Add(this.lblDepVars);
+            this.VariableSelectionTab.Controls.Add(this.lblNumObs);
+            this.VariableSelectionTab.Controls.Add(this.btnRemoveInputVariable);
+            this.VariableSelectionTab.Controls.Add(this.btnAddInputVariable);
+            this.VariableSelectionTab.Controls.Add(this.lbDepVarName);
+            this.VariableSelectionTab.Controls.Add(this.lblDepVariable);
+            this.VariableSelectionTab.Controls.Add(this.label14);
+            this.VariableSelectionTab.Controls.Add(this.lbIndVariables);
+            this.VariableSelectionTab.Controls.Add(this.label9);
+            this.VariableSelectionTab.Controls.Add(this.lbAvailableVariables);
+            this.VariableSelectionTab.Location = new System.Drawing.Point(4, 22);
+            this.VariableSelectionTab.Name = "VariableSelectionTab";
+            this.VariableSelectionTab.Padding = new System.Windows.Forms.Padding(3);
+            this.VariableSelectionTab.Size = new System.Drawing.Size(1094, 619);
+            this.VariableSelectionTab.TabIndex = 1;
+            this.VariableSelectionTab.Text = "Variable Selection";
             // 
             // lblAvailVars
             // 
@@ -317,24 +317,23 @@
             this.lbAvailableVariables.Size = new System.Drawing.Size(160, 446);
             this.lbAvailableVariables.TabIndex = 73;
             // 
-            // tabPage2
+            // ModelingTab
             // 
-            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage2.Controls.Add(this.lblDecisionThreshold);
-            this.tabPage2.Controls.Add(this.pnlThresholdingButtons);
-            this.tabPage2.Controls.Add(this.lblSpec);
-            this.tabPage2.Controls.Add(this.chartValidation);
-            this.tabPage2.Controls.Add(this.groupBox10);
-            this.tabPage2.Controls.Add(this.label4);
-            this.tabPage2.Controls.Add(this.groupBox6);
-            this.tabPage2.Controls.Add(this.groupBox11);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1094, 619);
-            this.tabPage2.TabIndex = 2;
-            this.tabPage2.Text = "Model";
-            this.tabPage2.Enter += new System.EventHandler(this.RequestModelData);
+            this.ModelingTab.BackColor = System.Drawing.SystemColors.Control;
+            this.ModelingTab.Controls.Add(this.lblDecisionThreshold);
+            this.ModelingTab.Controls.Add(this.pnlThresholdingButtons);
+            this.ModelingTab.Controls.Add(this.lblSpec);
+            this.ModelingTab.Controls.Add(this.chartValidation);
+            this.ModelingTab.Controls.Add(this.groupBox10);
+            this.ModelingTab.Controls.Add(this.label4);
+            this.ModelingTab.Controls.Add(this.groupBox6);
+            this.ModelingTab.Controls.Add(this.groupBox11);
+            this.ModelingTab.Location = new System.Drawing.Point(4, 22);
+            this.ModelingTab.Name = "ModelingTab";
+            this.ModelingTab.Padding = new System.Windows.Forms.Padding(3);
+            this.ModelingTab.Size = new System.Drawing.Size(1094, 619);
+            this.ModelingTab.TabIndex = 2;
+            this.ModelingTab.Text = "Model";
             // 
             // lblDecisionThreshold
             // 
@@ -709,16 +708,16 @@
             this.tbThreshold.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.tbThreshold.TextChanged += new System.EventHandler(this.tbThreshold_TextChanged);
             // 
-            // tabPage3
+            // DiagnosticTab
             // 
-            this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage3.Controls.Add(this.tabControl2);
-            this.tabPage3.Controls.Add(this.tabStats);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(1094, 619);
-            this.tabPage3.TabIndex = 3;
-            this.tabPage3.Text = "Diagnostics";
+            this.DiagnosticTab.BackColor = System.Drawing.SystemColors.Control;
+            this.DiagnosticTab.Controls.Add(this.tabControl2);
+            this.DiagnosticTab.Controls.Add(this.tabStats);
+            this.DiagnosticTab.Location = new System.Drawing.Point(4, 22);
+            this.DiagnosticTab.Name = "DiagnosticTab";
+            this.DiagnosticTab.Size = new System.Drawing.Size(1094, 619);
+            this.DiagnosticTab.TabIndex = 3;
+            this.DiagnosticTab.Text = "Diagnostics";
             // 
             // tabControl2
             // 
@@ -942,12 +941,12 @@
             this.Name = "IPyModelingControl";
             this.Size = new System.Drawing.Size(1101, 602);
             this.tabControl1.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
+            this.DatasheetTab.ResumeLayout(false);
+            this.DatasheetTab.PerformLayout();
+            this.VariableSelectionTab.ResumeLayout(false);
+            this.VariableSelectionTab.PerformLayout();
+            this.ModelingTab.ResumeLayout(false);
+            this.ModelingTab.PerformLayout();
             this.pnlThresholdingButtons.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chartValidation)).EndInit();
             this.groupBox10.ResumeLayout(false);
@@ -958,7 +957,7 @@
             this.groupBox12.PerformLayout();
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
-            this.tabPage3.ResumeLayout(false);
+            this.DiagnosticTab.ResumeLayout(false);
             this.tabControl2.ResumeLayout(false);
             this.tabResults.ResumeLayout(false);
             this.tabResults.PerformLayout();
@@ -973,7 +972,7 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage VariableSelectionTab;
         private System.Windows.Forms.Label lblNumObs;
         private System.Windows.Forms.Button btnRemoveInputVariable;
         private System.Windows.Forms.Button btnAddInputVariable;
@@ -983,7 +982,7 @@
         public System.Windows.Forms.ListBox lbIndVariables;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.ListBox lbAvailableVariables;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage ModelingTab;
         protected System.Windows.Forms.GroupBox groupBox11;
         protected System.Windows.Forms.GroupBox groupBox12;
         protected System.Windows.Forms.Label label1;
@@ -1020,7 +1019,7 @@
         protected System.Windows.Forms.Label lblDecisionThreshold;
         private System.Windows.Forms.Label lblDepVars;
         private System.Windows.Forms.Label lblAvailVars;
-        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage DiagnosticTab;
         private System.Windows.Forms.TabControl tabStats;
         private System.Windows.Forms.TabPage tabVariableStats;
         private System.Windows.Forms.ListView listView1;
@@ -1043,7 +1042,7 @@
         private ZedGraph.ZedGraphControl zgc2;
         private System.Windows.Forms.TabPage tabObsPred;
         private VBCommon.Controls.AnnotatedScatterPlot myScatterPlot;
-        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage DatasheetTab;
         private VBCommon.Controls.DatasheetControl dsControl1;
         private System.Windows.Forms.Label label3;
     }

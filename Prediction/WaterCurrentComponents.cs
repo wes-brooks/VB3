@@ -5,7 +5,7 @@ using System.Text;
 using System.Data;
 //using LogUtilities;
 
-namespace IPyPrediction
+namespace Prediction
 {
     public class WaterCurrentComponents
     {

@@ -34,7 +34,8 @@ namespace VBProjectManager
         public static string VBProjectsPath = null;
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;        
-        public Stack UndoRedoStack = new Stack();
+        private Stack UndoStack = new Stack();
+        private Stack RedoStack = new Stack();
                 
         //constructor
         public VBProjectManager()
@@ -78,7 +79,7 @@ namespace VBProjectManager
             App.HeaderControl.Add(btnAbout);
 
             //add an undo button to application ("Edit") menu... ??
-            var btnUndo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Undo", UndoAction);
+            var btnUndo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Undo", Undo);
             btnUndo.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnUndo.LargeImage = Resources.Undo_16x16;
             btnUndo.ToolTipText = "Undo the last action";
@@ -241,16 +242,18 @@ namespace VBProjectManager
         
 
         //pop off last stack for undo
-        public void UndoAction(object sender, EventArgs e)
+        public void Undo(object sender, EventArgs e)
         {
             //check to see if pop is a model first, first undo on model will accidentally send unpack to _frmDatasheet
-            object objCurrentState = UndoRedoStack.Pop();
-            object objLastState = UndoRedoStack.Peek();
+            KeyValuePair<string, object> kvpCurrentState = (KeyValuePair<string, object>)(UndoStack.Pop());
+            KeyValuePair<string, object> kvpLastState = (KeyValuePair<string, object>)(UndoStack.Peek());
 
-            IDictionary<string, object> dictLastState = (IDictionary<string, object>)objLastState;
-            string strKey;
+            RedoStack.Push(kvpCurrentState);
 
-            signaller.RaiseBroadcastRequest(this, dictLastState);
+            //IDictionary<string, object> dictLastState = (IDictionary<string, object>)dictLastState;
+            string strKey = kvpLastState.Key;
+
+            signaller.RaiseBroadcastRequest(this, (IDictionary<string, object>)(kvpLastState.Value));
 
             /*if ((bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("PLSPanel") || (bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("GBMPanel"))
             {
@@ -307,7 +310,7 @@ namespace VBProjectManager
             if (((IPlugin)sender).PluginType != Globals.PluginType.ProjectManager)
             {
                 KeyValuePair<string, object> kvpStackObj = new KeyValuePair<string, object>(((VBCommon.Interfaces.IPlugin)sender).PanelKey, e.PackedPluginState);
-                UndoRedoStack.Push(kvpStackObj);    
+                UndoStack.Push(kvpStackObj);    
             }
         }
 

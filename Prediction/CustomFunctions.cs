@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using VBCommon;
 
-namespace IPyPrediction
+namespace Prediction
 {
     public static class CustomFunctions
     {

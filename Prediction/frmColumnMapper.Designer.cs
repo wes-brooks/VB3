@@ -1,4 +1,4 @@
-﻿namespace IPyPrediction
+﻿namespace Prediction
 {
     partial class frmColumnMapper
     {

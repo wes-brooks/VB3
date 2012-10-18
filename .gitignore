@@ -26,5 +26,6 @@
 *VBControls.dll
 *IPyPLSControl.dll
 *IPyGBMControl.dll
+*Prediction.dll
 .svn*
 *.suo

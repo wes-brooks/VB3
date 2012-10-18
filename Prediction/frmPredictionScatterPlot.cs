@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using VBCommon;
 using VBCommon.Controls;
 
-namespace IPyPrediction
+namespace Prediction
 {
     public partial class frmPredictionScatterPlot : Form
     {

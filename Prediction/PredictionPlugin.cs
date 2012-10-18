@@ -13,7 +13,7 @@ using VBCommon.PluginSupport;
 using VBCommon.Interfaces;
 
 
-namespace IPyPrediction
+namespace Prediction
 {
     public class IpyPredictionPlugin : Extension, IPartImportsSatisfiedNotification, IPlugin
     {                      
@@ -21,7 +21,7 @@ namespace IPyPrediction
         private ContainerControl Shell { get; set; }
 
         //instance of  class
-        private frmIPyPrediction _frmIPyPred;
+        private frmPrediction _frmPred;
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Prediction;
         
         private VBCommon.Signaller signaller;
@@ -54,7 +54,7 @@ namespace IPyPrediction
 
         public IpyPredictionPlugin()
         {
-            _frmIPyPred = new frmIPyPrediction();
+            _frmPred = new frmPrediction();
             strPanelKey = "IPyPrediction";
             strPanelCaption = "Prediction";
         }
@@ -64,8 +64,8 @@ namespace IPyPrediction
         public override void Deactivate()
         {
             App.HeaderControl.RemoveAll();
-            App.DockManager.Remove(strPanelKey);            
-            _frmIPyPred = null;
+            App.DockManager.Remove(strPanelKey);
+            _frmPred = null;
             base.Deactivate();
         }
 
@@ -111,7 +111,7 @@ namespace IPyPrediction
         //initial activation
         public override void Activate()
         {
-            _frmIPyPred.RequestModelPluginList += new EventHandler(PassModelPluginList);
+            _frmPred.RequestModelPluginList += new EventHandler(PassModelPluginList);
             
             AddPanel();
             AddRibbon("Activate");
@@ -201,7 +201,7 @@ namespace IPyPrediction
         //add the panel
         public void AddPanel()
         {
-            var dp = new DockablePanel(strPanelKey, strPanelCaption, _frmIPyPred, DockStyle.Fill);
+            var dp = new DockablePanel(strPanelKey, strPanelCaption, _frmPred, DockStyle.Fill);
             dp.DefaultSortOrder = (short)pluginType;
             App.DockManager.Add(dp);
         }
@@ -291,7 +291,7 @@ namespace IPyPrediction
 
         private void PassModelPluginList(object sender, EventArgs e)
         {
-            ((frmIPyPrediction)sender).models = models;
+            ((frmPrediction)sender).models = models;
         }
 
 
@@ -300,41 +300,61 @@ namespace IPyPrediction
         {
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {
-                //add the model to list of Available Models
                 if ((bool)e.PackedPluginState["Complete"])
                 {
-                    _frmIPyPred.AddModel(e.PackedPluginState);
+                    _frmPred.AddModel(e.PackedPluginState);
                     if (!boolVisible)
                         Show();
                 }
                 else
                 {
-                    int intValidModels = _frmIPyPred.ClearModel(e.PackedPluginState);
+                    int intValidModels = _frmPred.ClearModel(e.PackedPluginState);
                     if (intValidModels == 0)
                         Hide();
-                }                    
+                }
 
                 //if the prediction is complete and the model was cleared, clear the prediction
                 if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
                 {
-                    _frmIPyPred.ClearDataGridViews();
+                    _frmPred.ClearDataGridViews();
                     boolComplete = false;
 
                     //add the modified model to list of Available Models if just changed (not cleared)
                     if ((bool)e.PackedPluginState["Complete"])
-                        _frmIPyPred.AddModel(e.PackedPluginState);
+                        _frmPred.AddModel(e.PackedPluginState);
                 }
             }
-            //if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
-            //    if (boolComplete)
-            //        Show();
+            else
+            {
+                //This handles an undo:
+                try
+                {
+                    if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
+                    {
+                        if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
+                        {
+                            IDictionary<string, object> dictPlugin = e.PackedPluginState;
+
+                            boolVisible = (bool)dictPlugin["Visible"];
+                            boolComplete = (bool)dictPlugin["Complete"];
+
+                            if (boolVisible)
+                                Show();
+                            else
+                                Hide();
+
+                            _frmPred.UnpackState(dictPlugin);
+                        }
+                    }
+                }
+                catch { }
+            }
         }
 
 
-        //when prediction makes changes, event broadcasts changes to those listening
         public void Broadcast()
         {
-            IDictionary<string, object> dictPackedState = _frmIPyPred.PackState();
+            IDictionary<string, object> dictPackedState = _frmPred.PackState();
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, dictPackedState);
@@ -344,7 +364,7 @@ namespace IPyPrediction
         //event handler for saving project state
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            IDictionary<string,object> dictPackedState =  _frmIPyPred.PackState();
+            IDictionary<string, object> dictPackedState = _frmPred.PackState();
             if (dictPackedState != null)
             {
                 dictPackedState.Add("Complete", boolComplete);
@@ -369,8 +389,8 @@ namespace IPyPrediction
                     Show();
                 else 
                     Hide();
-                
-                _frmIPyPred.UnpackState(e.PackedPluginStates[strPanelKey]);
+
+                _frmPred.UnpackState(e.PackedPluginStates[strPanelKey]);
             }
         }
 
@@ -388,14 +408,14 @@ namespace IPyPrediction
         //import iv data, sends to form click event
         void btnImportIV_Click(object sender, EventArgs e)
         {
-            _frmIPyPred.btnImportIVs_Click(sender, e);
+            _frmPred.btnImportIVs_Click(sender, e);
         }
 
 
         //import ob data, sends to form click event
         void btnImportOB_Click(object sender, EventArgs e)
         {
-            _frmIPyPred.btnImportObs_Click(sender, e);
+            _frmPred.btnImportObs_Click(sender, e);
             btnIVDataVal.Enabled = true;
         }
 
@@ -403,7 +423,7 @@ namespace IPyPrediction
         // validate data, sends to form click event and enables make prediction button
         void btnIVDataVal_Click(object sender, EventArgs e)
         {
-            _frmIPyPred.btnIVDataValidation_Click(sender, e);
+            _frmPred.btnIVDataValidation_Click(sender, e);
             btnMakePred.Enabled = true;
         }
 
@@ -412,7 +432,7 @@ namespace IPyPrediction
         void btnMakePrediction_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
-            _frmIPyPred.btnMakePredictions_Click(sender, e);
+            _frmPred.btnMakePredictions_Click(sender, e);
            boolComplete = true;
            Cursor.Current = Cursors.Default;
         }
@@ -421,21 +441,21 @@ namespace IPyPrediction
         //plot, sends to form click event
         void btnPlot_Ck(object sender, EventArgs e)
         {
-            _frmIPyPred.btnPlot_Click(sender, e);
+            _frmPred.btnPlot_Click(sender, e);
         }
 
 
         //clear, sends to form click event
         void btnClearTable_Ck(object sender, EventArgs e)
         {
-            _frmIPyPred.btnClearTable_Click(sender, e);
+            _frmPred.btnClearTable_Click(sender, e);
         }
 
 
         //export table, sends to form click event
         void btnExportTable_Ck(object sender, EventArgs e)
         {
-            _frmIPyPred.btnExportTable_Click(sender, e);
+            _frmPred.btnExportTable_Click(sender, e);
         }
     }
 }

@@ -34,41 +34,6 @@ namespace VBCommon
         public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
 
-
-        /*private Boolean boolConnectActivePluginEvents = true;
-        public Boolean ActivePluginEventsConnected
-        {
-            get { return (boolConnectActivePluginEvents); }
-        }
-
-        public void ConnectActivePluginEvents()
-        {
-            boolConnectActivePluginEvents = true;
-        }
-
-        public void DisconnectActivePluginEvents()
-        {
-            boolConnectActivePluginEvents = false;
-        }
-
-
-        private Boolean boolHeaderClickEventsConnected = true;
-        public Boolean HeaderClickEventsConnected
-        {
-            get { return (boolHeaderClickEventsConnected); }
-        }
-
-        public void ConnectHeaderClickEvents()
-        {
-            boolHeaderClickEventsConnected = true;
-        }
-
-        public void DisconnectHeaderClickEvents()
-        {
-            boolHeaderClickEventsConnected = false;
-        }*/
-
-
         public Signaller() {}
 
 
@@ -77,8 +42,22 @@ namespace VBCommon
         {
             if (BroadcastState != null) //has some method been told to handle this event?
             {
-                BroadcastEventArgs e = new BroadcastEventArgs(sender, dictPackedPlugin);
-                BroadcastState(sender, e);
+                string strSenderKey = "";
+                try
+                {
+                    strSenderKey = ((VBCommon.Interfaces.IPlugin)sender).PanelKey;
+                }
+                catch { }
+                finally
+                {
+                    if (!dictPackedPlugin.ContainsKey("Sender"))
+                    {
+                        dictPackedPlugin.Add("Sender", strSenderKey);
+                    }
+                    BroadcastEventArgs e = new BroadcastEventArgs(sender, dictPackedPlugin);
+                    BroadcastState(sender, e);
+                    
+                }
             }
         }
 

@@ -29,8 +29,8 @@ namespace IPyModeling
         //Class member definitions:
         //Events:
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
-        public event EventHandler<LogMessageEvent> LogMessageSent;
-        public event EventHandler<MessageEvent> MessageSent;
+        //public event EventHandler<LogMessageEvent> LogMessageSent;
+        //public event EventHandler<MessageEvent> MessageSent;
         public event EventHandler ModelUpdated;
         public event EventHandler<RunButtonStatusArgs> RunButtonStatusChanged;
 
@@ -41,7 +41,7 @@ namespace IPyModeling
         //Delegates to get data from Virtual Beach
         public delegate void RequestData(object sender, EventArgs args);
         public RequestData TabPageEntered;
-        public event EventHandler<ModelingCallback> DataRequested;
+        //public event EventHandler<ModelingCallback> DataRequested;
         public event EventHandler IronPythonInterfaceRequested;
         protected DataTable tblModelData;
         
@@ -67,8 +67,8 @@ namespace IPyModeling
         protected string strMethod;
 
         //RunChanged = true:running, false:canceled
-        public delegate void BoolChangedEvent(bool val);
-        public event BoolChangedEvent boolRunChanged; 
+        //public delegate void BoolChangedEvent(bool val);
+        public event EventHandler ControlStatusUpdated; 
 
         protected Dictionary<string, object> dictTransform = new Dictionary<string, object>()
         {
@@ -79,7 +79,7 @@ namespace IPyModeling
         private DataTable correlationData = null;
         private DataTable _dtFull = null;
         DataTable dt = new DataTable();
-        private IDictionary<string, object> dictPackedDatasheetState = null;
+        //private IDictionary<string, object> dictPackedDatasheetState = null;
         
         //Number of observations in the dataset
         int intNumObs;
@@ -103,10 +103,10 @@ namespace IPyModeling
             RequestIronPythonInterface();
 
             //Create the delegate that will raise the event that requests model data
-            this.tabPage1.Enter += new EventHandler(DataTabEnter);
-            this.TabPageEntered += new RequestData(RequestModelData);
-            this.DataRequested += new EventHandler<ModelingCallback>(this.ProvideData);    
-           // ResetIPyProject += new EventHandler(this.ResetProject);
+            //this.VariableSelectionTab.Enter += new EventHandler(DataTabEnter);
+            //this.TabPageEntered
+            //this.DataRequested += new EventHandler<ModelingCallback>(this.ProvideData);    
+            //ResetIPyProject += new EventHandler(this.ResetProject);
 
             this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);
         }
@@ -285,10 +285,31 @@ namespace IPyModeling
         }
 
 
-        //set the model with incoming datatable information
-        public void SetModelData(DataTable data)
+        public TabControl ModelingTabControl
         {
-            this.tblModelData = data;
+            get { return tabControl1; }
+        }
+
+
+        //set the model with incoming datatable information
+        public void SetModelData() //(DataTable data)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+
+            //Datasheet's packed state coming in
+            DataTable dtCorr_ = dsControl1.DT;
+            DataView dvCorr_ = dtCorr_.DefaultView;
+
+            List<string> list = new List<string>();
+
+            list.Add(dtCorr_.Columns[0].ColumnName);
+            list.Add(dtCorr_.Columns[1].ColumnName);
+
+            int intNumVars = lbIndVariables.Items.Count;
+            for (int i = 0; i < intNumVars; i++)
+                list.Add(lbIndVariables.Items[i].ToString());
+
+            DataTable data = this.tblModelData = dvCorr_.ToTable("ModelData", false, list.ToArray());
 
             int intI = 0;
             bool boolFinished = false;
@@ -370,18 +391,18 @@ namespace IPyModeling
 
 
         //Handle a request from an IronPython-based modeling tab to begin the modeling process.
-        private void ProvideData(object sender, ModelingCallback CallbackObject)
+        /*private void ProvideData(object sender, ModelingCallback CallbackObject)
         {
             Cursor.Current = Cursors.WaitCursor;
             DataTable modelDataTable;
            
             modelDataTable = CreateModelDataTable();
             CallbackObject.MakeModel(modelDataTable);
-        }
+        }*/
 
 
         //control ribbon active buttons depending on which tab
-        protected void DataTabEnter(object sender, EventArgs args)
+        /*protected void DataTabEnter(object sender, EventArgs args)
         {
             if (((TabPage)sender).Text == "Data Manipulation")
             {
@@ -390,7 +411,6 @@ namespace IPyModeling
                     EventArgs e = new EventArgs();
                     ManipulateDataTab(this, e);
                 }
-
             }
             if (((TabPage)sender).Text == "Variable Selection")
             {
@@ -400,10 +420,10 @@ namespace IPyModeling
                     VariableTab(this, e);
                 }
             }
-        }
+        }*/
 
 
-        //Raise a request for access to the model data - should be raised when the Model tab is entered.
+        /*//Raise a request for access to the model data - should be raised when the Model tab is entered.
         protected void RequestModelData(object sender, EventArgs args)
         {
             //only have run button enabled when on modeling tab
@@ -417,16 +437,12 @@ namespace IPyModeling
             }
             if (boolVirgin == true)
             {
-                if (DataRequested != null)
-                {
-                    ModelingCallback e = new ModelingCallback(SetModelData);
-                    DataRequested(this, e);
-                }
+                SetModelData(CreateModelDataTable());
             } 
-        }
+        }*/
 
 
-        //Raise a MessageEvent (passes a message to the container, which should be logged)
+        /*//Raise a MessageEvent (passes a message to the container, which should be logged)
         protected virtual void Log(string message, LogMessageEvent.Intents intent, LogMessageEvent.Targets target)
         {
             if (LogMessageSent != null)
@@ -460,7 +476,7 @@ namespace IPyModeling
                 MessageEvent e = new MessageEvent(message);
                 MessageSent(this, e);
             }
-        }
+        }*/
 
 
         //Enable or disable controls, then raise an event to do the same up the chain in the containing Form.
@@ -657,28 +673,13 @@ namespace IPyModeling
         }
 
 
-        //used for IronPython-based modeling tab to begin the modeling process
+        /*//used for IronPython-based modeling tab to begin the modeling process
         public DataTable CreateModelDataTable()
         {
-            Cursor.Current = Cursors.WaitCursor;
 
-            //Datasheet's packed state coming in
-            DataTable dtCorr_ = dsControl1.DT;
-            DataView dvCorr_ = dtCorr_.DefaultView;
-            
-            List<string> list = new List<string>();
-
-            list.Add(dtCorr_.Columns[0].ColumnName);
-            list.Add(dtCorr_.Columns[1].ColumnName);
-            
-            int intNumVars = lbIndVariables.Items.Count;
-            for (int i = 0; i < intNumVars; i++)
-                list.Add(lbIndVariables.Items[i].ToString());
-            
-            DataTable dtModel = dvCorr_.ToTable("ModelData", false, list.ToArray());
             
             return dtModel;
-        }
+        }*/
 
 
         //Enable or disable the regulatory threshold control, then raise an event to do the same up the chain in the containing Form.
@@ -697,11 +698,11 @@ namespace IPyModeling
             VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             
             //check to see if the model tab was clicked first (otherwise will get error half way thru model run)
-            if (tblModelData == null)
+            /*if (tblModelData == null)
             {
                 MessageBox.Show("You must select the model tab before running the model.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
-            }
+            }*/
 
             //Now this modeling tab has been touched.
             boolVirgin = false;
@@ -715,7 +716,10 @@ namespace IPyModeling
             boolInitialControlStatus = boolControlStatus;
             ChangeControlStatus(false);
             VBLogger.GetLogger().LogEvent("40", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            StartModeling();
+
+            SetModelData();
+            MakeModel(tblModelData);
+
             VBLogger.GetLogger().LogEvent("80", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
 
@@ -1415,7 +1419,7 @@ namespace IPyModeling
         }
 
 
-        //This is the callback method that sets the model
+        /*//This is the callback method that sets the model
         public void SetModel(Dictionary<string, object> dictPackedModel)
         {
             if (dictPackedModel != null)
@@ -1424,12 +1428,10 @@ namespace IPyModeling
 
                 myScatterPlot.PowerExponent = Convert.ToDouble(dictTransform["Exponent"]);
                 myScatterPlot.Transform = dictTransform["Type"].ToString();
-
-                //_projectOpened = true;
             }
             else
                 ipyModel = null;
-        }
+        }*/
 
 
         public List<double> Predict(DataTable tblForPrediction)

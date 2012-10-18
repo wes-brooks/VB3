@@ -5,7 +5,7 @@ using System.Text;
 using System.Data;
 using Ciloci.Flee;
 
-namespace IPyPrediction
+namespace Prediction
 {
     public class ExpressionEvaluator
     {

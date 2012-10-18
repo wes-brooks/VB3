@@ -1,6 +1,6 @@
-﻿namespace MLRPrediction
+﻿namespace Prediction
 {
-    partial class frmMLRPrediction
+    partial class frmPrediction
     {
         /// <summary>
         /// Required designer variable.
@@ -28,6 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panelIVs = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -58,6 +64,8 @@
             this.btnSaveTable = new System.Windows.Forms.Button();
             this.btnIVDataValidation = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+            this.lstAvailModels = new System.Windows.Forms.ListBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.panel2.SuspendLayout();
             this.panelIVs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -74,29 +82,30 @@
             this.groupBox1.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel2
             // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.panel2.Controls.Add(this.panelIVs);
-            this.panel2.Location = new System.Drawing.Point(12, 231);
+            this.panel2.Location = new System.Drawing.Point(12, 211);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(967, 294);
+            this.panel2.Size = new System.Drawing.Size(967, 314);
             this.panel2.TabIndex = 1;
             // 
             // panelIVs
             // 
-            this.panelIVs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelIVs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panelIVs.Controls.Add(this.splitContainer1);
             this.panelIVs.Location = new System.Drawing.Point(4, 3);
             this.panelIVs.Name = "panelIVs";
-            this.panelIVs.Size = new System.Drawing.Size(960, 288);
+            this.panelIVs.Size = new System.Drawing.Size(960, 308);
             this.panelIVs.TabIndex = 3;
             // 
             // splitContainer1
@@ -113,25 +122,38 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(960, 288);
+            this.splitContainer1.Size = new System.Drawing.Size(960, 308);
             this.splitContainer1.SplitterDistance = 538;
             this.splitContainer1.TabIndex = 0;
-            this.splitContainer1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer1_SplitterMoved);
             // 
             // dgvVariables
             // 
             this.dgvVariables.AllowUserToOrderColumns = true;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvVariables.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvVariables.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvVariables.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvVariables.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvVariables.Location = new System.Drawing.Point(0, 0);
             this.dgvVariables.Name = "dgvVariables";
-            this.dgvVariables.Size = new System.Drawing.Size(538, 288);
+            this.dgvVariables.Size = new System.Drawing.Size(538, 308);
             this.dgvVariables.TabIndex = 2;
             this.dgvVariables.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgvVariables_CellPainting);
             this.dgvVariables.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_CellValueChanged);
             this.dgvVariables.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvVariables_DataError);
-            this.dgvVariables.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_RowEnter);
-            this.dgvVariables.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_RowLeave);
             this.dgvVariables.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dgvVariables_Scroll);
             this.dgvVariables.SelectionChanged += new System.EventHandler(this.dgvVariables_SelectionChanged);
             // 
@@ -148,23 +170,37 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.dgvStats);
-            this.splitContainer2.Size = new System.Drawing.Size(418, 288);
+            this.splitContainer2.Size = new System.Drawing.Size(418, 308);
             this.splitContainer2.SplitterDistance = 139;
             this.splitContainer2.TabIndex = 0;
             this.splitContainer2.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer2_SplitterMoved);
             // 
             // dgvObs
             // 
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvObs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dgvObs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvObs.DefaultCellStyle = dataGridViewCellStyle4;
             this.dgvObs.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvObs.Location = new System.Drawing.Point(0, 0);
             this.dgvObs.Name = "dgvObs";
-            this.dgvObs.Size = new System.Drawing.Size(139, 288);
+            this.dgvObs.Size = new System.Drawing.Size(139, 308);
             this.dgvObs.TabIndex = 3;
             this.dgvObs.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvObs_CellEndEdit);
             this.dgvObs.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvObs_DataError);
-            this.dgvObs.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvObs_RowEnter);
-            this.dgvObs.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvObs_RowLeave);
             this.dgvObs.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dgvObs_Scroll);
             this.dgvObs.SelectionChanged += new System.EventHandler(this.dgvObs_SelectionChanged);
             this.dgvObs.MouseUp += new System.Windows.Forms.MouseEventHandler(this.dgvObs_MouseUp);
@@ -172,15 +208,29 @@
             // dgvStats
             // 
             this.dgvStats.AllowUserToOrderColumns = true;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvStats.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dgvStats.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvStats.DefaultCellStyle = dataGridViewCellStyle6;
             this.dgvStats.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvStats.Location = new System.Drawing.Point(0, 0);
             this.dgvStats.Name = "dgvStats";
             this.dgvStats.ReadOnly = true;
-            this.dgvStats.Size = new System.Drawing.Size(275, 288);
+            this.dgvStats.Size = new System.Drawing.Size(275, 308);
             this.dgvStats.TabIndex = 4;
-            this.dgvStats.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvStats_RowEnter);
-            this.dgvStats.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvStats_RowLeave);
             this.dgvStats.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dgvStats_Scroll);
             this.dgvStats.SelectionChanged += new System.EventHandler(this.dgvStats_SelectionChanged);
             // 
@@ -188,7 +238,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(12, 208);
+            this.label2.Location = new System.Drawing.Point(12, 188);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(133, 20);
             this.label2.TabIndex = 2;
@@ -204,6 +254,7 @@
             this.btnMakePredictions.TabIndex = 6;
             this.btnMakePredictions.Text = "Make\r\nPredictions";
             this.btnMakePredictions.UseVisualStyleBackColor = false;
+            this.btnMakePredictions.Visible = false;
             this.btnMakePredictions.Click += new System.EventHandler(this.btnMakePredictions_Click);
             // 
             // groupBox1
@@ -213,9 +264,9 @@
             this.groupBox1.Controls.Add(this.txtRegStd);
             this.groupBox1.Controls.Add(this.label24);
             this.groupBox1.Controls.Add(this.txtDecCrit);
-            this.groupBox1.Location = new System.Drawing.Point(22, 76);
+            this.groupBox1.Location = new System.Drawing.Point(266, 63);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(401, 129);
+            this.groupBox1.Size = new System.Drawing.Size(401, 124);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Model Evaluation Thresholds";
@@ -325,23 +376,23 @@
             // 
             // txtModel
             // 
-            this.txtModel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtModel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.txtModel.BackColor = System.Drawing.Color.White;
             this.txtModel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtModel.Location = new System.Drawing.Point(93, 9);
+            this.txtModel.Location = new System.Drawing.Point(266, 9);
             this.txtModel.Multiline = true;
             this.txtModel.Name = "txtModel";
             this.txtModel.ReadOnly = true;
             this.txtModel.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtModel.Size = new System.Drawing.Size(850, 46);
+            this.txtModel.Size = new System.Drawing.Size(678, 46);
             this.txtModel.TabIndex = 15;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(18, 24);
+            this.label1.Location = new System.Drawing.Point(198, 24);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(60, 20);
             this.label1.TabIndex = 14;
@@ -355,12 +406,13 @@
             this.groupBox2.Controls.Add(this.btnImportIVs);
             this.groupBox2.Controls.Add(this.btnClearTable);
             this.groupBox2.Controls.Add(this.btnSaveTable);
-            this.groupBox2.Location = new System.Drawing.Point(653, 88);
+            this.groupBox2.Location = new System.Drawing.Point(653, 77);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(290, 128);
             this.groupBox2.TabIndex = 16;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Prediction Grid";
+            this.groupBox2.Visible = false;
             // 
             // btnPlot
             // 
@@ -370,6 +422,7 @@
             this.btnPlot.TabIndex = 18;
             this.btnPlot.Text = "Plot";
             this.btnPlot.UseVisualStyleBackColor = false;
+            this.btnPlot.Visible = false;
             this.btnPlot.Click += new System.EventHandler(this.btnPlot_Click);
             // 
             // btnImportObs
@@ -380,6 +433,7 @@
             this.btnImportObs.TabIndex = 17;
             this.btnImportObs.Text = "Import Obs";
             this.btnImportObs.UseVisualStyleBackColor = false;
+            this.btnImportObs.Visible = false;
             this.btnImportObs.Click += new System.EventHandler(this.btnImportObs_Click);
             // 
             // btnImportIVs
@@ -390,6 +444,7 @@
             this.btnImportIVs.TabIndex = 16;
             this.btnImportIVs.Text = "Import IVs";
             this.btnImportIVs.UseVisualStyleBackColor = false;
+            this.btnImportIVs.Visible = false;
             this.btnImportIVs.Click += new System.EventHandler(this.btnImportIVs_Click);
             // 
             // btnClearTable
@@ -401,6 +456,7 @@
             this.btnClearTable.TabIndex = 15;
             this.btnClearTable.Text = "Clear";
             this.btnClearTable.UseVisualStyleBackColor = false;
+            this.btnClearTable.Visible = false;
             this.btnClearTable.Click += new System.EventHandler(this.btnClearTable_Click);
             // 
             // btnSaveTable
@@ -412,6 +468,7 @@
             this.btnSaveTable.TabIndex = 14;
             this.btnSaveTable.Text = "Export As CSV";
             this.btnSaveTable.UseVisualStyleBackColor = false;
+            this.btnSaveTable.Visible = false;
             this.btnSaveTable.Click += new System.EventHandler(this.btnExportTable_Click);
             // 
             // btnIVDataValidation
@@ -422,27 +479,47 @@
             this.btnIVDataValidation.TabIndex = 17;
             this.btnIVDataValidation.Text = "IV Data Validation";
             this.btnIVDataValidation.UseVisualStyleBackColor = false;
+            this.btnIVDataValidation.Visible = false;
             this.btnIVDataValidation.Click += new System.EventHandler(this.btnIVDataValidation_Click);
             // 
-            // frmMLRPrediction
+            // lstAvailModels
+            // 
+            this.lstAvailModels.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lstAvailModels.FormattingEnabled = true;
+            this.lstAvailModels.Location = new System.Drawing.Point(6, 25);
+            this.lstAvailModels.Name = "lstAvailModels";
+            this.lstAvailModels.Size = new System.Drawing.Size(134, 108);
+            this.lstAvailModels.TabIndex = 18;
+            this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.lstAvailModels);
+            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox3.Location = new System.Drawing.Point(16, 9);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(146, 143);
+            this.groupBox3.TabIndex = 97;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Available Models: ";
+            // 
+            // frmIPyPrediction
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(991, 537);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnIVDataValidation);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.txtModel);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnMakePredictions);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.panel2);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Name = "frmMLRPrediction";
-            this.Text = "MLR Prediction";
-            this.Load += new System.EventHandler(this.frmMLRPrediction_Load);
-            this.HelpRequested += new System.Windows.Forms.HelpEventHandler(this.frmMLRPrediction_HelpRequested);
-            this.Enter += new System.EventHandler(this.frmMLRPrediction_Enter);
+            this.Name = "frmIPyPrediction";
+            this.Size = new System.Drawing.Size(991, 537);
+            this.Load += new System.EventHandler(this.frmIPyPrediction_Load);
             this.panel2.ResumeLayout(false);
             this.panelIVs.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -461,6 +538,7 @@
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -498,5 +576,7 @@
         private System.Windows.Forms.Button btnImportObs;
         private System.Windows.Forms.Button btnImportIVs;
         private System.Windows.Forms.HelpProvider helpProvider1;
+        private System.Windows.Forms.ListBox lstAvailModels;
+        private System.Windows.Forms.GroupBox groupBox3;
     }
 }

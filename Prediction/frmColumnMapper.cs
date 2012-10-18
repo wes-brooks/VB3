@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace IPyPrediction
+namespace Prediction
 {
     public partial class frmColumnMapper : Form
     {
