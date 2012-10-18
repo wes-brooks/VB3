@@ -248,13 +248,10 @@ namespace VBCommon.Statistics
 
             
             _Press = 0.0;
-            //GeneralVector vecLeverage = _model.GetLeverage();
-            //GeneralVector vecResiduals = _model.Residuals;
             double leverage = 0.0;
             for (int i = 0; i < M2.Results.Length; i++)
             {
-                leverage = Math.Min(Leverage[i], 0.99);
-                //_Press += ((Residuals[i])* (Residuals[i])) / ((1 - Leverage[i]) * (1 - Leverage[i]));
+                leverage = Math.Min(Leverage[i], 0.99);                
                 _Press += Math.Pow((Residuals[i]) / (1 - leverage),2);
             }
 

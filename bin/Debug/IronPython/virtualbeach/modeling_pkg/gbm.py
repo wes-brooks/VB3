@@ -33,6 +33,7 @@ class Model(object):
         self.folds = model_struct['folds']
         self.trees = model_struct['trees']
         self.actual = model_struct['actual']
+        self.array_actual = np.array(self.actual)
         
         #Get the data into R 
         self.data_frame = utils.DictionaryToR(self.data_dictionary)

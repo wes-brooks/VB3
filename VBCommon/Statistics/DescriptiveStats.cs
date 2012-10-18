@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-//using Extreme.Statistics;
+using Accord;
+using Accord.Math;
+using Accord.Statistics;
 
 namespace VBCommon.Statistics
 {
@@ -24,18 +26,17 @@ namespace VBCommon.Statistics
 
         public void getStats(double[] data) 
         {
-        //    NumericalVariable _stats = new NumericalVariable(data);
-        //    _max = _stats.Maximum;
-        //    _min = _stats.Minimum;
-        //    _mean = _stats.Mean;
-        //    _stddev = _stats.StandardDeviation;
-        //    _kurtosis = _stats.Kurtosis;
-        //    _skewness = _stats.Skewness;
-        //    _range = _stats.Range;
-        //    _variance = _stats.Variance;
-        //    _sum = _stats.Sum;
-        //    _count = _stats.CountValid;
-        //    _median = _stats.Median;
+            _max = data.Max();
+            _min = data.Min();
+            _mean = data.Mean();
+            _stddev = data.StandardDeviation();
+            _kurtosis = data.Kurtosis();
+            _skewness = data.Skewness();
+            _range = data.Range().Length;
+            _variance = data.Variance();
+            _sum = data.Sum();
+            _count = data.Count();
+            _median = data.Median();
 
         }
 

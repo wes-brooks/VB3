@@ -17,7 +17,6 @@ namespace VBProjectManager
 {
     public partial class VBProjectManager
     {
-        //save a project
         public void Save(object sender, EventArgs e)
         {
             string fullName = string.Empty;
@@ -30,7 +29,7 @@ namespace VBProjectManager
                 saveFile.Filter = strFilterstring;
                 saveFile.FilterIndex = 1;
                 saveFile.RestoreDirectory = true;
-                //save File dialog
+
                 DialogResult dr = saveFile.ShowDialog();
                 if (dr != DialogResult.OK)
                 { return; }
@@ -44,23 +43,19 @@ namespace VBProjectManager
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
             signaller.RaiseSaveRequest(dictPluginStates);
 
-            //loop through plugins to get values and types
             Dictionary<string, object> dictProjectState = new Dictionary<string, object>();
 
             //loop through each plugin in the dictionary of plugins
             foreach (KeyValuePair<string, IDictionary<string, object>> plugin in dictPluginStates)
             {   
-                //holds jsonRepresented values
                 Dictionary<string, object> dictJsonRep = new Dictionary<string, object>(); 
-                //holds object types
                 Dictionary<string, Type> dictObjectType = new Dictionary<string, Type>(); 
-                //holds all of the dictionaries
                 List<object> lstContainer = new List<object>();  
-                string strPluginKey = plugin.Key;                
-                //holds the packed plugin
+                string strPluginKey = plugin.Key;
                 IDictionary<string, object> dictPluginState = plugin.Value;
 
                 if (dictPluginState == null) break;
+
                 //loop through each element in the plugin to pull value and class type of each
                 foreach (KeyValuePair<string, object> element in dictPluginState)
                 {                    
@@ -70,9 +65,7 @@ namespace VBProjectManager
                         {
                             string jsonRepresentation = JsonConvert.SerializeObject(element.Value);
                             Type objType = element.Value.GetType();
-                            //add key and value
                             dictJsonRep.Add(element.Key, jsonRepresentation);
-                            //add key and value's type
                             dictObjectType.Add(element.Key, objType);
                         }
                         catch {}
@@ -103,19 +96,8 @@ namespace VBProjectManager
 
         public void SaveAs(object sender, EventArgs e)
         {
-            //save an opened project 
-            string message = "Are you sure you want to replace this file?";
-            string messageTitle = "Save As";
-
-            //ask user if they want to replace file, and send them to Save
-            DialogResult result = MessageBox.Show(message, messageTitle, MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
-            {
-                ProjectPathName = null;
-                Save(sender, e);
-            }
-            else
-                 return;
+            ProjectPathName = null;
+            Save(sender, e);
         }
 
 
@@ -173,10 +155,8 @@ namespace VBProjectManager
                     string jsonRep = pair.Value;
                                        
                     object objDeserialized = JsonConvert.DeserializeObject(jsonRep, jsonType);
-                    //add the newly constructed key value pair, containing correct class types to a dictionary
                     dictPluginState.Add(pair.Key, objDeserialized);
                 }
-                //Now store the packed plugin state in a dictionary
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
 
@@ -184,18 +164,15 @@ namespace VBProjectManager
             signaller.UnpackProjectState(dictPluginStates);
             
             //Make the top plugin active
-            //this isn't working correctly. If a prediction is the topPlugin, it works with the added code to make Modeling show, 
-            //if a modeling is the topPlugin, it works with the addition of making the other model show
-            //if a datasheet is the topPlugin, I need to make it just Make Active and not show, because by default it already shows.
-            //Something is going on with the Location plugin. Once the code gets back from unpacking, I have to show the plugins AGAIN that are needed.
-            //Its as if something is getting hit that makes it the default setting of Location and Datasheet tabs only, no matter what came before that,
-            //and I can't find where that's happening.
-            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+            if (dictPluginStates[this.strPluginKey]["TopPlugin"] != null)
             {
-                if (x is VBCommon.Interfaces.IPlugin)
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
                 {
-                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[strPluginKey]["TopPlugin"].ToString())
-                        ((VBCommon.Interfaces.IPlugin)x).MakeActive();
+                    if (x is VBCommon.Interfaces.IPlugin)
+                    {
+                        if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[strPluginKey]["TopPlugin"].ToString())
+                            ((VBCommon.Interfaces.IPlugin)x).MakeActive();
+                    }
                 }
             }
         }

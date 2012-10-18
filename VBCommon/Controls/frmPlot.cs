@@ -46,9 +46,6 @@ namespace VBCommon.Controls
         public delegate void PointEnableEventHandler(string tag);
         public event PointEnableEventHandler pointEnabled;
 
-        private double dblRegressionadstat;
-        private double dblRegressionadpval;
-
 
         /// <summary>
         /// method initializs form, sets up context menus for plots
@@ -119,8 +116,8 @@ namespace VBCommon.Controls
             double norm = adtest.ADStat;
             double pvnorm = adtest.ADStatPval;
 
-            //DescriptiveStats ds = new DescriptiveStats();
-            //ds.getStats(vals);
+            DescriptiveStats ds = new DescriptiveStats();
+            ds.getStats(vals);
             
             double median = GetMedian(vals);//nv.Median;
             double range = vals.Max() - vals.Min();// nv.Range;
@@ -181,12 +178,12 @@ namespace VBCommon.Controls
             lvi.SubItems.Add("");
             listView1.Items.Add(lvi);
 
-            lvi = new ListViewItem("AD Statistic");
-            lvi.SubItems.Add(dblRegressionadstat.ToString("n4"));
+            lvi = new ListViewItem("KS Statistic");
+            lvi.SubItems.Add(norm.ToString("n4"));
             listView1.Items.Add(lvi);
 
-            lvi = new ListViewItem("AD Stat P-Value");
-            lvi.SubItems.Add(dblRegressionadpval.ToString("n4"));
+            lvi = new ListViewItem("KS Stat P-Value");
+            lvi.SubItems.Add(pvnorm.ToString("n4"));
             listView1.Items.Add(lvi);
 
             lvi = new ListViewItem("Mean Value");

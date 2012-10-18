@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 //using Extreme.Statistics;
+using Accord;
+using Accord.Controls;
+using Accord.Math;
+using Accord.Statistics;
 
 namespace VBCommon.Statistics
 {
@@ -15,21 +19,21 @@ namespace VBCommon.Statistics
 
         public void getHist(double[] data, int bins)
         {
-        //    Histogram hist = new Histogram(data.Min(), data.Max(), bins);
-        //    hist.Tabulate(data);
+            Accord.Statistics.Visualizations.Histogram hist = new Accord.Statistics.Visualizations.Histogram(); //(data.Min(), data.Max(), bins);
+            hist.Compute(data, numberOfBins:bins);
 
-        //    _freq = new double[bins];
-        //    _lb = new double[bins];
-        //    _ub = new double[bins];
-        //    _center = new double[bins];
-        //    double inc = ( ( (data.Max() - data.Min()) / bins) / 2.0d);
-        //    for (int bin = 0; bin < hist.Bins.Count; bin++)
-        //    {
-        //        _freq[bin] = Convert.ToInt32(hist.Bins[bin].Value);
-        //        _lb[bin] = hist.Bins[bin].LowerBound;
-        //        _ub[bin] = hist.Bins[bin].UpperBound;
-        //        _center[bin] = _lb[bin] + inc;
-        //    }
+            _freq = new double[bins];
+            _lb = new double[bins];
+            _ub = new double[bins];
+            _center = new double[bins];
+            double inc = ( ( (data.Max() - data.Min()) / bins) / 2.0d);
+            for (int bin = 0; bin < hist.Bins.Count; bin++)
+            {
+                _freq[bin] = Convert.ToInt32(hist.Bins[bin].Value);
+                _lb[bin] = hist.Bins[bin].Range.Min;
+                _ub[bin] = hist.Bins[bin].Range.Max;
+                _center[bin] = _lb[bin] + inc;
+            }
         }
 
         public double[] Counts

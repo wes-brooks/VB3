@@ -97,17 +97,16 @@ namespace VBProjectManager
             }
 
             //Hook up the event handler that fires when the user clicks on a new plugin.
-            //App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
-            //App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
+            App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
 
-            //if PType is smallest (datasheet/map), set as activated when open
+            /*//if PType is smallest (datasheet/map), set as activated when open
             int pos = lstAllPluginTypes.IndexOf(lstAllPluginTypes.Min());
             DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
             IPlugin ex = (IPlugin)extension;
             if (ex != null)
                 ex.MakeActive();
                                
-            base.Activate();
+            base.Activate();*/
         }
 
 
@@ -235,31 +234,10 @@ namespace VBProjectManager
 
 
         //event handler when a plugin is selected from tabs
-        /*void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
+        void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
-            if (signaller.ActivePluginEventsConnected)
-            {
-                signaller.DisconnectActivePluginEvents();
-                signaller.DisconnectHeaderClickEvents();
-
-                signaller.ActivePluginChanged(e);
-                
-                signaller.ConnectActivePluginEvents();
-                signaller.ConnectHeaderClickEvents();
-            }
+            strTopPlugin = e.ActivePanelKey;
         }
-
-
-        //a root item (plugin) has been selected
-        void HeaderControl_RootItemSelected(object sender, RootItemEventArgs e)
-        {
-            if (signaller.HeaderClickEventsConnected)
-            {
-                signaller.DisconnectHeaderClickEvents();
-                signaller.HeaderClicked(e);
-                signaller.ConnectHeaderClickEvents();
-            }
-        }*/
         
 
         //pop off last stack for undo

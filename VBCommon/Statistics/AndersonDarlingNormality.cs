@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Accord;
+using Accord.Statistics;
+using Accord.Math;
 //using System.Collections;
 //using Extreme.Statistics;
 //using Extreme.Statistics.Distributions;
@@ -19,20 +22,21 @@ namespace VBCommon.Statistics
 
         public void getADstat(double[] data)
         {
-            //try
-            //{
-            //    NumericalVariable nv = new NumericalVariable(data);
-            //    AndersonDarlingTest adtest = new AndersonDarlingTest(nv, nv.Mean, nv.StandardDeviation);
-            //    _adStat = adtest.Statistic;
-            //    _adStatPval = adtest.PValue;
-            //    _reject = adtest.Reject();
-            //}
-            //catch
-            //{
-            //    _adStat = double.NaN;
-            //    _adStatPval = double.NaN;
-            //    _reject = false;
-            //}
+            try
+            {
+                //NumericalVariable nv = new NumericalVariable(data);
+                //AndersonDarlingTest adtest = new AndersonDarlingTest(nv, nv.Mean, nv.StandardDeviation);
+                Accord.Statistics.Testing.KolmogorovSmirnovTest kstest = new Accord.Statistics.Testing.KolmogorovSmirnovTest(data, new Accord.Statistics.Distributions.Univariate.NormalDistribution(data.Mean(), data.StandardDeviation()));
+                _adStat = kstest.Statistic;
+                _adStatPval = kstest.PValue;
+                _reject = kstest.Significant;
+            }
+            catch
+            {
+                _adStat = double.NaN;
+                _adStatPval = double.NaN;
+                _reject = false;
+            }
 
              
         }

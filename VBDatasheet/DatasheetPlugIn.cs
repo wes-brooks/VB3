@@ -90,11 +90,10 @@ namespace VBDatasheet
 
             //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
-
-            //when root item is selected
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
+
             _frmDatasheet.NotifiableDataEvent += new EventHandler(NotifiableDataEventHandler);
-            base.Activate(); //ensures "enabled" is set to true
+            base.Activate();
         }
 
 
