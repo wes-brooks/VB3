@@ -485,7 +485,7 @@ namespace IPyModeling
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
 
-                Show();
+                //Show();
                 MakeActive();
 
                 innerIronPythonControl.UnpackState(dictPlugin);
@@ -501,7 +501,7 @@ namespace IPyModeling
             }
             else
             {
-                Activate();
+                innerIronPythonControl.Clear();
             }
         }
 

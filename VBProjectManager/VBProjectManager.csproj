@@ -78,6 +78,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Externals\DotSpatial\DotSpatial.Symbology.Forms.dll</HintPath>
     </Reference>
+    <Reference Include="Esent.Collections">
+      <HintPath>..\Externals\ManagedEsent_1.6\Esent.Collections.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Externals\Json.NET\Net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -117,6 +120,8 @@
     <None Include="Resources\Open.png" />
     <None Include="Resources\About.png" />
     <None Include="Resources\About_16x16.png" />
+    <None Include="Resources\Redo_16x16.png" />
+    <None Include="Resources\Redo.png" />
     <Content Include="Resources\open_16x16.png" />
     <Content Include="Resources\open_32x32.png" />
     <None Include="Resources\SaveAs.png" />

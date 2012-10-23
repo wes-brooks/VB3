@@ -9,6 +9,7 @@ namespace VBCommon
 {
     [XmlRoot("dictionary")]
     [DataContract]
+    [Serializable]
     public class SerializableDictionary<TKey, TValue>
         : Dictionary<TKey, TValue>
         //, IXmlSerializable

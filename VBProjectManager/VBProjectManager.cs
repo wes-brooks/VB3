@@ -14,14 +14,15 @@ using System.Windows.Forms;
 using VBCommon;
 using VBCommon.Interfaces;
 using VBCommon.PluginSupport;
-
+using Microsoft.Isam.Esent.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace VBProjectManager
 {
     //class to manage all plugins
     public partial class VBProjectManager : Extension, IFormState, IPartImportsSatisfiedNotification, IPlugin
-    {        
- //       private Dictionary<string, Boolean> dictTabStates;
+    {
+        //       private Dictionary<string, Boolean> dictTabStates;
         private string strPathName;
         private string strProjectName;
         private string strTopPlugin; //plugin change event changes this value
@@ -33,10 +34,14 @@ namespace VBProjectManager
         private string strPluginKey = "Project Manager";
         public static string VBProjectsPath = null;
         private Boolean boolComplete = false;
-        private Boolean boolVisible = false;        
+        private Boolean boolVisible = false;
+
         private Stack UndoStack = new Stack();
         private Stack RedoStack = new Stack();
-                
+        private SimpleActionItem btnUndo;
+        private SimpleActionItem btnRedo;
+        
+
         //constructor
         public VBProjectManager()
         {
@@ -49,51 +54,74 @@ namespace VBProjectManager
 
 
         public override void Activate()
-        {       
+        {
+            short n = 0;
+
             //Add an Open button to the application ("File") menu.
             var btnOpen = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Open", Open);
             btnOpen.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnOpen.LargeImage = Resources.open_16x16;
             btnOpen.ToolTipText = "Open a saved project.";
-            App.HeaderControl.Add(btnOpen);      
-            
+            btnOpen.SortOrder = n;
+            App.HeaderControl.Add(btnOpen);
+            n++;
+
             //Add a Save button to the application ("File") menu.
             var btnSave = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save", Save);
             btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSave.LargeImage = Resources.Save16x16;
             btnSave.ToolTipText = "Save the current project state.";
+            btnSave.SortOrder = n;
             App.HeaderControl.Add(btnSave);
+            n++;
 
             //Add a Save As button to the application ("File") menu.
             var btnSaveAs = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As", SaveAs);
             btnSaveAs.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSaveAs.LargeImage = Resources.SaveAs16x16;
             btnSaveAs.ToolTipText = "test hide panel";
+            btnSaveAs.SortOrder = n;
             App.HeaderControl.Add(btnSaveAs);
-            
+            n++;
+
             //Add an item to the application ("File") menu.
             var btnAbout = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             btnAbout.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnAbout.LargeImage = Resources.About_16x16;
             btnAbout.ToolTipText = "Open the 'About VirtualBeach' dialog";
+            btnAbout.SortOrder = n;
             App.HeaderControl.Add(btnAbout);
+            n++;
 
             //add an undo button to application ("Edit") menu... ??
-            var btnUndo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Undo", Undo);
+            btnUndo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Undo", Undo);
             btnUndo.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnUndo.LargeImage = Resources.Undo_16x16;
             btnUndo.ToolTipText = "Undo the last action";
+            btnUndo.Enabled = true;
+            btnUndo.SortOrder = n;
             App.HeaderControl.Add(btnUndo);
+            n++;
+
+            //add a redo button to application ("Edit") menu... ??
+            btnRedo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Redo", Redo);
+            btnRedo.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnRedo.LargeImage = Resources.Redo_16x16;
+            btnRedo.ToolTipText = "Redo the last undo action";
+            btnRedo.Enabled = true;
+            btnRedo.SortOrder = n;
+            App.HeaderControl.Add(btnRedo);
+            n++;
 
             //get plugin type for each plugin
             List<Globals.PluginType> lstAllPluginTypes = new List<Globals.PluginType>();
 
-            foreach(DotSpatial.Extensions.IExtension ext in App.Extensions)  
+            foreach (DotSpatial.Extensions.IExtension ext in App.Extensions)
             {
-                if (ext is IPlugin)    
-                {               
+                if (ext is IPlugin)
+                {
                     if (((IPlugin)ext).PluginType >= 0)
-                        lstAllPluginTypes.Add(((IPlugin)ext).PluginType); 
+                        lstAllPluginTypes.Add(((IPlugin)ext).PluginType);
                 }
             }
 
@@ -112,23 +140,23 @@ namespace VBProjectManager
 
 
         //IPlugin requires that we override these, but they have no purpose for the VBProjectManager.
-        public void MakeActive() {}
-        public void Show() {}
-        public void Hide() {}
-        public void AddRibbon(string sender) {}
+        public void MakeActive() { }
+        public void Show() { }
+        public void Hide() { }
+        public void AddRibbon(string sender) { }
 
 
         //projectManager doesn't get deactivated (inherits from IPlugin)
         public override void Deactivate()
         {
-            App.HeaderControl.RemoveAll();            
+            App.HeaderControl.RemoveAll();
             base.Deactivate();
         }
 
 
         //Write any messages we receive from the plugins directly to the debug console.
         private void MessageReceived(object sender, MessageArgs args)
-        {            
+        {
             System.Diagnostics.Debug.WriteLine(args.Message);
         }
 
@@ -138,7 +166,7 @@ namespace VBProjectManager
         {
             System.Windows.Forms.MessageBox.Show("this is a test.");
         }
-        
+
 
         //holds project full path name
         public string ProjectPathName
@@ -146,21 +174,6 @@ namespace VBProjectManager
             get { return strPathName; }
             set { strPathName = value; }
         }
-
-
-        /*//once open, store top plugin value here
-        public string OpeningTopPlugin
-        {
-            get { return openingTopPlugin; }
-            set { openingTopPlugin = value; }
-        }
-
-        //holds top plugin for opening
-        public string TopPlugin
-        {
-            get { return strTopPlugin; }
-            set { strTopPlugin = value; }
-        }*/
 
 
         public string ProjectName
@@ -173,7 +186,7 @@ namespace VBProjectManager
         //inherits from IPlugin, ProjectManager's complete flag doesn't change
         public Boolean Complete
         {
-            get { return boolComplete;}
+            get { return boolComplete; }
         }
 
 
@@ -239,21 +252,32 @@ namespace VBProjectManager
         {
             strTopPlugin = e.ActivePanelKey;
         }
-        
+
 
         //pop off last stack for undo
         public void Undo(object sender, EventArgs e)
         {
             //check to see if pop is a model first, first undo on model will accidentally send unpack to _frmDatasheet
-            KeyValuePair<string, object> kvpCurrentState = (KeyValuePair<string, object>)(UndoStack.Pop());
-            KeyValuePair<string, object> kvpLastState = (KeyValuePair<string, object>)(UndoStack.Peek());
+            //KeyValuePair<string, object> kvpCurrentState = (KeyValuePair<string, object>)(UndoStack.Pop());
+            //KeyValuePair<string, object> kvpLastState = (KeyValuePair<string, object>)(UndoStack.Peek());
 
-            RedoStack.Push(kvpCurrentState);
+            if (UndoStack.Count > 1)
+            {
+                IDictionary<string, IDictionary<string, object>> dictCurrentState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Pop());
+                IDictionary<string, IDictionary<string, object>> dictLastState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Peek());
 
-            //IDictionary<string, object> dictLastState = (IDictionary<string, object>)dictLastState;
-            string strKey = kvpLastState.Key;
+                RedoStack.Push(dictCurrentState);
+                if (RedoStack.Count > 0)
+                    btnRedo.Enabled = true;
 
-            signaller.RaiseBroadcastRequest(this, (IDictionary<string, object>)(kvpLastState.Value));
+                //raise unpack event, sending packed plugins dictionary
+                signaller.UnpackProjectState(dictLastState);
+
+                //signaller.RaiseBroadcastRequest(this, (IDictionary<string, object>)(kvpLastState.Value));
+
+                if (UndoStack.Count == 1)
+                    btnUndo.Enabled = false;
+            }               
 
             /*if ((bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("PLSPanel") || (bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("GBMPanel"))
             {
@@ -304,13 +328,37 @@ namespace VBProjectManager
         }
 
 
+        public void Redo(object sender, EventArgs e)
+        {
+        }
+
+
         //listen to plugin's broadcast in order to update other plugins
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
             if (((IPlugin)sender).PluginType != Globals.PluginType.ProjectManager)
             {
-                KeyValuePair<string, object> kvpStackObj = new KeyValuePair<string, object>(((VBCommon.Interfaces.IPlugin)sender).PanelKey, e.PackedPluginState);
-                UndoStack.Push(kvpStackObj);    
+                //Dictionary to store each plugin's state for saving
+                IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
+                signaller.RaiseSaveRequest(dictPluginStates);
+
+                string strKey = RandomString(20);
+                //pdUndo.Add(strKey, dictPluginStates);
+
+                UndoStack.Push(dictPluginStates);
+                RedoStack.Clear();
+
+                btnUndo.Enabled = true;
+                btnRedo.Enabled = false;
+
+                /*KeyValuePair<string, object> kvpStackObj = new KeyValuePair<string, object>(((VBCommon.Interfaces.IPlugin)sender).PanelKey, e.PackedPluginState);
+                UndoStack.Push(kvpStackObj);
+                if (UndoStack.Count > 0)
+                {
+                    btnUndo.Enabled = true;
+                    btnRedo.Enabled = false;
+                    RedoStack.Clear();
+                }*/
             }
         }
 
@@ -320,6 +368,22 @@ namespace VBProjectManager
         {
             IDictionary<string, object> packedState = PackState();
             signaller.RaiseBroadcastRequest(this, packedState);
+        }
+
+
+        //Generate random strings for use as keys to the Undo/Redo dictionaries
+        private static Random random = new Random((int)DateTime.Now.Ticks);//thanks to McAden
+        private string RandomString(int size)
+        {
+            StringBuilder builder = new StringBuilder();
+            char ch;
+            for (int i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+
+            return builder.ToString();
         }
 
     }

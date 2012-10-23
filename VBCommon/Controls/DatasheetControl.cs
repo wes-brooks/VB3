@@ -202,6 +202,19 @@ namespace VBCommon.Controls
         }
 
 
+        public void Clear()
+        {
+            listView1.Clear();            
+
+            dt = null;
+            dtRI = null;
+            dtCI = null;
+
+            dgv.DataSource = null;
+            dgv.Update();
+        }
+
+
         //Notify the containing control that there's been a change to the datasheet
         private void NotifyContainer()
         {
@@ -1075,16 +1088,13 @@ namespace VBCommon.Controls
 
                 //Save Datasheet info as xml string for serialization
                 StringWriter sw = null;
-                if (this.DT != null)
-                {
-                    this.DT.TableName = "DataSheetData";
-                    sw = new StringWriter();
-                    this.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                    string strXmlDataTable = sw.ToString();
-                    sw.Close();
-                    sw = null;
-                    dictPackedState.Add("XmlDataTable", strXmlDataTable);
-                }
+                this.DT.TableName = "DataSheetData";
+                sw = new StringWriter();
+                this.DT.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+                string strXmlDataTable = sw.ToString();
+                sw.Close();
+                sw = null;
+                dictPackedState.Add("XmlDataTable", strXmlDataTable);
 
                 if (this.State == VBCommon.Controls.DatasheetControl.dtState.clean)
                 {
@@ -1098,13 +1108,13 @@ namespace VBCommon.Controls
                 }
 
                 //model expects this change to the dt first ... I DON'T SEE THIS USED ANYWHERE ELSE
-                DataTable Filtered4ModelDt = this.DT;
-                Filtered4ModelDt.Columns[this.ResponseVarColName].SetOrdinal(1);
+                DataTable tblFiltered = this.DT;
+                tblFiltered.Columns[this.ResponseVarColName].SetOrdinal(1);
                 //filter diabled rows and columns
-                Filtered4ModelDt = this.filterDataTableRows(Filtered4ModelDt);
-                Utilities.TableUtils tableutils = new Utilities.TableUtils(Filtered4ModelDt);
-                Filtered4ModelDt = tableutils.filterRVHcols(Filtered4ModelDt);
-                dictPackedState.Add("DataSheetDatatable", Filtered4ModelDt);
+                tblFiltered = this.filterDataTableRows(tblFiltered);
+                Utilities.TableUtils tableutils = new Utilities.TableUtils(tblFiltered);
+                tblFiltered = tableutils.filterRVHcols(tblFiltered);
+                dictPackedState.Add("DataSheetDatatable", tblFiltered);
             }
 
             return dictPackedState;
@@ -1125,95 +1135,98 @@ namespace VBCommon.Controls
         {
             //unpack datatable
             //unpack xmlDT and repopulate this.DT
-            string xmlDT = (string)dictPackedState["XmlDataTable"];
-            StringReader sr = new StringReader(xmlDT);
-            DataSet ds = new DataSet();
-            ds.ReadXml(sr);
-            sr.Close();
-            this.DT = ds.Tables[0];
-
-            this.DT.TableName = "DataSheetData";
-            this.dgv.DataSource = null;
-            this.dgv.DataSource = this.DT;
-            
-            
-            //get row information
-            this.DTRI = new VBCommon.Metadata.dtRowInformation(this.DT);
-            
-            //json deserialize the dictionary first
-            object jsonRowHolder = (object)dictPackedState["DTRowInfo"];
-            if (jsonRowHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+            if (dictPackedState.ContainsKey("XmlDataTable"))
             {
-                string strJson = jsonRowHolder.ToString();
-                Dictionary<string, bool> dtriRowInfo = new Dictionary<string, bool>();
-                dtriRowInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
-                this.DTRI.DTRowInfo = dtriRowInfo;
-            }
-            else
-            {
-                this.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPackedState["DTRowInfo"];
-            }
+                string xmlDT = (string)dictPackedState["XmlDataTable"];
+                StringReader sr = new StringReader(xmlDT);
+                DataSet ds = new DataSet();
+                ds.ReadXml(sr);
+                sr.Close();
+                this.DT = ds.Tables[0];
 
-            //get column information
-            this.DTCI = new VBCommon.Metadata.dtColumnInformation(this.DT);
-  
-            //json deserialize the dictionary first
-            object jsonColHolder = (object)dictPackedState["DTColInfo"];
-            if (jsonColHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
-            {
-                string strJson = jsonColHolder.ToString();
-                Dictionary<string, bool> dtriColInfo = new Dictionary<string, bool>();
-                dtriColInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
-                this.DTCI.DTColInfo = dtriColInfo;
-            }
-            else
-            {
-                this.DTCI.DTColInfo = (Dictionary<string, bool>)dictPackedState["DTColInfo"];
-            }
+                this.DT.TableName = "DataSheetData";
+                this.dgv.DataSource = null;
+                this.dgv.DataSource = this.DT;
 
-            //need to convert if its unpacked from saved project
-            if (dictPackedState["CurrentColIndex"].GetType().ToString() == "System.Int64")
-                this.SelectedColIndex = Convert.ToInt16((Int64)dictPackedState["CurrentColIndex"]);
-            else
-                this.SelectedColIndex = (int)dictPackedState["CurrentColIndex"];
 
-            //need to change from 1 to the actual type
-            string depVarTran = Convert.ToString(dictPackedState["DepVarTransform"]);
-            this.DependentVariableTransform = (VBCommon.DependentVariableTransforms)Enum.Parse(typeof(VBCommon.DependentVariableTransforms), depVarTran);
-            this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
-            this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
+                //get row information
+                this.DTRI = new VBCommon.Metadata.dtRowInformation(this.DT);
 
-            maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
+                //json deserialize the dictionary first
+                object jsonRowHolder = (object)dictPackedState["DTRowInfo"];
+                if (jsonRowHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    string strJson = jsonRowHolder.ToString();
+                    Dictionary<string, bool> dtriRowInfo = new Dictionary<string, bool>();
+                    dtriRowInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
+                    this.DTRI.DTRowInfo = dtriRowInfo;
+                }
+                else
+                {
+                    this.DTRI.DTRowInfo = (Dictionary<string, bool>)dictPackedState["DTRowInfo"];
+                }
 
-            this.FileName = (string)dictPackedState["fileName"];
+                //get column information
+                this.DTCI = new VBCommon.Metadata.dtColumnInformation(this.DT);
 
-            //unpack listInfo for model datasheet
-            //need to convert if its unpacked from saved project
-            if (dictPackedState["DisabledColCt"].GetType().ToString() == "System.Int64")
-                this.DisabledCols = Convert.ToInt16((Int64)dictPackedState["DisabledColCt"]);
-            else this.DisabledCols = (int)dictPackedState["DisabledColCt"];
+                //json deserialize the dictionary first
+                object jsonColHolder = (object)dictPackedState["DTColInfo"];
+                if (jsonColHolder.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    string strJson = jsonColHolder.ToString();
+                    Dictionary<string, bool> dtriColInfo = new Dictionary<string, bool>();
+                    dtriColInfo = JsonConvert.DeserializeObject<Dictionary<string, bool>>(strJson);
+                    this.DTCI.DTColInfo = dtriColInfo;
+                }
+                else
+                {
+                    this.DTCI.DTColInfo = (Dictionary<string, bool>)dictPackedState["DTColInfo"];
+                }
 
-            if (dictPackedState["DisabledRwCt"].GetType().ToString() == "System.Int64")
-                this.DisabledRows = Convert.ToInt16((Int64)dictPackedState["DisabledRwCt"]);
-            else this.DisabledRows = (int)dictPackedState["DisabledRwCt"];
+                //need to convert if its unpacked from saved project
+                if (dictPackedState["CurrentColIndex"].GetType().ToString() == "System.Int64")
+                    this.SelectedColIndex = Convert.ToInt16((Int64)dictPackedState["CurrentColIndex"]);
+                else
+                    this.SelectedColIndex = (int)dictPackedState["CurrentColIndex"];
 
-            if (dictPackedState["HiddenColCt"].GetType().ToString() == "System.Int64")
-                this.HiddenCols = Convert.ToInt16((Int64)dictPackedState["HiddenColCt"]);
-            else this.HiddenCols = (int)dictPackedState["HiddenColCt"];
-            
-            if (dictPackedState["IndVarCt"].GetType().ToString() == "System.Int64")
-                this.NumberIVs = Convert.ToInt16((Int64)dictPackedState["IndVarCt"]);
-            else this.NumberIVs = (int)dictPackedState["IndVarCt"];
+                //need to change from 1 to the actual type
+                string depVarTran = Convert.ToString(dictPackedState["DepVarTransform"]);
+                this.DependentVariableTransform = (VBCommon.DependentVariableTransforms)Enum.Parse(typeof(VBCommon.DependentVariableTransforms), depVarTran);
+                this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
+                this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
 
-            this.showListInfo(this.FileName, this.DT);
+                maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
 
-            if ((bool)dictPackedState["Clean"])
-            {
-                this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
-            }
-            else
-            {
-                this.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
+                this.FileName = (string)dictPackedState["fileName"];
+
+                //unpack listInfo for model datasheet
+                //need to convert if its unpacked from saved project
+                if (dictPackedState["DisabledColCt"].GetType().ToString() == "System.Int64")
+                    this.DisabledCols = Convert.ToInt16((Int64)dictPackedState["DisabledColCt"]);
+                else this.DisabledCols = (int)dictPackedState["DisabledColCt"];
+
+                if (dictPackedState["DisabledRwCt"].GetType().ToString() == "System.Int64")
+                    this.DisabledRows = Convert.ToInt16((Int64)dictPackedState["DisabledRwCt"]);
+                else this.DisabledRows = (int)dictPackedState["DisabledRwCt"];
+
+                if (dictPackedState["HiddenColCt"].GetType().ToString() == "System.Int64")
+                    this.HiddenCols = Convert.ToInt16((Int64)dictPackedState["HiddenColCt"]);
+                else this.HiddenCols = (int)dictPackedState["HiddenColCt"];
+
+                if (dictPackedState["IndVarCt"].GetType().ToString() == "System.Int64")
+                    this.NumberIVs = Convert.ToInt16((Int64)dictPackedState["IndVarCt"]);
+                else this.NumberIVs = (int)dictPackedState["IndVarCt"];
+
+                this.showListInfo(this.FileName, this.DT);
+
+                if ((bool)dictPackedState["Clean"])
+                {
+                    this.State = VBCommon.Controls.DatasheetControl.dtState.clean;
+                }
+                else
+                {
+                    this.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
+                }
             }
         }
 

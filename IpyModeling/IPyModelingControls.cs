@@ -112,6 +112,21 @@ namespace IPyModeling
         }
 
 
+        public void Clear()
+        {
+            dsControl1.Clear();
+
+            if (correlationData != null) { correlationData.Clear(); }
+            if (_dtFull != null) { _dtFull.Clear(); }
+            if (dt != null) { dt.Clear(); }
+
+            lbAvailableVariables.Items.Clear();
+            lbIndVariables.Items.Clear();
+
+            ClearModelingTab();
+        }
+
+
         //Return the IronPython model object
         [JsonProperty]
         public dynamic Model
@@ -551,7 +566,11 @@ namespace IPyModeling
             for (int i = 0; i < lstFieldList.Count; i++)
             {
                 ListItem li = new ListItem(lstFieldList[i], i.ToString());
-                lbAvailableVariables.Items.Add(li);
+
+                if (listPredictors.Any(l => l.DisplayItem == li.DisplayItem))
+                    lbIndVariables.Items.Add(li);
+                else
+                    lbAvailableVariables.Items.Add(li);
             }
 
             lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
@@ -630,6 +649,7 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             ClearModelingTab();
+            RaiseUpdateNotification();
         }
 
 
@@ -670,6 +690,7 @@ namespace IPyModeling
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
             ClearModelingTab();
+            RaiseUpdateNotification();
         }
 
 
@@ -941,6 +962,15 @@ namespace IPyModeling
 
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
 
+            //Needed by the prediction plugin: 
+            //if changing a saved project need to keep the listPredictions the same, because lbIndVariables aren't saved            
+            listPredictors = new List<ListItem>();
+            if (lbIndVariables.Items.Count > 0)
+            {
+                foreach (ListItem item in lbIndVariables.Items)
+                    listPredictors.Add(item);
+            }
+
             dictPluginState.Add("PackedDatasheetState", dsControl1.PackState());
             dictPluginState.Add("Predictors", listPredictors);
 
@@ -956,13 +986,7 @@ namespace IPyModeling
             try { dblRegulatoryThreshold = Convert.ToDouble(RegulatoryThreshold); }
             catch (InvalidCastException) { dblRegulatoryThreshold = -1; }
 
-            //Needed by the prediction plugin: 
-            //if changing a saved project need to keep the listPredictions the same, because lbIndVariables aren't saved
-            if (ListPredictors.Count == 0)
-            {
-                foreach (ListItem item in lbIndVariables.Items)
-                    listPredictors.Add(item);
-            }
+
 
             //if just adding to stack, go to different pack to be used in setData()
             if (Model == null)
@@ -1012,10 +1036,11 @@ namespace IPyModeling
             if (dictProjectState.Count <= 3) return; //if only plugin props are here
 
             this.boolComplete = (bool)dictProjectState["Complete"];
+            this.listPredictors = (List<ListItem>)dictProjectState["Predictors"];
 
             //unpack the model's datasheet
             this.SetData(dictProjectState);
- 
+                       
             //Make the modeling tab active during unpacking so we can draw the graph.
             tabControl1.SelectedIndex = 2;
 
@@ -1058,8 +1083,7 @@ namespace IPyModeling
                     this.rbPower.Checked = true;
                 else
                     this.rbValue.Checked = true;
-                //unpack predictors
-                this.listPredictors = (List<ListItem>)dictProjectState["Predictors"];
+
 
                 //Now make sure the selected transformation is reflected behind the scenes, too.
                 EventArgs e = new EventArgs();

@@ -55,7 +55,7 @@ namespace Prediction
         public IpyPredictionPlugin()
         {
             _frmPred = new frmPrediction();
-            strPanelKey = "IPyPrediction";
+            strPanelKey = "Prediction";
             strPanelCaption = "Prediction";
         }
 
@@ -365,13 +365,10 @@ namespace Prediction
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             IDictionary<string, object> dictPackedState = _frmPred.PackState();
-            if (dictPackedState != null)
-            {
-                dictPackedState.Add("Complete", boolComplete);
-                dictPackedState.Add("Visible", boolVisible);
+            dictPackedState.Add("Complete", boolComplete);
+            dictPackedState.Add("Visible", boolVisible);
               
-                e.PackedPluginStates.Add(strPanelKey, dictPackedState);
-            }
+            e.PackedPluginStates.Add(strPanelKey, dictPackedState);
         }
 
 

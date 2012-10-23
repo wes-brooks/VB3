@@ -49,7 +49,7 @@ namespace Prediction
         private bool boolObsTransformed = false;
         
         IDictionary<string, object> dictModels = new Dictionary<string, object>();
-        private int intSelectedListedModel;
+        private int intSelectedModel = -1;
         private string strMethod;
         
         private string strModelTabClean;
@@ -82,10 +82,10 @@ namespace Prediction
 
         //selected model's index from listbox
         [JsonProperty]
-        public int SelectedListedModel
+        public int SelectedModel
         {
-            get { return intSelectedListedModel; }
-            set { intSelectedListedModel = value; }
+            get { return intSelectedModel; }
+            set { intSelectedModel = value; }
         }
 
 
@@ -93,7 +93,22 @@ namespace Prediction
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {
             if (dictPackedState.Count == 0) return;
-            
+
+            if (dictPackedState.ContainsKey("AvailableModels"))
+            {
+                //Unpack contents of listbox holding available models
+                this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+                dictModels = (IDictionary<string, object>)dictPackedState["AvailableModels"];
+                List<string> keys = new List<string>();
+                foreach (KeyValuePair<string, object> pair in dictModels)
+                { this.lstAvailModels.Items.Add(pair.Key); }
+
+                if (dictPackedState.ContainsKey("AvailableModelsIndex")) { lstAvailModels.SelectedIndex = (int)dictPackedState["AvailableModelsIndex"]; }
+                this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+            }
+
+            if (!dictPackedState.ContainsKey("Model")) { return; }
+
             Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];
             /*if (dictModel["ModelString"] == null)
                 return;*/
@@ -114,16 +129,6 @@ namespace Prediction
             txtPower.Text = dictTransform["Exponent"].ToString();
             txtRegStd.Text = Convert.ToDouble(dictModel["RegulatoryThreshold"]).ToString();
             txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
-
-            //Unpack contents of listbox holding available models
-            this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-            dictModels = (IDictionary<string, object>)dictPackedState["AvailableModels"];
-            List<string> keys = new List<string>();
-            foreach (KeyValuePair<string, object> pair in dictModels)
-                { this.lstAvailModels.Items.Add(pair.Key); }
-            
-            lstAvailModels.SelectedIndex = (int)dictPackedState["AvailableModelsIndex"];
-            this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
 
             DataSet ds = null;
             
@@ -182,8 +187,26 @@ namespace Prediction
         {
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
 
+            if (dictModels.Count > 0)
+            {
+                //Remove the unserializable IronPython model objects:
+                //can't make changes inside a loop to the thing you are looping through
+                Dictionary<string, object> dictModelsSerialize = new Dictionary<string, object>();
+
+                foreach (KeyValuePair<string, object> kvpModel in dictModels)
+                {
+                    IDictionary<string, object> dictModel = (IDictionary<string, object>)(kvpModel.Value);
+                    //dictModel.Remove("ModelByObject");
+                    dictModelsSerialize.Add(kvpModel.Key, dictModel);
+                }
+
+                //Now add the lists to the packed state dictionary
+                dictPluginState.Add("AvailableModels", dictModelsSerialize);
+                if (intSelectedModel >= 0) { dictPluginState.Add("AvailableModelsIndex", intSelectedModel); }
+            }
+
             if (model == null)
-                return null;
+                return dictPluginState;
 
             //Serialize the model
             //string strModelString = ipyInterface.Serialize(Model);
@@ -223,7 +246,7 @@ namespace Prediction
             dictPluginState.Add("Model", dictModelState);
             dictPluginState.Add("Transform", dictTransform);
 
-            //Remove the unserializable IronPython model objects:
+            /*//Remove the unserializable IronPython model objects:
             //can't make changes inside a loop to the thing you are looping through
             Dictionary<string,object> dictModelsSerialize = new Dictionary<string,object>();
 
@@ -237,6 +260,7 @@ namespace Prediction
             //Now add the lists to the packed state dictionary
             dictPluginState.Add("AvailableModels", dictModelsSerialize);
             dictPluginState.Add("AvailableModelsIndex", intSelectedListedModel);
+            */
 
             StringWriter sw = null;
             //pack values
@@ -330,7 +354,7 @@ namespace Prediction
         private void lstAvailModels_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             string strSelectedItem = lstAvailModels.SelectedItem.ToString();
-            intSelectedListedModel = lstAvailModels.SelectedIndex;
+            intSelectedModel = lstAvailModels.SelectedIndex;
 
             //didn't select a model
             if (strSelectedItem == null)

@@ -94,5 +94,23 @@ namespace VBProjectManager {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+
+        internal static System.Drawing.Bitmap Redo
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("Redo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        internal static System.Drawing.Bitmap Redo_16x16
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("Redo_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
