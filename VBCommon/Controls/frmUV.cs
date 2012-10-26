@@ -35,7 +35,7 @@ namespace VBCommon.Controls
         /// <param name="dt">table to operate on</param>
         /// <param name="dvname">response variable name</param>
         /// <param name="dtsname">datetimestamp column name</param>
-        public frmUV(DataTable dt, string dvname, string dtsname)
+        public frmUV(DataTable dt, string dvname, string dtsname, double orientation)
         {
             InitializeComponent();
 
@@ -47,12 +47,12 @@ namespace VBCommon.Controls
             _rvname = dvname;
             _dtsname = dtsname;
             initcbs();
-            _proj = VBProjectManager.GetProjectManager();
+            /*_proj = VBProjectManager.GetProjectManager();
             
             if (_proj.SiteInfo != null)
             {
                 _bo = _proj.SiteInfo.Orientation;
-            }
+            }*/
             txtRotationAngle.Text = _bo.ToString();
         }
 
@@ -103,8 +103,8 @@ namespace VBCommon.Controls
 
             if (cbWindDirectionColumn.SelectedIndex >= 0 && cbWindSpeedColumn.SelectedIndex >= 0)
             {
-                
-                WindComponents wc = new WindComponents(_dt, cbWindSpeedColumn.SelectedItem.ToString(),
+
+                VBCommon.Spatial.WindComponents wc = new VBCommon.Spatial.WindComponents(_dt, cbWindSpeedColumn.SelectedItem.ToString(),
                     cbWindDirectionColumn.SelectedItem.ToString(), _bo);
                 if (!wc.Message.Equals("OK"))
                 {
@@ -135,7 +135,7 @@ namespace VBCommon.Controls
             {
                 //CurrentComponents cc = new CurrentComponents(_dt, cbCurrentSpeedColumn.SelectedItem.ToString(),
                 //    cbCurrentDirectionColumn.SelectedItem.ToString(), _bo);
-                WaterCurrentComponents cc = new WaterCurrentComponents(_dt, cbCurrentSpeedColumn.SelectedItem.ToString(),
+                VBCommon.Spatial.WaterCurrentComponents cc = new VBCommon.Spatial.WaterCurrentComponents(_dt, cbCurrentSpeedColumn.SelectedItem.ToString(),
                     cbCurrentDirectionColumn.SelectedItem.ToString(), _bo);
                 if (!cc.Message.Equals("OK"))
                 {

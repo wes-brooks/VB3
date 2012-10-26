@@ -10,5 +10,6 @@ namespace VBCommon.Interfaces
         List<double> Predict(System.Data.DataTable table);
         List<double> PredictExceedanceProbability(System.Data.DataTable table);
         string ModelString();
+        IDictionary<string, object> GetPackedState();
     }
 }

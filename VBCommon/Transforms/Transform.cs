@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace VBCommon
+namespace VBCommon.Transforms
 {
     public enum DependentVariableTransforms
     {

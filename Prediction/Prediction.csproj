@@ -131,8 +131,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Support.cs" />
-    <Compile Include="WaterCurrentComponents.cs" />
-    <Compile Include="WindComponents.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmPrediction.resx">

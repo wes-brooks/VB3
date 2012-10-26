@@ -74,6 +74,8 @@ namespace VBCommon
             MODEL
         }
 
+        public enum listvals { NCOLS, NROWS, DATECOLNAME, RVCOLNAME, BLANK, NDISABLEDROWS, NDISABLEDCOLS, NHIDDENCOLS, NIVS };
+
         //datatable column data attributes
         public const string MAINEFFECT = "maineffect";
         public const string TRANSFORM = "transform";

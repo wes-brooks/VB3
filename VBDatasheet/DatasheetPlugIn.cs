@@ -232,6 +232,11 @@ namespace VBDatasheet
         //listen to Model's complete status
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {
+            if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.Map & ((IPlugin)sender).Complete)
+            {
+                _frmDatasheet.SetLocation(e.PackedPluginState);
+            }
+
             //This handles an undo:
             try
             {
@@ -383,6 +388,6 @@ namespace VBDatasheet
             //once you leave here, changes made to ds clear for next time here
             boolFirstPass = false;
             boolClean = true;
-        }  
+        }
     }
 }

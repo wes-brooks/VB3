@@ -57,7 +57,10 @@ namespace VBLocation
         private int zoomlevel = 12;
         bool isMouseDown = false;
 
-        private LocationPlugin _plugin = null;
+        public event EventHandler LocationFormEvent;
+        public bool boolComplete = false;
+
+        //private LocationPlugin _plugin = null;
 
         
         public frmLocation()//LocationPlugin plugin)
@@ -75,6 +78,55 @@ namespace VBLocation
         {
             //to hold packed state
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
+
+            if (_site != null)
+            {
+                if (_site.Orientation != null)
+                {
+                    dictPluginState.Add("Orientation", _site.Orientation);
+                }
+
+                if (_site.Location != null)
+                {
+                    Dictionary<string, double> dictLocation = new Dictionary<string, double>();
+                    dictLocation.Add("Latitude", _site.Location.Latitude);
+                    dictLocation.Add("Longitude", _site.Location.Longitude);
+                    dictPluginState.Add("Location", dictLocation);
+                }
+
+                if (_site.LeftMarker != null)
+                {
+                    Dictionary<string, double> dictLeftMarker = new Dictionary<string, double>();
+                    dictLeftMarker.Add("Latitude", _site.LeftMarker.Latitude);
+                    dictLeftMarker.Add("Longitude", _site.LeftMarker.Longitude);
+                    dictPluginState.Add("LeftMarker", dictLeftMarker);
+                }
+
+                if (_site.RightMarker != null)
+                {
+                    Dictionary<string, double> dictRightMarker = new Dictionary<string, double>();
+                    dictRightMarker.Add("Latitude", _site.RightMarker.Latitude);
+                    dictRightMarker.Add("Longitude", _site.RightMarker.Longitude);
+                    dictPluginState.Add("RightMarker", dictRightMarker);
+                }
+
+                if (_site.WaterMarker != null)
+                {
+                    Dictionary<string, double> dictWaterMarker = new Dictionary<string, double>();
+                    dictWaterMarker.Add("Latitude", _site.WaterMarker.Latitude);
+                    dictWaterMarker.Add("Longitude", _site.WaterMarker.Longitude);
+                    dictPluginState.Add("WaterMarker", dictWaterMarker);
+                }
+            }
+
+            if (dictPluginState.ContainsKey("Location") && dictPluginState.ContainsKey("Orientation") && dictPluginState.ContainsKey("LeftMarker") && dictPluginState.ContainsKey("RightMarker") && dictPluginState.ContainsKey("WaterMarker"))
+            {
+                dictPluginState.Add("Complete", true);
+            }
+            else
+            {
+                dictPluginState.Add("Complete", false);
+            }
 
             return (dictPluginState);
         }
@@ -949,10 +1001,16 @@ namespace VBLocation
                 _site.WaterMarker.Latitude = waterMarker.Position.Lat;//watermark.Lat;
                 _site.WaterMarker.Longitude = waterMarker.Position.Lng;//watermark.Long;
 
-                if (_plugin != null)
+                /*if (_plugin != null)
                 {
                     //VBCommon.Interfaces.IBeachSite site = _plugin as VBCommon.Interfaces.IBeachSite;
                     _plugin.Site = _site.Clone();
+                }*/
+
+                if (LocationFormEvent != null)
+                {
+                    EventArgs args  = new EventArgs();
+                    LocationFormEvent(this, args);
                 }
             }
             catch (Exception ex)

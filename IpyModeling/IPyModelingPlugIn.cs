@@ -462,6 +462,24 @@ namespace IPyModeling
         }
 
 
+        public IDictionary<string, object> GetPackedState()
+        {
+            //get packed state, add complete and visible and raise broadcast event
+            IDictionary<string, object> dictPackedState = innerIronPythonControl.PackState();
+            dictPackedState["Origin"] = strPanelKey;
+
+            if (dictPackedState.ContainsKey("Model"))
+            {
+                if (dictPackedState["Model"] != null)
+                    boolComplete = true;
+            }
+
+            dictPackedState.Add("Complete", innerIronPythonControl.Complete);
+            dictPackedState.Add("Visible", boolVisible);
+            return dictPackedState;
+        }
+
+
         //event handler for saving project state
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {

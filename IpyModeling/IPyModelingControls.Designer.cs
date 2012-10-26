@@ -170,7 +170,7 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.dsControl1.CurrentSelectedRowIndex = -1;
-            this.dsControl1.DependentVariableTransform = VBCommon.DependentVariableTransforms.none;
+            this.dsControl1.DependentVariableTransform = VBCommon.Transforms.DependentVariableTransforms.none;
             this.dsControl1.DisabledCols = 0;
             this.dsControl1.DisabledRows = 0;
             this.dsControl1.DT = null;

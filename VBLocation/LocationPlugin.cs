@@ -107,6 +107,7 @@ namespace VBLocation
         public override void Activate()
         {
             cLocation = new frmLocation();
+            cLocation.LocationFormEvent += new EventHandler(LocationEventHandler);
 
             AddPanel();
             AddRibbon("Activate");
@@ -211,6 +212,12 @@ namespace VBLocation
         }
 
 
+        private void LocationEventHandler(object sender, EventArgs e)
+        {
+            Broadcast();
+        }
+
+
         private void btnNull_Click(object sender, EventArgs e)
         {
             //cLocation.btnImport_Click(sender, e);
@@ -275,7 +282,8 @@ namespace VBLocation
         {
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = cLocation.PackState();
-            dictPackedState.Add("Complete", boolComplete);
+
+            boolComplete = (bool)dictPackedState["Complete"];
             dictPackedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, dictPackedState);
         }

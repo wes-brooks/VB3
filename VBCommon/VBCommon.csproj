@@ -91,6 +91,12 @@
     <Compile Include="Controls\DatasheetControl.designer.cs">
       <DependentUpon>DatasheetControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\frmUV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmUV.Designer.cs">
+      <DependentUpon>frmUV.cs</DependentUpon>
+    </Compile>
     <Compile Include="Interfaces\IModel.cs" />
     <Compile Include="Metadata\dtColumnInformation.cs" />
     <Compile Include="Metadata\dtRowInformation.cs" />
@@ -140,6 +146,8 @@
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Signaller.cs" />
     <Compile Include="Spatial\Site.cs" />
+    <Compile Include="Spatial\WaterCurrentComponents.cs" />
+    <Compile Include="Spatial\WindComponents.cs" />
     <Compile Include="Statistics\AndersonDarlingNormality.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -168,6 +176,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Transforms\Transform.cs" />
+    <Compile Include="Transforms\Transformer.cs" />
+    <Compile Include="Controls\Utilities.cs" />
     <Compile Include="VBCSHelp.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +202,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmPowerExponent.resx">
       <DependentUpon>frmPowerExponent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmUV.resx">
+      <DependentUpon>frmUV.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmVariableSpecification.resx">
       <DependentUpon>frmVariableSpecification.cs</DependentUpon>

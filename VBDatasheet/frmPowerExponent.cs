@@ -6,17 +6,23 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using VBCommon;
+//using VBTools;
 
-namespace DatasheetTest
+namespace VBDatasheet
 {
+    /// <summary>
+    /// class allows for user selection or specification of an exponent used
+    /// to raise a value in a power(value)**exponent form.  this functionality 
+    /// is meant to be used to transform the response variable values of the VB
+    /// dataset
+    /// </summary>
     public partial class frmPowerExponent : Form
     {
-        private double dblExp = double.NaN;
+        private double _exp = double.NaN;
         private DataTable _dt = null;
-        private int intCndx = -1;
-        private double[] dblArrV = null;
-        private string strTmessage = string.Empty;
+        private int _cndx = -1;
+        private double[] _v = null;
+        private string _tmessage = string.Empty;
 
 
         /// <summary>
@@ -28,36 +34,30 @@ namespace DatasheetTest
         public frmPowerExponent(DataTable dt, int cndx)
         {
             InitializeComponent();
-            intCndx = cndx;
+            _cndx = cndx;
             _dt = dt;
         }
-
 
         /// <summary>
         /// accessor to return a array of transformed values
         /// </summary>
         public double[] TransformedValues
         {
-            set { dblArrV = value; }
-            get { return dblArrV; }
+            set { _v = value; }
+            get { return _v; }
         }
-
-
         public string TransformMessage
         {
-            set { strTmessage = value; }
-            get { return strTmessage; }
+            set { _tmessage = value; }
+            get { return _tmessage; }
         }
-
-
         /// <summary>
         /// accessor to return the exponent used in the transform
         /// </summary>
         public double Exponent
         {
-            get { return dblExp; }
+            get { return _exp; }
         }
-
 
         /// <summary>
         /// button go clicked, perform the calculation, save the data and go away
@@ -71,8 +71,17 @@ namespace DatasheetTest
                 MessageBox.Show("Must enter a value for exponent.", "Exponent Cannot be Blank", MessageBoxButtons.OK);
                 return;
             }
-        }
+            else if (!_exp.Equals(double.NaN))
+            {
+                VBCommon.Transforms.Transformer t = new VBCommon.Transforms.Transformer(_dt, _cndx, _exp);
+                double[] v = t.POWER;
+                _tmessage = t.Message;
+                _v = v;
+                this.DialogResult = DialogResult.OK;
+                Close();
+            }
 
+        }
 
         /// <summary>
         /// button cancel clicked, go away
@@ -84,52 +93,42 @@ namespace DatasheetTest
             Close();
         }
 
-
         #region radio button maintenance for selection of one of the commonly used exponents
-
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton1.Checked) dblExp = -1.0d;
+            if (radioButton1.Checked) _exp = -1.0d;
         }
-
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton2.Checked) dblExp = 2.0d;
+            if (radioButton2.Checked) _exp = 2.0d;
         }
-
 
         private void radioButton3_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton3.Checked) dblExp = 0.5d;
+            if (radioButton3.Checked) _exp = 0.5d;
         }
-
 
         private void radioButton4_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton4.Checked) dblExp = 3.0d;
+            if (radioButton4.Checked) _exp = 3.0d;
         }
-
 
         private void radioButton5_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton5.Checked) dblExp = 1.0d / 3.0d;
+            if (radioButton5.Checked) _exp = 1.0d / 3.0d;
         }
-
 
         private void radioButton6_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton6.Checked) dblExp = 4.0d;
+            if (radioButton6.Checked) _exp = 4.0d;
         }
-
 
         private void radioButton7_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton7.Checked) dblExp = 0.25d;
+            if (radioButton7.Checked) _exp = 0.25d;
         }
-
         #endregion
-
 
         /// <summary>
         /// user selected to enter a value for an exponent, validate it and save
@@ -142,7 +141,7 @@ namespace DatasheetTest
             {
                 if (!string.IsNullOrWhiteSpace(textBox1.Text))
                 {
-                    dblExp = Convert.ToDouble(textBox1.Text);
+                    _exp = Convert.ToDouble(textBox1.Text);
                 }
             }
         }
@@ -150,7 +149,7 @@ namespace DatasheetTest
 
         private void textBox1_Validating(object sender, CancelEventArgs e)
         {
-            if (!double.TryParse(textBox1.Text, out dblExp))
+            if (!double.TryParse(textBox1.Text, out _exp))
             {
                 e.Cancel = true;
                 textBox1.Select(0, textBox1.Text.Length);
@@ -158,10 +157,10 @@ namespace DatasheetTest
             }
         }
 
-
         private void textBox1_Validated(object sender, EventArgs e)
         {
             errorProvider1.SetError(textBox1, "");
         }
+
     }
 }

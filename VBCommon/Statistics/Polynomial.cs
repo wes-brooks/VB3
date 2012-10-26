@@ -7,7 +7,7 @@ using VBCommon;
 
 namespace VBCommon.Statistics
 {
-   /* public class Polynomial
+    public class Polynomial
     {
         //run a regression on y, x and x**2 and compute x(new) = intercept + c1*x + c2*x*x and adjustedR**2 fit
         //save x var name, intercept, c1, c2 and adjustedR**2 in memory (_polyDT) (for prediction) and 
@@ -16,7 +16,7 @@ namespace VBCommon.Statistics
 
         private DataTable _modelDT = null;
         private double[] _polytransform = null;
-        private double _adjrsqrd, _intercept, _c1, _c2, _rsqrd;
+        public double _adjrsqrd, _intercept, _c1, _c2, _rsqrd;
         private string _colname = string.Empty;
         public static DataTable _polyDT = null;
 
@@ -114,7 +114,7 @@ namespace VBCommon.Statistics
             addModelTableCols();
             double [] y = Utility.GetColumnFromTable(dt, 1);
             double [] x = Utility.GetColumnFromTable(dt, colndx);
-            Transform t = new Transform(dt, colndx);
+            VBCommon.Transforms.Transformer t = new VBCommon.Transforms.Transformer(dt, colndx);
             double[] x2 = t.SQUARE;
             //DataRow r;
             for (int i = 0; i < y.Length; i++)
@@ -125,7 +125,7 @@ namespace VBCommon.Statistics
         private DataTable createModelTable(double[] y, double[] x)
         {
             addModelTableCols();
-            Transform t = new Transform(x);
+            VBCommon.Transforms.Transformer t = new VBCommon.Transforms.Transformer(x);
             double[] x2 = t.SQUARE;
             for (int i = 0; i < y.Length; i++)
                 _modelDT.Rows.Add(new Object[] { y[i], x[i], x2[i] });
@@ -141,5 +141,5 @@ namespace VBCommon.Statistics
             _modelDT.Columns.Add("X", typeof(double));
             _modelDT.Columns.Add("X**2", typeof(double));
         }
-    }*/
+    }
 }

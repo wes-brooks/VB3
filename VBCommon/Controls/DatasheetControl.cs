@@ -45,12 +45,11 @@ namespace VBCommon.Controls
         private dtState state = dtState.dirty;
 
         //dealing with transform
-        private VBCommon.DependentVariableTransforms depVarTransform;
+        private VBCommon.Transforms.DependentVariableTransforms depVarTransform;
         private double dblPowerTransformExp = double.NaN;
         private string fn = string.Empty;
 
-        public enum listvals { NCOLS, NROWS, DATECOLNAME, RVCOLNAME, BLANK, NDISABLEDROWS, NDISABLEDCOLS, NHIDDENCOLS, NIVS };
-        private Type ListVal = typeof(listvals);
+        private Type ListVal = typeof(VBCommon.Globals.listvals);
         private int intNdisabledcols = 0;
         private int intNdisabledrows = 0;
         private int intNhiddencols = 0;
@@ -58,7 +57,7 @@ namespace VBCommon.Controls
 
         // getter/setter for transform type
         [JsonProperty]
-        public VBCommon.DependentVariableTransforms DependentVariableTransform  
+        public VBCommon.Transforms.DependentVariableTransforms DependentVariableTransform  
         {
             get { return depVarTransform; }
             set { depVarTransform = value; }
@@ -315,46 +314,46 @@ namespace VBCommon.Controls
 
         
         // as user manipulates the dataset, track changes and update the UI listview
-        public void updateListView(listvals listitem, object value)
+        public void updateListView(VBCommon.Globals.listvals listitem, object value)
         {
             string strName = string.Empty;
             int intNumber;
 
             switch (listitem)
             {
-                case listvals.NCOLS:
+                case VBCommon.Globals.listvals.NCOLS:
                     intNumber = (int)value;
                     listView1.Items[0].SubItems[1].Text = intNumber.ToString();
                     break;
-                case listvals.NROWS:
+                case VBCommon.Globals.listvals.NROWS:
                     intNumber = (int)value;
                     listView1.Items[1].SubItems[1].Text = intNumber.ToString();
                     break;
-                case listvals.DATECOLNAME:
+                case VBCommon.Globals.listvals.DATECOLNAME:
                     strName = (string)value;
                     listView1.Items[2].SubItems[1].Text = strName;
                     break;
-                case listvals.RVCOLNAME:
+                case VBCommon.Globals.listvals.RVCOLNAME:
                     strName = (string)value;
                     listView1.Items[3].SubItems[1].Text = strName;
                     break;
-                case listvals.BLANK:
+                case VBCommon.Globals.listvals.BLANK:
                     intNumber = (int)value;
                     listView1.Items[4].SubItems[1].Text = "";
                     break;
-                case listvals.NDISABLEDROWS:
+                case VBCommon.Globals.listvals.NDISABLEDROWS:
                     intNumber = (int)value;
                     listView1.Items[5].SubItems[1].Text = intNumber.ToString();
                     break;
-                case listvals.NDISABLEDCOLS:
+                case VBCommon.Globals.listvals.NDISABLEDCOLS:
                     intNumber = (int)value;
                     listView1.Items[6].SubItems[1].Text = intNumber.ToString();
                     break;
-                case listvals.NHIDDENCOLS:
+                case VBCommon.Globals.listvals.NHIDDENCOLS:
                     intNumber = (int)value;
                     listView1.Items[7].SubItems[1].Text = intNumber.ToString();
                     break;
-                case listvals.NIVS:
+                case VBCommon.Globals.listvals.NIVS:
                     intNumber = (int)value;
                     listView1.Items[8].SubItems[1].Text = intNumber.ToString();
                     break;
@@ -370,7 +369,7 @@ namespace VBCommon.Controls
 
             string newcolname = "LOG10[" + dt.Columns[intSelectedColIndex].Caption + "]";
             performTOperation(dt, newcolname, intSelectedColIndex, newvals);
-            dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.DependentVariableTransforms.Log10.ToString();
+            dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.Transforms.DependentVariableTransforms.Log10.ToString();
 
             intResponseVarColIndex = dt.Columns.IndexOf(newcolname);
             strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
@@ -438,13 +437,13 @@ namespace VBCommon.Controls
                     dt = dtCopy;
                     maintainGrid(dgv, dt, selectedColIndex, strResponseVarColName);
 
-                    updateListView(listvals.NHIDDENCOLS, ++intNhiddencols);
+                    updateListView(VBCommon.Globals.listvals.NHIDDENCOLS, ++intNhiddencols);
                     //count iv columns and update list
                     int nonivs = intNhiddencols > 0 ? 3 : 2;
                     intNivs = dt.Columns.Count - nonivs;
-                    updateListView(listvals.NIVS, intNivs);
+                    updateListView(VBCommon.Globals.listvals.NIVS, intNivs);
                     //and rv name
-                    updateListView(listvals.RVCOLNAME, strResponseVarColName);
+                    updateListView(VBCommon.Globals.listvals.RVCOLNAME, strResponseVarColName);
 
                     state = dtState.dirty;
                     NotifyContainer();
@@ -504,8 +503,8 @@ namespace VBCommon.Controls
 
             string newcolname = "LN[" + dt.Columns[intSelectedColIndex].Caption + "]";
             performTOperation(dt, newcolname, intSelectedColIndex, newvals);
-            dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.DependentVariableTransforms.Ln.ToString();
-            depVarTransform = VBCommon.DependentVariableTransforms.Ln;
+            dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.Transforms.DependentVariableTransforms.Ln.ToString();
+            depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Ln;
             state = dtState.dirty;
             NotifyContainer();
         }
@@ -528,8 +527,8 @@ namespace VBCommon.Controls
                 string sexp = frmExp.Exponent.ToString("n2");
                 string newcolname = "POWER" + "[" + sexp + "," + dt.Columns[intSelectedColIndex].Caption + "]";
                 performTOperation(dt, newcolname, intSelectedColIndex, newvals);
-                dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.DependentVariableTransforms.Power.ToString() + "," + sexp;
-                depVarTransform = VBCommon.DependentVariableTransforms.Power;
+                dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.Transforms.DependentVariableTransforms.Power.ToString() + "," + sexp;
+                depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Power;
                 dblPowerTransformExp = Convert.ToDouble(sexp);
                 state = dtState.dirty;
                 NotifyContainer();
@@ -635,7 +634,7 @@ namespace VBCommon.Controls
                 dt.ExtendedProperties.Remove(intSelectedRowIndex.ToString());
             dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), "false");
 
-            updateListView(listvals.NDISABLEDROWS, ++intNdisabledrows);
+            updateListView(VBCommon.Globals.listvals.NDISABLEDROWS, ++intNdisabledrows);
             state = dtState.dirty;
             NotifyContainer();
         }
@@ -658,8 +657,8 @@ namespace VBCommon.Controls
             if (dt.ExtendedProperties.ContainsKey(intSelectedRowIndex.ToString()))
                 dt.ExtendedProperties.Remove(intSelectedRowIndex.ToString());
             dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), "true");
-            
-            updateListView(listvals.NDISABLEDROWS, --intNdisabledrows);
+
+            updateListView(VBCommon.Globals.listvals.NDISABLEDROWS, --intNdisabledrows);
             state = dtState.dirty;
             NotifyContainer();
         }
@@ -696,7 +695,7 @@ namespace VBCommon.Controls
                         strResponseVarColName = dtCopy.Columns[intSelectedColIndex].Caption;
                         intResponseVarColIndex = intSelectedColIndex;
 
-                        updateListView(listvals.NHIDDENCOLS, --intNhiddencols);
+                        updateListView(VBCommon.Globals.listvals.NHIDDENCOLS, --intNhiddencols);
                         break;
                     }
                 }
@@ -706,9 +705,9 @@ namespace VBCommon.Controls
                 //count iv columns and update list
                 int nonivs = intNhiddencols > 0 ? 3 : 2;
                 intNivs = dt.Columns.Count - nonivs;
-                updateListView(listvals.NIVS, intNivs);
+                updateListView(VBCommon.Globals.listvals.NIVS, intNivs);
                 //and rv name
-                updateListView(listvals.RVCOLNAME, strResponseVarColName);
+                updateListView(VBCommon.Globals.listvals.RVCOLNAME, strResponseVarColName);
 
                 state = dtState.dirty;
                 NotifyContainer();
@@ -720,7 +719,7 @@ namespace VBCommon.Controls
             //menu response from right click, determine which transform was selected
             MenuItem mi = (MenuItem)o;
             string transform = mi.Text;
-            if (transform == VBCommon.DependentVariableTransforms.Power.ToString())
+            if (transform == VBCommon.Transforms.DependentVariableTransforms.Power.ToString())
             {
                 frmPowerExponent frmExp = new frmPowerExponent(dt, intSelectedColIndex);
                 DialogResult dlgr = frmExp.ShowDialog();
@@ -728,7 +727,7 @@ namespace VBCommon.Controls
                 {
                     string sexp = frmExp.Exponent.ToString("n2");
                     transform += "," + sexp;
-                    depVarTransform = VBCommon.DependentVariableTransforms.Power;
+                    depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Power;
                     dblPowerTransformExp = Convert.ToDouble(sexp);
                     dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                     state = dtState.dirty;
@@ -738,11 +737,11 @@ namespace VBCommon.Controls
             else
             {
                 if (String.Compare(transform, "Log10", true) == 0)
-                    depVarTransform = VBCommon.DependentVariableTransforms.Log10;
+                    depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Log10;
                 else if (String.Compare(transform, "Ln", true) == 0)
-                    depVarTransform = VBCommon.DependentVariableTransforms.Ln;
+                    depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Ln;
                 else if (String.Compare(transform, "none", true) == 0)
-                    depVarTransform = VBCommon.DependentVariableTransforms.none;
+                    depVarTransform = VBCommon.Transforms.DependentVariableTransforms.none;
 
                 dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                 state = dtState.dirty;
@@ -757,8 +756,8 @@ namespace VBCommon.Controls
             string cn = dt.Columns[intSelectedColIndex].Caption;
             dtCI.SetColStatus(dt.Columns[intSelectedColIndex].ColumnName.ToString(), false);
             dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
-            updateListView(listvals.NDISABLEDCOLS, ++intNdisabledcols);
-            updateListView(listvals.NIVS, --intNivs);
+            updateListView(VBCommon.Globals.listvals.NDISABLEDCOLS, ++intNdisabledcols);
+            updateListView(VBCommon.Globals.listvals.NIVS, --intNivs);
             disableGridCol(dgv, intSelectedColIndex);
 
             state = dtState.dirty;
@@ -772,8 +771,8 @@ namespace VBCommon.Controls
             string cn = dt.Columns[intSelectedColIndex].Caption;
             dtCI.SetColStatus(dt.Columns[intSelectedColIndex].ColumnName.ToString(), true);
             dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.ENABLED] = true;
-            updateListView(listvals.NDISABLEDCOLS, --intNdisabledcols);
-            updateListView(listvals.NIVS, ++intNivs);
+            updateListView(VBCommon.Globals.listvals.NDISABLEDCOLS, --intNdisabledcols);
+            updateListView(VBCommon.Globals.listvals.NIVS, ++intNivs);
             enableGridCol(dgv, intSelectedColIndex, dt);
 
             state = dtState.dirty;
@@ -813,7 +812,7 @@ namespace VBCommon.Controls
                     dt.AcceptChanges();
                     UnhideHiddenCols(dgv, dt);
 
-                    updateListView(listvals.NHIDDENCOLS, --intNhiddencols);
+                    updateListView(VBCommon.Globals.listvals.NHIDDENCOLS, --intNhiddencols);
                 }
 
                 intResponseVarColIndex = dt.Columns.IndexOf(strSelectedColName);
@@ -824,9 +823,9 @@ namespace VBCommon.Controls
                 //count iv columns and update list
                 int nonivs = intNhiddencols > 0 ? 3 : 2;
                 intNivs = dt.Columns.Count - nonivs;
-                updateListView(listvals.NIVS, intNivs);
+                updateListView(VBCommon.Globals.listvals.NIVS, intNivs);
                 //and rv name
-                updateListView(listvals.RVCOLNAME, strResponseVarColName);
+                updateListView(VBCommon.Globals.listvals.RVCOLNAME, strResponseVarColName);
 
                 state = dtState.dirty;
                 NotifyContainer();
@@ -852,8 +851,8 @@ namespace VBCommon.Controls
 
                 dgv.DataSource = dt;
                 dgv.FirstDisplayedScrollingColumnIndex = gridpos;
-                updateListView(listvals.NCOLS, dt.Columns.Count);
-                updateListView(listvals.NIVS, --intNivs);
+                updateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);
+                updateListView(VBCommon.Globals.listvals.NIVS, --intNivs);
 
                 state = dtState.dirty;
                 NotifyContainer();
@@ -871,11 +870,11 @@ namespace VBCommon.Controls
             }
 
             intNdisabledcols = 0;
-            updateListView(listvals.NDISABLEDCOLS, intNdisabledcols);
+            updateListView(VBCommon.Globals.listvals.NDISABLEDCOLS, intNdisabledcols);
 
             int intNonivs = intNhiddencols > 0 ? 3 : 2;
             intNivs = dt.Columns.Count - intNonivs;
-            updateListView(listvals.NIVS, intNivs);
+            updateListView(VBCommon.Globals.listvals.NIVS, intNivs);
             state = dtState.dirty;
             NotifyContainer();
         }
@@ -901,7 +900,7 @@ namespace VBCommon.Controls
             }
 
             intNdisabledrows = 0;
-            updateListView(listvals.NDISABLEDROWS, intNdisabledrows);
+            updateListView(VBCommon.Globals.listvals.NDISABLEDROWS, intNdisabledrows);
             state = dtState.dirty;
             NotifyContainer();
         }
@@ -1191,7 +1190,7 @@ namespace VBCommon.Controls
 
                 //need to change from 1 to the actual type
                 string depVarTran = Convert.ToString(dictPackedState["DepVarTransform"]);
-                this.DependentVariableTransform = (VBCommon.DependentVariableTransforms)Enum.Parse(typeof(VBCommon.DependentVariableTransforms), depVarTran);
+                this.DependentVariableTransform = (VBCommon.Transforms.DependentVariableTransforms)Enum.Parse(typeof(VBCommon.Transforms.DependentVariableTransforms), depVarTran);
                 this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
                 this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
 
@@ -1231,19 +1230,19 @@ namespace VBCommon.Controls
         }
 
 
-        /*public void registerNewCols(DataTable dt)
+        public void registerNewCols(DataTable dt)
         {
-            _dtCI = new dtColumnInformation(dt);
+            DTCI = new dtColumnInformation(dt);
             //          _dtCI = dtColumnInformation.getdtCI(dt, false);
             foreach (DataColumn c in dt.Columns)
             {
-                if (!_dtCI.GetColStatus(c.ColumnName))
+                if (!DTCI.GetColStatus(c.ColumnName))
                 {
-                    _dtCI.AddColumnNameToDict(c.ColumnName);
+                    DTCI.AddColumnNameToDict(c.ColumnName);
                 }
 
             }
-        }*/
+        }
 
 
         public bool testValueAttribute(DataColumn dc, string attr)
@@ -1660,6 +1659,550 @@ namespace VBCommon.Controls
             }
         }
 
+
+        /*
+        //public class Utilities
+        //{
+            public bool testValueAttribute(DataColumn dc, string attr)
+            {
+                if (dc.ExtendedProperties.ContainsKey(attr))
+                {
+                    //if (dc.ExtendedProperties[attr].Equals(true))
+                    if (dc.ExtendedProperties[attr].ToString() == "True")
+                        return true;
+                    else
+                        return false;
+                    //bool value = (bool)dc.ExtendedProperties[attr];
+                    //return value;
+                }
+                return false;
+            }
+
+
+            public void setAttributeValue(DataColumn dc, string attr, bool value)
+            {
+                dc.ExtendedProperties[attr] = value;
+            }
+
+            /// <summary>
+            /// datatable methods for filtering and adding columns based on table extended properties
+            /// </summary>
+            public class TableUtils
+            {
+                private dtRowInformation _dtRI = null;
+                private dtColumnInformation _dtCI = null;
+                private DataTable _dt = null;
+
+                public TableUtils(DataTable dt)
+                {
+                    _dt = dt;
+                    _dtCI = dtColumnInformation.getdtCI(dt, false);
+                    _dtRI = dtRowInformation.getdtRI(dt, false);
+
+                }
+
+
+                public void registerNewCols(DataTable dt)
+                {
+                    _dtCI = dtColumnInformation.getdtCI(dt, false);
+                    foreach (DataColumn c in dt.Columns)
+                    {
+                        if (!_dtCI.GetColStatus(c.ColumnName))
+                        {
+                            _dtCI.AddColumnNameToDict(c.ColumnName);
+                        }
+
+                    }
+                }
+
+
+                public DataTable filterDisabledCols(DataTable dt)
+                {
+                    //filter out disabled columns
+                    DataTable dtCopy = dt.Copy();
+
+                    dtColumnInformation dtCI = dtColumnInformation.getdtCI(dt, false);
+                    foreach (KeyValuePair<string, bool> kv in dtCI.DTColInfo)
+                    {
+                        if (kv.Value) continue;
+                        if (dtCopy.Columns.Contains(kv.Key))
+                            dtCopy.Columns.Remove(kv.Key);
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable filterDataTableRows(DataTable dt)
+                {
+                    //filter out disabled rows
+                    DataTable dtCopy = dt.Copy();
+                    Dictionary<string, bool> rstatus = _dtRI.DTRowInfo;
+                    for (int i = 0; i < dtCopy.Rows.Count; i++)
+                    {
+                        if (!rstatus[dtCopy.Rows[i][0].ToString()])
+                            //if (dtCopy.Rows.Contains(dtCopy.Rows[i][0].ToString()))
+                            dtCopy.Rows[i].Delete();
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable filterTcols(DataTable dt)
+                {
+                    //filter transformed columns
+                    DataTable dtCopy = dt.Copy();
+
+                    for (int c = 0; c < dt.Columns.Count; c++)
+                    {
+                        bool transformed = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM);
+                        if (transformed == true)
+                            if (dtCopy.Columns.Contains(dt.Columns[c].Caption.ToString()))
+                                dtCopy.Columns.Remove(dt.Columns[c].Caption.ToString());
+                        //_dtCI.removeColumnFromDic(dt.Columns[c].Caption);
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable filterRVHcols(DataTable dt)
+                {
+                    //filter hidden response variable columns
+                    DataTable dtCopy = dt.Copy();
+
+                    for (int c = 0; c < dt.Columns.Count; c++)
+                    {
+                        bool isrv = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVAR);
+                        bool istrv = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVARIBLETRANSFORM);
+                        if (isrv == true)
+                        {
+                            bool isH = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
+                            if (isH == true)
+                            {
+                                //bool isVis = (bool)dt.Columns[c].ExtendedProperties[VBTools.Globals.HIDDEN];
+                                //if (isVis == true)
+                                if (dt.Columns[c].ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                                {
+                                    if (dtCopy.Columns.Contains(dt.Columns[c].Caption))
+                                        dtCopy.Columns.Remove(dt.Columns[c].Caption);
+                                    //_dtCI.removeColumnFromDic(dt.Columns[c].Caption);
+                                }
+                            }
+                        }
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable filterCatVars(DataTable dt)
+                {
+                    DataTable dtCopy = dt.Copy();
+
+                    for (int c = 0; c < dt.Columns.Count; c++)
+                    {
+                        bool hascat = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.CATEGORICAL);
+                        //bool istrv = dt.Columns[c].ExtendedProperties.ContainsKey(VBTools.Globals.DEPENDENTVARIBLETRANSFORM);
+                        if (hascat == true)
+                        {
+                            //bool iscat = dt.Columns[c].ExtendedProperties.ContainsKey(VBTools.Globals.CATEGORICAL);
+                            //if (iscat == true)
+                            if (dt.Columns[c].ExtendedProperties[VBCommon.Globals.CATEGORICAL].ToString() == "True")
+                            {
+
+                                if (dtCopy.Columns.Contains(dt.Columns[c].Caption))
+                                    dtCopy.Columns.Remove(dt.Columns[c].Caption);
+                            }
+                        }
+                    }
+
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable addCatCols(DataTable dtnew, DataTable dt)
+                {
+                    DataTable dtCopy = dtnew.Copy();
+                    foreach (DataColumn dc in dt.Columns)
+                    {
+                        bool hasAttribute = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.CATEGORICAL);
+                        if (!hasAttribute) continue;
+                        if (!dtCopy.Columns.Contains(dc.Caption))
+                        {
+                            int ndx = dt.Columns.IndexOf(dc);
+                            var dvalues = (from row in dt.Select() select row.Field<double>(dt.Columns.IndexOf(dc))).ToArray<double>();
+                            dtCopy.Columns.Add(dc.Caption, typeof(double));
+                            for (int r = 0; r < dtCopy.Rows.Count; r++)
+                                dtCopy.Rows[r][dc.Caption] = dvalues[r];
+
+                            if (ndx > dtCopy.Columns.Count)
+                            {
+                                ndx = dtCopy.Columns.Count - 1;
+                            }
+                            dtCopy.Columns[dc.Caption].SetOrdinal(ndx);
+                            //dtCopy.Columns[dc.Caption].ExtendedProperties[VBTools.Globals.ENABLED] = false;
+                            dtCopy = copyAllColAttributes(dc, dt, dtCopy);
+
+
+                        }
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable addDisabledCols(DataTable dtnew, DataTable dt)
+                {
+                    DataTable dtCopy = dtnew.Copy();
+                    foreach (DataColumn dc in dt.Columns)
+                    {
+                        bool hasAttribute = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED);
+                        if (!hasAttribute) continue;
+                        //bool enabled = (bool)dc.ExtendedProperties[VBTools.Globals.ENABLED];
+                        //if (!enabled)
+                        if (dc.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
+                        {
+                            if (!dtCopy.Columns.Contains(dc.Caption))
+                            {
+                                int ndx = dt.Columns.IndexOf(dc);
+                                var dvalues = (from row in dt.Select() select row.Field<double>(dt.Columns.IndexOf(dc))).ToArray<double>();
+                                dtCopy.Columns.Add(dc.Caption, typeof(double));
+                                for (int r = 0; r < dtCopy.Rows.Count; r++)
+                                    dtCopy.Rows[r][dc.Caption] = dvalues[r];
+
+                                if (ndx > dtCopy.Columns.Count)
+                                {
+                                    ndx = dtCopy.Columns.Count - 1;
+                                }
+                                dtCopy.Columns[dc.Caption].SetOrdinal(ndx);
+                                //dtCopy.Columns[dc.Caption].ExtendedProperties[VBTools.Globals.ENABLED] = false;
+                                dtCopy = copyAllColAttributes(dc, dt, dtCopy);
+                            }
+
+                        }
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable addOldTCols(DataTable dtnew, DataTable dt)
+                {
+                    DataTable dtCopy = dtnew.Copy();
+                    foreach (DataColumn dc in dt.Columns)
+                    {
+                        if (dc.ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM))
+                        {
+                            if (!dtCopy.Columns.Contains(dc.Caption))
+                            {
+                                var dvalues = (from row in dt.Select() select row.Field<double>(dt.Columns.IndexOf(dc))).ToArray<double>();
+                                dtCopy.Columns.Add(dc.Caption, typeof(double));
+                                for (int r = 0; r < dt.Rows.Count; r++)
+                                    dtCopy.Rows[r][dc.Caption] = dvalues[r];
+
+                                //dtCopy.Columns[dc.Caption].ExtendedProperties[VBTools.Globals.TRANSFORM] = true;
+                                dtCopy = copyAllColAttributes(dc, dt, dtCopy);
+                            }
+                        }
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable addHiddenResponseVarCols(DataTable dtnew, DataTable dt)
+                {
+                    DataTable dtCopy = dtnew.Copy();
+                    foreach (DataColumn dc in dt.Columns)
+                    {
+                        bool hasAttribute = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVAR);
+                        if (!hasAttribute) continue;
+
+                        bool hasHidden = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
+                        if (!hasHidden) continue;
+
+                        //bool isHidden = (bool)dc.ExtendedProperties[VBTools.Globals.HIDDEN];
+                        //if (isHidden)
+                        if (dc.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                        {
+                            if (!dtCopy.Columns.Contains(dc.Caption))
+                            {
+                                int ndx = dt.Columns.IndexOf(dc);
+                                var dvalues = (from row in dt.Select() select row.Field<double>(dt.Columns.IndexOf(dc))).ToArray<double>();
+                                dtCopy.Columns.Add(dc.Caption, typeof(double));
+                                for (int r = 0; r < dtCopy.Rows.Count; r++)
+                                    dtCopy.Rows[r][dc.Caption] = dvalues[r];
+
+                                dtCopy.Columns[dc.Caption].SetOrdinal(ndx);
+                                dtCopy = copyAllColAttributes(dc, dt, dtCopy);
+                                //dtCopy.Columns[dc.Caption].ExtendedProperties[VBTools.Globals.HIDDEN] = true;
+                                //dtCopy.Columns[dc.Caption].ExtendedProperties[VBTools.Globals.DEPENDENTVAR] = true;
+                            }
+                        }
+                    }
+                    dtCopy.AcceptChanges();
+                    return dtCopy;
+                }
+
+
+                public DataTable setHiddenIVstoUnhidden(DataTable dt)
+                {
+                    DataTable dtCopy = dt.Copy();
+                    foreach (DataColumn dc in dtCopy.Columns)
+                    {
+                        bool hasAttr = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.MAINEFFECT);
+                        if (hasAttr)
+                        {
+                            hasAttr = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
+                            if (hasAttr)
+                            {
+                                //bool isHidden = (bool)dc.ExtendedProperties[VBTools.Globals.HIDDEN];
+                                //if (isHidden)
+                                if (dc.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                                {
+                                    dc.ExtendedProperties[VBCommon.Globals.HIDDEN] = false;
+                                }
+                            }
+                        }
+                    }
+                    return dtCopy;
+                }
+
+
+                private DataTable copyAllColAttributes(DataColumn dc, DataTable sourceDT, DataTable targetDT)
+                {
+                    PropertyCollection sourceproperties = sourceDT.Columns[dc.Caption].ExtendedProperties;
+                    foreach (DictionaryEntry kv in sourceproperties)
+                    {
+                        targetDT.Columns[dc.Caption].ExtendedProperties[kv.Key] = kv.Value;
+                    }
+                    return targetDT;
+                }
+            }
+
+            /// <summary>
+            /// datagridview methods for maintaining the view of the datatable data in the grid
+            /// </summary>
+            public class GridUtils
+            {
+                private dtRowInformation _dtRI = null;
+
+                public GridUtils(DataGridView dgv)
+                {
+                }
+
+
+                public void maintainGrid(DataGridView dgv, DataTable dt, int selectedColIndex, string responseVarColName)
+                {
+                    //reset the grid
+                    dgv.DataSource = null;
+                    dgv.DataSource = dt;
+
+                    //mark all grid cols visible, not sortable
+                    for (int c = 0; c < dgv.Columns.Count; c++)
+                    {
+                        //dgv.Columns[c].Visible = true;
+                        dgv.Columns[c].SortMode = DataGridViewColumnSortMode.NotSortable;
+                    }
+
+                    //hide any main effect cols that have been transformed (hidden attribute is set in the transform class)
+                    foreach (DataColumn c in dt.Columns)
+                    {
+
+                        bool hashidden = c.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
+                        if (hashidden == true)
+                        {
+                            //bool hide = c.ExtendedProperties[VBTools.Globals.HIDDEN].Equals(true);
+                            //bool hide = (bool)c.ExtendedProperties[VBTools.Globals.HIDDEN];
+                            //if (hide) 
+                            if (c.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                            { dgv.Columns[c.ColumnName].Visible = false; }
+                        }
+                        //reset the column disabled properties
+                        bool hasattribute = c.ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED);
+                        if (hasattribute)
+                        {
+                            selectedColIndex = dt.Columns.IndexOf(c);
+                            //this is not working after serialization....
+                            //bool enabled = (bool)c.ExtendedProperties[VBTools.Globals.ENABLED];
+                            if (c.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
+                            //if (!enabled) 
+                            {
+                                for (int r = 0; r < dgv.Rows.Count; r++)
+                                    dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
+                            }
+                            else
+                            {
+                                for (int r = 0; r < dgv.Rows.Count; r++)
+                                    dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
+                            }
+                        }
+
+                    }
+
+                    //reset the UI clues for the response variable
+                    dgv.Columns[responseVarColName].DefaultCellStyle.BackColor = Color.LightBlue;
+
+                    //reset disable rows
+                    _dtRI = dtRowInformation.getdtRI(dt, false);
+                    for (int r = 0; r < dt.Rows.Count; r++)
+                    {
+                        bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());
+                        if (!enabled)
+                        {
+                            for (int c = 0; c < dgv.Columns.Count; c++)
+                                dgv[c, r].Style.ForeColor = Color.Red;
+
+                        }
+                    }
+
+                    ////hide any main effect cols that have been transformed (hidden attribute is set in the transform class)
+                    //foreach (DataColumn c in dt.Columns)
+                    //{
+
+                    //    bool hasattribute = c.ExtendedProperties.ContainsKey(VBTools.Globals.HIDDEN);
+                    //    if (hasattribute == true)
+                    //    {
+                    //        bool hide = (bool)c.ExtendedProperties[VBTools.Globals.HIDDEN];
+                    //        if (hide) { dgv.Columns[c.ColumnName].Visible = false; }
+                    //    }
+                    //    //reset the column disabled properties
+                    //    hasattribute = c.ExtendedProperties.ContainsKey(VBTools.Globals.ENABLED);
+                    //    if (hasattribute)
+                    //    {
+                    //        selectedColIndex = dt.Columns.IndexOf(c);
+                    //        bool enabled = (bool)c.ExtendedProperties[VBTools.Globals.ENABLED];
+                    //        if (!enabled) //{ DisableCol(null, null); }
+                    //        {
+                    //            for (int r = 0; r < dgv.Rows.Count; r++)
+                    //                dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
+                    //        }
+                    //    }
+
+                    //}
+
+                    //set the numerical precision for display
+                    setViewOnGrid(dgv);
+                }
+
+
+                public void setViewOnGrid(DataGridView dgv)
+                {
+                    //utility method used to set numerical precision displayed in grid
+
+                    //seems to be the only way I can figure to get a string in col 1 that may
+                    //(or may not) be a date and numbers in all other columns.
+                    //in design mode set "no format" for the dgv defaultcellstyle
+                    string testcellval = string.Empty;
+                    //double numval = double.NaN;
+                    for (int col = 1; col < dgv.Columns.Count; col++)
+                    {
+                        //skips col 0 (date/time/string/whatever)
+                        testcellval = dgv[col, 0].Value.ToString();
+                        //double.TryParse(testcellval, out numval); //dumb: "0", a number, returns 0 as well as nonsense does
+                        bool isNum = Information.IsNumeric(testcellval); //try a little visualbasic magic
+
+                        //if (numval != 0)
+                        if (isNum)
+                        {
+                            dgv.Columns[col].ValueType = typeof(System.Double);
+                            dgv.Columns[col].DefaultCellStyle.Format = "g4";
+                            //shit! only works if no data in table
+                            // _rawdataDT.Columns[col].DataType = typeof(System.Double);
+                        }
+                        else
+                        {
+                            dgv.Columns[col].ValueType = typeof(System.String);
+                            // _rawdataDT.Columns[col].DataType = typeof(System.String);
+                            //dgv.Columns[col].DefaultCellStyle.Format = "none";
+                        }
+                    }
+                }
+
+
+                public void disableGridCol(DataGridView dgv, int selectedColIndex)
+                {
+                    for (int r = 0; r < dgv.Rows.Count; r++)
+                        dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
+                }
+
+
+                public void enableGridCol(DataGridView dgv, int selectedColIndex, DataTable dt)
+                {
+                    dtRowInformation dtRI = dtRowInformation.getdtRI(dt, false);
+                    for (int r = 0; r < dgv.Rows.Count; r++)
+                    {
+                        //set style to black unless the row is disabled
+                        if (!dtRI.GetRowStatus(dgv[0, r].Value.ToString())) continue;
+                        dgv[selectedColIndex, r].Style.ForeColor = Color.Black;
+                    }
+                }
+
+
+                public void setResponseVarCol(DataGridView dgv, int selectedColIndex, int responseVarColIndex)
+                {
+                    dgv.Columns[responseVarColIndex].DefaultCellStyle.BackColor = Color.White;
+                    dgv.Columns[selectedColIndex].DefaultCellStyle.BackColor = Color.LightBlue;
+                }
+
+
+                public void setDisabledColandRows(DataGridView dgv, DataTable dt)
+                {
+                    //reset the column disabled properties
+                    foreach (DataColumn c in dt.Columns)
+                    {
+                        bool hasattribute = c.ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED);
+                        if (hasattribute)
+                        {
+                            int selectedColIndex = dt.Columns.IndexOf(c);
+                            //bool enabled = (bool)c.ExtendedProperties[VBTools.Globals.ENABLED];
+                            //if (!enabled) //{ DisableCol(null, null); }
+                            if (c.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
+                            {
+                                for (int r = 0; r < dgv.Rows.Count; r++)
+                                    dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
+                            }
+                        }
+                    }
+
+                    //reset disable rows
+                    _dtRI = dtRowInformation.getdtRI(dt, false);
+                    for (int r = 0; r < dt.Rows.Count; r++)
+                    {
+                        bool enabled = _dtRI.GetRowStatus(dt.Rows[r][0].ToString());
+                        if (!enabled)
+                        {
+                            for (int c = 0; c < dgv.Columns.Count; c++)
+                                dgv[c, r].Style.ForeColor = Color.Red;
+
+                        }
+                    }
+                }
+                public void unHideHiddenCols(DataGridView dgv, DataTable dt)
+                {
+                    foreach (DataColumn dc in dt.Columns)
+                    {
+                        bool hasH = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
+                        if (hasH)
+                        {
+                            bool isHidden = (bool)dc.ExtendedProperties[VBCommon.Globals.HIDDEN];
+                            if (isHidden)
+                            {
+                                //if (!dt.Columns[dc.Caption].ExtendedProperties.ContainsKey(VBTools.Globals.DEPENDENTVAR))
+                                //{
+                                dt.Columns[dc.Caption].ExtendedProperties[VBCommon.Globals.HIDDEN] = false;
+                                dgv.Columns[dc.Caption].Visible = true;
+                                //}
+                            }
+                        }
+                    }
+                }
+            }*/
+
+        //}
     }
 }
 

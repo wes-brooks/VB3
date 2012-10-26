@@ -72,7 +72,7 @@ namespace IPyModeling
 
         protected Dictionary<string, object> dictTransform = new Dictionary<string, object>()
         {
-            {"Type", DependentVariableTransforms.none.ToString()},
+            {"Type", VBCommon.Transforms.DependentVariableTransforms.none.ToString()},
             {"Exponent", 1}
         };
 
@@ -338,13 +338,13 @@ namespace IPyModeling
                         //Unpack the user's selected transformation of the dependent variable.
                         string strTransform = data.Columns[intI].ExtendedProperties["responsevardefinedtransform"].ToString();
 
-                        if (String.Compare(strTransform, DependentVariableTransforms.none.ToString(), 0) == 0)
+                        if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.none.ToString(), 0) == 0)
                             this.rbValue.Checked = true;
-                        else if (String.Compare(strTransform, DependentVariableTransforms.Ln.ToString(), 0) == 0)
+                        else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Ln.ToString(), 0) == 0)
                             this.rbLoge.Checked = true;
-                        else if (String.Compare(strTransform, DependentVariableTransforms.Log10.ToString(), 0) == 0)
+                        else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Log10.ToString(), 0) == 0)
                             this.rbLog10.Checked = true;
-                        else if (String.Compare(strTransform, DependentVariableTransforms.Power.ToString(), 0) == 0)
+                        else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Power.ToString(), 0) == 0)
                             this.rbPower.Checked = true;
                         else
                             this.rbValue.Checked = true;
@@ -941,13 +941,13 @@ namespace IPyModeling
 
         protected double UntransformThreshold(double value)
         {
-            if ((DependentVariableTransforms)this.DependentVariableTransform["Type"] == DependentVariableTransforms.none)
+            if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.none)
                 return value;
-            else if ((DependentVariableTransforms)this.DependentVariableTransform["Type"] == DependentVariableTransforms.Log10)
+            else if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.Log10)
                 return Math.Pow(10, value);
-            else if ((DependentVariableTransforms)this.DependentVariableTransform["Type"] == DependentVariableTransforms.Ln)
+            else if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.Ln)
                 return Math.Exp(value);
-            else if ((DependentVariableTransforms)this.DependentVariableTransform["Type"] == DependentVariableTransforms.Power)
+            else if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.Power)
                 return Math.Pow(value, 1 / (double)this.DependentVariableTransform["Exponent"]);
             else
                 return value;
@@ -1073,13 +1073,13 @@ namespace IPyModeling
                 this.lblDecisionThreshold.Text = ((double)dictModel["DecisionThreshold"]).ToString();
 
                 //Unpack the user's selected transformation of the dependent variable.
-                if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(DependentVariableTransforms.none))
+                if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.none))
                     this.rbValue.Checked = true;
-                else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(DependentVariableTransforms.Ln))
+                else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.Ln))
                     this.rbLoge.Checked = true;
-                else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(DependentVariableTransforms.Log10))
+                else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.Log10))
                     this.rbLog10.Checked = true;
-                else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(DependentVariableTransforms.Power))
+                else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.Power))
                     this.rbPower.Checked = true;
                 else
                     this.rbValue.Checked = true;
@@ -1172,7 +1172,7 @@ namespace IPyModeling
                 }
 
                 dblMandateThreshold = tv;
-                dictTransform["Type"] = DependentVariableTransforms.none;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.none;
             }
             boolClean = false;
         }
@@ -1210,7 +1210,7 @@ namespace IPyModeling
                 }
 
                 dblMandateThreshold = tv;
-                dictTransform["Type"] = DependentVariableTransforms.Log10;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Log10;
             }
             boolClean = false;
         }
@@ -1248,7 +1248,7 @@ namespace IPyModeling
                 }
 
                 dblMandateThreshold = tv;
-                dictTransform["Type"] = DependentVariableTransforms.Ln;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Ln;
             }
             boolClean = false;
         }
@@ -1290,7 +1290,7 @@ namespace IPyModeling
                     return;
                 }
 
-                dictTransform["Type"] = DependentVariableTransforms.Power;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Power;
                 dictTransform["Exponent"] = Convert.ToDouble(tbExponent.Text);
                 dblMandateThreshold = tv;
             }

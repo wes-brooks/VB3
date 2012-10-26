@@ -117,13 +117,13 @@ namespace Prediction
             
             
             dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
-            if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.none))
+            if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.none))
                 rbNone.Checked = true;
-            else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.Log10))
+            else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.Log10))
                 rbLog10.Checked = true;
-            else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.Ln))
+            else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.Ln))
                 rbLn.Checked = true;
-            else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.DependentVariableTransforms.Power))
+            else if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.Power))
                 rbPower.Checked = true;
             
             txtPower.Text = dictTransform["Exponent"].ToString();
@@ -197,7 +197,7 @@ namespace Prediction
                 {
                     IDictionary<string, object> dictModel = (IDictionary<string, object>)(kvpModel.Value);
                     //dictModel.Remove("ModelByObject");
-                    dictModelsSerialize.Add(kvpModel.Key, dictModel);
+                    dictModelsSerialize.Add(kvpModel.Key, dictModel["Method"].ToString());
                 }
 
                 //Now add the lists to the packed state dictionary
@@ -222,13 +222,13 @@ namespace Prediction
             dictTransform.Add("Exponent", dblTransformExponent);
 
             if (rbNone.Checked)
-                dictTransform["Type"] = DependentVariableTransforms.none;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.none;
             else if (rbLog10.Checked)
-                dictTransform["Type"] = DependentVariableTransforms.Log10;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Log10;
             else if (rbLn.Checked)
-                dictTransform["Type"] = DependentVariableTransforms.Ln;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Ln;
             else if (rbPower.Checked)
-                dictTransform["Type"] = DependentVariableTransforms.Power;
+                dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Power;
 
             try { dblRegulatoryThreshold = Convert.ToDouble(txtRegStd.Text); }
             catch (InvalidCastException) { dblRegulatoryThreshold = -1; }
@@ -368,98 +368,114 @@ namespace Prediction
                 this.dgvVariables.DataSource = null;
             }
 
-            SetModel((IDictionary<string, object>)dictModels[strSelectedItem]);
+            SetModel(dictModels[strSelectedItem].ToString());
         }
 
 
-        public void SetModel(IDictionary<string,object> dictPackedState)
+        public void SetModel(string strModelPlugin)
         {
-            //make sure empty model doesnt run through this method
-            if (dictPackedState.Count <= 2)
-                return;
+            IDictionary<string, object> dictPackedState = null;
 
-            Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];
-            dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
-
-            //if ((bool)dictPackedState["CleanPredict"])
-            //    ClearDataGridViews();
-
-            if (dictModel != null)
+            //Load the interface that links us to the selected modeling plugin:
+            //strMethod = dictModel["Method"].ToString();
+            foreach (Lazy<IModel, IDictionary<string, object>> module in models)
             {
-                Dictionary<string,object> packedDatasheet = new Dictionary<string,object>((Dictionary<string,object>)dictPackedState["PackedDatasheetState"]);
-
-                //datatables serialized as xml string to maintain extendedProperty values
-                string strXmlDataTable = (string)packedDatasheet["XmlDataTable"];
-                StringReader sr = new StringReader(strXmlDataTable);
-                DataSet ds = new DataSet();
-                ds.ReadXml(sr);
-                sr.Close();
-                corrDT = ds.Tables[0];
-
-                //unpack independent variables and text boxes
-                lstIndVars = (List<ListItem>)dictPackedState["Predictors"];
-                txtDecCrit.Text = ((double)dictModel["DecisionThreshold"]).ToString();
-                txtRegStd.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
-                txtPower.Text = (dictTransform["Exponent"]).ToString();
-                
-                //Load the interface that links us to the selected modeling plugin:
-                strMethod = dictModel["Method"].ToString();
-                foreach (Lazy<IModel, IDictionary<string, object>> module in models)
+                if (module.Metadata["PluginKey"].ToString() == strModelPlugin)
                 {
-                    if (module.Metadata["PluginKey"].ToString() == strMethod)
+                    model = module.Value;
+                    dictPackedState = model.GetPackedState();
+                }
+            }
+
+            if (dictPackedState != null)
+            {
+                //make sure empty model doesnt run through this method
+                if (dictPackedState.Count <= 2)
+                    return;
+
+                Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];
+                dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
+
+                //if ((bool)dictPackedState["CleanPredict"])
+                //    ClearDataGridViews();
+
+                if (dictModel != null)
+                {
+                    Dictionary<string, object> packedDatasheet = (Dictionary<string, object>)dictPackedState["PackedDatasheetState"];
+
+                    //datatables serialized as xml string to maintain extendedProperty values
+                    string strXmlDataTable = (string)packedDatasheet["XmlDataTable"];
+                    StringReader sr = new StringReader(strXmlDataTable);
+                    DataSet ds = new DataSet();
+                    ds.ReadXml(sr);
+                    sr.Close();
+                    corrDT = ds.Tables[0];
+
+                    //unpack independent variables and text boxes
+                    lstIndVars = (List<ListItem>)dictPackedState["Predictors"];
+                    txtDecCrit.Text = ((double)dictModel["DecisionThreshold"]).ToString();
+                    txtRegStd.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
+                    txtPower.Text = (dictTransform["Exponent"]).ToString();
+
+                    //Load the interface that links us to the selected modeling plugin:
+                    /*strMethod = dictModel["Method"].ToString();
+                    foreach (Lazy<IModel, IDictionary<string, object>> module in models)
                     {
-                        model = module.Value;
-                    }
-                }
+                        if (module.Metadata["PluginKey"].ToString() == strMethod)
+                        {
+                            model = module.Value;
+                        }
+                    }*/
 
-                strModelExpression = model.ModelString();
-                txtModel.Text = strModelExpression;
+                    strModelExpression = model.ModelString();
+                    txtModel.Text = strModelExpression;
 
-                List<string> list = new List<string>();
-                list.Add(corrDT.Columns[0].ColumnName);
-                list.Add(corrDT.Columns[1].ColumnName);
+                    List<string> list = new List<string>();
+                    list.Add(corrDT.Columns[0].ColumnName);
+                    list.Add(corrDT.Columns[1].ColumnName);
 
-                int intNumVars = lstIndVars.Count;
-                for (int i = 0; i < intNumVars; i++)
-                    list.Add(lstIndVars[i].ToString());
+                    int intNumVars = lstIndVars.Count;
+                    for (int i = 0; i < intNumVars; i++)
+                        list.Add(lstIndVars[i].ToString());
 
-                //Lets get all the main effect variables
-                dictMainEffects = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
-                for (int i = 2; i < corrDT.Columns.Count; i++)
-                {
-                    bool bMainEffect = Support.IsMainEffect(corrDT.Columns[i].ColumnName, corrDT);
-                    if (bMainEffect)
+                    //Lets get all the main effect variables
+                    dictMainEffects = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+                    for (int i = 2; i < corrDT.Columns.Count; i++)
                     {
-                        string strColName = corrDT.Columns[i].ColumnName;
-                        dictMainEffects.Add(strColName, strColName);
+                        bool bMainEffect = Support.IsMainEffect(corrDT.Columns[i].ColumnName, corrDT);
+                        if (bMainEffect)
+                        {
+                            string strColName = corrDT.Columns[i].ColumnName;
+                            dictMainEffects.Add(strColName, strColName);
+                        }
                     }
-                }
 
-                //determine which transform type box to check
-                string strTransformType = dictTransform["Type"].ToString();
-                if (String.Compare(strTransformType, VBCommon.DependentVariableTransforms.none.ToString(), 0) == 0)
-                    rbNone.Checked = true;
-                else if (String.Compare(strTransformType, VBCommon.DependentVariableTransforms.Log10.ToString(), 0) == 0)
-                    rbLog10.Checked = true;
-                else if (String.Compare(strTransformType, VBCommon.DependentVariableTransforms.Ln.ToString(), 0) == 0)
-                    rbLn.Checked = true;
-                else if (String.Compare(strTransformType, VBCommon.DependentVariableTransforms.Power.ToString(), 0) == 0)
-                {
-                    rbPower.Checked = true;
-                    txtPower.Text = dictTransform["Exponent"].ToString();
-                }
-                else
-                    rbNone.Checked = true;
-                //format txtModel textbox
-                strModelExpression = model.ModelString();
-                txtModel.Text = strModelExpression;
+                    //determine which transform type box to check
+                    string strTransformType = dictTransform["Type"].ToString();
+                    if (String.Compare(strTransformType, VBCommon.Transforms.DependentVariableTransforms.none.ToString(), 0) == 0)
+                        rbNone.Checked = true;
+                    else if (String.Compare(strTransformType, VBCommon.Transforms.DependentVariableTransforms.Log10.ToString(), 0) == 0)
+                        rbLog10.Checked = true;
+                    else if (String.Compare(strTransformType, VBCommon.Transforms.DependentVariableTransforms.Ln.ToString(), 0) == 0)
+                        rbLn.Checked = true;
+                    else if (String.Compare(strTransformType, VBCommon.Transforms.DependentVariableTransforms.Power.ToString(), 0) == 0)
+                    {
+                        rbPower.Checked = true;
+                        txtPower.Text = dictTransform["Exponent"].ToString();
+                    }
+                    else
+                        rbNone.Checked = true;
+                    //format txtModel textbox
+                    strModelExpression = model.ModelString();
+                    txtModel.Text = strModelExpression;
 
-                //Lets get only the main effects in the model
-                string[] strArrRefvars = ExpressionEvaluator.GetReferencedVariables(strModelExpression, dictMainEffects.Keys.ToArray());
-                List<string> lstRefVar = new List<string>();
-                lstRefVar.Add("ID");
-                lstRefVar.AddRange(strArrRefvars);
-                strArrReferencedVars = lstRefVar.ToArray();
+                    //Lets get only the main effects in the model
+                    string[] strArrRefvars = ExpressionEvaluator.GetReferencedVariables(strModelExpression, dictMainEffects.Keys.ToArray());
+                    List<string> lstRefVar = new List<string>();
+                    lstRefVar.Add("ID");
+                    lstRefVar.AddRange(strArrRefvars);
+                    strArrReferencedVars = lstRefVar.ToArray();
+                }
             }
         }
 
@@ -800,8 +816,8 @@ namespace Prediction
         //generate prediction data for table
         private DataTable GeneratePredStats(DataTable dtPredictions, DataTable dtObs, DataTable dtRaw)
         {
-            VBCommon.DependentVariableTransforms dvt = GetTransformType();
-            if (dvt == VBCommon.DependentVariableTransforms.Power)
+            VBCommon.Transforms.DependentVariableTransforms dvt = GetTransformType();
+            if (dvt == VBCommon.Transforms.DependentVariableTransforms.Power)
             {
                 if (ValidateNumericTextBox(txtPower) == false)
                     return null;
@@ -837,11 +853,11 @@ namespace Prediction
                 dr["Exceedance_Probability"] = lstExceedanceProbability[i];
                 dr["Regulatory_Standard"] = regStd;
 
-                if (dvt == VBCommon.DependentVariableTransforms.Log10)
+                if (dvt == VBCommon.Transforms.DependentVariableTransforms.Log10)
                     dr["Untransformed"] = Math.Pow(10, dblPredValue);
-                else if (dvt == VBCommon.DependentVariableTransforms.Ln)
+                else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Ln)
                     dr["Untransformed"] = Math.Pow(Math.E, dblPredValue);
-                else if (dvt == VBCommon.DependentVariableTransforms.Power)
+                else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Power)
                 {
                     double dblPower = (double)dictTransform["Exponent"];
                     if (dblPower == double.NaN)
@@ -894,16 +910,16 @@ namespace Prediction
         }
 
         //get the transform types for plotting
-        private VBCommon.DependentVariableTransforms GetTransformType()
+        private VBCommon.Transforms.DependentVariableTransforms GetTransformType()
         {
-            VBCommon.DependentVariableTransforms dvt = VBCommon.DependentVariableTransforms.none;
+            VBCommon.Transforms.DependentVariableTransforms dvt = VBCommon.Transforms.DependentVariableTransforms.none;
 
-            if (String.Compare(dictTransform["Type"].ToString(), VBCommon.DependentVariableTransforms.Log10.ToString(), 0) == 0)
-                dvt = VBCommon.DependentVariableTransforms.Log10;
-            else if (String.Compare(dictTransform["Type"].ToString(), VBCommon.DependentVariableTransforms.Ln.ToString(), 0) == 0)
-                dvt = VBCommon.DependentVariableTransforms.Ln;
-            else if (String.Compare(dictTransform["Type"].ToString(), VBCommon.DependentVariableTransforms.Power.ToString(), 0) == 0)
-                dvt = VBCommon.DependentVariableTransforms.Power;
+            if (String.Compare(dictTransform["Type"].ToString(), VBCommon.Transforms.DependentVariableTransforms.Log10.ToString(), 0) == 0)
+                dvt = VBCommon.Transforms.DependentVariableTransforms.Log10;
+            else if (String.Compare(dictTransform["Type"].ToString(), VBCommon.Transforms.DependentVariableTransforms.Ln.ToString(), 0) == 0)
+                dvt = VBCommon.Transforms.DependentVariableTransforms.Ln;
+            else if (String.Compare(dictTransform["Type"].ToString(), VBCommon.Transforms.DependentVariableTransforms.Power.ToString(), 0) == 0)
+                dvt = VBCommon.Transforms.DependentVariableTransforms.Power;
 
             return dvt;
         }
