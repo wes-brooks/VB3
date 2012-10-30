@@ -238,38 +238,37 @@ namespace VBDatasheet
                     {
                         if (!_dtCopy.Columns[varname].ExtendedProperties.Contains(VBCommon.Globals.DECOMPOSITION.ToString()))
                         {
-                            //_dtCopy.Columns[varname].ExtendedProperties[VBTools.Globals.HIDDEN] = true;
+                            _dtCopy.Columns[varname].ExtendedProperties[VBCommon.Globals.HIDDEN] = true;
 
                         }
                         _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.TRANSFORM] = true;
                     }
                     else
                     {
-                        //_dtCopy.Columns[colname].ExtendedProperties[VBTools.Globals.HIDDEN] = false;
+                        _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.HIDDEN] = false;
+                    }                
+
+                    if (!_dtCopy.Columns[colname].ExtendedProperties.Contains(VBCommon.Globals.MAINEFFECT.ToString()) && !(_dtCopy.Columns[colname].ExtendedProperties.Contains(VBCommon.Globals.DECOMPOSITION.ToString())))
+                    {
+                        _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.TRANSFORM] = true;
                     }
+
+                    /*if (tname != "none")
+                        _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.TRANSFORM] = true;
+                    else
+                        _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.HIDDEN] = true;*/
                 }
-
-                //if (!_dtCopy.Columns[colname].ExtendedProperties.Contains(VBTools.Globals.MAINEFFECT.ToString()) &&
-                //    !!_dtCopy.Columns[colname]ExtendedProperties.Contains(VBTools.Globals.DECOMPOSITION.ToString()))
-                //{
-                //    _dtCopy.Columns[colname]ExtendedProperties[VBTools.Globals.TRANSFORM] = true;
-                //}
-
-                //if (tname != "none")
-                //    _dtCopy.Columns[colname].ExtendedProperties[VBTools.Globals.TRANSFORM] = true;
-                //else
-                //    _dtCopy.Columns[colname].ExtendedProperties[VBTools.Globals.HIDDEN] = true;
-
-                //mark transformed cols as transformed
-                //foreach (DataColumn c in _dtCopy.Columns)
-                //{
-                //    if (!c.ExtendedProperties.Contains(VBTools.Globals.MAINEFFECT.ToString()) &&
-                //        !c.ExtendedProperties.Contains(VBTools.Globals.DECOMPOSITION.ToString()))
-                //    {
-                //        c.ExtendedProperties[VBTools.Globals.TRANSFORM] = true;
-                //        _dtCopy.Columns[varname].ExtendedProperties[VBTools.Globals.HIDDEN] = true;
-                //    }
-                //}
+                
+                /*//mark transformed cols as transformed
+                foreach (DataColumn c in _dtCopy.Columns)
+                {
+                    if (!c.ExtendedProperties.Contains(VBCommon.Globals.MAINEFFECT.ToString()) &&
+                        !c.ExtendedProperties.Contains(VBCommon.Globals.DECOMPOSITION.ToString()))
+                    {
+                        c.ExtendedProperties[VBCommon.Globals.TRANSFORM] = true;
+                        _dtCopy.Columns[varname].ExtendedProperties[VBCommon.Globals.HIDDEN] = true;
+                    }
+                }*/
 
             }
             _dtCopy.AcceptChanges();

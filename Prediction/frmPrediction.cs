@@ -368,7 +368,7 @@ namespace Prediction
                 this.dgvVariables.DataSource = null;
             }
 
-            SetModel(dictModels[strSelectedItem].ToString());
+            SetModel(((IDictionary<string, object>)dictModels[strSelectedItem])["Method"].ToString());
         }
 
 

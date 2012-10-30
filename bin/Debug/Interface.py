@@ -103,7 +103,7 @@ class BeachInterface(object):
         
         expression = predictors[0]
         for predictor in predictors[1:]:
-            expression = expression + " + " + utils.SanitizeVariableName(predictor)
+            expression = expression + " + " + predictor #utils.SanitizeVariableName(predictor)
         
         return expression
         

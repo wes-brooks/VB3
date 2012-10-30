@@ -77,7 +77,7 @@ namespace Prediction
             ExpressionContext context = new ExpressionContext();
             // Use string.format
             context.Imports.AddType(typeof(string));
-            //context.Imports.AddType(typeof(CustomFunctions));
+            context.Imports.AddType(typeof(CustomFunctions));
 
             for (int i=0;i<variables.Length;i++)
                 context.Variables[variables[i]] = 1.0;

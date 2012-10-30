@@ -53,6 +53,7 @@ namespace VBCommon.Controls
             {
                 _bo = _proj.SiteInfo.Orientation;
             }*/
+            _bo = orientation;
             txtRotationAngle.Text = _bo.ToString();
         }
 
