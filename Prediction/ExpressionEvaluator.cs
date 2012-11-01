@@ -12,6 +12,57 @@ namespace Prediction
         private static DataTable MyTable;
         private static DataRow MyCurrentRow;
 
+
+        //public List<double> Evaluate(string expression, DataTable dt)
+        public DataTable EvaluateTable(string[] expressions, DataTable dt)
+        {          
+            MyTable = dt;
+
+            ExpressionContext context = new ExpressionContext();
+            // Use string.format
+            context.Imports.AddType(typeof(string));
+            context.Imports.AddType(typeof(CustomFunctions));
+
+            // Use on demand variables to provide the values for the columns
+            context.Variables.ResolveVariableType += new EventHandler<ResolveVariableTypeEventArgs>(Variables_ResolveVariableType);
+            context.Variables.ResolveVariableValue += new EventHandler<ResolveVariableValueEventArgs>(Variables_ResolveVariableValue);
+
+            List<List<double>> listCalcValues = new List<List<double>>();
+            DataTable dtCalcValues = new DataTable();
+            //dtCalcValues.Columns.Add("ID", typeof(string));
+            
+            // Create the expression; Flee will now query for the types of ItemName, Price, and Tax
+            List<IDynamicExpression> listDE = new List<IDynamicExpression>();
+            
+            for (int j = 0; j < expressions.Count(); j++)
+            {
+                dtCalcValues.Columns.Add(expressions[j], typeof(double));
+                listDE.Add(context.CompileDynamic(expressions[j]));
+                listCalcValues.Add(new List<double>());
+            }
+             
+            DataRow dr = null;
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                MyCurrentRow = dt.Rows[i];
+                dr = dtCalcValues.NewRow();
+                //dr[0] = MyCurrentRow[0] as string;
+
+                for (int j = 0; j < expressions.Count(); j++)
+                {
+                    // Evaluate the expression; Flee will query for the values of the columns
+                    double dlbResult = (double)listDE[j].Evaluate();
+                    listCalcValues[j].Add(dlbResult);                                        
+                    //dr[j+1] = dlbResult;
+                    dr[j] = dlbResult;
+                    Console.WriteLine("Row {0}, Column {1} = {2}", i, j, dlbResult);
+                }
+                dtCalcValues.Rows.Add(dr);
+            }
+            return dtCalcValues;
+        }
+
+
         //public List<double> Evaluate(string expression, DataTable dt)
         public DataTable Evaluate(string expression, DataTable dt)
         {
@@ -24,7 +75,8 @@ namespace Prediction
 
             ExpressionContext context = new ExpressionContext();
             // Use string.format
-            context.Imports.AddType(typeof(string));            
+            context.Imports.AddType(typeof(string));
+            context.Imports.AddType(typeof(CustomFunctions));
 
             // Use on demand variables to provide the values for the columns
             context.Variables.ResolveVariableType += new EventHandler<ResolveVariableTypeEventArgs>(Variables_ResolveVariableType);

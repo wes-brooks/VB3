@@ -91,12 +91,39 @@
     <Compile Include="Controls\DatasheetControl.designer.cs">
       <DependentUpon>DatasheetControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\frmManipulate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmManipulate.Designer.cs">
+      <DependentUpon>frmManipulate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\frmPcoeff.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmPcoeff.designer.cs">
+      <DependentUpon>frmPcoeff.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\frmPCPlots.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmPCPlots.Designer.cs">
+      <DependentUpon>frmPCPlots.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\frmTransform.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\frmTransform.Designer.cs">
+      <DependentUpon>frmTransform.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\frmUV.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Controls\frmUV.Designer.cs">
       <DependentUpon>frmUV.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataGridViewPrinter.cs" />
+    <Compile Include="Expressions\ExpressionBuilder.cs" />
+    <Compile Include="Expressions\ExpressionExecution.cs" />
     <Compile Include="Interfaces\IModel.cs" />
     <Compile Include="Metadata\dtColumnInformation.cs" />
     <Compile Include="Metadata\dtRowInformation.cs" />
@@ -194,14 +221,26 @@
     <EmbeddedResource Include="Controls\AnnotatedScatterPlot.resx">
       <DependentUpon>AnnotatedScatterPlot.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmManipulate.resx">
+      <DependentUpon>frmManipulate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmMissingValues.resx">
       <DependentUpon>frmMissingValues.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmPcoeff.resx">
+      <DependentUpon>frmPcoeff.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmPCPlots.resx">
+      <DependentUpon>frmPCPlots.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmPlot.resx">
       <DependentUpon>frmPlot.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmPowerExponent.resx">
       <DependentUpon>frmPowerExponent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\frmTransform.resx">
+      <DependentUpon>frmTransform.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmUV.resx">
       <DependentUpon>frmUV.cs</DependentUpon>

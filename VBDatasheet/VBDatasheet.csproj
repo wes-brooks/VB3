@@ -85,45 +85,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataGridViewPrinter.cs" />
     <Compile Include="DatasheetPlugIn.cs" />
-    <Compile Include="ExpressionBuilder.cs" />
-    <Compile Include="ExpressionExecution.cs" />
     <Compile Include="frmDatasheet.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="frmDatasheet.Designer.cs">
       <DependentUpon>frmDatasheet.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmManipulate.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmManipulate.designer.cs">
-      <DependentUpon>frmManipulate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmPcoeff.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmPcoeff.designer.cs">
-      <DependentUpon>frmPcoeff.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmPCPlots.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmPCPlots.designer.cs">
-      <DependentUpon>frmPCPlots.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmPowerExponent.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmPowerExponent.Designer.cs">
-      <DependentUpon>frmPowerExponent.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmTransform.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmTransform.designer.cs">
-      <DependentUpon>frmTransform.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -136,21 +103,6 @@
     <EmbeddedResource Include="frmDatasheet.resx">
       <DependentUpon>frmDatasheet.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmManipulate.resx">
-      <DependentUpon>frmManipulate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmPcoeff.resx">
-      <DependentUpon>frmPcoeff.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmPCPlots.resx">
-      <DependentUpon>frmPCPlots.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmPowerExponent.resx">
-      <DependentUpon>frmPowerExponent.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmTransform.resx">
-      <DependentUpon>frmTransform.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

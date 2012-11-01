@@ -13,7 +13,7 @@ using Accord.Statistics;
 //using VBTools;
 //using VBStatistics;
 
-namespace VBDatasheet
+namespace VBCommon.Controls
 {
     /// <summary>
     /// class allows users' selection of various transforms to perform on all independent variables

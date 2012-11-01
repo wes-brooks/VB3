@@ -19,7 +19,7 @@ using ZedGraph;
 //using Extreme.Statistics.Tests;
 //using VBStatistics;
 
-namespace VBDatasheet
+namespace VBCommon.Controls
 {
     /// <summary>
     /// class to show plots of a variable and all its possible transforms.

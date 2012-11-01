@@ -42,7 +42,7 @@
             this.dgvObs = new System.Windows.Forms.DataGridView();
             this.dgvStats = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnMakePredictions = new System.Windows.Forms.Button();
+            //this.btnMakePredictions = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.txtPower = new System.Windows.Forms.TextBox();
@@ -246,7 +246,7 @@
             // 
             // btnMakePredictions
             // 
-            this.btnMakePredictions.BackColor = System.Drawing.SystemColors.Control;
+            /*this.btnMakePredictions.BackColor = System.Drawing.SystemColors.Control;
             this.btnMakePredictions.Enabled = false;
             this.btnMakePredictions.Location = new System.Drawing.Point(472, 155);
             this.btnMakePredictions.Name = "btnMakePredictions";
@@ -255,7 +255,7 @@
             this.btnMakePredictions.Text = "Make\r\nPredictions";
             this.btnMakePredictions.UseVisualStyleBackColor = false;
             this.btnMakePredictions.Visible = false;
-            this.btnMakePredictions.Click += new System.EventHandler(this.btnMakePredictions_Click);
+            this.btnMakePredictions.Click += new System.EventHandler(this.btnMakePredictions_Click);*/
             // 
             // groupBox1
             // 
@@ -423,7 +423,7 @@
             this.btnPlot.Text = "Plot";
             this.btnPlot.UseVisualStyleBackColor = false;
             this.btnPlot.Visible = false;
-            this.btnPlot.Click += new System.EventHandler(this.btnPlot_Click);
+            //this.btnPlot.Click += new System.EventHandler(this.btnPlot_Click);
             // 
             // btnImportObs
             // 
@@ -434,7 +434,7 @@
             this.btnImportObs.Text = "Import Obs";
             this.btnImportObs.UseVisualStyleBackColor = false;
             this.btnImportObs.Visible = false;
-            this.btnImportObs.Click += new System.EventHandler(this.btnImportObs_Click);
+            //this.btnImportObs.Click += new System.EventHandler(this.btnImportObs_Click);
             // 
             // btnImportIVs
             // 
@@ -445,7 +445,7 @@
             this.btnImportIVs.Text = "Import IVs";
             this.btnImportIVs.UseVisualStyleBackColor = false;
             this.btnImportIVs.Visible = false;
-            this.btnImportIVs.Click += new System.EventHandler(this.btnImportIVs_Click);
+            //this.btnImportIVs.Click += new System.EventHandler(this.btnImportIVs_Click);
             // 
             // btnClearTable
             // 
@@ -457,7 +457,7 @@
             this.btnClearTable.Text = "Clear";
             this.btnClearTable.UseVisualStyleBackColor = false;
             this.btnClearTable.Visible = false;
-            this.btnClearTable.Click += new System.EventHandler(this.btnClearTable_Click);
+            //this.btnClearTable.Click += new System.EventHandler(this.btnClearTable_Click);
             // 
             // btnSaveTable
             // 
@@ -469,7 +469,7 @@
             this.btnSaveTable.Text = "Export As CSV";
             this.btnSaveTable.UseVisualStyleBackColor = false;
             this.btnSaveTable.Visible = false;
-            this.btnSaveTable.Click += new System.EventHandler(this.btnExportTable_Click);
+            //this.btnSaveTable.Click += new System.EventHandler(this.btnExportTable_Click);
             // 
             // btnIVDataValidation
             // 
@@ -480,7 +480,7 @@
             this.btnIVDataValidation.Text = "IV Data Validation";
             this.btnIVDataValidation.UseVisualStyleBackColor = false;
             this.btnIVDataValidation.Visible = false;
-            this.btnIVDataValidation.Click += new System.EventHandler(this.btnIVDataValidation_Click);
+            //this.btnIVDataValidation.Click += new System.EventHandler(this.btnIVDataValidation_Click);
             // 
             // lstAvailModels
             // 
@@ -513,7 +513,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.txtModel);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.btnMakePredictions);
+            //this.Controls.Add(this.btnMakePredictions);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.panel2);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -548,7 +548,7 @@
 
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnMakePredictions;
+        //private System.Windows.Forms.Button btnMakePredictions;
         private System.Windows.Forms.Panel panelIVs;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.DataGridView dgvVariables;

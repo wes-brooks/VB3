@@ -1,4 +1,4 @@
-﻿namespace VBDatasheet
+﻿namespace VBCommon.Controls
 {
     partial class frmTransform
     {

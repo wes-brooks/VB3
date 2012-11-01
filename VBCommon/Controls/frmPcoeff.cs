@@ -13,7 +13,7 @@ using Accord.Statistics;
 //using LogUtilities;
 //using VBTools;
 
-namespace VBDatasheet
+namespace VBCommon.Controls
 {
 
     /// <summary>

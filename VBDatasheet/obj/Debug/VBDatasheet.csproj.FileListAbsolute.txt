@@ -7,8 +7,3 @@ C:\VB3\bin\Debug\Binaries\Datasheet\VBDatasheet.dll
 C:\VB3\bin\Debug\Binaries\Datasheet\VBDatasheet.pdb
 C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.dll
 C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.pdb
-C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.frmPcoeff.resources
-C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.frmPCPlots.resources
-C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.frmPowerExponent.resources
-C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.frmTransform.resources
-C:\VB3\VBDatasheet\obj\Debug\VBDatasheet.frmManipulate.resources

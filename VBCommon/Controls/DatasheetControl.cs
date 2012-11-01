@@ -55,6 +55,8 @@ namespace VBCommon.Controls
         private int intNhiddencols = 0;
         private int intNivs = 0;
 
+        private double dblOrientation;
+
         // getter/setter for transform type
         [JsonProperty]
         public VBCommon.Transforms.DependentVariableTransforms DependentVariableTransform  
@@ -191,6 +193,13 @@ namespace VBCommon.Controls
         {
             get { return this.intNivs; }
             set { intNivs = value; }
+        }
+
+
+        public double Orientation
+        {
+            get { return this.dblOrientation; }
+            set { this.dblOrientation = value; }
         }
 
 
@@ -1071,8 +1080,7 @@ namespace VBCommon.Controls
                 dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
                 dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
                 dictPackedState.Add("DepVarTransform", this.DependentVariableTransform);
-
-
+                
                 //pack up listInfo for model datasheet
                 dictPackedState.Add("ColCount", this.DT.Columns.Count);
                 dictPackedState.Add("RowCount", this.DT.Rows.Count);
@@ -1084,6 +1092,7 @@ namespace VBCommon.Controls
                 dictPackedState.Add("IndVarCt", this.NumberIVs);
                 dictPackedState.Add("fileName", this.FileName);
 
+                dictPackedState.Add("orientation", dblOrientation);
 
                 //Save Datasheet info as xml string for serialization
                 StringWriter sw = null;
@@ -1197,7 +1206,7 @@ namespace VBCommon.Controls
                 maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
 
                 this.FileName = (string)dictPackedState["fileName"];
-
+                
                 //unpack listInfo for model datasheet
                 //need to convert if its unpacked from saved project
                 if (dictPackedState["DisabledColCt"].GetType().ToString() == "System.Int64")
@@ -1217,6 +1226,9 @@ namespace VBCommon.Controls
                 else this.NumberIVs = (int)dictPackedState["IndVarCt"];
 
                 this.showListInfo(this.FileName, this.DT);
+
+                if (dictPackedState.ContainsKey("orientation"))
+                    this.dblOrientation = (double)dictPackedState["orientation"];
 
                 if ((bool)dictPackedState["Clean"])
                 {
@@ -1536,6 +1548,14 @@ namespace VBCommon.Controls
                         _dtCI.SetColStatus(c.ColumnName.ToString(), true);   //make sure col status is updated
                     }
                 }
+                else 
+                {
+                    if (!c.ExtendedProperties.ContainsKey(VBCommon.Globals.DATETIMESTAMP))
+                    {
+                        //On the first pass through (after import) enable all columns.
+                        setAttributeValue(c, VBCommon.Globals.ENABLED.ToString(), true);
+                    }
+                }
             }
 
             //reset the UI clues for the response variable
@@ -1656,6 +1676,216 @@ namespace VBCommon.Controls
                         dgv.Columns[dc.Caption].Visible = true;
                     }
                 }
+            }
+        }
+
+
+        /// <summary>
+        /// sets the table display order for transformed data columns
+        /// finds main effect and sets the transform column next to it
+        /// </summary>
+        /// <param name="dtnew">table to arrange</param>
+        /// <param name="dc">transformed data column</param>
+        /// <returns>re-arranged table</returns>
+        private DataTable arrangeTableCols(DataTable dtnew, DataColumn dc)
+        {
+            string me = string.Empty;
+            DataTable dtcopy = dtnew.Copy();
+            //added if clause for new column nameing conventions: T(x) == T[COLNAME] or T[p1, <p2, p3>, COLNAME]
+            //changed to T[COLNAME, p1, <P2, p3>]
+            if (dc.Caption.Contains(","))
+            {
+                //me = dc.Caption.Substring(dc.Caption.IndexOf("[") + 1, (dc.Caption.IndexOf(",") - dc.Caption.Length(dc.Caption.IndexOf("[") ) ) );
+                int start = dc.Caption.IndexOf("[") + 1;
+                int stop = dc.Caption.IndexOf(",") - start;
+                me = dc.Caption.Substring(start, stop);
+
+            }
+            else
+            {
+                me = dc.Caption.Substring(dc.Caption.IndexOf("[") + 1, (dc.Caption.Length - dc.Caption.IndexOf("[") - 2));
+            }
+            int pos = dtnew.Columns.IndexOf(me);
+            if (pos > 0 && pos < dtcopy.Columns.Count)
+            {
+                dtcopy.Columns[dc.Caption].SetOrdinal(pos + 1);
+                dtcopy.AcceptChanges();
+            }
+            return dtcopy;
+        }
+
+
+        /// <summary>
+        /// invoke the independent variable transforms tool
+        /// creates columns of data transforms
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void btnTransform_Click(object sender, EventArgs e)
+        {
+            if (dt != null)
+            {
+                //filter disabled cols
+                DataTable tblFiltered = filterDisabledCols(dt);
+
+                //filter transformed cols
+                tblFiltered = filterTcols(tblFiltered);
+
+                //filter hidden (untransformed) dependent variable
+                tblFiltered = filterRVHcols(tblFiltered);
+
+                //filter cat vars
+                tblFiltered = filterCatVars(tblFiltered);
+
+                int rvndx = tblFiltered.Columns.IndexOf(ResponseVarColName);
+                //string responseVarColName = dt.Columns[rvndx].Caption;
+                frmTransform frmT = new frmTransform(tblFiltered, rvndx);
+                DialogResult dlgr = frmT.ShowDialog();
+
+                if (dlgr != DialogResult.Cancel)
+                {
+                    DataTable dtnew = frmT.PCDT;
+
+                    registerNewCols(dtnew);
+
+                    //add any disabled columns back into the operational datatable
+                    dtnew = addDisabledCols(dtnew, dt);
+
+                    //add any response variables back ...
+                    dtnew = addHiddenResponseVarCols(dtnew, dt);
+
+                    //add any previously transform cols back
+                    //dtnew = addOldTCols(dtnew, _dt);
+                    dtnew = addOldTCols(dtnew, dt);
+
+                    dtnew = addCatCols(dtnew, dt);
+
+                    foreach (DataColumn dc in dtnew.Columns)
+                    {
+                        if (dc.ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM)) //||
+                            //dc.ExtendedProperties.ContainsKey(VBTools.Globals.OPERATION) ||
+                            //dc.ExtendedProperties.ContainsKey(VBTools.Globals.DECOMPOSITION) )
+                            dtnew = arrangeTableCols(dtnew, dc);
+                    }
+
+                    //update global table
+                    dt = dtnew;
+                    dt.AcceptChanges();
+
+                    //grid operations
+                    SelectedColIndex = dt.Columns.IndexOf(ResponseVarColName);
+                    ResponseVarColIndex = dt.Columns.IndexOf(ResponseVarColName);
+                    maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName);
+
+                    //count iv columns and update list
+                    int nonivs = HiddenCols + 2;
+                    NumberIVs = dt.Columns.Count - nonivs;
+                    updateListView(VBCommon.Globals.listvals.NIVS, NumberIVs);
+                    updateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);
+
+                    NotifyContainer();
+
+                    //_state = _dtState.dirty;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Must import data first.", "Proceedural Error", MessageBoxButtons.OK);
+            }
+        }
+
+
+        /// <summary>
+        /// invoke the data manipulation tool - allows for creation of data columns of interaction data
+        /// (sums, means, products, ...etc)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void btnManipulate_Click(object sender, EventArgs e)
+        {
+            if (dt != null)
+            {
+                DataTable tblFiltered = filterDisabledCols(dt);
+                int rvndx = tblFiltered.Columns.IndexOf(ResponseVarColName);
+                //string responseVarColName = dt.Columns[rvndx].Caption;
+                frmManipulate frmIA = new frmManipulate(tblFiltered, rvndx);
+                DialogResult dlgr = frmIA.ShowDialog();
+
+                if (dlgr != DialogResult.Cancel)
+                {
+                    DataTable dtnew = frmIA.NewDataTable;
+
+                    registerNewCols(dtnew);
+                    dtnew = addDisabledCols(dtnew, dt);
+
+                    dt = dtnew;
+                    maintainGrid(dgv, dtnew, SelectedColIndex, ResponseVarColName);
+
+                    int nonivs = HiddenCols + 2;
+                    NumberIVs = dt.Columns.Count - nonivs;
+                    updateListView(VBCommon.Globals.listvals.NIVS, NumberIVs);
+                    updateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);
+
+                    NotifyContainer();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Must import data first.", "Proceedural Error", MessageBoxButtons.OK);
+            }
+        }
+
+
+        // invoke the wind/current component decomposition tool
+        // creates data columns of orthogonal wind/current components
+        public void btnComputeAO_Click(object sender, EventArgs e)
+        {
+            //just adds columns for wind and/or current components to the datatable/grid view
+            //this will need some sort of property setting mechanisms to reset columns to
+            //hidden, enabled, etc when the form for decomposition exits.
+            if (dt != null)
+            {
+                //DataTable dt = filterDataTableCols(_dt);
+                DataTable tblFiltered = filterDisabledCols(dt);
+                string rvname = ResponseVarColName;
+                string dtsname = tblFiltered.Columns[0].Caption;
+
+                VBCommon.Controls.frmUV frmWC = new VBCommon.Controls.frmUV(tblFiltered, rvname, dtsname, dblOrientation);
+                frmWC.ShowDialog();
+
+                DataTable dtnew = frmWC.WCDT;
+
+                //this will effect to enable column context menus on new columns
+                foreach (DataColumn c in dtnew.Columns)
+                {
+                    if (!DTCI.GetColStatus(c.ColumnName))
+                        DTCI.AddColumnNameToDict(c.ColumnName);
+                }
+
+                //add disabled col back in
+                dtnew = addDisabledCols(dtnew, dt);
+
+                //mark created cols as decomposition
+                List<string> newcols = frmWC.WCColsAdded;
+                foreach (string colname in newcols)
+                {
+                    dtnew.Columns[colname].ExtendedProperties[VBCommon.Globals.DECOMPOSITION] = true;
+                }
+
+                dt = dtnew;
+                dgv.DataSource = dtnew;
+                maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName);
+
+                int nonivs = HiddenCols + 2;
+                NumberIVs = dt.Columns.Count - nonivs;
+                updateListView(VBCommon.Globals.listvals.NIVS, NumberIVs);
+                updateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);
+
+                NotifyContainer();
+            }
+            else
+            {
+                MessageBox.Show("Must import data first.", "Proceedural Error", MessageBoxButtons.OK);
             }
         }
 

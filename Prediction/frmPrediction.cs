@@ -30,7 +30,7 @@ namespace Prediction
     {
         private ContextMenu cmforResponseVar = new ContextMenu();
         private Dictionary<string, string> dictMainEffects;
-        private string strModelExpression = "";
+        //private string strModelExpression = "";
 
         private IModel model = null;
         public List<Lazy<IModel, IDictionary<string, object>>> models;
@@ -171,12 +171,12 @@ namespace Prediction
 
             if (model != null)
             {
-                strModelExpression = model.ModelString();
-                txtModel.Text = strModelExpression;
+                txtModel.Text = model.ModelString();
+                
             }
             else
             {
-                strModelExpression = "";
+                //strModelExpression = "";
                 txtModel.Text = "";
             }
         }
@@ -427,8 +427,8 @@ namespace Prediction
                         }
                     }*/
 
-                    strModelExpression = model.ModelString();
-                    txtModel.Text = strModelExpression;
+                    txtModel.Text = model.ModelString();
+                    // = strModelExpression;
 
                     List<string> list = new List<string>();
                     list.Add(corrDT.Columns[0].ColumnName);
@@ -466,7 +466,7 @@ namespace Prediction
                     else
                         rbNone.Checked = true;
                     //format txtModel textbox
-                    strModelExpression = model.ModelString();
+                    string strModelExpression = model.ModelString();
                     txtModel.Text = strModelExpression;
 
                     //Lets get only the main effects in the model
@@ -543,19 +543,19 @@ namespace Prediction
 
 
         //import IV datatable
-        public void btnImportIVs_Click(object sender, EventArgs e)
+        public bool btnImportIVs_Click(object sender, EventArgs e)
         {
             //check to ensure user chose a model first
             if (dictMainEffects == null)
             {
                 MessageBox.Show("You must first pick a model from the Available Models");
-                return;
+                return(false);
             }
             
             VBCommon.IO.ImportExport import = new ImportExport();
             DataTable dt = import.Input;            
             if (dt == null)
-                return;
+                return(false);
 
             string[] strArrHeaderCaptions = { "Model Variables", "Imported Variables" };
 
@@ -574,19 +574,20 @@ namespace Prediction
                                     "in the ID column and try importing again.\n\n" +
                                     "Record Identifier values cannot be blank or duplicated;\nencountered " +
                                     "error near row " + errndx.ToString(), "Import Data Error - Cannot Import This Dataset", MessageBoxButtons.OK);
-                    return;
+                    return(false);
                 }
                 dgvVariables.DataSource = dt;
             }
             else
-                return;
+                return(false);
 
             foreach (DataGridViewColumn dvgCol in dgvVariables.Columns)
             {
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
             setViewOnGrid(dgvVariables);            
-            btnMakePredictions.Enabled = false;
+            //btnMakePredictions.Enabled = false;
+            return (true);
         }
 
 
@@ -693,64 +694,19 @@ namespace Prediction
             if (dtObs != null)
                 dtObs.AcceptChanges();
 
-            DataTable tblForPrediction = dtVariables.AsDataView().ToTable();
-            tblForPrediction.Columns.Remove("ID");
+            DataTable tblRaw = dtVariables.AsDataView().ToTable();
+            tblRaw.Columns.Remove("ID");
 
             VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
-            string[] strArrExpressions = strModelExpression.Split('+');
-            foreach(string var in strArrExpressions)
-            {
-                int intIndx;
-                string strVariable = var.Trim();
-                if((intIndx = strVariable.IndexOf('(')) != -1)
-                    if((intIndx = strVariable.IndexOf(')', intIndx)) != -1)
-                        intIndx=0;
-            }
+            DataTable tblForPrediction = BuildPredictionTable(tblRaw, model.ModelString());
 
             VBLogger.GetLogger().LogEvent("30", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             
-            //This pattern should match any variable transformation
-            string pattern = @"(MAX|MEAN|PROD|SUM|MIN)\(([^\+]*)\)";
-            Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
-            Match m = r.Match(strModelExpression);
 
             Cursor.Current = Cursors.WaitCursor;
             VBLogger.GetLogger().LogEvent("40", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
-            if(m.Success)
-            {
-                //Create a list that will hold any matched transformations.
-                while(m.Success)
-                {
-                    //Reconstruct the expression from the matched string. Default operation is summation.
-                    Globals.Operations op = Globals.Operations.SUM;
-                    switch(m.Groups[1].Value)
-                    {
-                        case "MAX":
-                             op = Globals.Operations.MAX;
-                            break;
-                        case "MEAN":
-                            op = Globals.Operations.MEAN;
-                            break;
-                        case "PROD":
-                            op = Globals.Operations.PROD;
-                            break;
-                        case "SUM":
-                            op = Globals.Operations.SUM;
-                            break;
-                        case "MIN":
-                            op = Globals.Operations.MIN;
-                            break;
-                    }
-
-                    //Create the Expression object.
-                    string[] strArrVars = m.Groups[2].Value.Split(',');
-                    
-                    //Add this expression to the list and continue on.
-                    m = m.NextMatch();
-                }
-            }
 
             VBLogger.GetLogger().LogEvent("50", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
@@ -792,6 +748,86 @@ namespace Prediction
             setViewOnGrid(dgvStats);
 
             VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);            
+        }
+
+
+        private DataTable BuildPredictionTable(DataTable tblRaw, string strModelExpression)
+        {
+            DataTable tblForPrediction = new DataTable();
+
+
+            string[] strExpressionChunks = strModelExpression.Split('+');
+            string[] strExpressions = new string[strExpressionChunks.Count()];
+
+            for (int k=0; k<strExpressionChunks.Count(); k++)
+            {
+                string var = strExpressionChunks[k];
+                int intIndx;
+                string strVariable = var.Trim();
+                if ((intIndx = strVariable.IndexOf('(')) != -1)
+                    if ((intIndx = strVariable.IndexOf(')', intIndx)) != -1)
+                        intIndx = 0;
+                strExpressions[k] = strVariable;
+            }
+
+
+            //This pattern should match any variable transformation
+            //string pattern = @"(MAX|MEAN|PROD|SUM|MIN)\(([^\+]*)\)";
+            //Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
+            //Match m = r.Match(strModelExpression);
+            ExpressionEvaluator ee = new ExpressionEvaluator();
+
+            tblForPrediction = ee.EvaluateTable(strExpressions, tblRaw);
+
+            /*foreach (string strExpression in strExpressions)
+            {
+                DataTable tblMod = ee.Evaluate(strExpression, tblRaw);
+                    
+                tblForPrediction.Columns.Add(columnName:strExpression, type:tblMod.Columns[1].DataType);
+                
+                for (int i = 0; i < tblMod.Rows.Count; i++)
+                {
+                    if (!(tblForPrediction.Rows.Count > i))
+
+                    tblForPrediction.Rows[i].SetField<double>(columnName:strExpression,value:tblMod.Rows[i].Field<double>("CalcValue"));
+                }
+
+                if (m.Success)
+                {
+                    //Create a list that will hold any matched transformations.
+                    while (m.Success)
+                    {
+                        //Reconstruct the expression from the matched string. Default operation is summation.
+                        Globals.Operations op = Globals.Operations.SUM;
+                        switch (m.Groups[1].Value)
+                        {
+                            case "MAX":
+                                op = Globals.Operations.MAX;
+                                break;
+                            case "MEAN":
+                                op = Globals.Operations.MEAN;
+                                break;
+                            case "PROD":
+                                op = Globals.Operations.PROD;
+                                break;
+                            case "SUM":
+                                op = Globals.Operations.SUM;
+                                break;
+                            case "MIN":
+                                op = Globals.Operations.MIN;
+                                break;
+                        }
+
+                        //Create the Expression object.
+                        string[] strArrVars = m.Groups[2].Value.Split(',');
+
+                        //Add this expression to the list and continue on.
+                        m = m.NextMatch();
+                    }
+                }
+            }*/
+
+            return tblForPrediction;
         }
 
 
@@ -1605,12 +1641,12 @@ namespace Prediction
 
 
         //validate imported datatable
-        public void btnIVDataValidation_Click(object sender, EventArgs e)
+        public bool btnIVDataValidation_Click(object sender, EventArgs e)
         {
             //check for non unique records, blank records
             DataTable dt = dgvVariables.DataSource as DataTable;
             if ((dt == null) ||(dt.Rows.Count < 1))
-                return;
+                return(false);
 
             DataTable dtCopy = dt.Copy();
             DataTable dtSaved = dt.Copy();
@@ -1626,14 +1662,16 @@ namespace Prediction
                                     "in the ID column and try validating again.\n\n" +
                                     "Record Identifier values cannot be blank or duplicated;\nencountered " +
                                     "error near row " + errndx.ToString(), "Data Validation Error - Cannot Process This Dataset", MessageBoxButtons.OK);
-                    return;
+                    return(false);
                 }
                 dgvVariables.DataSource = frmMissVal.ValidatedDT;
-                btnMakePredictions.Enabled = true;
+                //btnMakePredictions.Enabled = true;
+                return (true);
             }
             else
             {
                 dgvVariables.DataSource = dtSaved;
+                return (false);
             }
         }
 
@@ -1683,7 +1721,7 @@ namespace Prediction
         private void dgvVariables_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             //If user has edited the ID column, make sure the IDs are still unique.
-            btnMakePredictions.Enabled = false;
+            //btnMakePredictions.Enabled = false;
         }
 
 

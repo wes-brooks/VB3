@@ -405,23 +405,29 @@ namespace Prediction
         //import iv data, sends to form click event
         void btnImportIV_Click(object sender, EventArgs e)
         {
-            _frmPred.btnImportIVs_Click(sender, e);
+            bool validated =  _frmPred.btnImportIVs_Click(sender, e);
+            if (validated)
+                btnIVDataVal.Enabled = true;
+            else
+                btnIVDataVal.Enabled = false;
         }
 
 
         //import ob data, sends to form click event
         void btnImportOB_Click(object sender, EventArgs e)
         {
-            _frmPred.btnImportObs_Click(sender, e);
-            btnIVDataVal.Enabled = true;
+            _frmPred.btnImportObs_Click(sender, e);            
         }
 
         
         // validate data, sends to form click event and enables make prediction button
         void btnIVDataVal_Click(object sender, EventArgs e)
         {
-            _frmPred.btnIVDataValidation_Click(sender, e);
-            btnMakePred.Enabled = true;
+            bool validated = _frmPred.btnIVDataValidation_Click(sender, e);
+            if (validated)
+                btnMakePred.Enabled = true;
+            else
+                btnMakePred.Enabled = false;
         }
 
 

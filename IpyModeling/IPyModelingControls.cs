@@ -598,11 +598,19 @@ namespace IPyModeling
             {
                 if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
                 {
-                    if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
-                        lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+                    if (!_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN))
+                    {
+                        if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
+                            lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+                    }
+                    else
+                    {
+                        if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "False")
+                            lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+                    }
                 }
-                else
-                    lstFieldList.Add(_dtFull.Columns[i].ColumnName);
+                else { }
+                    //lstFieldList.Add(_dtFull.Columns[i].ColumnName);
             }
 
             intNumObs = _dtFull.Rows.Count;
@@ -1492,19 +1500,19 @@ namespace IPyModeling
 
         public void btnComputeAO_Click(object sender, EventArgs e)
         {
-
+            dsControl1.btnComputeAO_Click(sender, e);
         }
 
 
         public void btnManipulate_Click(object sender, EventArgs e)
         {
-
+            dsControl1.btnManipulate_Click(sender, e);
         }
 
 
         public void btnTransform_Click(object sender, EventArgs e)
         {
-
+            dsControl1.btnTransform_Click(sender, e);
         }
     }
 }

@@ -7,9 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using VBCommon;
+using VBCommon.Expressions;
 //using VBTools;
 
-namespace VBDatasheet
+namespace VBCommon.Controls
 {
     public partial class frmManipulate : Form
     {
