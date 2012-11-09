@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Windows.Forms;
+using Microsoft.VisualBasic;
 using System.IO;
 using VBCommon.IO;
 using VBCommon.Controls;
 
 namespace VBCommon.IO
-{
- 
+{ 
     public class ImportExport
     {
         //class for import/export from/to xls, xlsx or csv files - note that xlsx has not been tested
@@ -19,8 +19,9 @@ namespace VBCommon.IO
         //has implications in the getTableInfo method (see below) used for export.
         
         private DataTable _dt = null;
-        private const string FILE_FILTER = @"Excel Files|*.xls|Excel 2007 Files|*.xlsx|CSV Files|*.csv";
+        private const string FILE_FILTER = @"Spreadsheet Files (*.xls;*.xlsx;*.csv)|*.xls;*.xlsx;*.csv|All Files(*.*)|*.*";
         private string _importFileName = string.Empty;
+
 
         //constructor for import
         public ImportExport ()
@@ -123,6 +124,7 @@ namespace VBCommon.IO
             _importFileName = fileName;
         }
 
+
         private bool Export()
         {
             //TODO: get overwrite existing file working, release locks on exported file when done
@@ -198,7 +200,8 @@ namespace VBCommon.IO
             }
             return true;
         }
-
+        
+        
         private Dictionary<string, string> getTableInfo(DataTable dt)
         {
             // utility method used for export of data - return table info (colnames/types)
@@ -225,8 +228,54 @@ namespace VBCommon.IO
                 else coltype = System.Data.OleDb.OleDbType.Double.ToString();
                 tableInfo.Add(colname, coltype);
             }
-
             return tableInfo;
+        }
+
+
+        /// <summary>
+        /// method gathers bad cells (blanks, nulls, text, search criterion) by datatable row
+        /// </summary>
+        /// <returns>list of int arrays containg column index and row index of bad cells</returns>
+        public static List<int[]> GetBadCellsByRow(DataTable RawData, string Find)
+        {
+            DataTable tblRaw = RawData;
+            string strFindstring = Find;
+            int[] cellNdxs = new int[2];
+            List<int[]> badCells = new List<int[]>();
+            
+            foreach (DataRow dr in tblRaw.Rows)
+            {
+                int rndx = tblRaw.Rows.IndexOf(dr);
+                foreach (DataColumn dc in tblRaw.Columns)
+                {
+                    int cndx = tblRaw.Columns.IndexOf(dc);
+                    //gather blanks...
+                    if (string.IsNullOrEmpty(dr[dc].ToString()))
+                    {
+                        cellNdxs[0] = cndx;
+                        cellNdxs[1] = rndx;
+                        badCells.Add(cellNdxs);
+                        cellNdxs = new int[2];
+                    }
+                    // ...AND alpha cells only (blanks captured above)...
+                    else if (!Information.IsNumeric(dr[dc].ToString()) && tblRaw.Columns.IndexOf(dc) != 0)
+                    {
+                        cellNdxs[0] = cndx;
+                        cellNdxs[1] = rndx;
+                        badCells.Add(cellNdxs);
+                        cellNdxs = new int[2];
+                    }
+                    //...AND user input
+                    if (dr[dc].ToString() == strFindstring && !string.IsNullOrWhiteSpace(strFindstring))
+                    {
+                        cellNdxs[0] = cndx;
+                        cellNdxs[1] = rndx;
+                        badCells.Add(cellNdxs);
+                        cellNdxs = new int[2];
+                    }
+                }
+            }
+            return badCells;
         }
     }
 }

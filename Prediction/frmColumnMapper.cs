@@ -14,31 +14,43 @@ namespace Prediction
         private string[] strArrMainEffects = null;
         private DataTable dtMapped;
         private bool boolIdColumn;
+        private bool boolObsColumn;
 
         //The captions for the two columns in the mapping grid
         private string[] strArrHeaderCaptions;
 
         //The columns names in the imported datatable
-        private List<string> lstImpColNames = null;
+        private List<string> listImportedColumnNames = null;
+
+        //The mapping of spreadsheet columns to model variables:
+        Dictionary<string, string> dictColumnMap = null;
+
 
         public DataTable MappedTable
         {
             get { return dtMapped; }
         }
 
+
+        public Dictionary<string, string> ColumnMapping
+        {
+            get { return dictColumnMap; }
+        }
+
        
-        public frmColumnMapper(string[] mainEffects, DataTable dt, string[] headerCaptions, bool IDColumn)
+        public frmColumnMapper(string[] mainEffects, DataTable dt, string[] headerCaptions, bool IDColumn, bool ObsColumn)
         {
             InitializeComponent();
             strArrMainEffects = mainEffects;
             dtMapped = dt.Copy();
 
             strArrHeaderCaptions = headerCaptions.ToArray();
-            lstImpColNames = new List<string>();
+            listImportedColumnNames = new List<string>();
             boolIdColumn = IDColumn;
+            boolObsColumn = ObsColumn;
 
             foreach (DataColumn dc in dtMapped.Columns)
-                lstImpColNames.Add(dc.ColumnName);
+                listImportedColumnNames.Add(dc.ColumnName);
         }
 
 
@@ -51,7 +63,7 @@ namespace Prediction
             DataGridViewComboBoxColumn dgComboCol = new DataGridViewComboBoxColumn();
             dgComboCol.HeaderText = strArrHeaderCaptions[1];
             dgComboCol.Width = 220;
-            dgComboCol.Items.AddRange(lstImpColNames.ToArray());
+            dgComboCol.Items.AddRange(listImportedColumnNames.ToArray());
 
             dataGridView1.Columns.Add(dgTextCol);
             dataGridView1.Columns.Add(dgComboCol);
@@ -67,9 +79,12 @@ namespace Prediction
             }
 
             //default the id/obs col selections to first/second cols
-            if(boolIdColumn)
+            if (boolIdColumn)
             {
-                dataGridView1.Rows[0].Cells[1].Value = lstImpColNames[0];
+                dataGridView1.Rows[0].Cells[1].Value = listImportedColumnNames[0];                
+            }
+            if (boolObsColumn)
+            {
                 //dataGridView1.Rows[1].Cells[1].Value = _impColNames[1];
             }
         }
@@ -95,7 +110,9 @@ namespace Prediction
                 dictColMap.Add(strMe, strIdata);                
             }
 
-            DataTable dt = new DataTable();
+            dictColumnMap = dictColMap;
+
+            /*DataTable dt = new DataTable();
             if (dictColMap.ContainsKey("ID"))
                 dt.Columns.Add("ID", typeof(string));     
 
@@ -118,12 +135,12 @@ namespace Prediction
                 }
                 dt.Rows.Add(dr);
             }
-
+            
             if (dt.Columns.Contains("ID"))
                 dt.Columns["ID"].SetOrdinal(0);
 
             dtMapped = dt;
-
+            */
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();
         }

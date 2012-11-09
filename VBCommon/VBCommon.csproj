@@ -204,7 +204,6 @@
     </Compile>
     <Compile Include="Transforms\Transform.cs" />
     <Compile Include="Transforms\Transformer.cs" />
-    <Compile Include="Controls\Utilities.cs" />
     <Compile Include="VBCSHelp.cs" />
   </ItemGroup>
   <ItemGroup>

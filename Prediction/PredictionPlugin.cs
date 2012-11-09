@@ -151,19 +151,19 @@ namespace Prediction
             //add sub-ribbons
             const string rGroupCaption = "Predict";
             
-            btnImportIV = new SimpleActionItem(strPanelKey, "Import IVs", btnImportIV_Click);
+            btnImportIV = new SimpleActionItem(strPanelKey, "Import Data", btnImportIV_Click);
             btnImportIV.LargeImage = Properties.Resources.ImportIV;
             btnImportIV.GroupCaption = rGroupCaption;
             btnImportIV.Enabled = true;
             App.HeaderControl.Add(btnImportIV);
 
-            btnImportOB = new SimpleActionItem(strPanelKey, "Import OBs", btnImportOB_Click);
+            btnImportOB = new SimpleActionItem(strPanelKey, "Import Lab Measurements", btnImportOB_Click);
             btnImportOB.LargeImage = Properties.Resources.ImportOB;
             btnImportOB.GroupCaption = rGroupCaption;
             btnImportOB.Enabled = true;
             App.HeaderControl.Add(btnImportOB);
             
-            btnIVDataVal = new SimpleActionItem(strPanelKey, "IV Data Validation", btnIVDataVal_Click);
+            btnIVDataVal = new SimpleActionItem(strPanelKey, "Data Validation", btnIVDataVal_Click);
             btnIVDataVal.LargeImage = Properties.Resources.IVDataVal;
             btnIVDataVal.GroupCaption = rGroupCaption;
             btnIVDataVal.Enabled = false;
@@ -405,11 +405,17 @@ namespace Prediction
         //import iv data, sends to form click event
         void btnImportIV_Click(object sender, EventArgs e)
         {
-            bool validated =  _frmPred.btnImportIVs_Click(sender, e);
+            bool validated = _frmPred.btnImportIVs_Click(sender, e);
             if (validated)
+            {
                 btnIVDataVal.Enabled = true;
+                btnMakePred.Enabled = true;
+            }
             else
+            {
                 btnIVDataVal.Enabled = false;
+                btnMakePred.Enabled = false;
+            }
         }
 
 

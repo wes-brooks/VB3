@@ -103,62 +103,17 @@ namespace VBCommon.Controls
         /// <param name="e"></param>
         private void btnScan_Click(object sender, EventArgs e)
         {
-            lstBadCells = getBadCellsByRow();
-            if (lstBadCells.Count > 0)
-                groupBox4.Enabled = true;
-        }
-
-
-        /// <summary>
-        /// method gathers bad cells (blanks, nulls, text, search criterion) by datatable row
-        /// </summary>
-        /// <returns>list of int arrays containg column index and row index of bad cells</returns>
-        private List<int[]> getBadCellsByRow()
-        {
+            lstBadCells = VBCommon.IO.ImportExport.GetBadCellsByRow(_dt, strFindstring);
             int[] cellNdxs = new int[2];
-            List<int[]> badCells = new List<int[]>();
 
-            foreach (DataRow dr in _dt.Rows)
-            { 
-                int rndx = _dt.Rows.IndexOf(dr);
-                foreach (DataColumn dc in _dt.Columns)
-                {
-                    int cndx = _dt.Columns.IndexOf(dc);
-                    //gather blanks...
-                    if (string.IsNullOrEmpty(dr[dc].ToString()))
-                    {
-                        cellNdxs[0] = cndx;
-                        cellNdxs[1] = rndx;
-                        badCells.Add(cellNdxs);
-                        cellNdxs = new int[2];
-                    }
-                    // ...AND alpha cells only (blanks captured above)...
-                    else if (!Information.IsNumeric(dr[dc].ToString()) && _dt.Columns.IndexOf(dc) != 0)
-                    {
-                        cellNdxs[0] = cndx;
-                        cellNdxs[1] = rndx;
-                        badCells.Add(cellNdxs);
-                        cellNdxs = new int[2];
-                    }
-                    //...AND user input
-                    if (dr[dc].ToString() == strFindstring && !string.IsNullOrWhiteSpace(strFindstring))
-                    {
-                        cellNdxs[0] = cndx;
-                        cellNdxs[1] = rndx;
-                        badCells.Add(cellNdxs);
-                        cellNdxs = new int[2];
-                    }
-                }
-            }
-
-            if (badCells.Count > 0)
+            if (lstBadCells.Count > 0)
             {
-                cellNdxs = badCells[0];
+                cellNdxs = lstBadCells[0];
                 _dgv.Rows[cellNdxs[1]].Cells[cellNdxs[0]].Selected = true;
                 _dgv.CurrentCell = _dgv.SelectedCells[0];
                 btnReturn.Enabled = false; //can't return until clean
                 boolStatus = false;
-                return badCells;
+                //return badCells;
             }
             else
             {
@@ -166,9 +121,15 @@ namespace VBCommon.Controls
                 btnReturn.Enabled = true;  //can return if user selects
                 boolStatus = true;
                 groupBox4.Enabled = false;
-                return badCells;
+                //return badCells;
             }
+
+            if (lstBadCells.Count > 0)
+                groupBox4.Enabled = true;
         }
+
+
+
 
 
         /// <summary>

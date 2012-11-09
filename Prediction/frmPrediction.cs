@@ -39,7 +39,9 @@ namespace Prediction
         private string[] strArrReferencedVars = null;
         private DataTable corrDT; 
         private List<ListItem> lstIndVars = null;
+        private string strOutputVariable = "Output";
 
+        InputMapper varmap = null;
         private DataTable dtVariables = null;
         private DataTable dtObs = null;
         private DataTable dtStats = null;
@@ -49,6 +51,7 @@ namespace Prediction
         private bool boolObsTransformed = false;
         
         IDictionary<string, object> dictModels = new Dictionary<string, object>();
+        IDictionary<string, object> dictPredictionElements = new Dictionary<string, object>();
         private int intSelectedModel = -1;
         private string strMethod;
         
@@ -196,7 +199,6 @@ namespace Prediction
                 foreach (KeyValuePair<string, object> kvpModel in dictModels)
                 {
                     IDictionary<string, object> dictModel = (IDictionary<string, object>)(kvpModel.Value);
-                    //dictModel.Remove("ModelByObject");
                     dictModelsSerialize.Add(kvpModel.Key, dictModel["Method"].ToString());
                 }
 
@@ -375,13 +377,19 @@ namespace Prediction
         public void SetModel(string strModelPlugin)
         {
             IDictionary<string, object> dictPackedState = null;
+            strMethod = strModelPlugin;
+
+            if (!dictPredictionElements.ContainsKey(strModelPlugin))
+            {
+                dictPredictionElements.Add(strModelPlugin, new Dictionary<string, object>());
+            }
 
             //Load the interface that links us to the selected modeling plugin:
             //strMethod = dictModel["Method"].ToString();
             foreach (Lazy<IModel, IDictionary<string, object>> module in models)
             {
                 if (module.Metadata["PluginKey"].ToString() == strModelPlugin)
-                {
+                {                    
                     model = module.Value;
                     dictPackedState = model.GetPackedState();
                 }
@@ -401,10 +409,11 @@ namespace Prediction
 
                 if (dictModel != null)
                 {
-                    Dictionary<string, object> packedDatasheet = (Dictionary<string, object>)dictPackedState["PackedDatasheetState"];
+                    Dictionary<string, object> dictPackedDatasheet = (Dictionary<string, object>)dictPackedState["PackedDatasheetState"];
+                    strOutputVariable = dictPackedDatasheet["ResponseVar"].ToString();
 
                     //datatables serialized as xml string to maintain extendedProperty values
-                    string strXmlDataTable = (string)packedDatasheet["XmlDataTable"];
+                    string strXmlDataTable = (string)dictPackedDatasheet["XmlDataTable"];
                     StringReader sr = new StringReader(strXmlDataTable);
                     DataSet ds = new DataSet();
                     ds.ReadXml(sr);
@@ -551,83 +560,29 @@ namespace Prediction
                 MessageBox.Show("You must first pick a model from the Available Models");
                 return(false);
             }
-            
-            VBCommon.IO.ImportExport import = new ImportExport();
-            DataTable dt = import.Input;            
-            if (dt == null)
-                return(false);
 
-            string[] strArrHeaderCaptions = { "Model Variables", "Imported Variables" };
-
-            Dictionary<string, string> dictFields = new Dictionary<string, string>(dictMainEffects);
-            frmColumnMapper colMapper = new frmColumnMapper(strArrReferencedVars, dt, strArrHeaderCaptions, true);
-            DialogResult dr = colMapper.ShowDialog();
-
-            if (dr == DialogResult.OK)
+            if (varmap == null)
             {
-                dt = colMapper.MappedTable;
-                int errndx = 0;
-                if (!recordIndexUnique(dt, out errndx))
-                {
-                    MessageBox.Show("Unable to import datasets with non-unique record identifiers.\n" +
-                                    "Fix your datatable by assuring unique record identifier values\n" +
-                                    "in the ID column and try importing again.\n\n" +
-                                    "Record Identifier values cannot be blank or duplicated;\nencountered " +
-                                    "error near row " + errndx.ToString(), "Import Data Error - Cannot Import This Dataset", MessageBoxButtons.OK);
-                    return(false);
-                }
-                dgvVariables.DataSource = dt;
+                varmap = new InputMapper(dictMainEffects, "Model Variables", strArrReferencedVars, "Imported Variables");
+                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("VariableMapping", varmap);
             }
-            else
-                return(false);
+
+            DataTable dt = varmap.ImportFile();
+            if (dt == null)
+                return (false);
+
+            dgvVariables.DataSource = dt;
 
             foreach (DataGridViewColumn dvgCol in dgvVariables.Columns)
             {
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
+
             setViewOnGrid(dgvVariables);            
             //btnMakePredictions.Enabled = false;
             return (true);
         }
 
-
-        /// <summary>
-        /// test all cells in the daetime column for uniqueness
-        /// could do this with linq but then how does one find where?
-        /// Code copied from Mike's VBDatasheet.frmDatasheet.
-        /// </summary>
-        /// <param name="dt">table to search</param>
-        /// <param name="where">record number of offending timestamp</param>
-        /// <returns>true iff all unique, false otherwise</returns>
-        private bool recordIndexUnique(DataTable dt, out int where)
-        {
-            Dictionary<string, int> dictTemp = new Dictionary<string, int>();
-            int intNdx = -1;
-            try
-            {
-                foreach (DataRow dr in dt.Rows)
-                {
-                    string strTempval = dr["ID"].ToString();
-                    dictTemp.Add(dr["ID"].ToString(), ++intNdx);
-                    if (string.IsNullOrWhiteSpace(dr["ID"].ToString()))
-                    {
-                        where = intNdx++;
-                        //MessageBox.Show("Record Identifier values cannot be blank - encountered blank in row " + ndx++.ToString() + ".\n",
-                        //    "Import data error", MessageBoxButtons.OK);
-                        return false;
-                    }
-                }
-            }
-            catch (ArgumentException)
-            {
-                where = intNdx++;
-                //MessageBox.Show("Record Identifier values cannot be duplicated - encountered existing record in row " + ndx++.ToString() + ".\n",
-                //    "Import data error", MessageBoxButtons.OK);
-                return false;
-            }
-            where = intNdx;
-            return true;
-        }
 
 
         public void ClearDataGridViews()
@@ -636,6 +591,7 @@ namespace Prediction
             this.dgvStats.DataSource = null;
             this.dgvObs.DataSource = null;
             this.dgvVariables.DataSource = null;
+            this.varmap = null;
 
             lstAvailModels.Items.Clear();
             txtModel.Text = "";
@@ -652,9 +608,9 @@ namespace Prediction
                 return;
 
             string[] strArrHeaderCaptions = { "Obs IDs", "Obs" };
-            string[] strArrObsColumns = { "ID", "Observation" };
+            string[] strArrObsColumns = { "ID", strOutputVariable };
 
-            frmColumnMapper colMapper = new frmColumnMapper(strArrObsColumns, dt, strArrHeaderCaptions, true);
+            frmColumnMapper colMapper = new frmColumnMapper(strArrObsColumns, dt, strArrHeaderCaptions, true, false);
             DialogResult dr = colMapper.ShowDialog();
 
             if (dr == DialogResult.OK)
@@ -696,6 +652,12 @@ namespace Prediction
 
             DataTable tblRaw = dtVariables.AsDataView().ToTable();
             tblRaw.Columns.Remove("ID");
+            List<int[]> lstBadCells = VBCommon.IO.ImportExport.GetBadCellsByRow(tblRaw, "");
+            if (lstBadCells.Count > 0)
+            {
+                MessageBox.Show("There are errors in the data");
+                return;
+            }
 
             VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
@@ -1655,7 +1617,7 @@ namespace Prediction
             if (frmMissVal.Status)
             {
                 int errndx;
-                if (!recordIndexUnique(frmMissVal.ValidatedDT, out errndx))
+                if (!InputMapper.RecordIndexUnique(frmMissVal.ValidatedDT, out errndx))
                 {
                     MessageBox.Show("Unable to process datasets with non-unique record identifiers.\n" +
                                     "Fix your datatable by assuring unique record identifier values\n" +
