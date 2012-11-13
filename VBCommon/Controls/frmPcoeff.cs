@@ -238,14 +238,14 @@ namespace VBCommon.Controls
                     {
                         if (!_dtCopy.Columns[varname].ExtendedProperties.Contains(VBCommon.Globals.DECOMPOSITION.ToString()))
                         {
-                            _dtCopy.Columns[varname].ExtendedProperties[VBCommon.Globals.HIDDEN] = true;
+                            _dtCopy.Columns[varname].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
 
                         }
                         _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.TRANSFORM] = true;
                     }
                     else
                     {
-                        _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.HIDDEN] = false;
+                        _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.ENABLED] = true;
                     }                
 
                     if (!_dtCopy.Columns[colname].ExtendedProperties.Contains(VBCommon.Globals.MAINEFFECT.ToString()) && !(_dtCopy.Columns[colname].ExtendedProperties.Contains(VBCommon.Globals.DECOMPOSITION.ToString())))

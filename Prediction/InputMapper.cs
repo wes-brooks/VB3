@@ -26,7 +26,7 @@ namespace Prediction
         }
 
 
-        public DataTable ImportFile()
+        public DataTable ImportFile(DataTable tblCurrent)
         {           
             VBCommon.IO.ImportExport import = new ImportExport();
             DataTable dt = import.Input;            
@@ -57,7 +57,14 @@ namespace Prediction
             }
             else
             {
+                //We shouldn't have existing data unless we have an existing mapping, so assume that tblCurrent!=null lands us here.
                 dt = MapInputColumns(dt);
+
+                if (tblCurrent != null)
+                {
+                    tblCurrent.Merge(dt);
+                    dt = tblCurrent;
+                }
 
                 if (!CheckUniqueIDs(dt))
                     return null;
@@ -114,7 +121,6 @@ namespace Prediction
                                 "error near row " + errndx.ToString(), "Import Data Error - Cannot Import This Dataset", MessageBoxButtons.OK);
                 return false;
             }
-
             return true;
         }
         

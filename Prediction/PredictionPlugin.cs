@@ -302,27 +302,32 @@ namespace Prediction
             {
                 if ((bool)e.PackedPluginState["Complete"])
                 {
-                    _frmPred.AddModel(e.PackedPluginState);
+                    _frmPred.AddModel(e.PackedPluginState["Method"].ToString());
                     if (!boolVisible)
                         Show();
                 }
                 else
                 {
-                    int intValidModels = _frmPred.ClearModel(e.PackedPluginState);
+                    int intValidModels = _frmPred.ClearMethod(e.PackedPluginState["Method"].ToString());
                     if (intValidModels == 0)
                         Hide();
                 }
 
-                //if the prediction is complete and the model was cleared, clear the prediction
-                if (boolComplete && (bool)e.PackedPluginState["CleanPredict"])
+                _frmPred.ClearDataGridViews(e.PackedPluginState["Method"].ToString());
+                boolComplete = false;
+
+                /*//if the prediction is complete and the model was cleared, clear the prediction
+                if (boolComplete) // && (bool)e.PackedPluginState["CleanPredict"])
                 {
-                    _frmPred.ClearDataGridViews();
+                    _frmPred.ClearDataGridViews(e.PackedPluginState["Method"].ToString());
                     boolComplete = false;
 
                     //add the modified model to list of Available Models if just changed (not cleared)
                     if ((bool)e.PackedPluginState["Complete"])
-                        _frmPred.AddModel(e.PackedPluginState);
-                }
+                        _frmPred.AddModel(e.PackedPluginState["Method"].ToString());
+                    else
+                        _frmPred.ClearMethod(e.PackedPluginState["Method"].ToString());
+                }*/
             }
             else
             {

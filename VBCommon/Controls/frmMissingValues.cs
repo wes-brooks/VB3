@@ -131,7 +131,7 @@ namespace VBCommon.Controls
 
 
 
-
+        /*
         /// <summary>
         /// depricated - gathers bad cells (blanks, nulls, text, search criterion) by datatable column
         /// MC wants the action to work by row.
@@ -193,7 +193,7 @@ namespace VBCommon.Controls
                 groupBox4.Enabled = false;
                 return badCells;
             }
-        }
+        }*/
         
 
         /// <summary>

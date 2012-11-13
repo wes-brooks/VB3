@@ -30,7 +30,6 @@ namespace Prediction
     {
         private ContextMenu cmforResponseVar = new ContextMenu();
         private Dictionary<string, string> dictMainEffects;
-        //private string strModelExpression = "";
 
         private IModel model = null;
         public List<Lazy<IModel, IDictionary<string, object>>> models;
@@ -50,7 +49,7 @@ namespace Prediction
         private DataTable dtObsOrig = null;
         private bool boolObsTransformed = false;
         
-        IDictionary<string, object> dictModels = new Dictionary<string, object>();
+        List<string> listModels = new List<string>();
         IDictionary<string, object> dictPredictionElements = new Dictionary<string, object>();
         private int intSelectedModel = -1;
         private string strMethod;
@@ -74,15 +73,6 @@ namespace Prediction
         }
 
 
-        //holds available models for listbox
-        [JsonProperty]
-        public IDictionary<string, object> ListedModelsDict
-        {
-            get { return dictModels; }
-            set { dictModels = value; }
-        }
-
-
         //selected model's index from listbox
         [JsonProperty]
         public int SelectedModel
@@ -96,28 +86,37 @@ namespace Prediction
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {
             if (dictPackedState.Count == 0) return;
+                        
+            if (dictPackedState.ContainsKey("PredictionElements"))
+            {
+                dictPredictionElements = (IDictionary<string, object>)dictPackedState["PredictionElements"];
+
+                //Convert the plugin's JSON into .NET objects and compile a dictionary of the deserialized objects.
+                Dictionary<string, object> dictTemp = new Dictionary<string, object>();
+                foreach (var pair in dictPredictionElements)
+                {
+                    Type objType = typeof(Dictionary<string, object>);
+                    string jsonRep = pair.Value.ToString();
+
+                    object objDeserialized = JsonConvert.DeserializeObject(jsonRep, objType);
+                    dictTemp.Add(pair.Key, objDeserialized);
+                }
+                dictPredictionElements = dictTemp;
+            }
 
             if (dictPackedState.ContainsKey("AvailableModels"))
             {
-                //Unpack contents of listbox holding available models
-                this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-                dictModels = (IDictionary<string, object>)dictPackedState["AvailableModels"];
-                List<string> keys = new List<string>();
-                foreach (KeyValuePair<string, object> pair in dictModels)
-                { this.lstAvailModels.Items.Add(pair.Key); }
+                List<string> listTemp = (List<string>)dictPackedState["AvailableModels"];
 
-                if (dictPackedState.ContainsKey("AvailableModelsIndex")) { lstAvailModels.SelectedIndex = (int)dictPackedState["AvailableModelsIndex"]; }
-                this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+                foreach (string method in listTemp)
+                    AddModel(method);
+
+                if (dictPackedState.ContainsKey("AvailableModelsIndex")) { lbAvailableModels.SelectedIndex = (int)dictPackedState["AvailableModelsIndex"]; }
+                
             }
 
             if (!dictPackedState.ContainsKey("Model")) { return; }
-
-            Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];
-            /*if (dictModel["ModelString"] == null)
-                return;*/
-            
-            //ipyModel = ipyInterface.Deserialize(dictModelStr["ModelString"]);
-            
+            Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];            
             
             dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
             if (Convert.ToInt32(dictTransform["Type"]) == Convert.ToInt32(VBCommon.Transforms.DependentVariableTransforms.none))
@@ -133,53 +132,34 @@ namespace Prediction
             txtRegStd.Text = Convert.ToDouble(dictModel["RegulatoryThreshold"]).ToString();
             txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
 
-            DataSet ds = null;
-            
-            string swIVVals = string.Empty;
-            if (dictPackedState.ContainsKey("IVData"))
-                swIVVals = (string)dictPackedState["IVData"];
-
-            if (!String.IsNullOrWhiteSpace(swIVVals))
+            //Unpack the current DataGridViews
+            dtVariables = DeserializeDataTable(Container: dictPackedState, Slot: "IVData", Title: "Variables");
+            if (dtVariables != null)
             {
-                ds = new DataSet();
-                ds.ReadXml(new StringReader(swIVVals), XmlReadMode.ReadSchema);
-                dtVariables = ds.Tables[0];
                 dgvVariables.DataSource = dtVariables;
                 setViewOnGrid(dgvVariables);
             }
 
-            string swOBVals = string.Empty;
-            if (dictPackedState.ContainsKey("ObsData"))
-                swOBVals = (string)dictPackedState["ObsData"];
-            if (!String.IsNullOrWhiteSpace(swOBVals))
+            dtObs = DeserializeDataTable(Container: dictPackedState, Slot: "ObsData", Title: "Observations");
+            if (dtObs != null)
             {
-                ds = new DataSet();
-                ds.ReadXml(new StringReader(swOBVals), XmlReadMode.ReadSchema);
-                dtObs = ds.Tables[0];
                 dgvObs.DataSource = dtObs;
                 setViewOnGrid(dgvObs);
             }
 
-            string swStatVals = string.Empty;
-            if (dictPackedState.ContainsKey("StatData"))
-                swStatVals = (string)dictPackedState["StatData"];
-            if (!String.IsNullOrWhiteSpace(swStatVals))
+            dtStats = DeserializeDataTable(Container: dictPackedState, Slot: "StatData", Title: "Stats");
+            if (dtStats != null)
             {
-                ds = new DataSet();
-                ds.ReadXml(new StringReader(swStatVals), XmlReadMode.ReadSchema);
-                dtStats = ds.Tables[0];
                 dgvStats.DataSource = dtStats;
                 setViewOnGrid(dgvStats);
             }
 
             if (model != null)
             {
-                txtModel.Text = model.ModelString();
-                
+                txtModel.Text = model.ModelString();                
             }
             else
             {
-                //strModelExpression = "";
                 txtModel.Text = "";
             }
         }
@@ -190,20 +170,9 @@ namespace Prediction
         {
             IDictionary<string, object> dictPluginState = new Dictionary<string, object>();
 
-            if (dictModels.Count > 0)
+            if (listModels.Count > 0)
             {
-                //Remove the unserializable IronPython model objects:
-                //can't make changes inside a loop to the thing you are looping through
-                Dictionary<string, object> dictModelsSerialize = new Dictionary<string, object>();
-
-                foreach (KeyValuePair<string, object> kvpModel in dictModels)
-                {
-                    IDictionary<string, object> dictModel = (IDictionary<string, object>)(kvpModel.Value);
-                    dictModelsSerialize.Add(kvpModel.Key, dictModel["Method"].ToString());
-                }
-
-                //Now add the lists to the packed state dictionary
-                dictPluginState.Add("AvailableModels", dictModelsSerialize);
+                dictPluginState.Add("AvailableModels", listModels);
                 if (intSelectedModel >= 0) { dictPluginState.Add("AvailableModelsIndex", intSelectedModel); }
             }
 
@@ -211,7 +180,6 @@ namespace Prediction
                 return dictPluginState;
 
             //Serialize the model
-            //string strModelString = ipyInterface.Serialize(Model);
             double dblRegulatoryThreshold;
             double dblDecisionThreshold;
 
@@ -247,130 +215,98 @@ namespace Prediction
 
             dictPluginState.Add("Model", dictModelState);
             dictPluginState.Add("Transform", dictTransform);
+            dictPluginState.Add("PredictionElements", dictPredictionElements);
 
-            /*//Remove the unserializable IronPython model objects:
-            //can't make changes inside a loop to the thing you are looping through
-            Dictionary<string,object> dictModelsSerialize = new Dictionary<string,object>();
-
-            foreach (KeyValuePair<string, object> kvpModel in dictModels)
-            {
-                IDictionary<string, object> dictModel = (IDictionary<string, object>)(kvpModel.Value);
-                //dictModel.Remove("ModelByObject");
-                dictModelsSerialize.Add(kvpModel.Key, dictModel); 
-            }
-
-            //Now add the lists to the packed state dictionary
-            dictPluginState.Add("AvailableModels", dictModelsSerialize);
-            dictPluginState.Add("AvailableModelsIndex", intSelectedListedModel);
-            */
-
-            StringWriter sw = null;
             //pack values
             dgvVariables.EndEdit();
             dtVariables = (DataTable)dgvVariables.DataSource;
-            if (dtVariables != null)
-            {
-                dtVariables.AcceptChanges();
-                dtVariables.TableName = "Variables";
-                sw = new StringWriter();
-                dtVariables.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                string swIVValues = sw.ToString();
-                dictPluginState.Add("IVData", swIVValues);
-                sw.Close();
-            }
+            SerializeDataTable(Data: dtVariables, Container: dictPluginState, Slot: "IVData", Title: "Variables");
 
             dgvObs.EndEdit();
             dtObs = (DataTable)dgvObs.DataSource;
-            if (dtObs != null)
-            {
-                dtObs.AcceptChanges();
-                dtObs.TableName = "Observations";
-                sw = new StringWriter();
-                dtObs.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                string swOBsValues = sw.ToString();
-                dictPluginState.Add("ObsData", swOBsValues);
-                sw.Close();
-            }
+            SerializeDataTable(Data: dtObs, Container: dictPluginState, Slot: "ObsData", Title: "Observations");
 
             dgvStats.EndEdit();
             dtStats = (DataTable)dgvStats.DataSource;
-            if (dtStats != null)
-            {
-                dtStats.AcceptChanges();
-                dtStats.TableName = "Stats";
-                sw = new StringWriter();
-                dtStats.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                string swStatValues = sw.ToString();
-                dictPluginState.Add("StatData", swStatValues);
-                sw.Close();
-            }           
+            SerializeDataTable(Data: dtStats, Container: dictPluginState, Slot: "StatData", Title: "Stats");
+
             return dictPluginState;
         }
 
 
         //store packed state and populate listbox
-        public void AddModel(IDictionary<string, object> dictPackedState)
+        public void AddModel(string Method)
         {
-            //make sure empty model doesnt run through this method
-            if (dictPackedState.Count <= 2)
-                return;
-
-            IDictionary<string, object> dictModel = (IDictionary<string, object>)dictPackedState["Model"];
-            string strModelName = dictModel["Method"].ToString();
+            //Disconnect the selection-changed handlers for this process
+            this.lbAvailableModels.SelectedIndexChanged -= new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);            
 
             //If there is already a model from this plugin in the listBox, then remove it.
-            if (dictModels.ContainsKey(strModelName))
+            if (listModels.Contains(Method))
             {
-                this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-                dictModels.Remove(strModelName);
-                lstAvailModels.Items.Remove(strModelName);
-                this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+                //Remove the Method from the lists
+                listModels.Remove(Method);
+                lbAvailableModels.Items.Remove(Method);
             }
+
+            if (dictPredictionElements.ContainsKey(Method))
+                dictPredictionElements.Remove(Method);
 
             //Now add the model to the listBox
-            dictModels.Add(strModelName, dictPackedState);
-            lstAvailModels.Items.Add(strModelName);
-        }
+            lbAvailableModels.Items.Add(Method);
+            listModels.Add(Method);
 
-
-        public int ClearModel(IDictionary<string, object> dictPackedState)
-        {           
-            //If we have a model from this plugin, clear it
-            string strMethod = dictPackedState["Method"].ToString();
-
-            //If there is already a model from this plugin in the listBox, then remove it.
-            if (dictModels.ContainsKey(strMethod))
-            {
-                this.lstAvailModels.SelectedIndexChanged -= new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-                dictModels.Remove(strMethod);
-                lstAvailModels.Items.Remove(strMethod);
-                this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
-            }
-
-            int intValidModels = dictModels.Count();
-            return (intValidModels);
+            //...And re-connect the selection-changed event handler
+            this.lbAvailableModels.SelectedIndexChanged += new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);
         }
 
 
         //when user selects model to use, send it to SetModel()
-        private void lstAvailModels_SelectedIndexChanged(object sender, System.EventArgs e)
+        private void lbAvailableModels_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            string strSelectedItem = lstAvailModels.SelectedItem.ToString();
-            intSelectedModel = lstAvailModels.SelectedIndex;
-
-            //didn't select a model
-            if (strSelectedItem == null)
-                return;
-
-            //clear the grids if another model's info has been used
-            if (corrDT != null)
+            try
             {
-                this.dgvStats.DataSource = null;
-                this.dgvObs.DataSource = null;
-                this.dgvVariables.DataSource = null;
-            }
+                string strSelectedItem = lbAvailableModels.SelectedItem.ToString();
+                intSelectedModel = lbAvailableModels.SelectedIndex;
 
-            SetModel(((IDictionary<string, object>)dictModels[strSelectedItem])["Method"].ToString());
+                //didn't select a model
+                if (strSelectedItem == null)
+                    return;
+
+                //First, pack up the data/observations/predictions for the current plugin
+                if (strMethod != null)
+                {
+                    //Make an entry for this model in dictPredictionElements if none exists
+                    if (!dictPredictionElements.ContainsKey(strMethod))
+                        dictPredictionElements.Add(strMethod, new Dictionary<string, object>());
+
+                    dgvVariables.EndEdit();
+                    dtVariables = (DataTable)dgvVariables.DataSource;
+                    if (dtVariables != null)
+                        SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+
+                    dgvObs.EndEdit();
+                    dtObs = (DataTable)dgvObs.DataSource;
+                    if (dtObs != null)
+                        SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
+
+                    dgvStats.EndEdit();
+                    dtStats = (DataTable)dgvStats.DataSource;
+                    if (dtStats != null)
+                        SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
+
+                }
+
+                //clear the grids if another model's info has been used
+                if (corrDT != null)
+                {
+                    this.dgvStats.DataSource = null;
+                    this.dgvObs.DataSource = null;
+                    this.dgvVariables.DataSource = null;
+                }
+
+                SetModel(strSelectedItem);
+            }
+            catch { }
         }
 
 
@@ -379,13 +315,7 @@ namespace Prediction
             IDictionary<string, object> dictPackedState = null;
             strMethod = strModelPlugin;
 
-            if (!dictPredictionElements.ContainsKey(strModelPlugin))
-            {
-                dictPredictionElements.Add(strModelPlugin, new Dictionary<string, object>());
-            }
-
             //Load the interface that links us to the selected modeling plugin:
-            //strMethod = dictModel["Method"].ToString();
             foreach (Lazy<IModel, IDictionary<string, object>> module in models)
             {
                 if (module.Metadata["PluginKey"].ToString() == strModelPlugin)
@@ -403,9 +333,6 @@ namespace Prediction
 
                 Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];
                 dictTransform = (Dictionary<string, object>)dictPackedState["Transform"];
-
-                //if ((bool)dictPackedState["CleanPredict"])
-                //    ClearDataGridViews();
 
                 if (dictModel != null)
                 {
@@ -426,19 +353,8 @@ namespace Prediction
                     txtRegStd.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
                     txtPower.Text = (dictTransform["Exponent"]).ToString();
 
-                    //Load the interface that links us to the selected modeling plugin:
-                    /*strMethod = dictModel["Method"].ToString();
-                    foreach (Lazy<IModel, IDictionary<string, object>> module in models)
-                    {
-                        if (module.Metadata["PluginKey"].ToString() == strMethod)
-                        {
-                            model = module.Value;
-                        }
-                    }*/
-
                     txtModel.Text = model.ModelString();
-                    // = strModelExpression;
-
+                    
                     List<string> list = new List<string>();
                     list.Add(corrDT.Columns[0].ColumnName);
                     list.Add(corrDT.Columns[1].ColumnName);
@@ -484,6 +400,38 @@ namespace Prediction
                     lstRefVar.Add("ID");
                     lstRefVar.AddRange(strArrRefvars);
                     strArrReferencedVars = lstRefVar.ToArray();
+
+                    //We may need to restore some previously used elements
+                    if (!dictPredictionElements.ContainsKey(strModelPlugin))
+                    {
+                        dictPredictionElements.Add(strModelPlugin, new Dictionary<string, object>());
+                    }
+                    else
+                    {
+                        IDictionary<string, object> dictNewModel = (IDictionary<string, object>)dictPredictionElements[strModelPlugin];
+
+                        dtVariables = DeserializeDataTable(Container: dictNewModel, Slot: "IVData", Title: "Variables");
+                        if (dtVariables != null)
+                        {
+                            dgvVariables.DataSource = dtVariables;
+                            setViewOnGrid(dgvVariables);
+                        }
+
+                        dtObs = DeserializeDataTable(Container: dictNewModel, Slot: "ObsData", Title: "Observations");
+                        if (dtObs != null)
+                        {
+                            dgvObs.DataSource = dtObs;
+                            setViewOnGrid(dgvObs);
+                        }
+
+
+                        dtStats = DeserializeDataTable(Container: dictNewModel, Slot: "StatData", Title: "Stats");
+                        if (dtStats != null)
+                        {
+                            dgvStats.DataSource = dtStats;
+                            setViewOnGrid(dgvStats);
+                        }
+                    }
                 }
             }
         }
@@ -554,6 +502,19 @@ namespace Prediction
         //import IV datatable
         public bool btnImportIVs_Click(object sender, EventArgs e)
         {
+            //Get the currently existing data, if there is any.
+            DataTable tblRaw = null;
+            dtVariables = (DataTable)dgvVariables.DataSource;
+            if (dtVariables != null)
+            {
+                if (dtVariables.Rows.Count >= 1)
+                {
+                    dgvVariables.EndEdit();
+                    dtVariables.AcceptChanges();
+                    tblRaw = dtVariables.AsDataView().ToTable();
+                }
+            }
+
             //check to ensure user chose a model first
             if (dictMainEffects == null)
             {
@@ -564,10 +525,10 @@ namespace Prediction
             if (varmap == null)
             {
                 varmap = new InputMapper(dictMainEffects, "Model Variables", strArrReferencedVars, "Imported Variables");
-                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("VariableMapping", varmap);
+                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("VariableMapping", varmap.PackState());
             }
 
-            DataTable dt = varmap.ImportFile();
+            DataTable dt = varmap.ImportFile(tblRaw);
             if (dt == null)
                 return (false);
 
@@ -578,26 +539,60 @@ namespace Prediction
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
 
-            setViewOnGrid(dgvVariables);            
-            //btnMakePredictions.Enabled = false;
+            setViewOnGrid(dgvVariables);
+
+            //Store the imported data in case we want to move to another modeling method
+            dgvVariables.EndEdit();
+            dtVariables = (DataTable)dgvVariables.DataSource;
+            SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+
             return (true);
         }
 
 
 
-        public void ClearDataGridViews()
+        public void ClearDataGridViews(string Method)
         {
-            //when changes made to modeling, clear the prediction tables (reset)
-            this.dgvStats.DataSource = null;
-            this.dgvObs.DataSource = null;
-            this.dgvVariables.DataSource = null;
-            this.varmap = null;
+            if (((IDictionary<string, object>)dictPredictionElements).ContainsKey(Method))
+            {
+                SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "IVData");
+                SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "ObsData");
+                SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "StatData");
+            }
 
-            lstAvailModels.Items.Clear();
-            txtModel.Text = "";
-            txtDecCrit.Text = "";
+            //when changes made to modeling, clear the prediction tables (reset)
+            if (Method == strMethod)
+            {
+                this.dgvStats.DataSource = null;
+                this.dgvObs.DataSource = null;
+                this.dgvVariables.DataSource = null;
+                this.varmap = null;
+                txtModel.Text = "";
+                txtDecCrit.Text = "";
+            }            
         }
 
+
+        public int ClearMethod(string Method)
+        {
+            //If there isn't a model from this plugin in the listBox, then we've got nothing to do.
+            if (listModels.Contains(Method))
+            {
+                //Disconnect the selection-changed event handler while we work
+                this.lbAvailableModels.SelectedIndexChanged -= new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);
+                
+                //Remove the Method from the lists
+                listModels.Remove(Method);
+                lbAvailableModels.Items.Remove(Method);
+                if (dictPredictionElements.ContainsKey(Method))
+                    dictPredictionElements.Remove(Method);
+
+                //...Now reconnect the seleciton-changed event handler.
+                this.lbAvailableModels.SelectedIndexChanged += new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);
+            }
+            return listModels.Count;
+        }
+        
 
         //Import OB datatable
         public void btnImportObs_Click(object sender, EventArgs e)
@@ -624,7 +619,12 @@ namespace Prediction
             foreach (DataGridViewColumn dvgCol in dgvObs.Columns)
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
 
-            setViewOnGrid(dgvObs);     
+            setViewOnGrid(dgvObs);
+
+            //Store the imported observations in case we want to move to another modeling method
+            dgvObs.EndEdit();
+            dtObs = (DataTable)dgvObs.DataSource;
+            SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
         }
 
 
@@ -706,8 +706,13 @@ namespace Prediction
             dgvStats.DataSource = dtStats;
             foreach (DataGridViewColumn dvgCol in dgvStats.Columns)
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-                        
+
             setViewOnGrid(dgvStats);
+
+            //Store the predictions in case we want to move to another modeling method
+            dgvStats.EndEdit();
+            dtStats = (DataTable)dgvStats.DataSource;
+            SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
 
             VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);            
         }
@@ -732,63 +737,9 @@ namespace Prediction
                 strExpressions[k] = strVariable;
             }
 
-
-            //This pattern should match any variable transformation
-            //string pattern = @"(MAX|MEAN|PROD|SUM|MIN)\(([^\+]*)\)";
-            //Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
-            //Match m = r.Match(strModelExpression);
+            //Do any transformations/manipulations of the raw data.
             ExpressionEvaluator ee = new ExpressionEvaluator();
-
             tblForPrediction = ee.EvaluateTable(strExpressions, tblRaw);
-
-            /*foreach (string strExpression in strExpressions)
-            {
-                DataTable tblMod = ee.Evaluate(strExpression, tblRaw);
-                    
-                tblForPrediction.Columns.Add(columnName:strExpression, type:tblMod.Columns[1].DataType);
-                
-                for (int i = 0; i < tblMod.Rows.Count; i++)
-                {
-                    if (!(tblForPrediction.Rows.Count > i))
-
-                    tblForPrediction.Rows[i].SetField<double>(columnName:strExpression,value:tblMod.Rows[i].Field<double>("CalcValue"));
-                }
-
-                if (m.Success)
-                {
-                    //Create a list that will hold any matched transformations.
-                    while (m.Success)
-                    {
-                        //Reconstruct the expression from the matched string. Default operation is summation.
-                        Globals.Operations op = Globals.Operations.SUM;
-                        switch (m.Groups[1].Value)
-                        {
-                            case "MAX":
-                                op = Globals.Operations.MAX;
-                                break;
-                            case "MEAN":
-                                op = Globals.Operations.MEAN;
-                                break;
-                            case "PROD":
-                                op = Globals.Operations.PROD;
-                                break;
-                            case "SUM":
-                                op = Globals.Operations.SUM;
-                                break;
-                            case "MIN":
-                                op = Globals.Operations.MIN;
-                                break;
-                        }
-
-                        //Create the Expression object.
-                        string[] strArrVars = m.Groups[2].Value.Split(',');
-
-                        //Add this expression to the list and continue on.
-                        m = m.NextMatch();
-                    }
-                }
-            }*/
-
             return tblForPrediction;
         }
 
@@ -1722,6 +1673,55 @@ namespace Prediction
         public string ModelTabState
         {
             set { strModelTabClean = value; }
-        }         
+        }
+
+
+        private void SerializeDataTable(DataTable Data, IDictionary<string, object> Container, string Slot, string Title=null)
+        {
+            if (Title == null)
+                Title = Slot;
+
+            string strSerializedDataTable = null;
+
+            if (Data != null)
+            {
+                Data.AcceptChanges();
+                Data.TableName = Title;
+                StringWriter sw = new StringWriter();
+                Data.WriteXml(sw, XmlWriteMode.WriteSchema, false);
+                strSerializedDataTable = sw.ToString();
+                sw.Close();
+            }
+
+            //If there's already observations packed up for this modeling method, remove them before adding the new stuff.
+            if (Container.ContainsKey(Slot))
+                Container.Remove(Slot);
+            Container.Add(Slot, strSerializedDataTable);
+        }
+
+
+        private DataTable DeserializeDataTable(IDictionary<string, object> Container, string Slot, string Title = null)
+        {
+            DataTable tblData = null;
+
+            if (Title == null)
+                Title = Slot;
+
+            if (Container.ContainsKey(Slot))
+            {
+                if (Container[Slot] != null)
+                {
+                    string strPackedDataTable = Container[Slot].ToString();
+
+                    if (!String.IsNullOrWhiteSpace(strPackedDataTable))
+                    {
+                        DataSet ds = new DataSet();
+                        ds.ReadXml(new StringReader(strPackedDataTable), XmlReadMode.ReadSchema);
+                        tblData = ds.Tables[0];
+                    }
+                }
+            }
+            return tblData;
+        }
     }
 }

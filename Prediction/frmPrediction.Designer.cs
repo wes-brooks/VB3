@@ -64,7 +64,7 @@
             this.btnSaveTable = new System.Windows.Forms.Button();
             this.btnIVDataValidation = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
-            this.lstAvailModels = new System.Windows.Forms.ListBox();
+            this.lbAvailableModels = new System.Windows.Forms.ListBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.panel2.SuspendLayout();
             this.panelIVs.SuspendLayout();
@@ -484,17 +484,17 @@
             // 
             // lstAvailModels
             // 
-            this.lstAvailModels.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lstAvailModels.FormattingEnabled = true;
-            this.lstAvailModels.Location = new System.Drawing.Point(6, 25);
-            this.lstAvailModels.Name = "lstAvailModels";
-            this.lstAvailModels.Size = new System.Drawing.Size(134, 108);
-            this.lstAvailModels.TabIndex = 18;
-            this.lstAvailModels.SelectedIndexChanged += new System.EventHandler(this.lstAvailModels_SelectedIndexChanged);
+            this.lbAvailableModels.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbAvailableModels.FormattingEnabled = true;
+            this.lbAvailableModels.Location = new System.Drawing.Point(6, 25);
+            this.lbAvailableModels.Name = "lstAvailModels";
+            this.lbAvailableModels.Size = new System.Drawing.Size(134, 108);
+            this.lbAvailableModels.TabIndex = 18;
+            this.lbAvailableModels.SelectedIndexChanged += new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.lstAvailModels);
+            this.groupBox3.Controls.Add(this.lbAvailableModels);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(16, 9);
             this.groupBox3.Name = "groupBox3";
@@ -576,7 +576,7 @@
         private System.Windows.Forms.Button btnImportObs;
         private System.Windows.Forms.Button btnImportIVs;
         private System.Windows.Forms.HelpProvider helpProvider1;
-        private System.Windows.Forms.ListBox lstAvailModels;
+        private System.Windows.Forms.ListBox lbAvailableModels;
         private System.Windows.Forms.GroupBox groupBox3;
     }
 }
