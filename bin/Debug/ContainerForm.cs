@@ -38,7 +38,6 @@ namespace VirtualBeach
         }
 
         public AppManager appManager { get; set; }
-        
 
          ///<summary>
          ///method is UI message displayer from application components

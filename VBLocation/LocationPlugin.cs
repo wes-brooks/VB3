@@ -285,7 +285,9 @@ namespace VBLocation
 
             boolComplete = (bool)dictPackedState["Complete"];
             dictPackedState.Add("Visible", boolVisible);
+
             signaller.RaiseBroadcastRequest(this, dictPackedState);
+            signaller.PushToUndoStack();
         }
 
 

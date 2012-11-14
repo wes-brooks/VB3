@@ -112,6 +112,9 @@ namespace Prediction
 
             dictColumnMap = dictColMap;
 
+
+
+
             /*DataTable dt = new DataTable();
             if (dictColMap.ContainsKey("ID"))
                 dt.Columns.Add("ID", typeof(string));     
@@ -135,12 +138,16 @@ namespace Prediction
                 }
                 dt.Rows.Add(dr);
             }
-            
+      
             if (dt.Columns.Contains("ID"))
                 dt.Columns["ID"].SetOrdinal(0);
 
-            dtMapped = dt;
-            */
+            dtMapped = dt;*/
+            
+
+
+
+
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();
         }

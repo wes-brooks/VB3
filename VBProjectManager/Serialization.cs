@@ -175,6 +175,11 @@ namespace VBProjectManager
                     }
                 }
             }
+
+            //Reset the undo stack
+            UndoStack.Clear();
+            RedoStack.Clear();
+            signaller.PushToUndoStack();
         }
 
 
@@ -213,19 +218,8 @@ namespace VBProjectManager
         //unpack plugin, assigning values from incoming dictionary
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {  
-            //this.strTopPlugin = (string)dictPackedState["TopPlugin"];
             this.strTopPlugin = (string)dictPackedState["TopPlugin"];
             this.strPathName = (string)dictPackedState["ProjectName"];
-
-            /*//Make the top plugin active
-            foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-            {
-                if (x is VBCommon.Interfaces.IPlugin)
-                {
-                    if (((VBCommon.Interfaces.IPlugin)x).PanelKey.ToString() == strTopPlugin)
-                        ((VBCommon.Interfaces.IPlugin)x).MakeActive();
-                }
-            }*/
         }
     }
 }

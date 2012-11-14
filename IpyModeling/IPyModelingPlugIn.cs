@@ -458,7 +458,9 @@ namespace IPyModeling
 
             dictPackedState.Add("Complete", innerIronPythonControl.Complete);
             dictPackedState.Add("Visible", boolVisible);
+
             signaller.RaiseBroadcastRequest(this, dictPackedState);
+            signaller.PushToUndoStack();
         }
 
 

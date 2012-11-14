@@ -6,21 +6,42 @@ using System.Data;
 using VBCommon;
 using VBCommon.IO;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace Prediction
 {
     class InputMapper
     {
-        private Dictionary<string, string> dictMainEffects, dictColMap;
+        private Dictionary<string, string> dictColMap;
         private DataTable tblMappedData;
         private string[] strArrReferencedVars;
         private string strLeftCaption, strRightCaption;
 
 
+        public InputMapper()
+        {
+        }
+
+
+        public InputMapper(IDictionary<string, object> PackedState)
+        {
+            this.UnpackState(PackedState);
+        }
+
+
         public InputMapper(Dictionary<string, string> MainEffects, string LeftCaption, string[] VariableNames, string RightCaption)
         {
             strArrReferencedVars = VariableNames;
-            dictMainEffects = MainEffects;
+            //dictMainEffects = MainEffects;
+            strLeftCaption = LeftCaption;
+            strRightCaption = RightCaption;
+        }
+
+
+        public InputMapper(string LeftCaption, string[] VariableNames, string RightCaption)
+        {
+            strArrReferencedVars = VariableNames;
+            //dictMainEffects = MainEffects;
             strLeftCaption = LeftCaption;
             strRightCaption = RightCaption;
         }
@@ -37,7 +58,7 @@ namespace Prediction
             {
                 string[] strArrHeaderCaptions = { strLeftCaption, strRightCaption };
 
-                Dictionary<string, string> dictFields = new Dictionary<string, string>(dictMainEffects);
+                //Dictionary<string, string> dictFields = new Dictionary<string, string>(dictMainEffects);
                 frmColumnMapper colMapper = new frmColumnMapper(strArrReferencedVars, dt, strArrHeaderCaptions, true, false);
                 DialogResult dr = colMapper.ShowDialog();
 
@@ -168,8 +189,8 @@ namespace Prediction
         {
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
 
-            dictPackedState.Add("MainEffects", dictMainEffects);
-            dictPackedState.Add("ColumnMap", dictColMap);
+            //dictPackedState.Add("MainEffects", dictMainEffects);
+            dictPackedState.Add("ColumnMap", JsonConvert.SerializeObject(dictColMap));
             dictPackedState.Add("ReferencedVariables", strArrReferencedVars);
             dictPackedState.Add("LeftCaption", strLeftCaption);
             dictPackedState.Add("RightCaption", strRightCaption);
@@ -178,15 +199,57 @@ namespace Prediction
         }
 
 
-        public void PackState(IDictionary<string, object> PackedState)
+        public void UnpackState(IDictionary<string, object> PackedState)
         {
             IDictionary<string, object> dictPackedState = PackedState;
 
-            dictMainEffects = (Dictionary<string, string>)(dictPackedState["dictMainEffects"]);
-            dictColMap = (Dictionary<string, string>)(dictPackedState["ColumnMap"]);
-            strArrReferencedVars = (string[])(dictPackedState["ReferencedVariables"]);
-            strLeftCaption = dictPackedState["LeftCaption"].ToString();
-            strRightCaption = dictPackedState["RightCaption"].ToString();
+            if (dictPackedState.ContainsKey("ColumnMap"))
+            {
+                if (dictPackedState["ColumnMap"].GetType() == typeof(string))
+                {
+                    Type objType = typeof(Dictionary<string, string>);
+                    string jsonRep = dictPackedState["ColumnMap"].ToString();
+
+                    object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
+                    dictColMap = (Dictionary<string, string>)objVariableMapping;
+                }
+            }
+
+            if (dictPackedState.ContainsKey("ReferencedVariables"))
+            {
+                if (dictPackedState["ReferencedVariables"].GetType() == typeof(Newtonsoft.Json.Linq.JArray))
+                {
+                    Type objType = typeof(string[]);
+                    string jsonRep = dictPackedState["ReferencedVariables"].ToString();
+
+                    object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
+                    strArrReferencedVars = (string[])objVariableMapping;
+                }
+            }
+
+            if (dictPackedState.ContainsKey("LeftCaption"))
+            {
+                if (dictPackedState["LeftCaption"].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                {
+                    Type objType = typeof(string);
+                    string jsonRep = dictPackedState["LeftCaption"].ToString();
+
+                    object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
+                    strLeftCaption = objVariableMapping.ToString();
+                }
+            }
+
+            if (dictPackedState.ContainsKey("RightCaption"))
+            {
+                if (dictPackedState["RightCaption"].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                {
+                    Type objType = typeof(string);
+                    string jsonRep = dictPackedState["RightCaption"].ToString();
+
+                    object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
+                    strRightCaption = objVariableMapping.ToString();
+                }
+            }
         }
     }
 }

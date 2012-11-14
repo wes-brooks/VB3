@@ -40,7 +40,8 @@ namespace Prediction
         private List<ListItem> lstIndVars = null;
         private string strOutputVariable = "Output";
 
-        InputMapper varmap = null;
+        InputMapper IvMap = null;
+        InputMapper ObsMap = null;
         private DataTable dtVariables = null;
         private DataTable dtObs = null;
         private DataTable dtStats = null;
@@ -99,6 +100,25 @@ namespace Prediction
                     string jsonRep = pair.Value.ToString();
 
                     object objDeserialized = JsonConvert.DeserializeObject(jsonRep, objType);
+
+                    if (((IDictionary<string, object>)objDeserialized).ContainsKey("VariableMapping"))
+                    {
+                        objType = typeof(Dictionary<string, object>);
+                        jsonRep = ((IDictionary<string, object>)objDeserialized)["VariableMapping"].ToString();
+
+                        object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
+                        ((IDictionary<string, object>)objDeserialized)["VariableMapping"] = new InputMapper((IDictionary<string, object>)objVariableMapping);
+                    }
+
+                    if (((IDictionary<string, object>)objDeserialized).ContainsKey("ObsVariableMapping"))
+                    {
+                        objType = typeof(Dictionary<string, object>);
+                        jsonRep = ((IDictionary<string, object>)objDeserialized)["ObsVariableMapping"].ToString();
+
+                        object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
+                        ((IDictionary<string, object>)objDeserialized)["ObsVariableMapping"] = new InputMapper((IDictionary<string, object>)objVariableMapping);
+                    }
+
                     dictTemp.Add(pair.Key, objDeserialized);
                 }
                 dictPredictionElements = dictTemp;
@@ -109,10 +129,9 @@ namespace Prediction
                 List<string> listTemp = (List<string>)dictPackedState["AvailableModels"];
 
                 foreach (string method in listTemp)
-                    AddModel(method);
-
-                if (dictPackedState.ContainsKey("AvailableModelsIndex")) { lbAvailableModels.SelectedIndex = (int)dictPackedState["AvailableModelsIndex"]; }
+                    AddModel(method, false);
                 
+                if (dictPackedState.ContainsKey("AvailableModelsIndex")) { lbAvailableModels.SelectedIndex = (int)dictPackedState["AvailableModelsIndex"]; }                
             }
 
             if (!dictPackedState.ContainsKey("Model")) { return; }
@@ -204,7 +223,7 @@ namespace Prediction
             catch (InvalidCastException) { dblRegulatoryThreshold = -1; }
 
             try { dblDecisionThreshold = Convert.ToDouble(txtDecCrit.Text); }
-            catch (InvalidCastException) { dblDecisionThreshold = -1; }
+            catch { dblDecisionThreshold = dblRegulatoryThreshold; }
 
             //Pack model as string and as model for serializing. need to versions for Json.net serialization (which can't serialize IronPython objects)
             Dictionary<string, object> dictModelState = new Dictionary<string, object>();
@@ -215,7 +234,7 @@ namespace Prediction
 
             dictPluginState.Add("Model", dictModelState);
             dictPluginState.Add("Transform", dictTransform);
-            dictPluginState.Add("PredictionElements", dictPredictionElements);
+            
 
             //pack values
             dgvVariables.EndEdit();
@@ -230,12 +249,14 @@ namespace Prediction
             dtStats = (DataTable)dgvStats.DataSource;
             SerializeDataTable(Data: dtStats, Container: dictPluginState, Slot: "StatData", Title: "Stats");
 
+            dictPluginState.Add("PredictionElements", dictPredictionElements);
+
             return dictPluginState;
         }
 
 
         //store packed state and populate listbox
-        public void AddModel(string Method)
+        public void AddModel(string Method, bool ReplacePredictionElements = true)
         {
             //Disconnect the selection-changed handlers for this process
             this.lbAvailableModels.SelectedIndexChanged -= new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);            
@@ -248,8 +269,11 @@ namespace Prediction
                 lbAvailableModels.Items.Remove(Method);
             }
 
-            if (dictPredictionElements.ContainsKey(Method))
-                dictPredictionElements.Remove(Method);
+            if (ReplacePredictionElements)
+            {
+                if (dictPredictionElements.ContainsKey(Method))
+                    dictPredictionElements.Remove(Method);
+            }
 
             //Now add the model to the listBox
             lbAvailableModels.Items.Add(Method);
@@ -293,8 +317,11 @@ namespace Prediction
                     dtStats = (DataTable)dgvStats.DataSource;
                     if (dtStats != null)
                         SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
-
                 }
+
+                //Clear the column mappings
+                IvMap = null;
+                ObsMap = null;
 
                 //clear the grids if another model's info has been used
                 if (corrDT != null)
@@ -410,6 +437,17 @@ namespace Prediction
                     {
                         IDictionary<string, object> dictNewModel = (IDictionary<string, object>)dictPredictionElements[strModelPlugin];
 
+                        if (dictNewModel.ContainsKey("ObsVariableMapping"))
+                        {
+                            ObsMap = (InputMapper)dictNewModel["ObsVariableMapping"];
+                            //ObsMap.UnpackState((IDictionary<string, object>)dictNewModel["ObsVariableMapping"]);
+                        }
+
+                        if (dictNewModel.ContainsKey("VariableMapping"))
+                        {
+                            IvMap = (InputMapper)dictNewModel["VariableMapping"];
+                        }
+
                         dtVariables = DeserializeDataTable(Container: dictNewModel, Slot: "IVData", Title: "Variables");
                         if (dtVariables != null)
                         {
@@ -502,6 +540,8 @@ namespace Prediction
         //import IV datatable
         public bool btnImportIVs_Click(object sender, EventArgs e)
         {
+            bool boolNewMapping = false;
+
             //Get the currently existing data, if there is any.
             DataTable tblRaw = null;
             dtVariables = (DataTable)dgvVariables.DataSource;
@@ -522,13 +562,13 @@ namespace Prediction
                 return(false);
             }
 
-            if (varmap == null)
+            if (IvMap == null)
             {
-                varmap = new InputMapper(dictMainEffects, "Model Variables", strArrReferencedVars, "Imported Variables");
-                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("VariableMapping", varmap.PackState());
+                IvMap = new InputMapper(dictMainEffects, "Model Variables", strArrReferencedVars, "Imported Variables");
+                boolNewMapping = true;
             }
 
-            DataTable dt = varmap.ImportFile(tblRaw);
+            DataTable dt = IvMap.ImportFile(tblRaw);
             if (dt == null)
                 return (false);
 
@@ -544,7 +584,11 @@ namespace Prediction
             //Store the imported data in case we want to move to another modeling method
             dgvVariables.EndEdit();
             dtVariables = (DataTable)dgvVariables.DataSource;
+            
+            //Store prediction elements in case we want to navigate away from this model and then come back.
             SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+            if (boolNewMapping)
+                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("VariableMapping", IvMap.PackState());
 
             return (true);
         }
@@ -566,7 +610,8 @@ namespace Prediction
                 this.dgvStats.DataSource = null;
                 this.dgvObs.DataSource = null;
                 this.dgvVariables.DataSource = null;
-                this.varmap = null;
+                this.IvMap = null;
+                this.ObsMap = null;
                 txtModel.Text = "";
                 txtDecCrit.Text = "";
             }            
@@ -597,7 +642,61 @@ namespace Prediction
         //Import OB datatable
         public void btnImportObs_Click(object sender, EventArgs e)
         {
-            VBCommon.IO.ImportExport import = new ImportExport();
+            //Get the currently existing data, if there is any.
+            DataTable tblRaw = null;
+            dtVariables = (DataTable)dgvVariables.DataSource;
+            if (dtVariables != null)
+            {
+                if (dtVariables.Rows.Count >= 1)
+                {
+                    dgvVariables.EndEdit();
+                    dtVariables.AcceptChanges();
+                    tblRaw = dtVariables.AsDataView().ToTable();
+                }
+            }
+
+            //check to ensure user chose a model first
+            if (dictMainEffects == null)
+            {
+                MessageBox.Show("You must first pick a model from the Available Models");
+                return;
+            }
+
+            if (ObsMap == null)
+            {
+                string[] strArrHeaderCaptions = { "Obs IDs", "Obs" };
+                string[] strArrObsColumns = { "ID", strOutputVariable };
+
+                //frmColumnMapper colMapper = new frmColumnMapper(strArrObsColumns, dt, strArrHeaderCaptions, true, false);
+                //DialogResult dr = colMapper.ShowDialog();
+
+                ObsMap = new InputMapper("Obs IDs", strArrObsColumns, "Obs");
+                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("ObsVariableMapping", ObsMap.PackState());
+            }
+
+            DataTable dt = ObsMap.ImportFile(tblRaw);
+            if (dt == null)
+                return;
+
+            dgvObs.DataSource = dt;
+
+            foreach (DataGridViewColumn dvgCol in dgvObs.Columns)
+            {
+                dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+
+            setViewOnGrid(dgvObs);
+
+            //Store the imported data in case we want to move to another modeling method
+            dgvObs.EndEdit();
+            dtObs = (DataTable)dgvObs.DataSource;
+            SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
+
+            return;
+
+
+
+            /*VBCommon.IO.ImportExport import = new ImportExport();
             DataTable dt = import.Input;
             if (dt == null)
                 return;
@@ -624,7 +723,7 @@ namespace Prediction
             //Store the imported observations in case we want to move to another modeling method
             dgvObs.EndEdit();
             dtObs = (DataTable)dgvObs.DataSource;
-            SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
+            SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");*/
         }
 
 

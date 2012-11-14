@@ -34,6 +34,8 @@ namespace VBCommon
         public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
 
+        public event EventHandler PopulateUndoStackRequested;
+
         public Signaller() {}
 
 
@@ -91,6 +93,17 @@ namespace VBCommon
             {
                 UnpackEventArgs e = new UnpackEventArgs(key, value);
                 UnpackRequest(this, e);
+            }
+        }
+
+
+        [System.ComponentModel.Composition.Export("Signalling.PushToUndoStack")]
+        public void PushToUndoStack()
+        {
+            if (PopulateUndoStackRequested != null)
+            {
+                EventArgs e = new EventArgs();
+                PopulateUndoStackRequested(this, e);
             }
         }
 

@@ -201,12 +201,13 @@ namespace VBDatasheet
                 dsControl1.DT = frmMissing.ValidatedDT;
                 dsControl1.dgv.Enabled = true;
                 //update list in case they've deleted cols/rows
-                dsControl1.updateListView(VBCommon.Globals.listvals.NCOLS, dsControl1.DT.Columns.Count);
+                /*dsControl1.UpdateListView(VBCommon.Globals.listvals.NCOLS, dsControl1.DT.Columns.Count);
                 int nonivs = dsControl1.HiddenCols + 2;
                 dsControl1.NumberIVs = dsControl1.DT.Columns.Count - nonivs;
-                dsControl1.updateListView(VBCommon.Globals.listvals.NIVS, dsControl1.NumberIVs);
+                dsControl1.UpdateListView(VBCommon.Globals.listvals.NIVS, dsControl1.NumberIVs);
                 int recount = dsControl1.DT.Rows.Count;
-                dsControl1.updateListView(VBCommon.Globals.listvals.NROWS, recount);
+                dsControl1.UpdateListView(VBCommon.Globals.listvals.NROWS, recount);*/
+                dsControl1.UpdateListView();
                 dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
                 boolValidated = true;
             }

@@ -23,7 +23,7 @@ namespace VBCommon.Metadata
         {
             if (dc.ExtendedProperties.ContainsKey(attr))
             {
-                if (dc.ExtendedProperties[attr].ToString() == "True")
+                if ((bool)dc.ExtendedProperties[attr] == true)
                     return true;
                 else
                     return false;
@@ -133,7 +133,7 @@ namespace VBCommon.Metadata
                         bool isH = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                         if (isH == true)
                         {
-                            if (dt.Columns[c].ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                            if ((bool)dt.Columns[c].ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
                             {
                                 if (dtCopy.Columns.Contains(dt.Columns[c].Caption))
                                     dtCopy.Columns.Remove(dt.Columns[c].Caption);
@@ -155,7 +155,7 @@ namespace VBCommon.Metadata
                     bool hascat = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.CATEGORICAL);
                     if (hascat == true)
                     {
-                        if (dt.Columns[c].ExtendedProperties[VBCommon.Globals.CATEGORICAL].ToString() == "True")
+                        if ((bool)dt.Columns[c].ExtendedProperties[VBCommon.Globals.CATEGORICAL] == true)
                         {
 
                             if (dtCopy.Columns.Contains(dt.Columns[c].Caption))
@@ -205,7 +205,7 @@ namespace VBCommon.Metadata
                     bool hasAttribute = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED);
                     if (!hasAttribute) continue;
 
-                    if (dc.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
+                    if ((bool)dc.ExtendedProperties[VBCommon.Globals.ENABLED] != true)
                     {
                         if (!dtCopy.Columns.Contains(dc.Caption))
                         {
@@ -263,7 +263,7 @@ namespace VBCommon.Metadata
                     bool hasHidden = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                     if (!hasHidden) continue;
 
-                    if (dc.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                    if ((bool)dc.ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
                     {
                         if (!dtCopy.Columns.Contains(dc.Caption))
                         {
@@ -294,7 +294,7 @@ namespace VBCommon.Metadata
                         hasAttr = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                         if (hasAttr)
                         {
-                            if (dc.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                            if ((bool)dc.ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
                             {
                                 dc.ExtendedProperties[VBCommon.Globals.HIDDEN] = false;
                             }
@@ -348,7 +348,7 @@ namespace VBCommon.Metadata
                     bool hashidden = c.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                     if (hashidden == true)
                     {
-                        if (c.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
+                        if ((bool)c.ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
                             { dgv.Columns[c.ColumnName].Visible = false; }
                     }
 
@@ -357,7 +357,7 @@ namespace VBCommon.Metadata
                     if (hasattribute)
                     {
                         selectedColIndex = dt.Columns.IndexOf(c);
-                        if (c.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
+                        if ((bool)c.ExtendedProperties[VBCommon.Globals.ENABLED] != true)
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
@@ -453,7 +453,7 @@ namespace VBCommon.Metadata
                     if (hasattribute)
                     {
                         int selectedColIndex = dt.Columns.IndexOf(c);
-                        if (c.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
+                        if ((bool)c.ExtendedProperties[VBCommon.Globals.ENABLED] != true)
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Red;

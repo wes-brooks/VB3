@@ -22,7 +22,6 @@ namespace VBProjectManager
     //class to manage all plugins
     public partial class VBProjectManager : Extension, IFormState, IPartImportsSatisfiedNotification, IPlugin
     {
-        //       private Dictionary<string, Boolean> dictTabStates;
         private string strPathName;
         private string strProjectName;
         private string strTopPlugin; //plugin change event changes this value
@@ -244,6 +243,7 @@ namespace VBProjectManager
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
+            signaller.PopulateUndoStackRequested += new EventHandler(PushCurrentState);
         }
 
 
@@ -257,113 +257,63 @@ namespace VBProjectManager
         //pop off last stack for undo
         public void Undo(object sender, EventArgs e)
         {
-            //check to see if pop is a model first, first undo on model will accidentally send unpack to _frmDatasheet
-            //KeyValuePair<string, object> kvpCurrentState = (KeyValuePair<string, object>)(UndoStack.Pop());
-            //KeyValuePair<string, object> kvpLastState = (KeyValuePair<string, object>)(UndoStack.Peek());
-
             if (UndoStack.Count > 1)
             {
                 IDictionary<string, IDictionary<string, object>> dictCurrentState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Pop());
                 IDictionary<string, IDictionary<string, object>> dictLastState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Peek());
 
-                RedoStack.Push(dictCurrentState);
-                if (RedoStack.Count > 0)
-                    btnRedo.Enabled = true;
-
                 //raise unpack event, sending packed plugins dictionary
+                RedoStack.Push(dictCurrentState);
                 signaller.UnpackProjectState(dictLastState);
 
-                //signaller.RaiseBroadcastRequest(this, (IDictionary<string, object>)(kvpLastState.Value));
-
+                if (RedoStack.Count > 0)
+                    btnRedo.Enabled = true;                
                 if (UndoStack.Count == 1)
                     btnUndo.Enabled = false;
-            }               
-
-            /*if ((bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("PLSPanel") || (bool)((Dictionary<string, object>)whatAreWePopping).ContainsKey("GBMPanel"))
-            {
-                Dictionary<string, object> modelPop = new Dictionary<string, object>((Dictionary<string, object>)whatAreWePopping);
-
-                //ensure the unpack goes to the model, not datasheet
-                foreach (KeyValuePair<string, object> pair in modelPop)
-                { stackKey = pair.Key; }
-
-                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-                {
-                    if (x is IPlugin)
-                    {
-                        IPlugin thisPlug = (IPlugin)x;
-                        if (thisPlug.PanelKey == stackKey)
-                        { //thisPlug.unpack back 
-                            Dictionary<string, object> dictUnpackThis = new Dictionary<string, object>();
-                            foreach (KeyValuePair<string, object> getValue in dictLastStackItem)
-                            { dictUnpackThis = (Dictionary<string,object>)getValue.Value; }
-                         
-
-                           // Broadcast(this, dictUnpackThis);
-                        }
-                    }
-                }
             }
-            else
-            {
-                foreach (KeyValuePair<string, object> pair in dictLastStackItem)
-                {
-                    stackKey = pair.Key;
-                }
-
-                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-                {
-                    if (x is IPlugin)
-                    {
-                        IPlugin thisPlug = (IPlugin)x;
-                        if (thisPlug.PanelKey == stackKey)
-                        { //thisPlug.unpack back 
-                            Dictionary<string, object> dictUnpackThis = new Dictionary<string, object>();
-                            dictUnpackThis = (Dictionary<string, object>)dictLastStackItem[stackKey];
-                            //thisPlug.UndoLastChange(dictUnpackThis);
-                        }
-                    }
-                }
-            }*/
         }
 
 
         public void Redo(object sender, EventArgs e)
         {
-        }
-
-
-        //listen to plugin's broadcast in order to update other plugins
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
-        {
-            if (((IPlugin)sender).PluginType != Globals.PluginType.ProjectManager)
+            if (RedoStack.Count > 0)
             {
-                //Dictionary to store each plugin's state for saving
-                IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
-                signaller.RaiseSaveRequest(dictPluginStates);
+                //IDictionary<string, IDictionary<string, object>> dictCurrentState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Peek());
+                IDictionary<string, IDictionary<string, object>> dictLastState = (IDictionary<string, IDictionary<string, object>>)(RedoStack.Pop());
 
-                string strKey = RandomString(20);
-                //pdUndo.Add(strKey, dictPluginStates);
+                //raise unpack event, sending packed plugins dictionary
+                UndoStack.Push(dictLastState);
+                signaller.UnpackProjectState(dictLastState);
 
-                UndoStack.Push(dictPluginStates);
-                RedoStack.Clear();
-
-                btnUndo.Enabled = true;
-                btnRedo.Enabled = false;
-
-                /*KeyValuePair<string, object> kvpStackObj = new KeyValuePair<string, object>(((VBCommon.Interfaces.IPlugin)sender).PanelKey, e.PackedPluginState);
-                UndoStack.Push(kvpStackObj);
-                if (UndoStack.Count > 0)
-                {
-                    btnUndo.Enabled = true;
-                    btnRedo.Enabled = false;
-                    RedoStack.Clear();
-                }*/
+                if (RedoStack.Count > 0)
+                    btnRedo.Enabled = true;
+                if (UndoStack.Count == 1)
+                    btnUndo.Enabled = false;
             }
         }
 
+        
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
+        {
+        }
 
-        //projectManager broadcasting itself when a change is made
+
+        private void PushCurrentState(object sender, EventArgs e)
+        {
+            //Dictionary to store each plugin's state for saving
+            IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
+            signaller.RaiseSaveRequest(dictPluginStates);
+            
+            //Manage the undo and redo stacks
+            UndoStack.Push(dictPluginStates);
+            RedoStack.Clear();
+
+            //Manage the state of the undo/redo buttons.
+            btnUndo.Enabled = true;
+            btnRedo.Enabled = false;
+        }
+
+
         public void Broadcast()
         {
             IDictionary<string, object> packedState = PackState();

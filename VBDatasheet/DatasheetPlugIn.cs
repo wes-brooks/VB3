@@ -280,6 +280,7 @@ namespace VBDatasheet
             dictPackedState.Add("FirstPass", boolFirstPass);
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
+            signaller.PushToUndoStack();
         }
 
 

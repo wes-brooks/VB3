@@ -362,7 +362,9 @@ namespace Prediction
             IDictionary<string, object> dictPackedState = _frmPred.PackState();
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
+
             signaller.RaiseBroadcastRequest(this, dictPackedState);
+            signaller.PushToUndoStack();
         }
 
 
