@@ -57,6 +57,7 @@ namespace Prediction
             _frmPred = new frmPrediction();
             strPanelKey = "Prediction";
             strPanelCaption = "Prediction";
+            _frmPred.ButtonStatusEvent += new EventHandler<ButtonStatusEventArgs>(_frmPred_ButtonStatusEvent);
         }
 
         
@@ -472,6 +473,21 @@ namespace Prediction
         void btnExportTable_Ck(object sender, EventArgs e)
         {
             _frmPred.btnExportTable_Click(sender, e);
+        }
+
+
+        void _frmPred_ButtonStatusEvent(object sender, ButtonStatusEventArgs args)
+        {
+            if (args.Set == false)
+            {
+                args.ButtonStatus.Add("PredictionButtonEnabled", btnMakePred.Enabled);
+                args.ButtonStatus.Add("ValidationButtonEnabled", btnIVDataVal.Enabled);
+            }
+            else
+            {
+                btnIVDataVal.Enabled = args.ButtonStatus["ValidationButtonEnabled"];
+                btnMakePred.Enabled = args.ButtonStatus["PredictionButtonEnabled"];
+            }
         }
     }
 }

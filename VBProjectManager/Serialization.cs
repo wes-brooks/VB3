@@ -117,6 +117,7 @@ namespace VBProjectManager
             else return;
 
             //Load a project file from disk and then send it out to be unpacked.
+            strPathName = strFileName;
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
             StreamReader streamreader = new StreamReader(strFileName);
             JsonTextReader jsonreader = new JsonTextReader(streamreader);
@@ -219,7 +220,7 @@ namespace VBProjectManager
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {  
             this.strTopPlugin = (string)dictPackedState["TopPlugin"];
-            this.strPathName = (string)dictPackedState["ProjectName"];
+            this.ProjectName = (string)dictPackedState["ProjectName"];
         }
     }
 }

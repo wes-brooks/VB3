@@ -104,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomFunctions.cs" />
+    <Compile Include="Events.cs" />
     <Compile Include="frmPrediction.cs">
       <SubType>UserControl</SubType>
     </Compile>

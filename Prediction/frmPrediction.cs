@@ -58,6 +58,8 @@ namespace Prediction
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
 
+        public event EventHandler<ButtonStatusEventArgs> ButtonStatusEvent;
+
 
         //constructor
         public frmPrediction()
@@ -107,7 +109,8 @@ namespace Prediction
                         jsonRep = ((IDictionary<string, object>)objDeserialized)["VariableMapping"].ToString();
 
                         object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
-                        ((IDictionary<string, object>)objDeserialized)["VariableMapping"] = new InputMapper((IDictionary<string, object>)objVariableMapping);
+                        //((IDictionary<string, object>)objDeserialized)["VariableMapping"] = new InputMapper((IDictionary<string, object>)objVariableMapping);
+                        ((IDictionary<string, object>)objDeserialized)["VariableMapping"] = (IDictionary<string, object>)objVariableMapping;
                     }
 
                     if (((IDictionary<string, object>)objDeserialized).ContainsKey("ObsVariableMapping"))
@@ -116,7 +119,8 @@ namespace Prediction
                         jsonRep = ((IDictionary<string, object>)objDeserialized)["ObsVariableMapping"].ToString();
 
                         object objVariableMapping = JsonConvert.DeserializeObject(jsonRep, objType);
-                        ((IDictionary<string, object>)objDeserialized)["ObsVariableMapping"] = new InputMapper((IDictionary<string, object>)objVariableMapping);
+                        //((IDictionary<string, object>)objDeserialized)["ObsVariableMapping"] = new InputMapper((IDictionary<string, object>)objVariableMapping);
+                        ((IDictionary<string, object>)objDeserialized)["ObsVariableMapping"] = (IDictionary<string, object>)objVariableMapping;
                     }
 
                     dictTemp.Add(pair.Key, objDeserialized);
@@ -289,12 +293,21 @@ namespace Prediction
         {
             try
             {
-                string strSelectedItem = lbAvailableModels.SelectedItem.ToString();
-                intSelectedModel = lbAvailableModels.SelectedIndex;
+                object selectedItem = lbAvailableModels.SelectedItem;
 
                 //didn't select a model
-                if (strSelectedItem == null)
+                if (selectedItem == null)
+                {
+                    txtModel.Clear();
+                    txtPower.Clear();
+                    txtRegStd.Clear();
+                    txtDecCrit.Clear();
+                    rbNone.Select();
                     return;
+                }
+
+                string strSelectedItem = selectedItem.ToString();
+                intSelectedModel = lbAvailableModels.SelectedIndex;
 
                 //First, pack up the data/observations/predictions for the current plugin
                 if (strMethod != null)
@@ -317,6 +330,19 @@ namespace Prediction
                     dtStats = (DataTable)dgvStats.DataSource;
                     if (dtStats != null)
                         SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
+
+                    if (ButtonStatusEvent != null)
+                    {
+                        IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                        ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates);
+                        //IDictionary<string, bool> 
+                        ButtonStatusEvent(this, args);
+
+
+                        ((IDictionary<string, object>)dictPredictionElements[strMethod])["PredictionButtonEnabled"] = dictButtonStates["PredictionButtonEnabled"];
+                        ((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"] = dictButtonStates["ValidationButtonEnabled"];
+                        //((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"] = btnMakePred.Enabled;
+                    }
                 }
 
                 //Clear the column mappings
@@ -432,6 +458,17 @@ namespace Prediction
                     if (!dictPredictionElements.ContainsKey(strModelPlugin))
                     {
                         dictPredictionElements.Add(strModelPlugin, new Dictionary<string, object>());
+
+                        //Initially, the validation and prediction buttons should be disabled.
+                        if (ButtonStatusEvent != null)
+                        {
+                            IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                            dictButtonStates["PredictionButtonEnabled"] = false;
+                            dictButtonStates["ValidationButtonEnabled"] = false;
+
+                            ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
+                            ButtonStatusEvent(this, args);
+                        }
                     }
                     else
                     {
@@ -439,13 +476,25 @@ namespace Prediction
 
                         if (dictNewModel.ContainsKey("ObsVariableMapping"))
                         {
-                            ObsMap = (InputMapper)dictNewModel["ObsVariableMapping"];
-                            //ObsMap.UnpackState((IDictionary<string, object>)dictNewModel["ObsVariableMapping"]);
+                            ObsMap = new InputMapper((IDictionary<string, object>)(dictNewModel["ObsVariableMapping"]));
                         }
 
                         if (dictNewModel.ContainsKey("VariableMapping"))
                         {
-                            IvMap = (InputMapper)dictNewModel["VariableMapping"];
+                            IvMap = new InputMapper((IDictionary<string, object>)(dictNewModel["VariableMapping"]));
+                        }
+
+                        if (dictNewModel.ContainsKey("PredictionButtonEnabled") && dictNewModel.ContainsKey("ValidationButtonEnabled"))
+                        {
+                            if (ButtonStatusEvent != null)
+                            {
+                                IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                                dictButtonStates["PredictionButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["PredictionButtonEnabled"];
+                                dictButtonStates["ValidationButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"];
+ 
+                                ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set:true);
+                                ButtonStatusEvent(this, args);
+                            }
                         }
 
                         dtVariables = DeserializeDataTable(Container: dictNewModel, Slot: "IVData", Title: "Variables");
@@ -642,6 +691,8 @@ namespace Prediction
         //Import OB datatable
         public void btnImportObs_Click(object sender, EventArgs e)
         {
+            bool boolNewMapping = false;
+
             //Get the currently existing data, if there is any.
             DataTable tblRaw = null;
             dtVariables = (DataTable)dgvVariables.DataSource;
@@ -664,14 +715,9 @@ namespace Prediction
 
             if (ObsMap == null)
             {
-                string[] strArrHeaderCaptions = { "Obs IDs", "Obs" };
                 string[] strArrObsColumns = { "ID", strOutputVariable };
-
-                //frmColumnMapper colMapper = new frmColumnMapper(strArrObsColumns, dt, strArrHeaderCaptions, true, false);
-                //DialogResult dr = colMapper.ShowDialog();
-
                 ObsMap = new InputMapper("Obs IDs", strArrObsColumns, "Obs");
-                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("ObsVariableMapping", ObsMap.PackState());
+                boolNewMapping = true;
             }
 
             DataTable dt = ObsMap.ImportFile(tblRaw);
@@ -691,39 +737,8 @@ namespace Prediction
             dgvObs.EndEdit();
             dtObs = (DataTable)dgvObs.DataSource;
             SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
-
-            return;
-
-
-
-            /*VBCommon.IO.ImportExport import = new ImportExport();
-            DataTable dt = import.Input;
-            if (dt == null)
-                return;
-
-            string[] strArrHeaderCaptions = { "Obs IDs", "Obs" };
-            string[] strArrObsColumns = { "ID", strOutputVariable };
-
-            frmColumnMapper colMapper = new frmColumnMapper(strArrObsColumns, dt, strArrHeaderCaptions, true, false);
-            DialogResult dr = colMapper.ShowDialog();
-
-            if (dr == DialogResult.OK)
-            {
-                dt = colMapper.MappedTable;
-                dgvObs.DataSource = dt;
-            }
-            else
-                return;
-
-            foreach (DataGridViewColumn dvgCol in dgvObs.Columns)
-                dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-
-            setViewOnGrid(dgvObs);
-
-            //Store the imported observations in case we want to move to another modeling method
-            dgvObs.EndEdit();
-            dtObs = (DataTable)dgvObs.DataSource;
-            SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");*/
+            if (boolNewMapping)
+                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("ObsVariableMapping", ObsMap.PackState());
         }
 
 
@@ -1326,6 +1341,11 @@ namespace Prediction
                 dtStats.Clear();            
             dtStats = null;
 
+            IvMap = null;
+            ObsMap = null;
+            dictPredictionElements = new Dictionary<string, object>(); ;
+            lbAvailableModels.ClearSelected();
+
             dgvVariables.DataSource = CreateEmptyIVsDataTable();
             dgvObs.DataSource = CreateEmptyObservationsDataTable();
         }
@@ -1353,7 +1373,7 @@ namespace Prediction
                 return;
             }
             //start plotting
-            frmPredictionScatterPlot frmPlot = new frmPredictionScatterPlot(dtObs, dtStats);
+            frmPredictionScatterPlot frmPlot = new frmPredictionScatterPlot(dtObs, dtStats, ObservationColumn:strOutputVariable);
             frmPlot.Show();
             //get the transform for plotting
             Int32 intTransform = Convert.ToInt32(dictTransform["Type"]);

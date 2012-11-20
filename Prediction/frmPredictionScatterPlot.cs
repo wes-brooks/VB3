@@ -21,13 +21,18 @@ namespace Prediction
         //observations and stats datatables
         private DataTable dtObs = null;
         private DataTable dtStats = null;
+        private string strObservationColumn;
+        private string strPredictionColumn;
         
+
         //constructor
-        public frmPredictionScatterPlot( DataTable dtObs, DataTable dtStats)
+        public frmPredictionScatterPlot(DataTable dtObs, DataTable dtStats, string ObservationColumn="Observation", string PredictionColumn="Model_Prediction")
         {
             InitializeComponent();
             this.dtObs = dtObs;
             this.dtStats = dtStats;
+            this.strObservationColumn = ObservationColumn;
+            this.strPredictionColumn = PredictionColumn;
 
             scatterPlot.UpdateResults(GetObsPredData());
         }
@@ -58,8 +63,8 @@ namespace Prediction
             for (int i = 0; i < intMinRecs; i++)
             {
                 dblArrRecord = new double[2];
-                dblArrRecord[0] = Convert.ToDouble(dtObs.Rows[i]["Observation"]);
-                dblArrRecord[1] = Convert.ToDouble(dtStats.Rows[i]["Model_Prediction"]);
+                dblArrRecord[0] = Convert.ToDouble(dtObs.Rows[i][strObservationColumn]);
+                dblArrRecord[1] = Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]);
                 lstData.Add(dblArrRecord);
             }
             return lstData;
