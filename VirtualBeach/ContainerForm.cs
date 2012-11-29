@@ -33,11 +33,19 @@ namespace VirtualBeach
             Shell = this;
             this.statusBar.Dock = DockStyle.Bottom;
             appManager.LoadExtensions();
+            this.FormClosed += new FormClosedEventHandler(Dispose);
 
             VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));
         }
 
         public AppManager appManager { get; set; }
+
+
+        public void Dispose(object sender, FormClosedEventArgs e)
+        {
+            appManager.Dispose();
+        }
+
 
          ///<summary>
          ///method is UI message displayer from application components

@@ -702,6 +702,47 @@ namespace IPyModeling
         }
 
 
+        public void btnRemoveInputVariableFromModelingTab_Click(object sender, EventArgs e)
+        {
+            List<ListItem> items = new List<ListItem>();
+
+            //Make a list of the variables we're removing from the model.
+            for (int i = 0; i < lvModel.SelectedIndices.Count; i++)
+            {
+                ListItem li = (ListItem)lbIndVariables.Items[lvModel.SelectedIndices[i]];
+                items.Add(li);
+            }
+
+            //Move the variables from the "Added" box to the "Available" box
+            foreach (ListItem li in items)
+            {
+                lbIndVariables.Items.Remove(li);
+
+                bool boolFoundIdx = false;
+                int intJ = 0;
+                for (intJ = 0; intJ < lbAvailableVariables.Items.Count; intJ++)
+                {
+                    ListItem li2 = (ListItem)lbAvailableVariables.Items[intJ];
+                    if (Convert.ToInt32(li2.ValueItem) > Convert.ToInt32(li.ValueItem))
+                    {
+                        lbAvailableVariables.Items.Insert(intJ, li);
+                        boolFoundIdx = true;
+                        break;
+                    }
+                }
+
+                if (boolFoundIdx == false)
+                    lbAvailableVariables.Items.Insert(intJ, li);
+            }
+
+            lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+
+            ClearModelingTab();
+            RaiseUpdateNotification();
+        }
+
+
         /*//used for IronPython-based modeling tab to begin the modeling process
         public DataTable CreateModelDataTable()
         {

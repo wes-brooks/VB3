@@ -43,6 +43,69 @@ namespace VBProjectManager
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
             signaller.RaiseSaveRequest(dictPluginStates);
 
+            string strProjectStateJson = StateToString(dictPluginStates);
+            File.WriteAllText(strPathName, strProjectStateJson);
+        }
+
+
+        public void SaveAs(object sender, EventArgs e)
+        {
+            ProjectPathName = null;
+            Save(sender, e);
+        }
+
+
+        public void Open(object sender, EventArgs e)
+        {
+            //open project
+            OpenFileDialog openFile = new OpenFileDialog();
+            openFile.InitialDirectory = VBProjectsPath;
+            openFile.Filter = @"VB3 Project Files|*.vbpx|All Files|*.*";
+            openFile.FilterIndex = 1;
+            openFile.RestoreDirectory = true;
+            string strFileName = string.Empty;
+
+            //Get the name of the selected file or return w/o doing anything if no file was selected.
+            if (openFile.ShowDialog() == DialogResult.OK)
+                strFileName = openFile.FileName;
+            else return;
+            strPathName = strFileName; 
+            
+            //Load a project file from disk and then send it out to be unpacked.           
+            StreamReader streamreader = new StreamReader(strFileName);
+            JsonTextReader jsonreader = new JsonTextReader(streamreader);
+            string strProjectStateJson = streamreader.ReadToEnd();
+            streamreader.Close();
+            jsonreader.Close();
+
+            IDictionary<string, IDictionary<string, object>> dictPluginStates = StringToState(strProjectStateJson);
+
+            //raise unpack event, sending packed plugins dictionary
+            signaller.UnpackProjectState(dictPluginStates);
+
+            //Make the top plugin active
+            if (dictPluginStates[this.strPluginKey]["TopPlugin"] != null)
+            {
+                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
+                {
+                    if (x is VBCommon.Interfaces.IPlugin)
+                    {
+                        if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[strPluginKey]["TopPlugin"].ToString())
+                            ((VBCommon.Interfaces.IPlugin)x).MakeActive();
+                    }
+                }
+            }
+
+            //Reset the undo stack
+            UndoStack.Clear();
+            RedoStack.Clear();
+            signaller.PushToUndoStack();
+        }
+
+
+        private string StateToString(IDictionary<string, IDictionary<string, object>> Plugins)
+        {
+            IDictionary<string, IDictionary<string, object>> dictPluginStates = Plugins;
             Dictionary<string, object> dictProjectState = new Dictionary<string, object>();
 
             //loop through each plugin in the dictionary of plugins
@@ -86,45 +149,20 @@ namespace VBProjectManager
             //JSON serialization of plugins dictionary
             JsonSerializer serializer = new JsonSerializer();
 
-            using (StreamWriter sw = new StreamWriter(strPathName))
+            using (StringWriter sw = new StringWriter())
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 serializer.Serialize(writer, dictProjectState);
+                return sw.ToString();
             }
         }
 
 
-        public void SaveAs(object sender, EventArgs e)
+        private IDictionary<string, IDictionary<string, object>> StringToState(string Serialized)
         {
-            ProjectPathName = null;
-            Save(sender, e);
-        }
-
-
-        public void Open(object sender, EventArgs e)
-        {
-            //open project
-            OpenFileDialog openFile = new OpenFileDialog();
-            openFile.InitialDirectory = VBProjectsPath;
-            openFile.Filter = @"VB3 Project Files|*.vbpx|All Files|*.*";
-            openFile.FilterIndex = 1;
-            openFile.RestoreDirectory = true;
-            string strFileName = string.Empty;
-
-            //Get the name of the selected file or return w/o doing anything if no file was selected.
-            if (openFile.ShowDialog() == DialogResult.OK)
-                strFileName = openFile.FileName;
-            else return;
-
-            //Load a project file from disk and then send it out to be unpacked.
-            strPathName = strFileName;
-            IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
-            StreamReader streamreader = new StreamReader(strFileName);
-            JsonTextReader jsonreader = new JsonTextReader(streamreader);
-            string strProjectStateJson = streamreader.ReadToEnd();
+            string strProjectStateJson = Serialized;
             var dictPackedProjectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(strProjectStateJson);
-            streamreader.Close();
-            jsonreader.Close();
+            IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
 
             //loop through plugins, deserialize each
             foreach (var plugin in dictPackedProjectState)
@@ -161,26 +199,7 @@ namespace VBProjectManager
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
 
-            //raise unpack event, sending packed plugins dictionary
-            signaller.UnpackProjectState(dictPluginStates);
-
-            //Make the top plugin active
-            if (dictPluginStates[this.strPluginKey]["TopPlugin"] != null)
-            {
-                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-                {
-                    if (x is VBCommon.Interfaces.IPlugin)
-                    {
-                        if (((VBCommon.Interfaces.IPlugin)x).PanelKey == dictPluginStates[strPluginKey]["TopPlugin"].ToString())
-                            ((VBCommon.Interfaces.IPlugin)x).MakeActive();
-                    }
-                }
-            }
-
-            //Reset the undo stack
-            UndoStack.Clear();
-            RedoStack.Clear();
-            signaller.PushToUndoStack();
+            return dictPluginStates;
         }
 
 

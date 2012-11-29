@@ -39,6 +39,7 @@ namespace IPyModeling
         private SimpleActionItem btnComputeAO;
         private SimpleActionItem btnManipulate;
         private SimpleActionItem btnTransform;
+        private SimpleActionItem btnDropVariables;
                 
         //Raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -187,6 +188,12 @@ namespace IPyModeling
             btnRun.GroupCaption = rGroupCaption;
             btnRun.Enabled = false;
             App.HeaderControl.Add(btnRun);
+
+            btnDropVariables = new SimpleActionItem(strPanelKey, "Drop Variable(s)", btnDropVariables_Click);
+            btnDropVariables.LargeImage = Properties.Resources.running_process;
+            btnDropVariables.GroupCaption = rGroupCaption;
+            btnDropVariables.Enabled = false;
+            App.HeaderControl.Add(btnDropVariables);
 
             /*btnCancel = new SimpleActionItem(strPanelKey, "Cancel", btnCancel_Click);
             btnCancel.LargeImage = Properties.Resources.Cancel;
@@ -348,6 +355,7 @@ namespace IPyModeling
                     btnManipulate.Enabled = true;
                     btnTransform.Enabled = true;
                     btnRun.Enabled = false;
+                    btnDropVariables.Enabled = false;
                 }
                 else if (strActiveTabName == "VariableSelectionTab")
                 {
@@ -355,6 +363,7 @@ namespace IPyModeling
                     btnManipulate.Enabled = false;
                     btnTransform.Enabled = false;
                     btnRun.Enabled = false;
+                    btnDropVariables.Enabled = false;
                 }
                 else if (strActiveTabName == "ModelingTab")
                 {
@@ -362,6 +371,7 @@ namespace IPyModeling
                     btnManipulate.Enabled = false;
                     btnTransform.Enabled = false;
                     btnRun.Enabled = true;
+                    btnDropVariables.Enabled = boolComplete;
                     innerIronPythonControl.SetModelData();
                 }
                 else if (strActiveTabName == "DiagnosticTab")
@@ -370,6 +380,7 @@ namespace IPyModeling
                     btnManipulate.Enabled = false;
                     btnTransform.Enabled = false;
                     btnRun.Enabled = false;
+                    btnDropVariables.Enabled = false;
                 }
             }
             catch
@@ -550,6 +561,7 @@ namespace IPyModeling
 
             MakeActive();
             boolComplete = true;
+            btnDropVariables.Enabled = true;
         }
 
 
@@ -575,6 +587,12 @@ namespace IPyModeling
                 //btnCancel.Enabled = false;
             }
         }*/
+
+
+        void btnDropVariables_Click(object sender, EventArgs e)
+        {
+            //innerIronPythonControl.btnRemoveInputVariableFromModelingTab_Click(sender, e);
+        }
 
 
         //change has been made within modeling, need to update

@@ -39,14 +39,20 @@ namespace VBProjectManager
         private Stack RedoStack = new Stack();
         private SimpleActionItem btnUndo;
         private SimpleActionItem btnRedo;
+
+        private string strUndoRedoDictionaryPath;
+        private PersistentDictionary<string, string> UndoRedoDict;
         
 
         //constructor
         public VBProjectManager()
         {
-            strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach.log");
+            strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach", "VirtualBeach.log");
             VBLogger.SetLogFileName(strLogFile);
             logger = VBLogger.GetLogger();
+
+            strUndoRedoDictionaryPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach", String.Concat("UndoRedo", RandomString(10), ".esent"));
+            UndoRedoDict = new PersistentDictionary<string, string>(strUndoRedoDictionaryPath);
 
             signaller = new VBCommon.Signaller();
         }
@@ -244,6 +250,7 @@ namespace VBProjectManager
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.PopulateUndoStackRequested += new EventHandler(PushCurrentState);
+            App.Disposed += new EventHandler(ApplicationsClosedHandler);
         }
 
 
@@ -259,11 +266,17 @@ namespace VBProjectManager
         {
             if (UndoStack.Count > 1)
             {
-                IDictionary<string, IDictionary<string, object>> dictCurrentState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Pop());
-                IDictionary<string, IDictionary<string, object>> dictLastState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Peek());
+                string strCurrentStateKey = UndoStack.Pop().ToString();
+                string strLastStateKey = UndoStack.Peek().ToString();
+
+                string strCurrentStateJson = UndoRedoDict[strCurrentStateKey];
+                string strLastStateJson = UndoRedoDict[strLastStateKey];
+
+                IDictionary<string, IDictionary<string, object>> dictCurrentState = StringToState(strCurrentStateJson);
+                IDictionary<string, IDictionary<string, object>> dictLastState = StringToState(strLastStateJson);
 
                 //raise unpack event, sending packed plugins dictionary
-                RedoStack.Push(dictCurrentState);
+                RedoStack.Push(strCurrentStateKey);
                 signaller.UnpackProjectState(dictLastState);
 
                 if (RedoStack.Count > 0)
@@ -278,13 +291,15 @@ namespace VBProjectManager
         {
             if (RedoStack.Count > 0)
             {
-                //IDictionary<string, IDictionary<string, object>> dictCurrentState = (IDictionary<string, IDictionary<string, object>>)(UndoStack.Peek());
-                IDictionary<string, IDictionary<string, object>> dictLastState = (IDictionary<string, IDictionary<string, object>>)(RedoStack.Pop());
+                string strLastStateKey = RedoStack.Pop().ToString();
+                string strLastStateJson = UndoRedoDict[strLastStateKey];
+                IDictionary<string, IDictionary<string, object>> dictLastState = StringToState(strLastStateJson);
 
                 //raise unpack event, sending packed plugins dictionary
-                UndoStack.Push(dictLastState);
+                UndoStack.Push(strLastStateKey);
                 signaller.UnpackProjectState(dictLastState);
 
+                
                 if (RedoStack.Count > 0)
                     btnRedo.Enabled = true;
                 if (UndoStack.Count == 1)
@@ -303,14 +318,26 @@ namespace VBProjectManager
             //Dictionary to store each plugin's state for saving
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
             signaller.RaiseSaveRequest(dictPluginStates);
-            
-            //Manage the undo and redo stacks
-            UndoStack.Push(dictPluginStates);
+
+            //PersistentDictionary-based undo and redo:
+            string strProjectStateJson = StateToString(dictPluginStates);
+            string strKey = RandomString(10);
+            UndoRedoDict.Add(key: strKey, value: strProjectStateJson);
+            UndoStack.Push(strKey);        
             RedoStack.Clear();
 
             //Manage the state of the undo/redo buttons.
             btnUndo.Enabled = true;
             btnRedo.Enabled = false;
+        }
+
+
+        public void ApplicationsClosedHandler(object sender, EventArgs e)
+        {
+            UndoRedoDict.Dispose();
+
+            PersistentDictionaryFile.DeleteFiles(strUndoRedoDictionaryPath);
+            Directory.Delete(strUndoRedoDictionaryPath);
         }
 
 
