@@ -1014,7 +1014,7 @@ namespace Prediction
         //load the prediction form
         private void frmIPyPrediction_Load(object sender, EventArgs e)
         {
-            cmforResponseVar.MenuItems.Add("Transform");
+            cmforResponseVar.MenuItems.Add("Define Transform");
             cmforResponseVar.MenuItems[0].MenuItems.Add("Log10", new EventHandler(Log10T));
             cmforResponseVar.MenuItems[0].MenuItems.Add("Ln", new EventHandler(LnT));
             cmforResponseVar.MenuItems[0].MenuItems.Add("Power", new EventHandler(PowerT));
@@ -1037,6 +1037,8 @@ namespace Prediction
                 dc.ColumnName = "Observation";
                 dgvObs.DataSource = dtObsOrig;
                 boolObsTransformed = false;
+
+                foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }
             }
         }
 
@@ -1047,7 +1049,7 @@ namespace Prediction
         /// <param name="o"></param>
         /// <param name="e"></param>
         private void Log10T(object o, EventArgs e)
-        {
+        {           
             //save changes to ob table
             dgvObs.EndEdit();
             DataTable _dt = (DataTable)dgvObs.DataSource;
@@ -1067,12 +1069,19 @@ namespace Prediction
             dc.ColumnName = "LOG10[Observation]";
             //save new dttable to obs table
             dgvObs.DataSource = _dtCopy;
+
+            if (cmforResponseVar.MenuItems[0].MenuItems.ContainsKey("Log10"))
+            {
+                foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }
+                cmforResponseVar.MenuItems[0].MenuItems["Log10"].Checked = true;
+            }
         }
 
 
         // response variable transform LnT
         private void LnT(object o, EventArgs e)
-        {
+        {                      
+            //cmforResponseVar.
             dgvObs.EndEdit();
             DataTable _dt = (DataTable)dgvObs.DataSource;
             DataTable _dtCopy = _dt.Copy();
@@ -1090,6 +1099,12 @@ namespace Prediction
             dc.ColumnName = "LN[Observation]";
 
             dgvObs.DataSource = _dtCopy;
+
+            if (cmforResponseVar.MenuItems[0].MenuItems.ContainsKey("Ln"))
+            {
+                foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }
+                cmforResponseVar.MenuItems[0].MenuItems["Ln"].Checked = true;
+            }
         }
 
         // response variable transform PowerT
@@ -1123,6 +1138,12 @@ namespace Prediction
                 DataColumn dc = _dtCopy.Columns["Observation"];
                 dc.ColumnName = "POWER[" + strSexp+ ",Observation]";
                 dgvObs.DataSource = _dtCopy;
+
+                if (cmforResponseVar.MenuItems[0].MenuItems.ContainsKey("Power"))
+                {
+                    foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }                        
+                    cmforResponseVar.MenuItems[0].MenuItems["Power"].Checked = true;
+                }
             }
         }
         

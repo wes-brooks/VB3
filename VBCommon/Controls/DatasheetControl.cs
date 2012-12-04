@@ -647,19 +647,36 @@ namespace VBCommon.Controls
         // set grid/listview properties for the user-selected row menu item Disable
         public void DisableRow(object sender, EventArgs e)
         {
-            //update the dtRowInformation dictionary of disabled/enabled rows
-            dtRI.SetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString(), false);
-            for (int c = 0; c < dgv.Columns.Count; c++)
-            {
-                dgv[c, intSelectedRowIndex].Style.ForeColor = Color.Red;
-                
-            }
+            List<int> rowsToDisable = new List<int>();
 
-            //check to see if this index is already in extendedProps (was set to true before)
-            //set extendedproperties so dtRowInformation can maintain dictDTRI
-            if (dt.ExtendedProperties.ContainsKey(intSelectedRowIndex.ToString()))
-                dt.ExtendedProperties.Remove(intSelectedRowIndex.ToString());
-            dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), "False");
+            //Figure out which rows we're going to disable
+            if (dgv.SelectedRows.Count > 0)
+            {
+                foreach (DataGridViewRow dgvr in dgv.SelectedRows)
+                {
+                    rowsToDisable.Add(dgvr.Index);
+                }
+            }
+            else
+            {
+                rowsToDisable.Add(intSelectedRowIndex);
+            }
+                        
+            foreach (int intRowToDisable in rowsToDisable)
+            {
+                //update the dtRowInformation dictionary of disabled/enabled rows
+                dtRI.SetRowStatus(dt.Rows[intRowToDisable][0].ToString(), false);
+                for (int c = 0; c < dgv.Columns.Count; c++)
+                {
+                    dgv[c, intRowToDisable].Style.ForeColor = Color.Red;
+                }
+
+                //check to see if this index is already in extendedProps (was set to true before)
+                //set extendedproperties so dtRowInformation can maintain dictDTRI
+                if (dt.ExtendedProperties.ContainsKey(intRowToDisable.ToString()))
+                    dt.ExtendedProperties.Remove(intRowToDisable.ToString());
+                dt.ExtendedProperties.Add(intRowToDisable.ToString(), false);
+            }
 
             //UpdateListView(VBCommon.Globals.listvals.NDISABLEDROWS, ++intNdisabledrows);
             UpdateListView();
@@ -671,20 +688,38 @@ namespace VBCommon.Controls
         // set grid/listview properties for the user-selected row menu item Enable
         public void EnableRow(object sender, EventArgs e)
         {
-            dtRI.SetRowStatus(dt.Rows[intSelectedRowIndex][0].ToString(), true);
+            List<int> rowsToEnable = new List<int>();
 
-            for (int c = 0; c < dgv.Columns.Count; c++)
+            //Figure out which rows we're going to disable
+            if (dgv.SelectedRows.Count > 0)
             {
-                if (!dtCI.GetColStatus(dgv.Columns[c].Name.ToString())) continue;
-                dgv[c, intSelectedRowIndex].Style.ForeColor = Color.Black;
-                
+                foreach (DataGridViewRow dgvr in dgv.SelectedRows)
+                {
+                    rowsToEnable.Add(dgvr.Index);
+                }
+            }
+            else
+            {
+                rowsToEnable.Add(intSelectedRowIndex);
             }
 
-            //check to see if this index is already in extendedProps (was set to false before)
-            //then set extendedproperties so dtRowInformation can maintain dictDTRI
-            if (dt.ExtendedProperties.ContainsKey(intSelectedRowIndex.ToString()))
-                dt.ExtendedProperties.Remove(intSelectedRowIndex.ToString());
-            dt.ExtendedProperties.Add(intSelectedRowIndex.ToString(), true);
+            foreach (int intRowToEnable in rowsToEnable)
+            {
+                dtRI.SetRowStatus(dt.Rows[intRowToEnable][0].ToString(), true);
+
+                for (int c = 0; c < dgv.Columns.Count; c++)
+                {
+                    if (!dtCI.GetColStatus(dgv.Columns[c].Name.ToString())) continue;
+                    dgv[c, intRowToEnable].Style.ForeColor = Color.Black;
+
+                }
+
+                //check to see if this index is already in extendedProps (was set to false before)
+                //then set extendedproperties so dtRowInformation can maintain dictDTRI
+                if (dt.ExtendedProperties.ContainsKey(intRowToEnable.ToString()))
+                    dt.ExtendedProperties.Remove(intRowToEnable.ToString());
+                dt.ExtendedProperties.Add(intRowToEnable.ToString(), true);
+            }
 
             //UpdateListView(VBCommon.Globals.listvals.NDISABLEDROWS, --intNdisabledrows);
             UpdateListView();

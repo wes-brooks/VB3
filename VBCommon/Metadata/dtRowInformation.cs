@@ -41,7 +41,7 @@ namespace VBCommon.Metadata
                         string rowI = r.ToString();
                         string ExtendedPropValue = _dt.ExtendedProperties[rowI].ToString();
                         
-                        if (ExtendedPropValue == "false")
+                        if (ExtendedPropValue == "False")
                             dictRowStatus.Add(_dt.Rows[r][0].ToString(), false);
                         else
                             dictRowStatus.Add(_dt.Rows[r][0].ToString(), true);
