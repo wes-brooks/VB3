@@ -40,7 +40,7 @@
             this.listView1.GridLines = true;
             this.listView1.Location = new System.Drawing.Point(16, 25);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(222, 554);
+            this.listView1.Size = new System.Drawing.Size(245, 554);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
@@ -50,9 +50,9 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.dgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv.Location = new System.Drawing.Point(244, 25);
+            this.dgv.Location = new System.Drawing.Point(267, 25);
             this.dgv.Name = "dgv";
-            this.dgv.Size = new System.Drawing.Size(794, 554);
+            this.dgv.Size = new System.Drawing.Size(771, 554);
             this.dgv.TabIndex = 1;
             this.dgv.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_CellEndEdit);
             this.dgv.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgv_DataError);

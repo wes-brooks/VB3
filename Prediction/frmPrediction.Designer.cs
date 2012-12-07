@@ -42,7 +42,6 @@
             this.dgvObs = new System.Windows.Forms.DataGridView();
             this.dgvStats = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
-            //this.btnMakePredictions = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.txtPower = new System.Windows.Forms.TextBox();
@@ -244,19 +243,6 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Predictive Record";
             // 
-            // btnMakePredictions
-            // 
-            /*this.btnMakePredictions.BackColor = System.Drawing.SystemColors.Control;
-            this.btnMakePredictions.Enabled = false;
-            this.btnMakePredictions.Location = new System.Drawing.Point(472, 155);
-            this.btnMakePredictions.Name = "btnMakePredictions";
-            this.btnMakePredictions.Size = new System.Drawing.Size(75, 39);
-            this.btnMakePredictions.TabIndex = 6;
-            this.btnMakePredictions.Text = "Make\r\nPredictions";
-            this.btnMakePredictions.UseVisualStyleBackColor = false;
-            this.btnMakePredictions.Visible = false;
-            this.btnMakePredictions.Click += new System.EventHandler(this.btnMakePredictions_Click);*/
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.groupBox7);
@@ -325,6 +311,7 @@
             this.rbNone.TabStop = true;
             this.rbNone.Text = "None";
             this.rbNone.UseVisualStyleBackColor = true;
+            this.rbNone.CheckedChanged += new System.EventHandler(this.rbNone_CheckedChanged);
             // 
             // rbLog10
             // 
@@ -335,6 +322,7 @@
             this.rbLog10.TabIndex = 16;
             this.rbLog10.Text = "Log10";
             this.rbLog10.UseVisualStyleBackColor = true;
+            this.rbLog10.CheckedChanged += new System.EventHandler(this.rbLog10_CheckedChanged);
             // 
             // label23
             // 
@@ -423,7 +411,6 @@
             this.btnPlot.Text = "Plot";
             this.btnPlot.UseVisualStyleBackColor = false;
             this.btnPlot.Visible = false;
-            //this.btnPlot.Click += new System.EventHandler(this.btnPlot_Click);
             // 
             // btnImportObs
             // 
@@ -434,7 +421,6 @@
             this.btnImportObs.Text = "Import Obs";
             this.btnImportObs.UseVisualStyleBackColor = false;
             this.btnImportObs.Visible = false;
-            //this.btnImportObs.Click += new System.EventHandler(this.btnImportObs_Click);
             // 
             // btnImportIVs
             // 
@@ -445,7 +431,6 @@
             this.btnImportIVs.Text = "Import IVs";
             this.btnImportIVs.UseVisualStyleBackColor = false;
             this.btnImportIVs.Visible = false;
-            //this.btnImportIVs.Click += new System.EventHandler(this.btnImportIVs_Click);
             // 
             // btnClearTable
             // 
@@ -457,7 +442,6 @@
             this.btnClearTable.Text = "Clear";
             this.btnClearTable.UseVisualStyleBackColor = false;
             this.btnClearTable.Visible = false;
-            //this.btnClearTable.Click += new System.EventHandler(this.btnClearTable_Click);
             // 
             // btnSaveTable
             // 
@@ -469,7 +453,6 @@
             this.btnSaveTable.Text = "Export As CSV";
             this.btnSaveTable.UseVisualStyleBackColor = false;
             this.btnSaveTable.Visible = false;
-            //this.btnSaveTable.Click += new System.EventHandler(this.btnExportTable_Click);
             // 
             // btnIVDataValidation
             // 
@@ -480,14 +463,13 @@
             this.btnIVDataValidation.Text = "IV Data Validation";
             this.btnIVDataValidation.UseVisualStyleBackColor = false;
             this.btnIVDataValidation.Visible = false;
-            //this.btnIVDataValidation.Click += new System.EventHandler(this.btnIVDataValidation_Click);
             // 
-            // lstAvailModels
+            // lbAvailableModels
             // 
             this.lbAvailableModels.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbAvailableModels.FormattingEnabled = true;
             this.lbAvailableModels.Location = new System.Drawing.Point(6, 25);
-            this.lbAvailableModels.Name = "lstAvailModels";
+            this.lbAvailableModels.Name = "lbAvailableModels";
             this.lbAvailableModels.Size = new System.Drawing.Size(134, 108);
             this.lbAvailableModels.TabIndex = 18;
             this.lbAvailableModels.SelectedIndexChanged += new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);
@@ -503,7 +485,7 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Available Models: ";
             // 
-            // frmIPyPrediction
+            // frmPrediction
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -513,11 +495,10 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.txtModel);
             this.Controls.Add(this.label1);
-            //this.Controls.Add(this.btnMakePredictions);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.panel2);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Name = "frmIPyPrediction";
+            this.Name = "frmPrediction";
             this.Size = new System.Drawing.Size(991, 537);
             this.Load += new System.EventHandler(this.frmIPyPrediction_Load);
             this.panel2.ResumeLayout(false);

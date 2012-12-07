@@ -48,13 +48,10 @@ namespace VBCommon.Controls
         private VBCommon.Transforms.DependentVariableTransforms depVarTransform;
         private double dblPowerTransformExp = double.NaN;
         private string fn = string.Empty;
+        private int intCheckedMenu;
+        private int intCheckedItem;
 
         private Type ListVal = typeof(VBCommon.Globals.listvals);
-        /*private int intNdisabledcols = 0;
-        private int intNdisabledrows = 0;
-        private int intNhiddencols = 0;
-        private int intNivs = 0;*/
-
         private double dblOrientation;
 
         // getter/setter for transform type
@@ -245,9 +242,9 @@ namespace VBCommon.Controls
             cmforResponseVar.MenuItems.Add("View Plots", new EventHandler(seePlot));
             cmforResponseVar.MenuItems.Add("UnTransform", new EventHandler(UnTransform));
             cmforResponseVar.MenuItems.Add("Define Transform");
-            cmforResponseVar.MenuItems[3].MenuItems.Add("none", new EventHandler(defineTransformForRV));
-            cmforResponseVar.MenuItems[3].MenuItems.Add("Log10", new EventHandler(defineTransformForRV));
-            cmforResponseVar.MenuItems[3].MenuItems.Add("Ln", new EventHandler(defineTransformForRV));
+            cmforResponseVar.MenuItems[3].MenuItems.Add("none", new EventHandler(defineTransformForRV));                
+            cmforResponseVar.MenuItems[3].MenuItems.Add("Log10", new EventHandler(defineTransformForRV));            
+            cmforResponseVar.MenuItems[3].MenuItems.Add("Ln", new EventHandler(defineTransformForRV));            
             cmforResponseVar.MenuItems[3].MenuItems.Add("Power", new EventHandler(defineTransformForRV));
 
             //menu items for iv columns
@@ -262,6 +259,8 @@ namespace VBCommon.Controls
             cmforRows.MenuItems.Add("Disable Row", new EventHandler(DisableRow));
             cmforRows.MenuItems.Add("Enable Row", new EventHandler(EnableRow));
             cmforRows.MenuItems.Add("Enable All Rows", new EventHandler(EnableAllRows));
+
+            SetTransformCheckmarks(Menu:3, Item:0);
         }
 
 
@@ -407,6 +406,7 @@ namespace VBCommon.Controls
 
             intResponseVarColIndex = dt.Columns.IndexOf(newcolname);
             strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
+            SetTransformCheckmarks(Menu: 0, Item: 0);
 
             state = dtState.dirty;
             NotifyContainer();
@@ -532,6 +532,8 @@ namespace VBCommon.Controls
             performTOperation(dt, newcolname, intSelectedColIndex, newvals);
             dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.Transforms.DependentVariableTransforms.Ln.ToString();
             depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Ln;
+            SetTransformCheckmarks(Menu: 0, Item: 1);
+
             state = dtState.dirty;
             NotifyContainer();
         }
@@ -557,6 +559,8 @@ namespace VBCommon.Controls
                 dt.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.Transforms.DependentVariableTransforms.Power.ToString() + "," + sexp;
                 depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Power;
                 dblPowerTransformExp = Convert.ToDouble(sexp);
+                SetTransformCheckmarks(Menu: 0, Item: 2);
+
                 state = dtState.dirty;
                 NotifyContainer();
             }
@@ -795,6 +799,7 @@ namespace VBCommon.Controls
                     depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Power;
                     dblPowerTransformExp = Convert.ToDouble(sexp);
                     dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
+                    SetTransformCheckmarks(Menu: 3, Item: 3);
                     state = dtState.dirty;
                     NotifyContainer();
                 }
@@ -802,15 +807,56 @@ namespace VBCommon.Controls
             else
             {
                 if (String.Compare(transform, "Log10", true) == 0)
+                {
                     depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Log10;
+                    SetTransformCheckmarks(Menu: 3, Item: 1);
+                }
                 else if (String.Compare(transform, "Ln", true) == 0)
+                {
                     depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Ln;
+                    SetTransformCheckmarks(Menu: 3, Item: 2);
+                }
                 else if (String.Compare(transform, "none", true) == 0)
+                {
                     depVarTransform = VBCommon.Transforms.DependentVariableTransforms.none;
+                    SetTransformCheckmarks(Menu: 3, Item: 0);
+                }
 
                 dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                 state = dtState.dirty;
                 NotifyContainer();
+            }
+        }
+
+
+        private void SetTransformCheckmarks(int Menu, int Item)
+        {
+            int i;
+            intCheckedMenu = Menu;
+            intCheckedItem = Item;
+
+            //First handle the applied transforms' menu:
+            for (i = 0; i < 3; i++)
+            {
+                if (Menu != 0)
+                    cmforResponseVar.MenuItems[0].MenuItems[i].Checked = false;
+                else
+                    if (Item == i)
+                        cmforResponseVar.MenuItems[0].MenuItems[i].Checked = true;
+                    else
+                        cmforResponseVar.MenuItems[0].MenuItems[i].Checked = false;
+            }
+
+            //Now handle the defined transforms' menu:
+            for (i = 0; i < 4; i++)
+            {
+                if (Menu != 3)
+                    cmforResponseVar.MenuItems[3].MenuItems[i].Checked = false;
+                else
+                    if (Item == i)
+                        cmforResponseVar.MenuItems[3].MenuItems[i].Checked = true;
+                    else
+                        cmforResponseVar.MenuItems[3].MenuItems[i].Checked = false;
             }
         }
 
@@ -821,8 +867,7 @@ namespace VBCommon.Controls
             string cn = dt.Columns[intSelectedColIndex].Caption;
             dtCI.SetColStatus(dt.Columns[intSelectedColIndex].ColumnName.ToString(), false);
             dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
-            //UpdateListView(VBCommon.Globals.listvals.NDISABLEDCOLS, ++intNdisabledcols);
-            //UpdateListView(VBCommon.Globals.listvals.NIVS, --intNivs);
+
             UpdateListView();
             disableGridCol(dgv, intSelectedColIndex);
 
@@ -837,8 +882,7 @@ namespace VBCommon.Controls
             string cn = dt.Columns[intSelectedColIndex].Caption;
             dtCI.SetColStatus(dt.Columns[intSelectedColIndex].ColumnName.ToString(), true);
             dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.ENABLED] = true;
-            //UpdateListView(VBCommon.Globals.listvals.NDISABLEDCOLS, --intNdisabledcols);
-            //UpdateListView(VBCommon.Globals.listvals.NIVS, ++intNivs);
+
             UpdateListView();
             enableGridCol(dgv, intSelectedColIndex, dt);
 
@@ -878,21 +922,11 @@ namespace VBCommon.Controls
                     dt.Columns.Remove(dt.Columns[strResponseVarColName].Caption);
                     dt.AcceptChanges();
                     UnhideHiddenCols(dgv, dt);
-
-                    //UpdateListView(VBCommon.Globals.listvals.NHIDDENCOLS, --intNhiddencols);
                 }
+
                 intResponseVarColIndex = dt.Columns.IndexOf(strSelectedColName);
                 strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
-
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
-
-                /*//count iv columns and update list
-                int nonivs = intNhiddencols > 0 ? 3 : 2;
-                intNivs = dt.Columns.Count - nonivs;
-                UpdateListView(VBCommon.Globals.listvals.NIVS, intNivs);
-                //and rv name
-                UpdateListView(VBCommon.Globals.listvals.RVCOLNAME, strResponseVarColName);
-                */
                 UpdateListView();
 
                 state = dtState.dirty;
@@ -919,8 +953,7 @@ namespace VBCommon.Controls
 
                 dgv.DataSource = dt;
                 dgv.FirstDisplayedScrollingColumnIndex = gridpos;
-                /*UpdateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);
-                UpdateListView(VBCommon.Globals.listvals.NIVS, --intNivs);*/
+
                 UpdateListView();
 
                 state = dtState.dirty;
@@ -938,12 +971,6 @@ namespace VBCommon.Controls
                 enableGridCol(dgv, c, dt);
             }
 
-            /*intNdisabledcols = 0;
-            UpdateListView(VBCommon.Globals.listvals.NDISABLEDCOLS, intNdisabledcols);
-
-            int intNonivs = intNhiddencols > 0 ? 3 : 2;
-            intNivs = dt.Columns.Count - intNonivs;
-            UpdateListView(VBCommon.Globals.listvals.NIVS, intNivs);*/
             UpdateListView();
 
             state = dtState.dirty;
@@ -956,6 +983,7 @@ namespace VBCommon.Controls
             for (int r = 0; r < dt.Rows.Count; r++)
             {
                 dtRI.SetRowStatus(dt.Rows[r][0].ToString(), true);
+
                 //update extendedProps for those rows
                 if (dt.ExtendedProperties.ContainsKey(r.ToString()))
                     dt.ExtendedProperties[r.ToString()] = true;
@@ -970,8 +998,6 @@ namespace VBCommon.Controls
                 }
             }
 
-            /*intNdisabledrows = 0;
-            UpdateListView(VBCommon.Globals.listvals.NDISABLEDROWS, intNdisabledrows);*/
             UpdateListView();
 
             state = dtState.dirty;
@@ -979,7 +1005,6 @@ namespace VBCommon.Controls
         }
 
 
-        //done editing, accept changes
         public void dgv_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             dgv.EndEdit();
@@ -990,7 +1015,7 @@ namespace VBCommon.Controls
             maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName); //ensure disabled rows/cols stay red
         }
 
-        //response if error
+
         public void dgv_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             double result;
@@ -1144,16 +1169,14 @@ namespace VBCommon.Controls
                 dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
                 dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
                 dictPackedState.Add("DepVarTransform", this.DependentVariableTransform);
+                dictPackedState.Add("CheckedTransformMenu", this.intCheckedMenu);
+                dictPackedState.Add("CheckedTransformItem", this.intCheckedItem);
                 
                 //pack up listInfo for model datasheet
                 dictPackedState.Add("ColCount", this.DT.Columns.Count);
                 dictPackedState.Add("RowCount", this.DT.Rows.Count);
                 dictPackedState.Add("DateIndex", this.DT.Columns[0].ColumnName.ToString());
                 dictPackedState.Add("ResponseVar", this.DT.Columns[1].ColumnName.ToString());
-                /*dictPackedState.Add("DisabledRwCt", this.DisabledRows);
-                dictPackedState.Add("DisabledColCt", this.DisabledCols);
-                dictPackedState.Add("HiddenColCt", this.HiddenCols);
-                dictPackedState.Add("IndVarCt", this.NumberIVs);*/
                 dictPackedState.Add("fileName", this.FileName);
 
                 dictPackedState.Add("orientation", dblOrientation);
@@ -1182,6 +1205,7 @@ namespace VBCommon.Controls
                 //model expects this change to the dt first ... I DON'T SEE THIS USED ANYWHERE ELSE
                 DataTable tblFiltered = this.DT;
                 tblFiltered.Columns[this.ResponseVarColName].SetOrdinal(1);
+
                 //filter diabled rows and columns
                 tblFiltered = this.filterDataTableRows(tblFiltered);
                 Utilities.TableUtils tableutils = new Utilities.TableUtils(tblFiltered);
@@ -1258,28 +1282,12 @@ namespace VBCommon.Controls
                 this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
                 this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
 
+                this.intCheckedMenu = (int)dictPackedState["CheckedTransformMenu"];
+                this.intCheckedItem = (int)dictPackedState["CheckedTransformItem"];
+                SetTransformCheckmarks(Menu: intCheckedMenu, Item: intCheckedItem);
+
                 maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
-
                 this.FileName = (string)dictPackedState["fileName"];
-                
-                //unpack listInfo for model datasheet
-                //need to convert if its unpacked from saved project
-                /*if (dictPackedState["DisabledColCt"].GetType().ToString() == "System.Int64")
-                    this.DisabledCols = Convert.ToInt16((Int64)dictPackedState["DisabledColCt"]);
-                else this.DisabledCols = (int)dictPackedState["DisabledColCt"];
-
-                if (dictPackedState["DisabledRwCt"].GetType().ToString() == "System.Int64")
-                    this.DisabledRows = Convert.ToInt16((Int64)dictPackedState["DisabledRwCt"]);
-                else this.DisabledRows = (int)dictPackedState["DisabledRwCt"];
-
-                if (dictPackedState["HiddenColCt"].GetType().ToString() == "System.Int64")
-                    this.HiddenCols = Convert.ToInt16((Int64)dictPackedState["HiddenColCt"]);
-                else this.HiddenCols = (int)dictPackedState["HiddenColCt"];
-
-                if (dictPackedState["IndVarCt"].GetType().ToString() == "System.Int64")
-                    this.NumberIVs = Convert.ToInt16((Int64)dictPackedState["IndVarCt"]);
-                else this.NumberIVs = (int)dictPackedState["IndVarCt"];*/
-
                 this.showListInfo(this.FileName, this.DT);
 
                 if (dictPackedState.ContainsKey("orientation"))

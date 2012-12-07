@@ -336,9 +336,14 @@ namespace IPyModeling
                     if (data.Columns[intI].ExtendedProperties.ContainsKey("responsevardefinedtransform"))
                     {
                         //Unpack the user's selected transformation of the dependent variable.
+                        double dblExponent = 1;
                         string strTransform = data.Columns[intI].ExtendedProperties["responsevardefinedtransform"].ToString();
+                        if (strTransform == VBCommon.Globals.DependentVariableTransforms.Power.ToString())
+                            dblExponent = dsControl1.PowerTransformExponent;
 
-                        if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.none.ToString(), 0) == 0)
+                        this.dblMandateThreshold = UntransformThreshold(Convert.ToDouble(tbThreshold.Text), dictTransform["Type"].ToString());
+                        this.dblMandateThreshold = TransformThreshold(dblMandateThreshold, strTransform, dblExponent);
+                        /*if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.none.ToString(), 0) == 0)
                             this.rbValue.Checked = true;
                         else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Ln.ToString(), 0) == 0)
                             this.rbLoge.Checked = true;
@@ -347,11 +352,11 @@ namespace IPyModeling
                         else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Power.ToString(), 0) == 0)
                             this.rbPower.Checked = true;
                         else
-                            this.rbValue.Checked = true;
+                            this.rbValue.Checked = true;*/
                         //disable columns
-                        ChangeControlStatus(false);
+                        //ChangeControlStatus(false);
                         //enable regulatory threshold
-                        ChangeThresholdControlStatus(true);
+                        //ChangeThresholdControlStatus(true);
                         boolFinished = true;
                     }
                 }
@@ -702,20 +707,25 @@ namespace IPyModeling
         }
 
 
-        public void btnRemoveInputVariableFromModelingTab_Click(object sender, EventArgs e)
+        public void btnRemoveInputVariablesFromModelingTab_Click(object sender, EventArgs e)
         {
-            List<ListItem> items = new List<ListItem>();
+            List<ListViewItem> items = new List<ListViewItem>();
+            List<ListItem> candidates = lbIndVariables.Items.Cast<ListItem>().ToList<ListItem>();
 
             //Make a list of the variables we're removing from the model.
             for (int i = 0; i < lvModel.SelectedIndices.Count; i++)
             {
-                ListItem li = (ListItem)lbIndVariables.Items[lvModel.SelectedIndices[i]];
-                items.Add(li);
+                ListViewItem lviDrop = (ListViewItem)lvModel.Items[lvModel.SelectedIndices[i]];
+                items.Add(lviDrop);
             }
 
             //Move the variables from the "Added" box to the "Available" box
-            foreach (ListItem li in items)
+            foreach (ListViewItem lvi in items)
             {
+                string search = lvi.Text;
+                int index = candidates.Select((item, i) => new { Item=item, Index=i }).Single(s => s.Item.DisplayItem == search).Index;
+
+                ListItem li = (ListItem)lbIndVariables.Items[index];                    
                 lbIndVariables.Items.Remove(li);
 
                 bool boolFoundIdx = false;
@@ -954,7 +964,7 @@ namespace IPyModeling
             //Set the threshold with the given specificity.
             double dblSpecificity = this.listCandidateSpecificity[this.intThresholdIndex];
             ipyModel.Threshold(dblSpecificity);
-            lblDecisionThreshold.Text = String.Format("{0:F3}", UntransformThreshold((double)ipyModel.threshold));
+            lblDecisionThreshold.Text = String.Format("{0:F3}", UntransformThreshold((double)ipyModel.threshold, dictTransform["Type"].ToString()));
 
             //Locate the specificity annotation
             lblSpec.Text = "Specificity: " + Convert.ToString(Math.Round(value: dblSpecificity, digits: 3));
@@ -988,7 +998,7 @@ namespace IPyModeling
         }
 
 
-        protected double UntransformThreshold(double value)
+        /*protected double UntransformThreshold(double value)
         {
             if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.none)
                 return value;
@@ -1000,6 +1010,51 @@ namespace IPyModeling
                 return Math.Pow(value, 1 / (double)this.DependentVariableTransform["Exponent"]);
             else
                 return value;
+        }*/
+
+
+        protected double UntransformThreshold(double value)
+        {
+            if ((VBCommon.Transforms.DependentVariableTransforms)this.dsControl1.DependentVariableTransform == VBCommon.Transforms.DependentVariableTransforms.none)
+                return value;
+            else if ((VBCommon.Transforms.DependentVariableTransforms)this.dsControl1.DependentVariableTransform == VBCommon.Transforms.DependentVariableTransforms.Log10)
+                return Math.Pow(10, value);
+            else if ((VBCommon.Transforms.DependentVariableTransforms)this.dsControl1.DependentVariableTransform == VBCommon.Transforms.DependentVariableTransforms.Ln)
+                return Math.Exp(value);
+            else if ((VBCommon.Transforms.DependentVariableTransforms)this.dsControl1.DependentVariableTransform == VBCommon.Transforms.DependentVariableTransforms.Power)
+                return Math.Pow(value, 1 / (double)this.dsControl1.PowerTransformExponent);
+            else
+                return value;
+        }
+
+
+        protected double UntransformThreshold(double Value, string Transform, double Exponent=1)
+        {
+            if (Transform == VBCommon.Transforms.DependentVariableTransforms.none.ToString())
+                return Value;
+            else if (Transform == VBCommon.Transforms.DependentVariableTransforms.Log10.ToString())
+                return Math.Pow(10, Value);
+            else if (Transform == VBCommon.Transforms.DependentVariableTransforms.Ln.ToString())
+                return Math.Exp(Value);
+            else if (Transform == VBCommon.Transforms.DependentVariableTransforms.Power.ToString())
+                return Math.Pow(Value, 1 / Exponent);
+            else
+                return Value;
+        }
+
+
+        protected double TransformThreshold(double Value, string Transform, double Exponent = 1)
+        {
+            if (Transform == VBCommon.Transforms.DependentVariableTransforms.none.ToString())
+                return Value;
+            else if (Transform == VBCommon.Transforms.DependentVariableTransforms.Log10.ToString())
+                return Math.Log10(Value);
+            else if (Transform == VBCommon.Transforms.DependentVariableTransforms.Ln.ToString())
+                return Math.Log(Value);
+            else if (Transform == VBCommon.Transforms.DependentVariableTransforms.Power.ToString())
+                return Math.Pow(Value, Exponent);
+            else
+                return Value;
         }
 
 
@@ -1235,11 +1290,11 @@ namespace IPyModeling
 
                 try
                 {
-                    tv = Math.Log10(Convert.ToDouble(tbThreshold.Text.ToString()));
+                    tv = Math.Pow(10, Convert.ToDouble(tbThreshold.Text.ToString()));
                 }
                 catch
                 {
-                    string msg = @"Cannot Log 10 transform threshold. (" + tbThreshold.Text + ") ";
+                    string msg = @"Cannot invert Log 10 transform for threshold. (" + tbThreshold.Text + ") ";
                     MessageBox.Show(msg);
                     return;
                 }
@@ -1251,12 +1306,12 @@ namespace IPyModeling
                     return;
                 }
 
-                if (tv < 0)
+                /*if (tv < 0)
                 {
                     string msg = @"Entered value must be greater than 0. (" + tbThreshold.Text + ") ";
                     MessageBox.Show(msg);
                     return;
-                }
+                }*/
 
                 dblMandateThreshold = tv;
                 dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Log10;
@@ -1273,11 +1328,11 @@ namespace IPyModeling
 
                 try
                 {
-                    tv = Math.Log(Convert.ToDouble(tbThreshold.Text.ToString()));
+                    tv = Math.Pow(Math.E, Convert.ToDouble(tbThreshold.Text.ToString()));
                 }
                 catch
                 {
-                    string msg = @"Cannot Log e transform threshold. (" + tbThreshold.Text + ") ";
+                    string msg = @"Cannot invert Log e transform of threshold. (" + tbThreshold.Text + ") ";
                     MessageBox.Show(msg);
                     return;
                 }
@@ -1289,12 +1344,12 @@ namespace IPyModeling
                     return;
                 }
 
-                if (tv < 0)
+                /*if (tv < 0)
                 {
                     string msg = @"Entered value must be greater than 0. (" + tbThreshold.Text + ") ";
                     MessageBox.Show(msg);
                     return;
-                }
+                }*/
 
                 dblMandateThreshold = tv;
                 dictTransform["Type"] = VBCommon.Transforms.DependentVariableTransforms.Ln;
@@ -1316,7 +1371,7 @@ namespace IPyModeling
 
                 try
                 {
-                    tv = Math.Pow(Convert.ToDouble(tbThreshold.Text.ToString()), Convert.ToDouble(tbExponent.Text.ToString()));
+                    tv = Math.Pow(Convert.ToDouble(tbThreshold.Text.ToString()), 1/Convert.ToDouble(tbExponent.Text.ToString()));
                 }
                 catch
                 {
@@ -1327,7 +1382,7 @@ namespace IPyModeling
 
                 if (tv.Equals(double.NaN))
                 {
-                    string msg = @"Entered value must be greater than 0. (" + tbThreshold.Text + ") ";
+                    string msg = @"Entered value must not be zero. (" + tbThreshold.Text + ") ";
                     MessageBox.Show(msg);
                     return;
                 }
@@ -1359,7 +1414,7 @@ namespace IPyModeling
             }
             else
             {
-                dblMandateThreshold = Math.Pow(Convert.ToDouble(tbThreshold.Text.ToString()), dblExponent);
+                dblMandateThreshold = Math.Pow(Convert.ToDouble(tbThreshold.Text.ToString()), 1/dblExponent);
                 dictTransform["Exponent"] = dblExponent;
             }
             boolClean = false;

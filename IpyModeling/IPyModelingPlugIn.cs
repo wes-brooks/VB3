@@ -591,7 +591,7 @@ namespace IPyModeling
 
         void btnDropVariables_Click(object sender, EventArgs e)
         {
-            //innerIronPythonControl.btnRemoveInputVariableFromModelingTab_Click(sender, e);
+            innerIronPythonControl.btnRemoveInputVariablesFromModelingTab_Click(sender, e);
         }
 
 
