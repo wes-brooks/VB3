@@ -1282,8 +1282,8 @@ namespace VBCommon.Controls
                 this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
                 this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
 
-                this.intCheckedMenu = (int)dictPackedState["CheckedTransformMenu"];
-                this.intCheckedItem = (int)dictPackedState["CheckedTransformItem"];
+                this.intCheckedMenu = Convert.ToInt32(dictPackedState["CheckedTransformMenu"]);
+                this.intCheckedItem = Convert.ToInt32(dictPackedState["CheckedTransformItem"]);
                 SetTransformCheckmarks(Menu: intCheckedMenu, Item: intCheckedItem);
 
                 maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);

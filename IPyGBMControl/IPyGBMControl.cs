@@ -92,7 +92,7 @@ namespace IPyGBMControl
             }
 
             //Now post the decision threshold and the number of PLS components
-            lblDecisionThreshold.Text = String.Format("{0:F3}", UntransformThreshold(model.threshold));
+            lblDecisionThreshold.Text = String.Format("{0:F3}", model.threshold); //VBCommon.Transforms.Apply.UntransformThreshold(model.threshold));
             //lblNcomp.Text = model.ncomp.ToString();
         }
 	}

@@ -55,12 +55,6 @@
             this.txtDecCrit = new System.Windows.Forms.TextBox();
             this.txtModel = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.btnPlot = new System.Windows.Forms.Button();
-            this.btnImportObs = new System.Windows.Forms.Button();
-            this.btnImportIVs = new System.Windows.Forms.Button();
-            this.btnClearTable = new System.Windows.Forms.Button();
-            this.btnSaveTable = new System.Windows.Forms.Button();
             this.btnIVDataValidation = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
             this.lbAvailableModels = new System.Windows.Forms.ListBox();
@@ -80,7 +74,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvStats)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox7.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -386,74 +379,6 @@
             this.label1.TabIndex = 14;
             this.label1.Text = "Model: ";
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.btnPlot);
-            this.groupBox2.Controls.Add(this.btnImportObs);
-            this.groupBox2.Controls.Add(this.btnImportIVs);
-            this.groupBox2.Controls.Add(this.btnClearTable);
-            this.groupBox2.Controls.Add(this.btnSaveTable);
-            this.groupBox2.Location = new System.Drawing.Point(653, 77);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(290, 128);
-            this.groupBox2.TabIndex = 16;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Prediction Grid";
-            this.groupBox2.Visible = false;
-            // 
-            // btnPlot
-            // 
-            this.btnPlot.Location = new System.Drawing.Point(16, 81);
-            this.btnPlot.Name = "btnPlot";
-            this.btnPlot.Size = new System.Drawing.Size(75, 29);
-            this.btnPlot.TabIndex = 18;
-            this.btnPlot.Text = "Plot";
-            this.btnPlot.UseVisualStyleBackColor = false;
-            this.btnPlot.Visible = false;
-            // 
-            // btnImportObs
-            // 
-            this.btnImportObs.Location = new System.Drawing.Point(149, 27);
-            this.btnImportObs.Name = "btnImportObs";
-            this.btnImportObs.Size = new System.Drawing.Size(75, 41);
-            this.btnImportObs.TabIndex = 17;
-            this.btnImportObs.Text = "Import Obs";
-            this.btnImportObs.UseVisualStyleBackColor = false;
-            this.btnImportObs.Visible = false;
-            // 
-            // btnImportIVs
-            // 
-            this.btnImportIVs.Location = new System.Drawing.Point(63, 27);
-            this.btnImportIVs.Name = "btnImportIVs";
-            this.btnImportIVs.Size = new System.Drawing.Size(75, 41);
-            this.btnImportIVs.TabIndex = 16;
-            this.btnImportIVs.Text = "Import IVs";
-            this.btnImportIVs.UseVisualStyleBackColor = false;
-            this.btnImportIVs.Visible = false;
-            // 
-            // btnClearTable
-            // 
-            this.btnClearTable.BackColor = System.Drawing.SystemColors.Control;
-            this.btnClearTable.Location = new System.Drawing.Point(103, 81);
-            this.btnClearTable.Name = "btnClearTable";
-            this.btnClearTable.Size = new System.Drawing.Size(75, 29);
-            this.btnClearTable.TabIndex = 15;
-            this.btnClearTable.Text = "Clear";
-            this.btnClearTable.UseVisualStyleBackColor = false;
-            this.btnClearTable.Visible = false;
-            // 
-            // btnSaveTable
-            // 
-            this.btnSaveTable.BackColor = System.Drawing.SystemColors.Control;
-            this.btnSaveTable.Location = new System.Drawing.Point(190, 81);
-            this.btnSaveTable.Name = "btnSaveTable";
-            this.btnSaveTable.Size = new System.Drawing.Size(86, 29);
-            this.btnSaveTable.TabIndex = 14;
-            this.btnSaveTable.Text = "Export As CSV";
-            this.btnSaveTable.UseVisualStyleBackColor = false;
-            this.btnSaveTable.Visible = false;
-            // 
             // btnIVDataValidation
             // 
             this.btnIVDataValidation.Location = new System.Drawing.Point(472, 110);
@@ -492,7 +417,6 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnIVDataValidation);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.txtModel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
@@ -518,7 +442,6 @@
             this.groupBox1.PerformLayout();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -549,13 +472,7 @@
         private System.Windows.Forms.TextBox txtModel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtPower;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Button btnClearTable;
-        private System.Windows.Forms.Button btnSaveTable;
         private System.Windows.Forms.Button btnIVDataValidation;
-        private System.Windows.Forms.Button btnPlot;
-        private System.Windows.Forms.Button btnImportObs;
-        private System.Windows.Forms.Button btnImportIVs;
         private System.Windows.Forms.HelpProvider helpProvider1;
         private System.Windows.Forms.ListBox lbAvailableModels;
         private System.Windows.Forms.GroupBox groupBox3;
