@@ -97,6 +97,28 @@ namespace VBCommon.Controls
 
 
         /// <summary>
+        /// Constructor takes the datagridview to show changes implemented in this class
+        /// </summary>
+        /// <param name="dgv">datasheet grid reference</param>
+        /// <param name="dt">datasource for the grid</param>
+        public frmMissingValues(DataGridView dgv, DataTable dt, dtRowInformation dtri, dtColumnInformation dtci)
+        {
+            InitializeComponent();
+
+            _tu = new Utilities.TableUtils(dt);
+            _dtRI = dtri;
+            _dtCI = dtci;
+
+            //get a working copy of the dataset
+            _dt = dt.Copy();
+            _dgv = dgv;
+
+            cboCols.DataSource = strArrDdlReplaceWith;
+            btnReturn.Enabled = false;
+        }
+
+
+        /// <summary>
         /// Scan the table of anomolous data values
         /// </summary>
         /// <param name="sender"></param>
@@ -321,7 +343,7 @@ namespace VBCommon.Controls
                 {
                     _dgv.Rows[rndx].Cells[cndx].Selected = true;
                     _dtRI.SetRowStatus(_dt.Rows[rndx][0].ToString(), false);
-                    _dt = _tu.filterDataTableRows(_dt);
+                    _dt = _tu.filterDataTableRows(_dt, _dtRI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true;
@@ -337,7 +359,7 @@ namespace VBCommon.Controls
                         _dtRI.SetRowStatus(_dt.Rows[r][0].ToString(), false);
 
                     }
-                    _dt = _tu.filterDataTableRows(_dt);
+                    _dt = _tu.filterDataTableRows(_dt, _dtRI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true; 
@@ -352,7 +374,7 @@ namespace VBCommon.Controls
                         _dtRI.SetRowStatus(_dt.Rows[r][0].ToString(), false);
 
                     }
-                    _dt = _tu.filterDataTableRows(_dt);
+                    _dt = _tu.filterDataTableRows(_dt, _dtRI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true;

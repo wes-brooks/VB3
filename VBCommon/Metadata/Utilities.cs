@@ -87,11 +87,11 @@ namespace VBCommon.Metadata
             }
 
 
-            public DataTable filterDataTableRows(DataTable dt)
+            public DataTable filterDataTableRows(DataTable dt, dtRowInformation dtri)
             {
                 //filter out disabled rows
                 DataTable dtCopy = dt.Copy();
-                Dictionary<string, bool> rstatus = _dtRI.DTRowInfo;
+                Dictionary<string, bool> rstatus = dtri.DTRowInfo;
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     if (!rstatus[dtCopy.Rows[i][0].ToString()])

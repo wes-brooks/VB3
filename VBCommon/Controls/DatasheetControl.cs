@@ -1176,7 +1176,6 @@ namespace VBCommon.Controls
                 dictPackedState.Add("ColCount", this.DT.Columns.Count);
                 dictPackedState.Add("RowCount", this.DT.Rows.Count);
                 dictPackedState.Add("DateIndex", this.DT.Columns[0].ColumnName.ToString());
-                dictPackedState.Add("ResponseVar", this.DT.Columns[1].ColumnName.ToString());
                 dictPackedState.Add("fileName", this.FileName);
 
                 dictPackedState.Add("orientation", dblOrientation);
@@ -1204,7 +1203,7 @@ namespace VBCommon.Controls
 
                 //model expects this change to the dt first ... I DON'T SEE THIS USED ANYWHERE ELSE
                 DataTable tblFiltered = this.DT;
-                tblFiltered.Columns[this.ResponseVarColName].SetOrdinal(1);
+                //tblFiltered.Columns[this.ResponseVarColName].SetOrdinal(1);
 
                 //filter diabled rows and columns
                 tblFiltered = this.filterDataTableRows(tblFiltered);

@@ -193,7 +193,7 @@ namespace VBDatasheet
         public void btnValidateData_Click(object sender, EventArgs e)
         {
             DataTable savedt = dsControl1.DT.Copy();
-            frmMissingValues frmMissing = new frmMissingValues(dsControl1.dgv, dsControl1.DT);
+            frmMissingValues frmMissing = new frmMissingValues(dsControl1.dgv, dsControl1.DT, dsControl1.DTRI, dsControl1.DTCI);
             frmMissing.ShowDialog();
             //when whatever checks we're doing are good, enable the manipulation buttons
             if (frmMissing.Status)

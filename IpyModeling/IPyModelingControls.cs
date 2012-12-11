@@ -833,7 +833,7 @@ namespace IPyModeling
             //Set up the local variables we'll need for model-building.
             DataTable tblData = Data;
             double dblSpecificity = 0.9;
-            string strTarget = tblData.Columns[1].Caption;
+            string strTarget = dsControl1.ResponseVarColName; //tblData.Columns[1].Caption;
             double dblThreshold = dblMandateThreshold;
 
             //Remove the ID field:

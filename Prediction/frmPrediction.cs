@@ -457,7 +457,7 @@ namespace Prediction
                 if (dictModel != null)
                 {
                     Dictionary<string, object> dictPackedDatasheet = (Dictionary<string, object>)dictPackedState["PackedDatasheetState"];
-                    strOutputVariable = dictPackedDatasheet["ResponseVar"].ToString();
+                    strOutputVariable = dictPackedDatasheet["DepVarColName"].ToString();
 
                     //datatables serialized as xml string to maintain extendedProperty values
                     string strXmlDataTable = (string)dictPackedDatasheet["XmlDataTable"];
@@ -482,10 +482,11 @@ namespace Prediction
 
                     //Lets get all the main effect variables
                     dictMainEffects = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
-                    for (int i = 2; i < corrDT.Columns.Count; i++)
+                    for (int i = 1; i < corrDT.Columns.Count; i++)
                     {
+                        bool bIsResponseVariable = (corrDT.Columns[i].ColumnName == strOutputVariable);
                         bool bMainEffect = Support.IsMainEffect(corrDT.Columns[i].ColumnName, corrDT);
-                        if (bMainEffect)
+                        if (bMainEffect && !bIsResponseVariable)
                         {
                             string strColName = corrDT.Columns[i].ColumnName;
                             dictMainEffects.Add(strColName, strColName);
