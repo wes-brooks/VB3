@@ -72,23 +72,15 @@ namespace IPyModeling
 
 
         public void Show()
-        {
-            if (boolVisible)
-            {
-                //If this plugin is already visible, then do nothing.
-                return;
-            }
-            else
-            {                
-                AddRibbon("Show");
-                //((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-                //App.HeaderControl.SelectRoot(strPanelKey);
-                boolVisible = true;
-            }
+        {            
+            AddRibbon("Show");
+            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+            App.HeaderControl.SelectRoot(strPanelKey);
+            boolVisible = true; 
         }
 
 
-        public void ActivePluginChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
+        /*public void ActivePluginChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
             if (e.ActivePanelKey == strPanelKey)
             {                
@@ -106,13 +98,14 @@ namespace IPyModeling
                     }
                 }
             }
-        }
+        }*/
 
 
         public void MakeActive()
-        {
+        {            
             App.HeaderControl.SelectRoot(strPanelKey); 
-            App.DockManager.SelectPanel(strPanelKey);                       
+            App.DockManager.SelectPanel(strPanelKey);
+            boolVisible = true;       
         }
 
 
@@ -120,8 +113,7 @@ namespace IPyModeling
         {
             AddPanel();
             AddRibbon("Activate");
-            boolVisible = true;
-
+            
             //when panel is selected activate seriesview and ribbon tab
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
@@ -133,6 +125,7 @@ namespace IPyModeling
             //innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
             
             base.Activate();
+            //Hide();
         }
 
 
@@ -141,8 +134,7 @@ namespace IPyModeling
         {
             if (e.SelectedRootKey == strPanelKey)
             {
-                this.MakeActive();
-                //App.DockManager.SelectPanel(strPanelKey);
+                App.DockManager.SelectPanel(strPanelKey);
             }
         }
 
@@ -221,6 +213,8 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
+            if ((e.ActivePanelKey.ToString() == "DataSheetPanel" || e.ActivePanelKey.ToString() == "kVBLocation") && boolVisible)
+                Hide();
         }
 
 
@@ -294,7 +288,7 @@ namespace IPyModeling
                     {
                         if (dictPluginState.Count > 3)
                         {
-                            boolVirgin = false;
+                            //boolVirgin = false;
                             innerIronPythonControl.SetData(e.PackedPluginState);
                             Show();
                         }

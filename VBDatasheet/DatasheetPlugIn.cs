@@ -355,8 +355,25 @@ namespace VBDatasheet
 
         void btnImport_Click(object sender, EventArgs e)
         {
-            _frmDatasheet.btnImportData_Click(sender, e);
-            btnValidate.Enabled = true;
+            if (!boolFirstPass && !boolClean)
+            {
+                //Ask whether the user wants to clobber the modeling and prediction tabs by modifying the data.
+                DialogResult dlgr = MessageBox.Show("Importing new data will clear any existing data and models. Proceed?", "Proceed with import.", MessageBoxButtons.OKCancel);
+                if (dlgr == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+
+            bool bSuccess = _frmDatasheet.btnImportData_Click(sender, e);
+            if (bSuccess)
+            {
+                btnValidate.Enabled = true;
+                btnComputeAO.Enabled = false;
+                btnManipulate.Enabled = false;
+                btnTransform.Enabled = false;
+                btnGoToModeling.Enabled = false;
+            }
         }
 
 

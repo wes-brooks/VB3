@@ -18,6 +18,14 @@ namespace VBCommon
             Modeling = 2,
             Prediction = 3
         }
+
+        public enum DependentVariableTransforms
+        {
+            none,
+            Log10,
+            Ln,
+            Power
+        }
         
         public enum Transforms
         {

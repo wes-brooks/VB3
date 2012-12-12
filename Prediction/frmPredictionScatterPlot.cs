@@ -29,9 +29,9 @@ namespace Prediction
         private DependentVariableTransforms xfrmPred;
         private DependentVariableTransforms xfrmThresh;
 
-        private double dblThreshExponent;
         private double dblObsExponent;
-        private double dblImportedExponent;
+        private double dblPredExponent;
+        private double dblThreshExponent;
         
 
         //constructor
@@ -58,18 +58,24 @@ namespace Prediction
 
 
         //configure display for plot
-        public void ConfigureDisplay(double decisionThreshold, double regulatoryThreshold, DependentVariableTransforms ObservationTransform, double ObservationExponent, DependentVariableTransforms PredictionTransform, double PredictionExponent, DependentVariableTransforms ThresholdTransformation, double ThresholdExponent)
+        public void ConfigureDisplay(double decisionThreshold, double regulatoryThreshold, DependentVariableTransforms ObservationTransform, double ObservationExponent, DependentVariableTransforms PredictionTransform, double PredictionExponent, DependentVariableTransforms ThresholdTransform, double ThresholdExponent)
         {
             scatterPlot.SetThresholds(decisionThreshold, regulatoryThreshold);
-            scatterPlot.PowerExponent = ThresholdExponent;            
-            scatterPlot.Transform = ThresholdTransformation.ToString();
+            scatterPlot.PowerExponent = ThresholdExponent;
+            scatterPlot.Transform = ThresholdTransform.ToString();
 
             xfrmObs = ObservationTransform;
             xfrmPred = PredictionTransform;
-            scatterPlot.xfrmCurrent = xfrmThresh = ThresholdTransformation;
-            scatterPlot.dblCurrentExponent = dblThreshExponent = ThresholdExponent;
+            xfrmThresh = ThresholdTransform;
+
+            dblObsExponent = ObservationExponent;
+            dblPredExponent = PredictionExponent;
+            dblThreshExponent = ThresholdExponent;
 
             scatterPlot.UpdateResults(GetObsPredData());
+            
+            scatterPlot.PowerExponent = PredictionExponent;
+            scatterPlot.Transform = PredictionTransform.ToString();            
         }
 
 
@@ -89,7 +95,7 @@ namespace Prediction
             {
                 dblArrRecord = new double[2];
                 dblArrRecord[0] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtObs.Rows[i][strObservationColumn]), xfrmObs, dblObsExponent), xfrmThresh, dblThreshExponent);
-                dblArrRecord[1] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]), xfrmObs, dblObsExponent), xfrmThresh, dblThreshExponent);
+                dblArrRecord[1] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]), xfrmPred, dblPredExponent), xfrmThresh, dblThreshExponent);
                 lstData.Add(dblArrRecord);
             }
             return lstData;

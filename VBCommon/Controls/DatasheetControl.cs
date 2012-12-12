@@ -86,7 +86,11 @@ namespace VBCommon.Controls
         public DataTable DT     
         {
             get { return this.dt; }
-            set { dt = value; }
+            set 
+            { 
+                dt = value;
+                SetTransformCheckmarks(Menu: 3, Item: 0);
+            }
         }
 
         
@@ -204,6 +208,7 @@ namespace VBCommon.Controls
         public DatasheetControl()      
         {
             InitializeComponent();
+            InitializeContextMenus();
         }
 
 
@@ -234,7 +239,7 @@ namespace VBCommon.Controls
         // load the datasheet form, initialize then gridview's menu items/eventhandlers
         public void datasheet_load(object sender, EventArgs e)      
         {
-            //menu items for response variable column
+            /*//menu items for response variable column
             cmforResponseVar.MenuItems.Add("Transform");
             cmforResponseVar.MenuItems[0].MenuItems.Add("Log10", new EventHandler(log10T));
             cmforResponseVar.MenuItems[0].MenuItems.Add("Ln", new EventHandler(lnT));
@@ -256,6 +261,41 @@ namespace VBCommon.Controls
             cmforIVs.MenuItems.Add("Enable All Columns", new EventHandler(EnableAllCols));
 
             //menu items for rows 
+            cmforRows.MenuItems.Add("Disable Row", new EventHandler(DisableRow));
+            cmforRows.MenuItems.Add("Enable Row", new EventHandler(EnableRow));
+            cmforRows.MenuItems.Add("Enable All Rows", new EventHandler(EnableAllRows));
+
+            SetTransformCheckmarks(Menu:3, Item:0);*/
+        }
+
+
+        private void InitializeContextMenus()
+        {
+            //menu items for response variable column
+            cmforResponseVar.MenuItems.Clear();
+            cmforResponseVar.MenuItems.Add("Transform");
+            cmforResponseVar.MenuItems[0].MenuItems.Add("Log10", new EventHandler(log10T));
+            cmforResponseVar.MenuItems[0].MenuItems.Add("Ln", new EventHandler(lnT));
+            cmforResponseVar.MenuItems[0].MenuItems.Add("Power", new EventHandler(powerT));
+            cmforResponseVar.MenuItems.Add("View Plots", new EventHandler(seePlot));
+            cmforResponseVar.MenuItems.Add("UnTransform", new EventHandler(UnTransform));
+            cmforResponseVar.MenuItems.Add("Define Transform");
+            cmforResponseVar.MenuItems[3].MenuItems.Add("none", new EventHandler(defineTransformForRV));                
+            cmforResponseVar.MenuItems[3].MenuItems.Add("Log10", new EventHandler(defineTransformForRV));            
+            cmforResponseVar.MenuItems[3].MenuItems.Add("Ln", new EventHandler(defineTransformForRV));            
+            cmforResponseVar.MenuItems[3].MenuItems.Add("Power", new EventHandler(defineTransformForRV));
+
+            //menu items for iv columns
+            cmforIVs.MenuItems.Clear();
+            cmforIVs.MenuItems.Add("Disable Column", new EventHandler(DisableCol));
+            cmforIVs.MenuItems.Add("Enable Column", new EventHandler(EnableCol));
+            cmforIVs.MenuItems.Add("Set Response Variable", new EventHandler(SetResponse));
+            cmforIVs.MenuItems.Add("View Plots", new EventHandler(seePlot));
+            cmforIVs.MenuItems.Add("Delete Column", new EventHandler(DeleteCol));
+            cmforIVs.MenuItems.Add("Enable All Columns", new EventHandler(EnableAllCols));
+
+            //menu items for rows 
+            cmforRows.MenuItems.Clear();
             cmforRows.MenuItems.Add("Disable Row", new EventHandler(DisableRow));
             cmforRows.MenuItems.Add("Enable Row", new EventHandler(EnableRow));
             cmforRows.MenuItems.Add("Enable All Rows", new EventHandler(EnableAllRows));
@@ -926,6 +966,7 @@ namespace VBCommon.Controls
 
                 intResponseVarColIndex = dt.Columns.IndexOf(strSelectedColName);
                 strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
+                SetTransformCheckmarks(Menu: 3, Item: 3);
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
                 UpdateListView();
 

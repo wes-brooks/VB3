@@ -41,7 +41,7 @@ class Model(object):
         #Generate a gbm model in R.
         self.formula = r.Call('as.formula', obj=utils.SanitizeVariableName(self.target) + '~.')
         self.gbm_params = {'formula' : self.formula, \
-            'distribution' : 'bernoulli', \
+            'distribution' : 'gaussian', \
             'data' : self.data_frame, \
             'weights' : self.weights, \
             'interaction.depth' : self.depth, \
@@ -68,7 +68,7 @@ class Model(object):
         self.threshold = 0   #decision threshold
 
         try: self.iterations = args['iterations']
-        except KeyError: self.iterations = 2000   # if there is no 'iterations' key, then use the default (2000)
+        except KeyError: self.iterations = 10000   # if there is no 'iterations' key, then use the default (2000)
 
         #Cost: two values - the first is the cost of a false positive, the second is the cost of a false negative.
         try: self.cost = args['cost']
@@ -80,15 +80,15 @@ class Model(object):
 
         #depth: how many branches should be allowed per decision tree?
         try: self.depth = args['depth']
-        except KeyError: self.depth = 1   # if there is no 'depth' key, then use the default 1 (decision stumps)  
+        except KeyError: self.depth = 5   # if there is no 'depth' key, then use the default 1 (decision stumps)  
         
         #n.minobsinnode: what is the fewest observations per node in the tree?
         try: self.minobsinnode = args['minobsinnode']
-        except KeyError: self.minobsinnode = 10
+        except KeyError: self.minobsinnode = 5
 
         #shrinkage: learning rate parameter
         try: self.shrinkage = args['shrinkage']
-        except KeyError: self.shrinkage = 0.01   # if there is no 'shrinkage' key, then use the default 0.01
+        except KeyError: self.shrinkage = 0.001   # if there is no 'shrinkage' key, then use the default 0.01
         
         #bagging fraction: proportion of data used at each step
         try: self.fraction = args['fraction']
@@ -129,7 +129,7 @@ class Model(object):
             self.weights = self.AssignWeights(method=0) 
         
         #Label the exceedances in the training set.
-        self.data_dictionary[target] = self.Discretize(self.data_dictionary[target])
+        #self.data_dictionary[target] = self.Discretize(self.data_dictionary[target])
         
         #Get the data into R 
         self.data_frame = utils.DictionaryToR(self.data_dictionary)
@@ -137,7 +137,7 @@ class Model(object):
         #Generate a gbm model in R.
         self.formula = r.Call('as.formula', obj=utils.SanitizeVariableName(self.target) + '~.')
         self.gbm_params = {'formula' : self.formula, \
-            'distribution' : 'bernoulli', \
+            'distribution' : 'gaussian', \
             'data' : self.data_frame, \
             'weights' : self.weights, \
             'interaction.depth' : self.depth, \

@@ -86,33 +86,33 @@ namespace VBCommon.Controls
                 if (value == "none")
                 {
                     rbValue.Checked = true;
-                    dblDecisionThreshold = Convert.ToDouble(tbThresholdDec.Text);
-                    dblMandateThreshold = Convert.ToDouble(tbThresholdReg.Text);
+                    //dblDecisionThreshold = Convert.ToDouble(tbThresholdDec.Text);
+                    //dblMandateThreshold = Convert.ToDouble(tbThresholdReg.Text);
                     rbValue_CheckedChanged(this, args);
                 }
                 else if (value == "Ln")
                 {
                     rbLogeValue.Checked = true;
-                    dblDecisionThreshold = Math.Exp(Convert.ToDouble(tbThresholdDec.Text));
-                    dblMandateThreshold = Math.Exp(Convert.ToDouble(tbThresholdReg.Text));
+                    //dblDecisionThreshold = Math.Exp(Convert.ToDouble(tbThresholdDec.Text));
+                    //dblMandateThreshold = Math.Exp(Convert.ToDouble(tbThresholdReg.Text));
                     rbLogeValue_CheckedChanged(this, args);
                 }
                 else if (value == "Log10")
                 {
                     rbLog10Value.Checked = true;
-                    dblDecisionThreshold = Math.Pow(10, Convert.ToDouble(tbThresholdDec.Text));
-                    dblMandateThreshold = Math.Pow(10, Convert.ToDouble(tbThresholdReg.Text));
+                    //dblDecisionThreshold = Math.Pow(10, Convert.ToDouble(tbThresholdDec.Text));
+                    //dblMandateThreshold = Math.Pow(10, Convert.ToDouble(tbThresholdReg.Text));
                     rbLog10Value_CheckedChanged(this, args);
                 }
                 else if (value == "Power")
                 {
                     rbPwrValue.Checked = true;
                     double pwr = Convert.ToDouble(txtPwrValue.Text);
-                    dblDecisionThreshold = Math.Pow(Convert.ToDouble(tbThresholdDec.Text), 1/pwr);
-                    dblMandateThreshold = Math.Pow(Convert.ToDouble(tbThresholdReg.Text), 1/pwr);
+                    //dblDecisionThreshold = Math.Pow(Convert.ToDouble(tbThresholdDec.Text), 1/pwr);
+                    //dblMandateThreshold = Math.Pow(Convert.ToDouble(tbThresholdReg.Text), 1/pwr);
                     rbPwrValue_CheckedChanged(this, args);
                 }
-                this.Refresh();
+                UpdateResults(lstXYPlotdata);
             }
             get
             {               
@@ -382,8 +382,14 @@ namespace VBCommon.Controls
                 double th = double.NaN;
                 try
                 {
-                    tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
-                    th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                    tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.none);
+                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.none);
+
+                    tbThresholdReg.Text = tv.ToString();
+                    tbThresholdDec.Text = th.ToString();
+
+                    //tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
+                    //th = Convert.ToDouble(tbThresholdDec.Text.ToString());
                 }
                 catch
                 {
@@ -440,8 +446,13 @@ namespace VBCommon.Controls
 
                 try
                 {
-                    tv = Math.Log10(Convert.ToDouble(tbThresholdReg.Text.ToString()));
-                    th = Math.Log10(Convert.ToDouble(tbThresholdDec.Text.ToString()));
+                    tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Log10);
+                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Log10);
+
+                    tbThresholdReg.Text = tv.ToString();
+                    tbThresholdDec.Text = th.ToString();
+                    //tv = Math.Log10(Convert.ToDouble(tbThresholdReg.Text.ToString()));
+                    //th = Math.Log10(Convert.ToDouble(tbThresholdDec.Text.ToString()));
                 }
                 catch
                 {
@@ -486,8 +497,14 @@ namespace VBCommon.Controls
 
                 try
                 {
-                    tv = Math.Log(Convert.ToDouble(tbThresholdReg.Text.ToString()));
-                    th = Math.Log(Convert.ToDouble(tbThresholdDec.Text.ToString()));
+                    tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Ln);
+                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Ln);
+
+                    tbThresholdReg.Text = tv.ToString();
+                    tbThresholdDec.Text = th.ToString();
+
+                    //tv = Math.Log(Convert.ToDouble(tbThresholdReg.Text.ToString()));
+                    //th = Math.Log(Convert.ToDouble(tbThresholdDec.Text.ToString()));
                 }
                 catch
                 {
@@ -534,8 +551,14 @@ namespace VBCommon.Controls
                 try
                 {
                     power = Convert.ToDouble(txtPwrValue.Text);
-                    tv = Math.Pow(Convert.ToDouble(tbThresholdReg.Text), power);
-                    th = Math.Pow(Convert.ToDouble(tbThresholdDec.Text), power);
+                    tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Power, power);
+                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Power, power);
+
+                    tbThresholdReg.Text = tv.ToString();
+                    tbThresholdDec.Text = th.ToString();
+
+                    //tv = Math.Pow(Convert.ToDouble(tbThresholdReg.Text), power);
+                    //th = Math.Pow(Convert.ToDouble(tbThresholdDec.Text), power);
                 }
                 catch
                 {

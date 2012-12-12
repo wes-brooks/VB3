@@ -80,11 +80,11 @@ namespace VBDatasheet
         }
 
 
-        public void btnImportData_Click(object sender, EventArgs e)
+        public bool btnImportData_Click(object sender, EventArgs e)
         {
             DataTable dataDT = new DataTable("Imported Data");
             VBCommon.IO.ImportExport import = new VBCommon.IO.ImportExport();
-            if ((dataDT = import.Input) == null) return;
+            if ((dataDT = import.Input) == null) return false;
 
             //check for unique records or blanks
             string errcolname = string.Empty;
@@ -96,7 +96,7 @@ namespace VBDatasheet
                                 "in the 1st column and try importing again.\n\n" +
                                 "Record Identifier values cannot be blank or duplicated;\nencountered " +
                                 "error near row " + errndx.ToString(), "Import Data Error - Cannot Import This Dataset", MessageBoxButtons.OK);
-                return;
+                return false;
             }
             //check for spaces
             string offendingCol = string.Empty;
@@ -105,7 +105,7 @@ namespace VBDatasheet
                 MessageBox.Show("Cannot import datasets with spaces in column names.\nEdit your dataset and re-import.\n" +
                     "First offending column encountered = " + offendingCol,
                     "Import Data Error - Column names have spaces.", MessageBoxButtons.OK);
-                return;
+                return false;
             }
 
             dsControl1.DT = dataDT.Copy();
@@ -128,7 +128,7 @@ namespace VBDatasheet
                 dsControl1.dgv.Columns[c].SortMode = DataGridViewColumnSortMode.NotSortable;
                 dsControl1.dgv.Columns[c].DefaultCellStyle.ForeColor = Color.Black;
             }
-
+            
             //RowInformation and ColumnInformation to track which rows, columns are enabled/disabled.
             dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);
             dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
@@ -137,14 +137,15 @@ namespace VBDatasheet
             dsControl1.SelectedColIndex = 1;
             dsControl1.ResponseVarColIndex = 1;
             dsControl1.ResponseVarColName = dsControl1.DT.Columns[1].Caption;
-
+            
             //initial info for the list
             FileInfo fi = new FileInfo(import.getFileImportedName);
             dsControl1.FileName = fi.Name;
             dsControl1.showListInfo(dsControl1.FileName, dsControl1.DT);
-            dsControl1.dgv.Enabled = false;
+            dsControl1.dgv.Enabled = false;            
 
             dsControl1.maintainGrid(dsControl1.dgv, dsControl1.DT, dsControl1.SelectedColIndex, dsControl1.ResponseVarColName);
+            return true;
         }
 
 

@@ -1039,7 +1039,6 @@ namespace Prediction
                 dr["Decision_Criterion"] = dblCrit;
                 dr["Exceedance_Probability"] = lstExceedanceProbability[i];
                 dr["Regulatory_Standard"] = regStd;
-
                 dr["Untransformed"] = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
 
                 /*if (dvt == VBCommon.Transforms.DependentVariableTransforms.Log10)
@@ -1621,7 +1620,7 @@ namespace Prediction
             var exp = dblThresholdPowerTransformExp;
             double exponent = Convert.ToDouble(exp);
             //configure the plot display
-            frmPlot.ConfigureDisplay(decisionThreshold:Convert.ToDouble(txtDecCrit.Text), regulatoryThreshold:Convert.ToDouble(txtRegStd.Text), ObservationTransform:xfrmObs, ObservationExponent:dblObsPowerTransformExp, PredictionTransform:xfrmImported, PredictionExponent:dblImportedPowerTransformExp, ThresholdTransformation:xfrmThreshold, ThresholdExponent:dblThresholdPowerTransformExp);
+            frmPlot.ConfigureDisplay(decisionThreshold:Convert.ToDouble(txtDecCrit.Text), regulatoryThreshold:Convert.ToDouble(txtRegStd.Text), ObservationTransform:xfrmObs, ObservationExponent:dblObsPowerTransformExp, PredictionTransform:xfrmImported, PredictionExponent:dblImportedPowerTransformExp, ThresholdTransform:xfrmThreshold, ThresholdExponent:dblThresholdPowerTransformExp);
         }
 
 
