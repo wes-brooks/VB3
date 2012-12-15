@@ -84,28 +84,7 @@
             this.label39 = new System.Windows.Forms.Label();
             this.tbThreshold = new System.Windows.Forms.TextBox();
             this.DiagnosticTab = new System.Windows.Forms.TabPage();
-            this.tabControl2 = new System.Windows.Forms.TabControl();
-            this.tabResults = new System.Windows.Forms.TabPage();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.zgc2 = new ZedGraph.ZedGraphControl();
-            this.tabObsPred = new System.Windows.Forms.TabPage();
-            this.myScatterPlot = new VBCommon.Controls.AnnotatedScatterPlot();
-            this.tabStats = new System.Windows.Forms.TabControl();
-            this.tabVariableStats = new System.Windows.Forms.TabPage();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.tabModelStats = new System.Windows.Forms.TabPage();
-            this.listView2 = new System.Windows.Forms.ListView();
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.zgcDiagnostic = new ZedGraph.ZedGraphControl();
             this.tabControl1.SuspendLayout();
             this.DatasheetTab.SuspendLayout();
             this.VariableSelectionTab.SuspendLayout();
@@ -118,12 +97,6 @@
             this.groupBox12.SuspendLayout();
             this.groupBox13.SuspendLayout();
             this.DiagnosticTab.SuspendLayout();
-            this.tabControl2.SuspendLayout();
-            this.tabResults.SuspendLayout();
-            this.tabObsPred.SuspendLayout();
-            this.tabStats.SuspendLayout();
-            this.tabVariableStats.SuspendLayout();
-            this.tabModelStats.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -152,7 +125,6 @@
             this.DatasheetTab.Size = new System.Drawing.Size(1094, 619);
             this.DatasheetTab.TabIndex = 0;
             this.DatasheetTab.Text = "Data Manipulation";
-            //this.DatasheetTab.Enter += new System.EventHandler(this.DataTabEnter);
             // 
             // label3
             // 
@@ -171,16 +143,13 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.dsControl1.CurrentSelectedRowIndex = -1;
             this.dsControl1.DependentVariableTransform = VBCommon.Transforms.DependentVariableTransforms.none;
-            //this.dsControl1.DisabledCols = 0;
-            //this.dsControl1.DisabledRows = 0;
             this.dsControl1.DT = null;
             this.dsControl1.DTCI = null;
             this.dsControl1.DTRI = null;
             this.dsControl1.FileName = "";
-            //this.dsControl1.HiddenCols = 0;
             this.dsControl1.Location = new System.Drawing.Point(22, 39);
             this.dsControl1.Name = "dsControl1";
-            //this.dsControl1.NumberIVs = 0;
+            this.dsControl1.Orientation = 0D;
             this.dsControl1.PowerTransformExponent = double.NaN;
             this.dsControl1.ResponseVarColIndex = 1;
             this.dsControl1.ResponseVarColName = "";
@@ -711,227 +680,29 @@
             // DiagnosticTab
             // 
             this.DiagnosticTab.BackColor = System.Drawing.SystemColors.Control;
-            this.DiagnosticTab.Controls.Add(this.tabControl2);
-            this.DiagnosticTab.Controls.Add(this.tabStats);
+            this.DiagnosticTab.Controls.Add(this.zgcDiagnostic);
             this.DiagnosticTab.Location = new System.Drawing.Point(4, 22);
             this.DiagnosticTab.Name = "DiagnosticTab";
             this.DiagnosticTab.Size = new System.Drawing.Size(1094, 619);
             this.DiagnosticTab.TabIndex = 3;
             this.DiagnosticTab.Text = "Diagnostics";
             // 
-            // tabControl2
+            // zgcDiagnostic
             // 
-            this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.zgcDiagnostic.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl2.Controls.Add(this.tabResults);
-            this.tabControl2.Controls.Add(this.tabObsPred);
-            this.tabControl2.Location = new System.Drawing.Point(10, 198);
-            this.tabControl2.Name = "tabControl2";
-            this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(694, 379);
-            this.tabControl2.TabIndex = 63;
-            // 
-            // tabResults
-            // 
-            this.tabResults.Controls.Add(this.label8);
-            this.tabResults.Controls.Add(this.label2);
-            this.tabResults.Controls.Add(this.label7);
-            this.tabResults.Controls.Add(this.label5);
-            this.tabResults.Controls.Add(this.zgc2);
-            this.tabResults.Location = new System.Drawing.Point(4, 22);
-            this.tabResults.Name = "tabResults";
-            this.tabResults.Padding = new System.Windows.Forms.Padding(3);
-            this.tabResults.Size = new System.Drawing.Size(686, 353);
-            this.tabResults.TabIndex = 1;
-            this.tabResults.Text = "Predicted vs Residuals";
-            this.tabResults.UseVisualStyleBackColor = true;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(16, 109);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(0, 13);
-            this.label8.TabIndex = 8;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(16, 132);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(0, 13);
-            this.label2.TabIndex = 7;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(16, 73);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(35, 13);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "label7";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(16, 51);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(35, 13);
-            this.label5.TabIndex = 5;
-            this.label5.Text = "label5";
-            // 
-            // zgc2
-            // 
-            this.zgc2.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.zgc2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.zgc2.EditButtons = System.Windows.Forms.MouseButtons.Left;
-            this.zgc2.IsShowPointValues = true;
-            this.zgc2.Location = new System.Drawing.Point(191, 3);
-            this.zgc2.Name = "zgc2";
-            this.zgc2.PanModifierKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.None)));
-            this.zgc2.ScrollGrace = 0D;
-            this.zgc2.ScrollMaxX = 0D;
-            this.zgc2.ScrollMaxY = 0D;
-            this.zgc2.ScrollMaxY2 = 0D;
-            this.zgc2.ScrollMinX = 0D;
-            this.zgc2.ScrollMinY = 0D;
-            this.zgc2.ScrollMinY2 = 0D;
-            this.zgc2.Size = new System.Drawing.Size(492, 347);
-            this.zgc2.TabIndex = 4;
-            // 
-            // tabObsPred
-            // 
-            this.tabObsPred.Controls.Add(this.myScatterPlot);
-            this.tabObsPred.Location = new System.Drawing.Point(4, 22);
-            this.tabObsPred.Name = "tabObsPred";
-            this.tabObsPred.Size = new System.Drawing.Size(686, 353);
-            this.tabObsPred.TabIndex = 4;
-            this.tabObsPred.Text = "Observed vs Predicted";
-            this.tabObsPred.UseVisualStyleBackColor = true;
-            // 
-            // myScatterPlot
-            // 
-            this.myScatterPlot.Location = new System.Drawing.Point(3, 3);
-            this.myScatterPlot.Name = "myScatterPlot";
-            this.myScatterPlot.PowerExponent = double.NaN;
-            this.myScatterPlot.Size = new System.Drawing.Size(678, 345);
-            this.myScatterPlot.TabIndex = 0;
-            this.myScatterPlot.Transform = "none";
-            // 
-            // tabStats
-            // 
-            this.tabStats.Controls.Add(this.tabVariableStats);
-            this.tabStats.Controls.Add(this.tabModelStats);
-            this.tabStats.Location = new System.Drawing.Point(10, 3);
-            this.tabStats.Name = "tabStats";
-            this.tabStats.SelectedIndex = 0;
-            this.tabStats.Size = new System.Drawing.Size(571, 189);
-            this.tabStats.TabIndex = 62;
-            this.tabStats.Visible = false;
-            // 
-            // tabVariableStats
-            // 
-            this.tabVariableStats.Controls.Add(this.listView1);
-            this.tabVariableStats.Location = new System.Drawing.Point(4, 22);
-            this.tabVariableStats.Name = "tabVariableStats";
-            this.tabVariableStats.Padding = new System.Windows.Forms.Padding(3);
-            this.tabVariableStats.Size = new System.Drawing.Size(563, 163);
-            this.tabVariableStats.TabIndex = 0;
-            this.tabVariableStats.Text = "Variable Statistics";
-            this.tabVariableStats.UseVisualStyleBackColor = true;
-            // 
-            // listView1
-            // 
-            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5,
-            this.columnHeader8});
-            this.listView1.FullRowSelect = true;
-            this.listView1.GridLines = true;
-            this.listView1.Location = new System.Drawing.Point(3, 3);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(557, 187);
-            this.listView1.TabIndex = 50;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Parameter";
-            this.columnHeader1.Width = 88;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Coefficient";
-            this.columnHeader2.Width = 78;
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.DisplayIndex = 3;
-            this.columnHeader3.Text = "Std. Error";
-            this.columnHeader3.Width = 78;
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.DisplayIndex = 4;
-            this.columnHeader4.Text = "t-Statistic";
-            this.columnHeader4.Width = 78;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.DisplayIndex = 5;
-            this.columnHeader5.Text = "P-Value";
-            this.columnHeader5.Width = 96;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.DisplayIndex = 2;
-            this.columnHeader8.Text = "StandardizedCoefficient";
-            this.columnHeader8.Width = 130;
-            // 
-            // tabModelStats
-            // 
-            this.tabModelStats.Controls.Add(this.listView2);
-            this.tabModelStats.Location = new System.Drawing.Point(4, 22);
-            this.tabModelStats.Name = "tabModelStats";
-            this.tabModelStats.Padding = new System.Windows.Forms.Padding(3);
-            this.tabModelStats.Size = new System.Drawing.Size(563, 163);
-            this.tabModelStats.TabIndex = 1;
-            this.tabModelStats.Text = "Model Statistics";
-            this.tabModelStats.UseVisualStyleBackColor = true;
-            // 
-            // listView2
-            // 
-            this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader6,
-            this.columnHeader7});
-            this.listView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView2.FullRowSelect = true;
-            this.listView2.GridLines = true;
-            this.listView2.Location = new System.Drawing.Point(3, 3);
-            this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(557, 157);
-            this.listView2.TabIndex = 58;
-            this.listView2.UseCompatibleStateImageBehavior = false;
-            this.listView2.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader6
-            // 
-            this.columnHeader6.Text = "Metric";
-            this.columnHeader6.Width = 130;
-            // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Text = "Value";
-            this.columnHeader7.Width = 88;
+            this.zgcDiagnostic.Location = new System.Drawing.Point(0, 0);
+            this.zgcDiagnostic.Name = "zgcDiagnostic";
+            this.zgcDiagnostic.ScrollGrace = 0D;
+            this.zgcDiagnostic.ScrollMaxX = 0D;
+            this.zgcDiagnostic.ScrollMaxY = 0D;
+            this.zgcDiagnostic.ScrollMaxY2 = 0D;
+            this.zgcDiagnostic.ScrollMinX = 0D;
+            this.zgcDiagnostic.ScrollMinY = 0D;
+            this.zgcDiagnostic.ScrollMinY2 = 0D;
+            this.zgcDiagnostic.Size = new System.Drawing.Size(1094, 577);
+            this.zgcDiagnostic.TabIndex = 64;
             // 
             // IPyModelingControl
             // 
@@ -958,13 +729,6 @@
             this.groupBox13.ResumeLayout(false);
             this.groupBox13.PerformLayout();
             this.DiagnosticTab.ResumeLayout(false);
-            this.tabControl2.ResumeLayout(false);
-            this.tabResults.ResumeLayout(false);
-            this.tabResults.PerformLayout();
-            this.tabObsPred.ResumeLayout(false);
-            this.tabStats.ResumeLayout(false);
-            this.tabVariableStats.ResumeLayout(false);
-            this.tabModelStats.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1020,30 +784,9 @@
         private System.Windows.Forms.Label lblDepVars;
         private System.Windows.Forms.Label lblAvailVars;
         private System.Windows.Forms.TabPage DiagnosticTab;
-        private System.Windows.Forms.TabControl tabStats;
-        private System.Windows.Forms.TabPage tabVariableStats;
-        private System.Windows.Forms.ListView listView1;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
-        private System.Windows.Forms.ColumnHeader columnHeader8;
-        private System.Windows.Forms.TabPage tabModelStats;
-        private System.Windows.Forms.ListView listView2;
-        private System.Windows.Forms.ColumnHeader columnHeader6;
-        private System.Windows.Forms.ColumnHeader columnHeader7;
-        private System.Windows.Forms.TabControl tabControl2;
-        private System.Windows.Forms.TabPage tabResults;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label5;
-        private ZedGraph.ZedGraphControl zgc2;
-        private System.Windows.Forms.TabPage tabObsPred;
-        private VBCommon.Controls.AnnotatedScatterPlot myScatterPlot;
         private System.Windows.Forms.TabPage DatasheetTab;
         private VBCommon.Controls.DatasheetControl dsControl1;
         private System.Windows.Forms.Label label3;
+        private ZedGraph.ZedGraphControl zgcDiagnostic;
     }
 }

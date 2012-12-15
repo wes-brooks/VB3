@@ -101,7 +101,7 @@ class Model(object):
         #Store some object data
         self.data_dictionary = data = copy.deepcopy(args['data'])
         self.target = target = args['target']
-        self.array_actual = data[target][np.sum(np.isnan(data.values()), axis=0)==0]
+        self.array_actual = data[target][np.sum(np.isnan(data.values()), axis=0)==0].squeeze()
         self.actual = list(self.array_actual)
                 
         #Check to see if a weighting method has been specified in the function's arguments
@@ -290,8 +290,12 @@ class Model(object):
         
     def GetFitted(self, **params):
         params = {'object':self.model, 'n.trees':self.trees, 'newdata':self.data_frame}
-        self.fitted = list(r.Call("predict", **params).AsNumeric())
-        self.array_fitted = np.array(self.fitted, dtype='float')
+        self.fitted = list(r.Call("predict", **params).AsNumeric())        
+        self.array_fitted = np.array(self.fitted, dtype=float)
+        self.array_residuals = self.array_actual - self.array_fitted
+        self.array_actual = np.array(self.array_residuals + self.array_fitted, dtype=float)
+        self.actual = [float(x) for x in self.array_actual]
+        self.residuals = [float(x) for x in self.array_residuals]
 
         
     def GetInfluence(self):

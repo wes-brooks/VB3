@@ -290,7 +290,7 @@ namespace IPyModeling
                         {
                             //boolVirgin = false;
                             innerIronPythonControl.SetData(e.PackedPluginState);
-                            Show();
+                            //Show();
                         }
                     }
                 }
@@ -301,7 +301,7 @@ namespace IPyModeling
                         boolComplete = false;
                         innerIronPythonControl.SetData(e.PackedPluginState);
                     }
-                    Show();
+                    //Show();
                 }
             }
             else

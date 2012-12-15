@@ -966,7 +966,7 @@ namespace VBCommon.Controls
 
                 intResponseVarColIndex = dt.Columns.IndexOf(strSelectedColName);
                 strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
-                SetTransformCheckmarks(Menu: 3, Item: 3);
+                SetTransformCheckmarks(Menu: 3, Item: 0);
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
                 UpdateListView();
 

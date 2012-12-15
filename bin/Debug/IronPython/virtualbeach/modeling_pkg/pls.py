@@ -286,7 +286,7 @@ class Model(object):
         self.array_residual = self.array_actual - self.array_fitted
         
         self.fitted = list(self.array_fitted)
-        self.residual = list(self.array_residual)
+        self.residual = self.residuals = list(self.array_residual)
         
         
     def GetInfluence(self):

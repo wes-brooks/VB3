@@ -891,6 +891,7 @@ namespace IPyModeling
             }*/
 
             InitializeValidationChart();
+            UpdateDiagnostics();
             AnnotateChart();
 
             //Enable the thresholding controls and the model-selection button.
@@ -1178,6 +1179,7 @@ namespace IPyModeling
                 this.intThresholdIndex = 0;
 
             AnnotateChart();
+            UpdateDiagnostics();
             RaiseUpdateNotification();
         }
         
@@ -1190,6 +1192,7 @@ namespace IPyModeling
                 this.intThresholdIndex = 0;
 
             AnnotateChart();
+            UpdateDiagnostics();
             RaiseUpdateNotification();
         }
 
@@ -1202,6 +1205,7 @@ namespace IPyModeling
                 this.intThresholdIndex = this.listCandidateThresholds.Count - 1;
 
             AnnotateChart();
+            UpdateDiagnostics();
             RaiseUpdateNotification();
         }
 
@@ -1214,6 +1218,7 @@ namespace IPyModeling
                 this.intThresholdIndex = this.listCandidateThresholds.Count - 1;
 
             AnnotateChart();
+            UpdateDiagnostics();
             RaiseUpdateNotification();
         }
 
@@ -1505,22 +1510,7 @@ namespace IPyModeling
             dblMandateThreshold = tv;
             boolClean = false;
         }
-
-
-        /*//This is the callback method that sets the model
-        public void SetModel(Dictionary<string, object> dictPackedModel)
-        {
-            if (dictPackedModel != null)
-            {
-                myScatterPlot.SetThresholds(Convert.ToDouble(dictPackedModel["DecisionThreshold"]), Convert.ToDouble(dictPackedModel["RegulatoryThreshold"]));
-
-                myScatterPlot.PowerExponent = Convert.ToDouble(dictTransform["Exponent"]);
-                myScatterPlot.Transform = dictTransform["Type"].ToString();
-            }
-            else
-                ipyModel = null;
-        }*/
-
+        
 
         public List<double> Predict(DataTable tblForPrediction)
         {
@@ -1569,6 +1559,128 @@ namespace IPyModeling
         public void btnTransform_Click(object sender, EventArgs e)
         {
             dsControl1.btnTransform_Click(sender, e);
+        }
+
+
+        private ZedGraph.GraphPane TimeSeries(double[] Observed, double[] Fitted, string[] Tags)
+        {
+            DateTime date;
+            bool dateAxis = false;
+            if (IsDate(Tags[0], out date)) dateAxis = true;
+
+            ZedGraph.PointPairList pplObserved = new ZedGraph.PointPairList();
+            ZedGraph.PointPairList pplFitted = new ZedGraph.PointPairList();
+            string tag = string.Empty;
+            //might be a smarter way to add tags to points but I can't find it.
+            for (int i = 0; i < Observed.Length; i++)
+            {
+                //tag = "(" + iv[i].ToString("n2") + " , " + tags[i] + ") ";
+                tag = Tags[i];
+                if (dateAxis)
+                {
+                    DateTime d = Convert.ToDateTime(Tags[i]);
+                    pplObserved.Add((ZedGraph.XDate)d, Observed[i], tag);
+                    pplFitted.Add((ZedGraph.XDate)d, Fitted[i], tag);
+                }
+                else
+                {
+                    double n = Convert.ToDouble(Tags[i]);
+                    pplObserved.Add(n, Observed[i], tag);
+                    pplFitted.Add(n, Fitted[i], tag);
+                }
+            }
+            ZedGraph.GraphPane gp = new ZedGraph.GraphPane();
+
+            ZedGraph.LineItem curveObserved = gp.AddCurve("YObs", pplObserved, Color.Black, ZedGraph.SymbolType.Square);
+            ZedGraph.LineItem curveFitted = gp.AddCurve("YPred", pplFitted, Color.Red, ZedGraph.SymbolType.Triangle);
+
+            curveObserved.Line.IsVisible = true;
+            curveFitted.Line.IsVisible = true;
+            
+            if (dateAxis) gp.XAxis.Type = ZedGraph.AxisType.Date;
+            else gp.XAxis.Type = ZedGraph.AxisType.Linear;
+            gp.XAxis.Title.Text = dsControl1.DT.Columns[0].ColumnName;
+            gp.YAxis.Title.Text = dsControl1.ResponseVarColName;
+
+            gp.Tag = "TSPlot";
+            gp.Title.Text = "Time Series Plot";
+
+            return gp;
+        }
+
+
+        private ZedGraph.GraphPane PairPlot(double[] X, double[] Y, string[] Tags, string XLabel, string YLabel, string Title, string Tag, ZedGraph.SymbolType Symbol = ZedGraph.SymbolType.Triangle, Color? SymbolColor = null)
+        {
+            ZedGraph.PointPairList ppl = new ZedGraph.PointPairList();
+            string tag = string.Empty;
+            Color color = SymbolColor != null ? (Color)SymbolColor : Color.Black;
+
+            //might be a smarter way to add tags to points but I can't find it.
+            for (int i = 0; i < X.Length; i++)
+            {
+                ppl.Add(x: X[i], y: Y[i], tag: Tags[i]);
+            }
+            ZedGraph.GraphPane gp = new ZedGraph.GraphPane();
+            ZedGraph.LineItem curveResiduals = gp.AddCurve(YLabel, ppl, color, Symbol);
+            curveResiduals.Line.IsVisible = false;
+
+            gp.XAxis.Type = ZedGraph.AxisType.Linear;
+            gp.XAxis.Title.Text = XLabel;
+            gp.YAxis.Title.Text = YLabel;
+
+            gp.Tag = Tag;
+            gp.Title.Text = Title;
+
+            return gp;
+        }
+
+
+        private bool IsDate(string anyString, out DateTime resultDate)
+        {
+            bool isDate = true;
+
+            if (anyString == null)
+            {
+                anyString = "";
+            }
+            try
+            {
+                resultDate = DateTime.Parse(anyString);
+            }
+            catch
+            {
+                resultDate = DateTime.MinValue;
+                isDate = false;
+            }
+
+            return isDate;
+        }
+
+
+        private void UpdateDiagnostics()
+        {
+            ZedGraph.MasterPane master = zgcDiagnostic.MasterPane;
+            master.PaneList.Clear();
+
+            List<double> lstFitted = ((IList<object>)Model.fitted).Cast<double>().ToList();
+            List<double> lstObserved = ((IList<object>)Model.actual).Cast<double>().ToList();
+
+            DataRow[] rows = dsControl1.DT.Select();
+            string[] tags = rows.Select(x => x[0].ToString()).ToArray();
+            zgcDiagnostic.MasterPane.Add(TimeSeries(Observed: lstObserved.ToArray(), Fitted: lstFitted.ToArray(), Tags: tags));
+
+            List<double> lstResiduals = ((IList<object>)Model.residuals).Cast<double>().ToList();
+            zgcDiagnostic.MasterPane.Add(PairPlot(X: lstFitted.ToArray(), Y:lstResiduals.ToArray(), Tags: tags, XLabel:"Fitted", YLabel:"Residuals", Title:"Residuals vs. Fitted", Tag:"Resid", Symbol:ZedGraph.SymbolType.Square, SymbolColor:Color.Black));
+            zgcDiagnostic.MasterPane.Add(PairPlot(Y: lstResiduals.ToArray(), X: lstObserved.ToArray(), Tags: tags, XLabel: "Observed", YLabel: "Residuals", Title: "Residuals vs. Observed", Tag: "Resid", Symbol: ZedGraph.SymbolType.Triangle, SymbolColor: Color.Red));
+            zgcDiagnostic.MasterPane.Add(PairPlot(Y: lstFitted.ToArray(), X: lstObserved.ToArray(), Tags: tags, XLabel: "Observed", YLabel: "Fitted", Title: "Fitted vs. Observed", Tag: "Fit", Symbol: ZedGraph.SymbolType.Circle, SymbolColor: Color.Blue));
+
+            using (Graphics g = this.CreateGraphics())
+            { master.SetLayout(g, ZedGraph.PaneLayout.SquareColPreferred); }
+
+            zgcDiagnostic.IsShowPointValues = true;
+            zgcDiagnostic.AxisChange();
+            master.AxisChange();
+            zgcDiagnostic.Refresh();
         }
     }
 }
