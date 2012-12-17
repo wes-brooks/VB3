@@ -30,6 +30,20 @@ class Model(object):
         self.data_dictionary = copy.deepcopy(self.data_dictionary)
         self.num_predictors = len(self.data_dictionary.keys()) - 1
         
+        #First, save the serialized R object to disk (so it can be read from within R)
+    	modelstring = model_struct["modelstring"]
+    	robject_file = "pls" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+    	f = open(robject_file, "w")
+    	f.write(modelstring)
+    	f.close()
+    	
+    	#Read the serialized model object into R:
+    	load_params = {'file' : robject_file}
+        objects = r.Call(function='load', **load_params).AsVector()
+        get_params = {'x' : str(objects[0])}
+        self.model = r.Call(function="get", **get_params).AsList()
+    	os.remove(robject_file)
+        
         #Generate a PLS model in R.
         self.formula = r.Call('as.formula', obj=utils.SanitizeVariableName(self.target) + '~.')
         self.pls_params = {'formula' : self.formula, \
@@ -332,6 +346,18 @@ class Model(object):
         
         
     def Serialize(self):
+       	#First, get the serialized gbm model object out of R (we have to write it to disk first)
+    	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+    	save_params = {'list' : [self.model], \
+            'file' : robject_file, \
+            'ascii' : true }
+        r.Call(function='save', **save_params)
+    	f = open(robject_file, "r")
+    	self.modelstring = f.read()
+    	f.close()
+    	os.remove(robject_file)
+    	
+    	#Now pack the model state into a dictionary.
         model_struct = dict()
         model_struct['model_type'] = 'pls'
         elements_to_save = ["data_dictionary", "ncomp", "threshold", "specificity", "target", "regulatory_threshold"]
