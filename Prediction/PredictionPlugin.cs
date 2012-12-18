@@ -304,14 +304,14 @@ namespace Prediction
                 if ((bool)e.PackedPluginState["Complete"])
                 {
                     _frmPred.AddModel(e.PackedPluginState["Method"].ToString());
-                    if (!boolVisible)
-                        Show();
+                    /*if (!boolVisible)
+                        Show();*/
                 }
                 else
                 {
                     int intValidModels = _frmPred.ClearMethod(e.PackedPluginState["Method"].ToString());
-                    if (intValidModels == 0)
-                        Hide();
+                    /*if (intValidModels == 0)
+                        Hide();*/
                 }
 
                 _frmPred.ClearDataGridViews(e.PackedPluginState["Method"].ToString());
@@ -344,10 +344,10 @@ namespace Prediction
                             boolVisible = (bool)dictPlugin["Visible"];
                             boolComplete = (bool)dictPlugin["Complete"];
 
-                            if (boolVisible)
+                            /*if (boolVisible)
                                 Show();
                             else
-                                Hide();
+                                Hide();*/
 
                             _frmPred.UnpackState(dictPlugin);
                         }
@@ -390,10 +390,10 @@ namespace Prediction
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];
 
-                if (boolVisible)
+                /*if (boolVisible)
                     Show();
                 else 
-                    Hide();
+                    Hide();*/
 
                 _frmPred.UnpackState(e.PackedPluginStates[strPanelKey]);
             }

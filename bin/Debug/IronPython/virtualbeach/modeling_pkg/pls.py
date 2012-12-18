@@ -5,6 +5,8 @@ import re
 from random import choice
 from .. import utils
 from .. import RDotNetWrapper as rdn
+import string
+import os
 
 #Import the pls library into R, and connect python to R.
 rdn.r.EagerEvaluate("library(pls)") 
@@ -30,13 +32,30 @@ class Model(object):
         self.data_dictionary = copy.deepcopy(self.data_dictionary)
         self.num_predictors = len(self.data_dictionary.keys()) - 1
         
+        #First, save the serialized R object to disk (so it can be read from within R)
+    	modelstring = model_struct["modelstring"]
+    	robject_file = "pls" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+    	f = open(robject_file, "wb")
+    	f.write(modelstring)
+    	f.close()
+    	
+    	#Read the serialized model object into R:
+    	load_params = {'file' : robject_file}
+        print("test 1")
+        objects = r.Call(function='load', **load_params).AsVector()
+        get_params = {'x' : str(objects[0])}
+        print("test2")
+        self.model = r.Call(function="get", **get_params).AsList()
+    	#os.remove(robject_file)
+        print("test3")
+        
         #Generate a PLS model in R.
         self.formula = r.Call('as.formula', obj=utils.SanitizeVariableName(self.target) + '~.')
         self.pls_params = {'formula' : self.formula, \
             'data' : self.data_frame, \
             'validation' : 'LOO', \
             'x' : True }
-        self.model = r.Call(function='plsr', **self.pls_params).AsList()
+        #self.model = r.Call(function='plsr', **self.pls_params).AsList()
                 
         #Get the number of columns from the validation step
         #(Might be fewer than the number of predictor variables if n<p)
@@ -332,9 +351,21 @@ class Model(object):
         
         
     def Serialize(self):
+       	#First, get the serialized gbm model object out of R (we have to write it to disk first)
+    	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+    	save_params = {'save' : self.model, \
+            'file' : robject_file, \
+            'ascii' : True }
+        r.Call(function='save', **save_params)
+    	f = open(robject_file, "r")
+    	self.modelstring = f.read()
+    	f.close()
+    	os.remove(robject_file)
+    	
+    	#Now pack the model state into a dictionary.
         model_struct = dict()
         model_struct['model_type'] = 'pls'
-        elements_to_save = ["data_dictionary", "ncomp", "threshold", "specificity", "target", "regulatory_threshold"]
+        elements_to_save = ["data_dictionary", "ncomp", "threshold", "specificity", "target", "regulatory_threshold", "modelstring"]
         
         for element in elements_to_save:
             try: model_struct[element] = getattr(self, element)

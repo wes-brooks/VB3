@@ -102,8 +102,9 @@ namespace IPyModeling
             //this.TabPageEntered
             //this.DataRequested += new EventHandler<ModelingCallback>(this.ProvideData);    
             //ResetIPyProject += new EventHandler(this.ResetProject);
+            ModelingTabControl.TabPages[2].Enter += new EventHandler(ModelTabEntered);
 
-            this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);
+            this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);            
         }
 
 
@@ -941,6 +942,18 @@ namespace IPyModeling
         protected virtual void PopulateResults(dynamic model) { }
 
 
+        public void ModelTabEntered(object sender, EventArgs e)
+        {
+            if (this.ipyModel != null)
+            {
+                //rebuild model
+                PopulateResults(this.ipyModel);
+                InitializeValidationChart();
+                AnnotateChart();
+            }
+        }
+
+
         protected void AnnotateChart()
         {
             Cursor.Current = Cursors.WaitCursor;
@@ -952,9 +965,8 @@ namespace IPyModeling
                 return;
             }*/
 
-            tabControl1.SelectTab(2);
-
-
+            //tabControl1.SelectTab(2);           
+            
             //Set the threshold with the given specificity.
             double dblSpecificity = this.listCandidateSpecificity[this.intThresholdIndex];
             ipyModel.Threshold(dblSpecificity);
@@ -1159,11 +1171,6 @@ namespace IPyModeling
 
                 //Now restore the elements of the user interface.
                 this.pnlThresholdingButtons.Visible = (bool)dictProjectState["ThresholdingButtonsVisible"];
-
-                //rebuild model
-                PopulateResults(this.ipyModel);
-                InitializeValidationChart();
-                AnnotateChart();
             }
 
             //Now set the selected tab to whatever was on top when the project was saved.

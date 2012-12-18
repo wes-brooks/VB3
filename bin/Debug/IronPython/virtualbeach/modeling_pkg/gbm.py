@@ -3,6 +3,8 @@ import random
 import copy
 from .. import utils
 from .. import RDotNetWrapper as rdn
+import string
+import os
 
 #Import the gbm library to R and import the R engine
 rdn.r.EagerEvaluate("library(gbm)")
@@ -35,6 +37,20 @@ class Model(object):
         self.actual = model_struct['actual']
         self.array_actual = np.array(self.actual)
         
+    	#First, save the serialized R object to disk (so it can be read from within R)
+    	modelstring = model_struct["modelstring"]
+    	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+    	f = open(robject_file, "wb")
+    	f.write(modelstring)
+    	f.close()
+    	
+    	#Read the serialized model object into R:
+    	load_params = {'file' : robject_file}
+        objects = r.Call(function='load', **load_params).AsVector()
+        get_params = {'x' : str(objects[0])}
+        self.model = r.Call(function="get", **get_params).AsList()
+    	os.remove(robject_file)
+        
         #Get the data into R 
         self.data_frame = utils.DictionaryToR(self.data_dictionary)
 
@@ -51,7 +67,7 @@ class Model(object):
             'n.minobsinnode' : self.minobsinnode, \
             'cv.folds' : self.folds }
         
-        self.model=r.Call(function='gbm', **self.gbm_params).AsList()
+        #self.model=r.Call(function='gbm', **self.gbm_params).AsList()
         self.GetFitted()
         
         #Establish a decision threshold
@@ -342,10 +358,22 @@ class Model(object):
 
         
     def Serialize(self):
+       	#First, get the serialized gbm model object out of R (we have to write it to disk first)
+    	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+    	save_params = {'save' : self.model, \
+            'file' : robject_file, \
+            'ascii' : True }
+        r.Call(function='save', **save_params)
+    	f = open(robject_file, "r")
+    	self.modelstring = f.read()
+    	f.close()
+    	os.remove(robject_file)
+    	
+    	#Now pack the model state into a dictionary.
         model_struct = dict()
         model_struct['model_type'] = 'gbm'
         elements_to_save = ["data_dictionary", "iterations", "threshold", "specificity", "target", "regulatory_threshold",
-                                "cost", "depth", "shrinkage", "weights", 'trees', 'folds', 'fraction', 'actual', 'minobsinnode']
+                                "cost", "depth", "shrinkage", "weights", 'trees', 'folds', 'fraction', 'actual', 'minobsinnode', "modelstring"]
         
         for element in elements_to_save:
             try: model_struct[element] = getattr(self, element)

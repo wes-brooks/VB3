@@ -3,6 +3,8 @@ import random
 import copy
 from .. import utils
 from .. import RDotNetWrapper as rdn
+import string
+import os
 
 #Import the gbm library to R and import the R engine
 rdn.r.EagerEvaluate("library(gbm)")
@@ -38,7 +40,7 @@ class Model(object):
     	#First, save the serialized R object to disk (so it can be read from within R)
     	modelstring = model_struct["modelstring"]
     	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
-    	f = open(robject_file, "w")
+    	f = open(robject_file, "wb")
     	f.write(modelstring)
     	f.close()
     	
@@ -65,7 +67,7 @@ class Model(object):
             'n.minobsinnode' : self.minobsinnode, \
             'cv.folds' : self.folds }
         
-        self.model=r.Call(function='gbm', **self.gbm_params).AsList()
+        #self.model=r.Call(function='gbm', **self.gbm_params).AsList()
         self.GetFitted()
         
         #Establish a decision threshold
@@ -358,9 +360,9 @@ class Model(object):
     def Serialize(self):
        	#First, get the serialized gbm model object out of R (we have to write it to disk first)
     	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
-    	save_params = {'list' : [self.model], \
+    	save_params = {'save' : self.model, \
             'file' : robject_file, \
-            'ascii' : true }
+            'ascii' : True }
         r.Call(function='save', **save_params)
     	f = open(robject_file, "r")
     	self.modelstring = f.read()
@@ -371,7 +373,7 @@ class Model(object):
         model_struct = dict()
         model_struct['model_type'] = 'gbm'
         elements_to_save = ["data_dictionary", "iterations", "threshold", "specificity", "target", "regulatory_threshold",
-                                "cost", "depth", "shrinkage", "weights", 'trees', 'folds', 'fraction', 'actual', 'minobsinnode']
+                                "cost", "depth", "shrinkage", "weights", 'trees', 'folds', 'fraction', 'actual', 'minobsinnode', "modelstring"]
         
         for element in elements_to_save:
             try: model_struct[element] = getattr(self, element)

@@ -404,10 +404,19 @@ namespace Prediction
             Container.Add("RegulatoryThreshold", Convert.ToDouble(txtRegStd.Text));
 
             //Save the decision threshold as entered in the textbox
-            if (Container.ContainsKey("DecisionThreshold"))
-                Container.Remove("DecisionThreshold");
-            Container.Add("DecisionThreshold", Convert.ToDouble(txtDecCrit.Text));
-            
+            if (txtDecCrit.Text != "")
+            {
+                if (Container.ContainsKey("DecisionThreshold"))
+                    Container.Remove("DecisionThreshold");
+                Container.Add("DecisionThreshold", Convert.ToDouble(txtDecCrit.Text));
+            }
+            else
+            {
+                if (Container.ContainsKey("DecisionThreshold"))
+                    Container.Remove("DecisionThreshold");
+                Container.Add("DecisionThreshold", Convert.ToDouble(txtRegStd.Text));
+            }
+
             //Transform for dtObs
             if (Container.ContainsKey("xfrmObs"))
                 Container.Remove("xfrmObs");

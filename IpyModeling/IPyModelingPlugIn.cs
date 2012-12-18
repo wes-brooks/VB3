@@ -63,6 +63,12 @@ namespace IPyModeling
         }
 
 
+        private void Handler1(object sender, EventArgs e)
+        {
+
+        }
+
+
         public void Hide()
         {
             boolVisible = false;
@@ -213,8 +219,8 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            if ((e.ActivePanelKey.ToString() == "DataSheetPanel" || e.ActivePanelKey.ToString() == "kVBLocation") && boolVisible)
-                Hide();
+            //if ((e.ActivePanelKey.ToString() == "DataSheetPanel" || e.ActivePanelKey.ToString() == "kVBLocation") && boolVisible)
+            //    Hide();
         }
 
 
@@ -279,7 +285,7 @@ namespace IPyModeling
                 IDictionary<string, object> dictPluginState = (IDictionary<string, object>)(e.PackedPluginState);
                 if (!(bool)dictPluginState["Complete"])
                 {
-                    this.Hide();
+                    //this.Hide();
                     return;
                 }
                 else if (boolVirgin)
@@ -315,8 +321,8 @@ namespace IPyModeling
                         {
                             IDictionary<string, object> dictPlugin = e.PackedPluginState;
 
-                            Show();
-                            MakeActive();
+                            //Show();
+                            //MakeActive();
 
                             innerIronPythonControl.UnpackState(dictPlugin);
 
@@ -324,10 +330,10 @@ namespace IPyModeling
                             boolVisible = (bool)dictPlugin["Visible"];
                             boolVirgin = (bool)dictPlugin["Virgin"];
 
-                            if (boolVisible)
-                                Show();
-                            else
-                                Hide();
+                            //if (boolVisible)
+                                //Show();
+                            //else
+                                //Hide();
                         }
                     }
                 }
@@ -519,10 +525,10 @@ namespace IPyModeling
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolVirgin = (bool)dictPlugin["Virgin"];
 
-                if (boolVisible)
-                    Show();
-                else
-                    Hide();               
+                //if (!boolVisible)
+                //    Hide();
+                //else
+                //    Show();        
             }
             else
             {
