@@ -1665,24 +1665,44 @@ namespace Prediction
             dgvStats.SelectionChanged -= new EventHandler(dgvStats_SelectionChanged);
             //clear data
             DataGridViewSelectedRowCollection selRowCol = dgvVariables.SelectedRows;
+          
+            List<string> lstObsKeys = new List<string>();
             if (dgvObs.DataSource != null)
+            {
                 dgvObs.ClearSelection();
+                foreach (DataGridViewRow row in dgvObs.Rows)
+                {
+                    try { lstObsKeys.Add(row.Cells[0].Value.ToString()); }
+                    catch { }
+                }
+            }
 
+            List<string> lstStatsKeys = new List<string>();
             if (dgvStats.DataSource != null)
+            {
                 dgvStats.ClearSelection();
+                foreach (DataGridViewRow row in dgvStats.Rows)
+                {
+                    try { lstStatsKeys.Add(row.Cells[0].Value.ToString()); }
+                    catch { }
+                }
+            }
 
             for (int i=0;i<selRowCol.Count;i++)
             {
                 if (dgvObs.DataSource != null)
-                {
-                    if (selRowCol[i].Index < dgvObs.Rows.Count)
-                        dgvObs.Rows[selRowCol[i].Index].Selected = true;
+                {                    
+                    if (lstObsKeys.Contains(selRowCol[i].Cells[0].Value))
+                        dgvObs.Rows[lstObsKeys.IndexOf(selRowCol[i].Cells[0].Value.ToString())].Selected = true;
                 }
 
                 if (dgvStats.DataSource != null)
                 {
-                    if (selRowCol[i].Index < dgvStats.Rows.Count)
-                        dgvStats.Rows[selRowCol[i].Index].Selected = true;
+                    if (lstStatsKeys.Contains(selRowCol[i].Cells[0].Value))
+                        dgvStats.Rows[lstStatsKeys.IndexOf(selRowCol[i].Cells[0].Value.ToString())].Selected = true;
+
+                    //if (selRowCol[i].Index < dgvStats.Rows.Count)
+                    //    dgvStats.Rows[selRowCol[i].Index].Selected = true;
                 }
             }
             //resubscribe
@@ -1699,27 +1719,45 @@ namespace Prediction
             dgvStats.SelectionChanged -= new EventHandler(dgvStats_SelectionChanged);
 
             DataGridViewSelectedRowCollection selRowCol = dgvObs.SelectedRows;
-            //clear all
-            if (dgvVariables.DataSource != null)
-                dgvVariables.ClearSelection();
 
+            //clear all
+            List<string> lstVariablesKeys = new List<string>();
+            if (dgvVariables.DataSource != null)
+            {
+                dgvVariables.ClearSelection();
+                foreach (DataGridViewRow row in dgvVariables.Rows)
+                {
+                    try { lstVariablesKeys.Add(row.Cells[0].Value.ToString()); }
+                    catch { }
+                }
+            }
+
+            List<string> lstStatsKeys = new List<string>();
             if (dgvStats.DataSource != null)
+            {
                 dgvStats.ClearSelection();
+                foreach (DataGridViewRow row in dgvStats.Rows)
+                {
+                    try { lstStatsKeys.Add(row.Cells[0].Value.ToString()); }
+                    catch { }
+                }
+            }
 
             for (int i = 0; i < selRowCol.Count; i++)
             {
                 if (dgvVariables.DataSource != null)
-                {
-                    if (selRowCol[i].Index < dgvVariables.Rows.Count)
-                        dgvVariables.Rows[selRowCol[i].Index].Selected = true;
+                {                    
+                    if (lstVariablesKeys.Contains(selRowCol[i].Cells[0].Value))
+                        dgvVariables.Rows[lstVariablesKeys.IndexOf(selRowCol[i].Cells[0].Value.ToString())].Selected = true;
                 }
 
                 if (dgvStats.DataSource != null)
                 {
-                    if (selRowCol[i].Index < dgvStats.Rows.Count)
-                        dgvStats.Rows[selRowCol[i].Index].Selected = true;
+                    if (lstStatsKeys.Contains(selRowCol[i].Cells[0].Value))
+                        dgvStats.Rows[lstStatsKeys.IndexOf(selRowCol[i].Cells[0].Value.ToString())].Selected = true;
                 }
             }
+
             //resubscribe
             dgvVariables.SelectionChanged += new EventHandler(dgvVariables_SelectionChanged);
             dgvStats.SelectionChanged += new EventHandler(dgvStats_SelectionChanged);
@@ -1732,28 +1770,47 @@ namespace Prediction
             //unsubscribe
             dgvVariables.SelectionChanged -= new EventHandler(dgvVariables_SelectionChanged);
             dgvObs.SelectionChanged -= new EventHandler(dgvObs_SelectionChanged);
-            //clear all
-            DataGridViewSelectedRowCollection selRowCol = dgvStats.SelectedRows;
-            if (dgvVariables.DataSource != null)
-                dgvVariables.ClearSelection();
 
+            DataGridViewSelectedRowCollection selRowCol = dgvStats.SelectedRows;
+
+            //clear all
+            List<string> lstVariablesKeys = new List<string>();
+            if (dgvVariables.DataSource != null)
+            {
+                dgvVariables.ClearSelection();
+                foreach (DataGridViewRow row in dgvVariables.Rows)
+                {
+                    try { lstVariablesKeys.Add(row.Cells[0].Value.ToString()); }
+                    catch { }
+                }
+            }
+
+            List<string> lstObsKeys = new List<string>();
             if (dgvObs.DataSource != null)
+            {
                 dgvObs.ClearSelection();
+                foreach (DataGridViewRow row in dgvObs.Rows)
+                {
+                    try { lstObsKeys.Add(row.Cells[0].Value.ToString()); }
+                    catch { }
+                }
+            }
 
             for (int i = 0; i < selRowCol.Count; i++)
             {
                 if (dgvVariables.DataSource != null)
                 {
-                    if (selRowCol[i].Index < dgvVariables.Rows.Count)
-                        dgvVariables.Rows[selRowCol[i].Index].Selected = true;
+                    if (lstVariablesKeys.Contains(selRowCol[i].Cells[0].Value))
+                        dgvVariables.Rows[lstVariablesKeys.IndexOf(selRowCol[i].Cells[0].Value.ToString())].Selected = true;
                 }
 
                 if (dgvObs.DataSource != null)
                 {
-                    if (selRowCol[i].Index < dgvObs.Rows.Count)
-                        dgvObs.Rows[selRowCol[i].Index].Selected = true;
+                    if (lstObsKeys.Contains(selRowCol[i].Cells[0].Value))
+                        dgvObs.Rows[lstObsKeys.IndexOf(selRowCol[i].Cells[0].Value.ToString())].Selected = true;
                 }
             }
+
             //resubscribe
             dgvVariables.SelectionChanged += new EventHandler(dgvVariables_SelectionChanged);
             dgvObs.SelectionChanged += new EventHandler(dgvObs_SelectionChanged);

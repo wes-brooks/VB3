@@ -17,11 +17,11 @@ class Model(object):
     '''represents a PLS model generated in R'''
 
     def __init__(self, **args):
-        if "model_struct" in args: self.Deserialize( args['model_struct'] )
+        if "model_struct" in args: self.Deserialize( args['model_struct'], args["scratchdir"] )
         else: self.Create(**args)
         
         
-    def Deserialize(self, model_struct):
+    def Deserialize(self, model_struct, scratchdir=""):
         #Unpack the model_struct dictionary
         self.data_dictionary = model_struct['data_dictionary']
         self.target = model_struct['target']
@@ -33,8 +33,14 @@ class Model(object):
         self.num_predictors = len(self.data_dictionary.keys()) - 1
         
         #First, save the serialized R object to disk (so it can be read from within R)
-    	modelstring = model_struct["modelstring"]
-    	robject_file = "pls" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+        robject_file = "pls" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"        
+        if scratchdir:
+            scratchdir = scratchdir.split(os.sep)
+            scratchdir.append(robject_file)
+            robject_file = os.sep.join(scratchdir)        
+        robject_file = robject_file.replace("\\", "\\\\")
+
+        modelstring = model_struct["modelstring"]
     	f = open(robject_file, "wb")
     	f.write(modelstring)
     	f.close()
@@ -347,9 +353,15 @@ class Model(object):
         return [t_pos, t_neg, f_pos, f_neg]
         
         
-    def Serialize(self):
+    def Serialize(self, scratchdir=""):
        	#First, get the serialized gbm model object out of R (we have to write it to disk first)
-    	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+    	robject_file = "pls" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"
+        if scratchdir:
+            scratchdir = scratchdir.split(os.sep)
+            scratchdir.append(robject_file)
+            robject_file = os.sep.join(scratchdir)
+        robject_file = robject_file.replace("\\", "\\\\")
+        
     	save_params = {'save' : self.model, \
             'file' : robject_file, \
             'ascii' : True }

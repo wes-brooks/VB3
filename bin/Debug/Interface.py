@@ -75,17 +75,18 @@ class BeachInterface(object):
         return [[float(x) for x in thresholds], list(specificities)]
         
         
-    def Serialize(self, model):
+    def Serialize(self, model, scratchdir=""):
         '''Convert the model to a string that can be written to disk.'''
-        model_struct = model.Serialize()
+        model_struct = model.Serialize(scratchdir)
         serialized = pickle.dumps(model_struct, protocol=2)
         return serialized
         
         
-    def Deserialize(self, model_string):
+    def Deserialize(self, model_string, scratchdir=""):
+        print scratchdir
         '''Take a string and turn it into a model object.'''
         model_struct = pickle.loads(model_string)
-        model = Control.Deserialize(model_struct)
+        model = Control.Deserialize(model_struct, scratchdir)
         return model
 
     

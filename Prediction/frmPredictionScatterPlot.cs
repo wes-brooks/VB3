@@ -85,18 +85,44 @@ namespace Prediction
             if ((dtObs == null) || (dtStats == null))
                 return null;
 
-            int intMinRecs = Math.Min(dtObs.Rows.Count, dtStats.Rows.Count);
-            if (intMinRecs < 1)
+            //int intMinRecs = Math.Min(dtObs.Rows.Count, dtStats.Rows.Count);
+            //if (intMinRecs < 1)
+            //    return null;
+                                   
+            List<string> lstStatsKeys = new List<string>();
+            foreach (DataRow row in dtStats.Rows) {
+                try
+                {
+                    lstStatsKeys.Add(row[0].ToString());
+                }
+                catch {}
+            }
+
+            List<string> lstObsKeys = new List<string>();
+            foreach (DataRow row in dtObs.Rows) {
+                try
+                {
+                    lstObsKeys.Add(row[0].ToString());
+                }
+                catch {}
+            }
+
+            if (lstStatsKeys.Count < 1)
                 return null;
 
             List<double[]> lstData = new List<double[]>();
             double[] dblArrRecord = null;
-            for (int i = 0; i < intMinRecs; i++)
+            for (int i = 0; i < lstStatsKeys.Count; i++)
             {
-                dblArrRecord = new double[2];
-                dblArrRecord[0] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtObs.Rows[i][strObservationColumn]), xfrmObs, dblObsExponent), xfrmThresh, dblThreshExponent);
-                dblArrRecord[1] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]), xfrmPred, dblPredExponent), xfrmThresh, dblThreshExponent);
-                lstData.Add(dblArrRecord);
+                if (lstObsKeys.Contains(lstStatsKeys[i]))
+                {
+                    int j = lstObsKeys.IndexOf(lstStatsKeys[i]);
+
+                    dblArrRecord = new double[2];
+                    dblArrRecord[0] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtObs.Rows[j][strObservationColumn]), xfrmObs, dblObsExponent), xfrmThresh, dblThreshExponent);
+                    dblArrRecord[1] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]), xfrmPred, dblPredExponent), xfrmThresh, dblThreshExponent);
+                    lstData.Add(dblArrRecord);
+                }
             }
             return lstData;
         }

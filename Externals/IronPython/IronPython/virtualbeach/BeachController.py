@@ -351,7 +351,7 @@ def Summarize(model, validation_dict, **args):
     return [spec_lim, tp, tn, fp, fn, total]
     
     
-def Deserialize(model_struct, **args):
+def Deserialize(model_struct, scratchdir="", **args):
     '''Turns the model_struct into a Model object, using the method provided by model_struct['model_type']'''
     method = methods[ model_struct['model_type'] ]
-    return method.Model(model_struct=model_struct)
+    return method.Model(model_struct=model_struct, scratchdir=scratchdir)

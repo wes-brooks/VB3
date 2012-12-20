@@ -102,8 +102,8 @@ namespace IPyModeling
             //this.TabPageEntered
             //this.DataRequested += new EventHandler<ModelingCallback>(this.ProvideData);    
             //ResetIPyProject += new EventHandler(this.ResetProject);
-            ModelingTabControl.TabPages[2].Enter += new EventHandler(ModelTabEntered);
-
+            ModelingTabControl.TabPages[2].Paint += new PaintEventHandler(ModelTabEntered);
+            ModelingTabControl.TabPages[3].Paint += new PaintEventHandler(DiagnosticTabEntered);
             this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);            
         }
 
@@ -840,6 +840,25 @@ namespace IPyModeling
             //Remove the ID field:
             tblData.Columns.Remove(tblData.Columns[0].Caption);
 
+            //Make sure that there is at least one exceedance and one non-exceedance:
+            List<double> lstOutput = new List<double>();
+            foreach (DataRow row in tblData.Rows) { lstOutput.Add(Convert.ToDouble(row[strTarget])); }
+            int intExceedances = lstOutput.Count(y => y > dblThreshold);
+            if (intExceedances == 0)
+            {
+                MessageBox.Show("There are no exceedances in the training data! Did you forget to tell me about a transformation?");
+                return;
+            }
+
+            int intNonExceedances = lstOutput.Count(y => y <= dblThreshold);
+            if (intNonExceedances == 0)
+            {
+                MessageBox.Show("There are no non-exceedances in the training data! Did you forget to tell me about a transformation?");
+                return;
+            }
+
+
+
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
             dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblSpecificity, regulatory_threshold: dblThreshold, method: strMethod);
             
@@ -946,10 +965,19 @@ namespace IPyModeling
         {
             if (this.ipyModel != null)
             {
-                //rebuild model
-                PopulateResults(this.ipyModel);
+                //rebuild model                
                 InitializeValidationChart();
                 AnnotateChart();
+            }
+        }
+
+
+        public void DiagnosticTabEntered(object sender, EventArgs e)
+        {
+            if (this.ipyModel != null)
+            {
+                //rebuild model                
+                UpdateDiagnostics();
             }
         }
 
@@ -1063,7 +1091,8 @@ namespace IPyModeling
                 return dictPluginState;
 
             //Pack up the model's state in two ways: one with the model represented by a dynamic object, the other with the model represented by a string
-            string strModelString = ipyInterface.Serialize(Model);
+            string strScratchDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach");
+            string strModelString = ipyInterface.Serialize(Model, strScratchDir);
 
             //Store the decision threshold.
             double dblDecisionThreshold;
@@ -1105,7 +1134,7 @@ namespace IPyModeling
         //Reconstruct the saved modeling state - without the IronPython Model
         public void UnpackState(IDictionary<string, object> dictProjectState)
         {
-            this.Show();
+            //this.Show();
             if (dictProjectState.Count <= 3) return; //if only plugin props are here
 
             this.boolComplete = (bool)dictProjectState["Complete"];
@@ -1115,7 +1144,7 @@ namespace IPyModeling
             this.SetData(dictProjectState);
                        
             //Make the modeling tab active during unpacking so we can draw the graph.
-            tabControl1.SelectedIndex = 2;
+            //tabControl1.SelectedIndex = 2;
 
             if (boolComplete)
             {
@@ -1135,8 +1164,10 @@ namespace IPyModeling
 
                 //ModelState modelState = (ModelState)dictProjectState["Model"];
                 Dictionary<string, object> dictModel = (Dictionary<string, object>)dictProjectState["Model"];
-                this.ipyModel = ipyInterface.Deserialize(dictModel["ModelString"]);
+                string strScratchDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach");
+                this.ipyModel = ipyInterface.Deserialize(dictModel["ModelString"], strScratchDir);
                 this.Method = (string)dictModel["Method"];
+                PopulateResults(this.ipyModel);
 
                 //Unpack the contents of the threshold and exponent text boxes
                 //Dictionary<string, object> dictTransform = (Dictionary<string, object>)dictProjectState["Transform"];
