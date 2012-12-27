@@ -83,7 +83,6 @@ class BeachInterface(object):
         
         
     def Deserialize(self, model_string, scratchdir=""):
-        print scratchdir
         '''Take a string and turn it into a model object.'''
         model_struct = pickle.loads(model_string)
         model = Control.Deserialize(model_struct, scratchdir)

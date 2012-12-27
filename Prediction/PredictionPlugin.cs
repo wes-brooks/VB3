@@ -15,7 +15,7 @@ using VBCommon.Interfaces;
 
 namespace Prediction
 {
-    public class IpyPredictionPlugin : Extension, IPartImportsSatisfiedNotification, IPlugin
+    public class PredictionPlugin : Extension, IPartImportsSatisfiedNotification, IPlugin
     {                      
         [Import("Shell")]
         private ContainerControl Shell { get; set; }
@@ -52,7 +52,7 @@ namespace Prediction
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
 
 
-        public IpyPredictionPlugin()
+        public PredictionPlugin()
         {
             _frmPred = new frmPrediction();
             strPanelKey = "Prediction";

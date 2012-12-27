@@ -17,7 +17,6 @@ import RDotNetExtensions
 from System import Array
 import numpy as np
 
-
 #Fire up the interface to R
 r = RDotNet.REngine.CreateInstance("RDotNet", output=RDotNet.Internals.OutputMode.Quiet)
 
@@ -29,11 +28,11 @@ class Wrap():
         
     def Call(self, function, **params):
         #This function translates function calls into a form that R.NET can understand
-        
+                
         #start the command string with the function name:
         command = str(function) + "("
         
-        for item in params:
+        for item in params:            
             if isinstance(params[item], str): #put quotes around strings
 				params[item] = "'" +  params[item] + "'"
             
