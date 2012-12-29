@@ -1548,21 +1548,37 @@ namespace IPyModeling
             dblMandateThreshold = tv;
             boolClean = false;
         }
-        
 
-        public List<double> Predict(DataTable tblForPrediction)
+
+        public List<double> Predict(DataSet dsPredictionData)
         {
-            dynamic dynPredictions = ipyInterface.Predict(ipyModel, tblForPrediction);
-            List<double> lstPredictions = ((IList<object>)dynPredictions).Cast<double>().ToList();
-            return (lstPredictions);
+            try
+            {
+                DataTable tblForPrediction = dsPredictionData.Tables["Prediction"];
+                dynamic dynPredictions = ipyInterface.Predict(ipyModel, tblForPrediction);
+                List<double> lstPredictions = ((IList<object>)dynPredictions).Cast<double>().ToList();
+                return (lstPredictions);
+            }
+            catch
+            {
+                return new List<double>();
+            }
         }
 
 
-        public List<double> PredictExceedanceProbability(DataTable tblForPrediction)
+        public List<double> PredictExceedanceProbability(DataSet dsPredictionData)
         {
-            dynamic dynPredictions = ipyInterface.PredictExceedanceProbability(ipyModel, tblForPrediction);
-            List<double> lstExceedanceProbability = ((IList<object>)dynPredictions).Cast<double>().ToList();
-            return (lstExceedanceProbability);
+            try
+            {
+                DataTable tblForPrediction = dsPredictionData.Tables["Prediction"];
+                dynamic dynPredictions = ipyInterface.PredictExceedanceProbability(ipyModel, tblForPrediction);
+                List<double> lstExceedanceProbability = ((IList<object>)dynPredictions).Cast<double>().ToList();
+                return (lstExceedanceProbability);
+            }
+            catch
+            {
+                return new List<double>();
+            }
         }
 
 

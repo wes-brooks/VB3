@@ -19,8 +19,8 @@ namespace IPyGBMPlugin
         }
 
 
-        public List<double> Predict(System.Data.DataTable tblPredictionFrame) { return (innerIronPythonControl.Predict(tblPredictionFrame)); }
-        public List<double> PredictExceedanceProbability(System.Data.DataTable tblPredictionFrame) { return (innerIronPythonControl.PredictExceedanceProbability(tblPredictionFrame)); }
+        public List<double> Predict(System.Data.DataSet dsPredictionData) { return (innerIronPythonControl.Predict(dsPredictionData)); }
+        public List<double> PredictExceedanceProbability(System.Data.DataSet dsPredictionData) { return (innerIronPythonControl.PredictExceedanceProbability(dsPredictionData)); }
         public string ModelString() { return (innerIronPythonControl.ModelString()); }
     }
 }

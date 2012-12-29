@@ -906,19 +906,24 @@ namespace Prediction
 
             VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
-            DataTable tblForPrediction = BuildPredictionTable(tblRaw, model.ModelString());
+            DataTable tblForPrediction = BuildPredictionTable(tblRaw, model.ModelString());  
 
             VBLogger.GetLogger().LogEvent("30", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            
 
+            DataSet dsTables = new DataSet();
+            tblRaw.TableName = "Raw";
+            tblForPrediction.TableName = "Prediction";
+            dsTables.Tables.Add(tblRaw);
+            dsTables.Tables.Add(tblForPrediction);
             Cursor.Current = Cursors.WaitCursor;
+
             VBLogger.GetLogger().LogEvent("40", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
 
             VBLogger.GetLogger().LogEvent("50", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
             //make prediction
-            List<double> lstPredictions = model.Predict(tblForPrediction);
+            List<double> lstPredictions = model.Predict(dsTables);
 
             VBLogger.GetLogger().LogEvent("60", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
@@ -939,8 +944,8 @@ namespace Prediction
             }
 
             VBLogger.GetLogger().LogEvent("80", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            
-            dtStats = GeneratePredStats(dtPredictions, dtObs, tblForPrediction);
+
+            dtStats = GeneratePredStats(dtPredictions, dtObs, dsTables);
 
             VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
@@ -1008,7 +1013,7 @@ namespace Prediction
 
 
         //generate prediction data for table
-        private DataTable GeneratePredStats(DataTable dtPredictions, DataTable dtObs, DataTable dtRaw)
+        private DataTable GeneratePredStats(DataTable dtPredictions, DataTable dtObs, DataSet dsForPrediction)
         {
             //VBCommon.Transforms.DependentVariableTransforms dvt = GetTransformType();
             if (xfrmThreshold == VBCommon.Transforms.DependentVariableTransforms.Power)
@@ -1037,7 +1042,7 @@ namespace Prediction
             double dblPredValue = 0.0;
             string strId = "";
 
-            List<double> lstExceedanceProbability = model.PredictExceedanceProbability(dtRaw);
+            List<double> lstExceedanceProbability = model.PredictExceedanceProbability(dsForPrediction);
             for (int i = 0; i < dtPredictions.Rows.Count; i++)
             {
                 dblPredValue = (double)dtPredictions.Rows[i]["CalcValue"];

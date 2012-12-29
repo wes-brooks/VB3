@@ -7,8 +7,8 @@ namespace VBCommon.Interfaces
 {
     public interface IModel
     {
-        List<double> Predict(System.Data.DataTable table);
-        List<double> PredictExceedanceProbability(System.Data.DataTable table);
+        List<double> Predict(System.Data.DataSet data);
+        List<double> PredictExceedanceProbability(System.Data.DataSet data);
         string ModelString();
         IDictionary<string, object> GetPackedState();
     }
