@@ -48,8 +48,9 @@ namespace VBProjectManager
         public VBProjectManager()
         {
             strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach", "VirtualBeach.log");
-            VBLogger.SetLogFileName(strLogFile);
             logger = VBLogger.GetLogger();
+            VBLogger.SetLogFileName(strLogFile);
+            
 
             strUndoRedoDictionaryPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach", String.Concat("UndoRedo", RandomString(10), ".esent"));
             UndoRedoDict = new PersistentDictionary<string, string>(strUndoRedoDictionaryPath);

@@ -17,7 +17,7 @@ namespace VBProjectManager
     {
         private static volatile VBLogger me = null;
         private static object syncRoot = new Object();
-        private static String logFileName;
+        private String logFileName = String.Empty;
         private const int i_max = 100;
 
         public delegate void MessageLoggedEventHandler(String message, Globals.targetSStrip target);
@@ -51,9 +51,9 @@ namespace VBProjectManager
                 lock (syncRoot)
                 {
                     me = new VBLogger();
-                    if (!logFileName.Equals(String.Empty))
+                    if (!me.logFileName.Equals(String.Empty))
                     {
-                        me.LogFirstTime();
+                        LogFirstTime();
                     }
                     
                 }
@@ -91,7 +91,7 @@ namespace VBProjectManager
                                 me.MessageEventLogged -= (MessageLoggedEventHandler)del;
                             }
                         }
-                        logFileName = String.Empty;
+                        me.logFileName = String.Empty;
                         me = null;
                     }
                 }
@@ -114,10 +114,10 @@ namespace VBProjectManager
             }
             else
             {
-                logFileName = filePath;
+                me.logFileName = filePath;
                 if (me != null)
                 {
-                    me.LogFirstTime();
+                    LogFirstTime();
                 }
             }
         }
@@ -129,17 +129,17 @@ namespace VBProjectManager
         /// <param name="handler">see delegate this class</param>
         public void AddHandler(MessageLoggedEventHandler handler)
         {
-            this.MessageEventLogged += handler;
+            MessageEventLogged += handler;
         }
 
 
-        internal void LogFirstTime()
+        internal static void LogFirstTime()
         {
             try
             {
-                if (File.Exists(logFileName))
+                if (File.Exists(me.logFileName))
                 {
-                    using (FileStream fs = File.Open(logFileName, FileMode.Open))
+                    using (FileStream fs = File.Open(me.logFileName, FileMode.Open))
                     {
                         TextReader reader = new StreamReader(fs);
                         String ln = null;
@@ -161,7 +161,7 @@ namespace VBProjectManager
                 }
                 else
                 {
-                    InitLogFile(logFileName);
+                    InitLogFile(me.logFileName);
                 }
             }
             catch (IOException ioe)
@@ -175,9 +175,9 @@ namespace VBProjectManager
         }
 
 
-        void InitLogFile(string logFileName)
+        static void InitLogFile(string logFileName)
         {
-            string logFileDir = logFileName.Substring(0, logFileName.LastIndexOf('\\'));
+            string logFileDir = logFileName.Substring(0, logFileName.LastIndexOf(Path.PathSeparator));
             if (!Directory.Exists(logFileDir))
                 Directory.CreateDirectory(logFileDir);
 
@@ -199,7 +199,7 @@ namespace VBProjectManager
         /// <returns></returns>
         public static String GetLogFileName()
         {
-            return logFileName;
+            return me.logFileName;
         }
 
 
