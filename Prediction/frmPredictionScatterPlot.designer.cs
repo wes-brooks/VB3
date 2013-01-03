@@ -28,22 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.scatterPlot = new VBCommon.Controls.AnnotatedScatterPlot();
+            this.scatterPlot = new VBCommon.Controls.AnnotatedScatterPlot(EnableProbabilityThreshold:true);
             this.btnClose = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
             this.SuspendLayout();
             // 
-            // mlrPredObs1
+            // scatterPlot
             // 
             this.scatterPlot.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.scatterPlot.Location = new System.Drawing.Point(12, 12);
-            this.scatterPlot.Name = "mlrPredObs1";
+            this.scatterPlot.Location = new System.Drawing.Point(12, 23);
+            this.scatterPlot.Name = "scatterPlot";
             this.scatterPlot.PowerExponent = double.NaN;
             this.scatterPlot.Size = new System.Drawing.Size(678, 345);
             this.scatterPlot.TabIndex = 0;
-           
+            this.scatterPlot.Transform = "none";
             // 
             // btnClose
             // 
@@ -56,7 +56,7 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // frmMLRPredObs
+            // frmPredictionScatterPlot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

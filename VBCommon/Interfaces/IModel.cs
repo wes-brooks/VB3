@@ -7,8 +7,8 @@ namespace VBCommon.Interfaces
 {
     public interface IModel
     {
-        List<double> Predict(System.Data.DataSet data);
-        List<double> PredictExceedanceProbability(System.Data.DataSet data);
+        List<double> Predict(System.Data.DataSet data, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent);
+        List<double> PredictExceedanceProbability(System.Data.DataSet data, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent);
         string ModelString();
         IDictionary<string, object> GetPackedState();
     }

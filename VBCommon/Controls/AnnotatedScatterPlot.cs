@@ -19,7 +19,9 @@ namespace VBCommon.Controls
         //Threshold value used for sensitiviy, specificity, accuracy
         double dblDecisionThreshold;
         double dblMandateThreshold;
+        double dblProbabilityThreshold;
         double dblPowerExp = double.NaN;
+        bool boolRawPredictions = true;
 
         //public DependentVariableTransforms xfrmObs = DependentVariableTransforms.none;
         //public DependentVariableTransforms xfrmPred = DependentVariableTransforms.none;
@@ -31,9 +33,14 @@ namespace VBCommon.Controls
         public double dblCurrentExponent = 1;
         
         //constructor
-        public AnnotatedScatterPlot()
+        public AnnotatedScatterPlot(bool EnableProbabilityThreshold=false)
         {
             InitializeComponent();
+
+            lblProb.Visible = EnableProbabilityThreshold;
+            rbRaw.Visible = EnableProbabilityThreshold;
+            rbProb.Visible = EnableProbabilityThreshold;
+            txtProbabilityThreshold.Visible = EnableProbabilityThreshold;
 
             dblDecisionThreshold = Convert.ToDouble(tbThresholdDec.Text);
             dblMandateThreshold = Convert.ToDouble(tbThresholdDec.Text);
@@ -41,6 +48,16 @@ namespace VBCommon.Controls
             InitResultsGraph();
         }
 
+        //return horizonal threshold value
+        public bool RawPredictions
+        {
+            get { return rbRaw.Checked; }
+            set
+            { 
+                rbRaw.Checked = value;
+                rbProb.Checked = !value;
+            }
+        }
 
         //return horizonal threshold value
         public double ThresholdHoriz
@@ -57,22 +74,26 @@ namespace VBCommon.Controls
 
 
         //set threshold using variables
-        public void SetThresholds(double decisionThreshold, double mandateThreshold)
+        public void SetThresholds(double DecisionThreshold, double MandateThreshold, double ProbabilityThreshold=50)
         {
-            dblDecisionThreshold = decisionThreshold;
-            dblMandateThreshold = mandateThreshold;
+            dblDecisionThreshold = DecisionThreshold;
+            dblMandateThreshold = MandateThreshold;
+            dblProbabilityThreshold = ProbabilityThreshold;
             tbThresholdDec.Text = dblDecisionThreshold.ToString();
             tbThresholdReg.Text = dblMandateThreshold.ToString();
+            txtProbabilityThreshold.Text = dblProbabilityThreshold.ToString();
         }
 
 
         //set threshold using parameters
-        public void SetThresholds(string decisionThreshold, string mandateThreshold)
+        public void SetThresholds(string DecisionThreshold, string MandateThreshold, string ProbabilityThreshold="50")
         {
-            dblDecisionThreshold = Convert.ToDouble(decisionThreshold);
-            dblMandateThreshold = Convert.ToDouble(mandateThreshold);
-            tbThresholdDec.Text = decisionThreshold;
-            tbThresholdReg.Text = mandateThreshold;
+            dblDecisionThreshold = Convert.ToDouble(DecisionThreshold);
+            dblMandateThreshold = Convert.ToDouble(MandateThreshold);
+            dblProbabilityThreshold = Convert.ToDouble(ProbabilityThreshold);
+            tbThresholdDec.Text = DecisionThreshold;
+            tbThresholdReg.Text = MandateThreshold;
+            txtProbabilityThreshold.Text = ProbabilityThreshold;
         }
 
         
@@ -231,12 +252,21 @@ namespace VBCommon.Controls
             }
 
             //if data out of range of thresholds, make the threshold plot lines bigger
-            if (dblDecisionThreshold > maxX) maxX = dblMandateThreshold; //_decisionThreshold;
-            if (dblMandateThreshold > maxY) maxY = dblDecisionThreshold; //_mandateThreshold;
+            if (RawPredictions)
+            {
+                if (dblDecisionThreshold > maxX) maxX = dblMandateThreshold; //_decisionThreshold;
+                if (dblMandateThreshold > maxY) maxY = dblDecisionThreshold; //_mandateThreshold;
+            }
+            else
+            {
+                if (dblProbabilityThreshold > maxX) maxX = dblMandateThreshold; //_decisionThreshold;
+                if (dblMandateThreshold > maxY) maxY = dblProbabilityThreshold; //_mandateThreshold;
+            }
 
             //find the model error counts for the XYplot display
             ModelErrorCounts mec = new ModelErrorCounts();
-            mec.getCounts(dblDecisionThreshold, dblMandateThreshold, data);
+            if (RawPredictions) { mec.getCounts(dblDecisionThreshold, dblMandateThreshold, data); }
+            else { mec.getCounts(dblProbabilityThreshold, dblMandateThreshold, data); }
             if (mec.Status)
             {
                 int intFpc = mec.FPCount;
@@ -265,8 +295,16 @@ namespace VBCommon.Controls
                 IPointListEdit list2 = curve2.Points as IPointListEdit;
                 list2.Clear();
                 //mikec want the thresholds crossing, thus the "-1", "+1"
-                list2.Add(minX - 1, dblDecisionThreshold);
-                list2.Add(maxX + 1, dblDecisionThreshold);
+                if (RawPredictions)
+                {
+                    list2.Add(minX - 1, dblDecisionThreshold);
+                    list2.Add(maxX + 1, dblDecisionThreshold);
+                }
+                else
+                {
+                    list2.Add(minX - 1, dblProbabilityThreshold);
+                    list2.Add(maxX + 1, dblProbabilityThreshold);
+                }
                 curve2.Line.IsVisible = true;
 
                 // Get the PointPairList
@@ -383,10 +421,11 @@ namespace VBCommon.Controls
                 try
                 {
                     tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.none);
-                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.none);
+                    if (rbRaw.Checked) { th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.none); }
+                    else { th = Convert.ToDouble(txtProbabilityThreshold.Text); }
 
                     tbThresholdReg.Text = tv.ToString();
-                    tbThresholdDec.Text = th.ToString();
+                    if (rbRaw.Checked) { tbThresholdDec.Text = th.ToString(); }
 
                     //tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
                     //th = Convert.ToDouble(tbThresholdDec.Text.ToString());
@@ -399,7 +438,8 @@ namespace VBCommon.Controls
                 }
 
                 dblMandateThreshold = tv;
-                dblDecisionThreshold = th;
+                if (rbRaw.Checked) { dblDecisionThreshold = th; }
+                else { dblProbabilityThreshold = th; }
 
                 xfrmLast = xfrmCurrent;
                 xfrmCurrent = DependentVariableTransforms.none;
@@ -447,10 +487,11 @@ namespace VBCommon.Controls
                 try
                 {
                     tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Log10);
-                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Log10);
+                    if (rbRaw.Checked) { th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Log10); }
+                    else { th = Convert.ToDouble(txtProbabilityThreshold.Text); }
 
                     tbThresholdReg.Text = tv.ToString();
-                    tbThresholdDec.Text = th.ToString();
+                    if (rbRaw.Checked) { tbThresholdDec.Text = th.ToString(); }
                     //tv = Math.Log10(Convert.ToDouble(tbThresholdReg.Text.ToString()));
                     //th = Math.Log10(Convert.ToDouble(tbThresholdDec.Text.ToString()));
                 }
@@ -474,7 +515,9 @@ namespace VBCommon.Controls
                 }
 
                 dblMandateThreshold = tv;
-                dblDecisionThreshold = th;
+                if (rbRaw.Checked) { dblDecisionThreshold = th; }
+                else { dblProbabilityThreshold = th; }
+
 
                 xfrmLast = xfrmCurrent;
                 xfrmCurrent = DependentVariableTransforms.Log10;
@@ -498,10 +541,11 @@ namespace VBCommon.Controls
                 try
                 {
                     tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Ln);
-                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Ln);
+                    if (rbRaw.Checked) { th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Ln); }
+                    else { th = Convert.ToDouble(txtProbabilityThreshold.Text); }
 
                     tbThresholdReg.Text = tv.ToString();
-                    tbThresholdDec.Text = th.ToString();
+                    if (rbRaw.Checked) { tbThresholdDec.Text = th.ToString(); }
 
                     //tv = Math.Log(Convert.ToDouble(tbThresholdReg.Text.ToString()));
                     //th = Math.Log(Convert.ToDouble(tbThresholdDec.Text.ToString()));
@@ -526,7 +570,8 @@ namespace VBCommon.Controls
                 }
 
                 dblMandateThreshold = tv;
-                dblDecisionThreshold = th;
+                if (rbRaw.Checked) { dblDecisionThreshold = th; }
+                else { dblProbabilityThreshold = th; }
 
                 xfrmLast = xfrmCurrent;
                 xfrmCurrent = DependentVariableTransforms.Ln;
@@ -552,10 +597,11 @@ namespace VBCommon.Controls
                 {
                     power = Convert.ToDouble(txtPwrValue.Text);
                     tv = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdReg.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Power, power);
-                    th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Power, power);
+                    if (rbRaw.Checked) { th = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThresholdDec.Text), xfrmCurrent, dblCurrentExponent), DependentVariableTransforms.Power, power); }
+                    else { th = Convert.ToDouble(txtProbabilityThreshold.Text); }
 
                     tbThresholdReg.Text = tv.ToString();
-                    tbThresholdDec.Text = th.ToString();
+                    if (rbRaw.Checked) { tbThresholdDec.Text = th.ToString(); }
 
                     //tv = Math.Pow(Convert.ToDouble(tbThresholdReg.Text), power);
                     //th = Math.Pow(Convert.ToDouble(tbThresholdDec.Text), power);
@@ -580,7 +626,8 @@ namespace VBCommon.Controls
                 }
 
                 dblMandateThreshold = tv;
-                dblDecisionThreshold = th;
+                if (rbRaw.Checked) { dblDecisionThreshold = th; }
+                else { dblProbabilityThreshold = th; }
 
                 xfrmLast = xfrmCurrent;
                 xfrmCurrent = DependentVariableTransforms.Power;
@@ -600,10 +647,12 @@ namespace VBCommon.Controls
             {
                 double[] transformedPair = new double[2];
                 transformedPair[0] = VBCommon.Transforms.Apply.UntransformThreshold(dataPair[0], xfrmLast, dblLastExponent);
-                transformedPair[1] = VBCommon.Transforms.Apply.UntransformThreshold(dataPair[1], xfrmLast, dblLastExponent);
+                if (rbRaw.Checked) { transformedPair[1] = VBCommon.Transforms.Apply.UntransformThreshold(dataPair[1], xfrmLast, dblLastExponent); }
+                else { transformedPair[1] = dataPair[1]; }
 
                 transformedPair[0] = VBCommon.Transforms.Apply.TransformThreshold(transformedPair[0], xfrmCurrent, dblCurrentExponent);
-                transformedPair[1] = VBCommon.Transforms.Apply.TransformThreshold(transformedPair[1], xfrmCurrent, dblCurrentExponent);
+                if (rbRaw.Checked) { transformedPair[1] = VBCommon.Transforms.Apply.TransformThreshold(transformedPair[1], xfrmCurrent, dblCurrentExponent); }
+                else { transformedPair[1] = dataPair[1]; }
 
                 transformed.Add(transformedPair);
             }

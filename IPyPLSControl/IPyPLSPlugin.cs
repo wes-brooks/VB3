@@ -19,8 +19,8 @@ namespace IPyPLSPlugin
         }
 
 
-        public List<double> Predict(System.Data.DataSet dsPredictionData) { return (innerIronPythonControl.Predict(dsPredictionData)); }
-        public List<double> PredictExceedanceProbability(System.Data.DataSet dsPredictionData) { return (innerIronPythonControl.PredictExceedanceProbability(dsPredictionData)); }
+        public List<double> Predict(System.Data.DataSet dsPredictionData, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent) { return (innerIronPythonControl.Predict(dsPredictionData, RegulatoryThreshold, DecisionThreshold, ThresholdTransform, ThresholdPowerExponent)); }
+        public List<double> PredictExceedanceProbability(System.Data.DataSet dsPredictionData, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent) { return (innerIronPythonControl.PredictExceedanceProbability(dsPredictionData, RegulatoryThreshold, DecisionThreshold, ThresholdTransform, ThresholdPowerExponent)); }
         public string ModelString() { return (innerIronPythonControl.ModelString()); }
     }
 }

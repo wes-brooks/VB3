@@ -282,12 +282,18 @@ class Model(object):
         return [float(item) for item in prediction]
         
         
-    def PredictExceedanceProbability(self, data_dictionary, **args):
+    def PredictExceedanceProbability(self, data_dictionary, threshold, **args):
+        if not threshold:
+            threshold=self.threshold
+            
+        #Get the predicted values and the error variance for those predictions
+        se = np.sqrt(sum([x**2 for x in self.residuals]) / len(self.residuals))
         raw = self.Predict(data_dictionary, **args)
-        adjusted = [item-self.threshold for item in raw]
-        prediction = [np.exp(item) / (1 + np.exp(item)) for item in adjusted]
+        adjusted = [(item-threshold)/se for item in raw]
         
-        return [float(item) for item in prediction]
+        #Now produce the probability of exceedance:
+        exceedance_probability = r.Call(function='pnorm', q=np.array(adjusted, dtype=float)).AsVector()        
+        return [100*float(item) for item in exceedance_probability]
         
 
     def Validate(self, data_dictionary):

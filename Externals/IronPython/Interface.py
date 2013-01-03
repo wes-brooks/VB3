@@ -116,11 +116,11 @@ class BeachInterface(object):
         return list(predictions)
         
         
-    def PredictExceedanceProbability(self, model, data):
+    def PredictExceedanceProbability(self, model, data, threshold=''):
         '''Use the model to predict the probability of exceeding the threshold.'''
         [headers, data] = utils.DotNetToArray(data)
         data_dict = dict( zip(headers, np.transpose(data)) )
-        predictions = model.PredictExceedanceProbability(data_dict)
+        predictions = model.PredictExceedanceProbability(data_dict, threshold)
         return predictions
         
         

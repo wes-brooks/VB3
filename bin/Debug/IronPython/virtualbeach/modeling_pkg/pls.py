@@ -168,11 +168,14 @@ class Model(object):
         return np.array(prediction[:,self.ncomp-1] >= self.threshold, dtype=int)
         
         
-    def PredictExceedanceProbability(self, data_dictionary, **args):
+    def PredictExceedanceProbability(self, data_dictionary, threshold, **args):
+        if not threshold:
+            threshold = self.threshold
+            
         prediction = self.PredictValues(data_dictionary)[:,self.ncomp-1].squeeze()
         se = self.Extract('RMSEP')
-        nonexceedance_probability = r.Call(function='pnorm', q=np.array((self.threshold-prediction)/se, dtype=float)).AsVector()
-        exceedance_probability = [float(1-item) for item in nonexceedance_probability]
+        nonexceedance_probability = r.Call(function='pnorm', q=np.array((threshold-prediction)/se, dtype=float)).AsVector()
+        exceedance_probability = [100*float(1-item) for item in nonexceedance_probability]
         return exceedance_probability
 
         

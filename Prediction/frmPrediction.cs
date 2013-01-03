@@ -29,7 +29,8 @@ namespace Prediction
     [JsonObject]
     public partial class frmPrediction : UserControl, IFormState
     {
-        private ContextMenu cmforResponseVar = new ContextMenu();
+        private ContextMenu cmForResponseVar = new ContextMenu();
+        private ContextMenu cmForStats = new ContextMenu();
         private Dictionary<string, string> dictMainEffects;
 
         private IModel model = null;
@@ -67,6 +68,10 @@ namespace Prediction
         //The transform applied to the regulatory threshold:
         private DependentVariableTransforms xfrmThreshold;
         private double dblThresholdPowerTransformExp = double.NaN;
+
+        //The transform for entries in the Observations data table:
+        private DependentVariableTransforms xfrmDisplay;
+        private double dblDisplayPowerTransformExp = double.NaN;
         
         List<string> listModels = new List<string>();
         IDictionary<string, object> dictPredictionElements = new Dictionary<string, object>();
@@ -184,6 +189,11 @@ namespace Prediction
             txtPower.Text = dblThresholdPowerTransformExp.ToString();
             txtRegStd.Text = Convert.ToDouble(dictModel["RegulatoryThreshold"]).ToString();
             txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
+            txtProbabilityThreshold.Text = Convert.ToDouble(dictModel["ProbabilityThreshold"]).ToString();
+
+            if ((bool)dictModel["UseRawPredictions"]) { rbRaw.Checked = true; }
+            else { rbProbability.Checked = true; }
+
 
             //Unpack the current DataGridViews
             dtVariables = DeserializeDataTable(Container: dictPackedState, Slot: "IVData", Title: "Variables");
@@ -266,6 +276,8 @@ namespace Prediction
             //dictModelState.Add("Transform", dictTransform);
             dictModelState.Add("RegulatoryThreshold", dblRegulatoryThreshold);
             dictModelState.Add("DecisionThreshold", dblDecisionThreshold);
+            dictModelState.Add("ProbabilityThreshold", Convert.ToDouble(txtProbabilityThreshold.Text));
+            dictModelState.Add("UseRawPredictions", rbRaw.Checked);
 
             dictPluginState.Add("Model", dictModelState);
             //dictPluginState.Add("Transform", dictTransform);
@@ -436,6 +448,16 @@ namespace Prediction
             if (Container.ContainsKey("xfrmThresholdExponent"))
                 Container.Remove("xfrmThresholdExponent");
             Container.Add("xfrmThresholdExponent", dblThresholdPowerTransformExp);
+
+            //Store the contents of the Probability Threshold textbox.
+            if (Container.ContainsKey("ProbabilityThreshold"))
+                Container.Remove("ProbabilityThreshold");
+            Container.Add("ProbabilityThreshold", Convert.ToDouble(txtProbabilityThreshold.Text));
+
+            //Status of the rbRaw radiobutton.
+            if (Container.ContainsKey("RawThreshold"))
+                Container.Remove("RawThreshold");
+            Container.Add("RawThreshold", rbRaw.Checked);
         }
 
 
@@ -528,6 +550,8 @@ namespace Prediction
                         //Use the thresholds from the packed model object
                         txtDecCrit.Text = ((double)dictModel["DecisionThreshold"]).ToString();
                         txtRegStd.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
+                        txtProbabilityThreshold.Text = "50";
+                        rbRaw.Checked = true;
 
                         //Grab default transforms from the model.
                         xfrmThreshold = xfrmModeled;
@@ -585,6 +609,8 @@ namespace Prediction
                             dblThresholdPowerTransformExp = Convert.ToDouble(dictNewModel["xfrmThresholdExponent"]);
                             txtRegStd.Text = ((double)dictNewModel["RegulatoryThreshold"]).ToString();
                             txtDecCrit.Text = ((double)dictNewModel["DecisionThreshold"]).ToString();
+                            txtProbabilityThreshold.Text = ((double)dictNewModel["ProbabilityThreshold"]).ToString();
+                            rbRaw.Checked = (bool)dictNewModel["RawThreshold"];
                         }
                         else
                         {
@@ -593,6 +619,8 @@ namespace Prediction
                             dblThresholdPowerTransformExp = dblModeledPowerTransformExp;
                             txtDecCrit.Text = ((double)dictModel["DecisionThreshold"]).ToString();
                             txtRegStd.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
+                            txtProbabilityThreshold.Text = "50";
+                            rbRaw.Checked = true;
                         }
 
                         dtVariables = DeserializeDataTable(Container: dictNewModel, Slot: "IVData", Title: "Variables");
@@ -923,7 +951,7 @@ namespace Prediction
             VBLogger.GetLogger().LogEvent("50", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
             //make prediction
-            List<double> lstPredictions = model.Predict(dsTables);
+            List<double> lstPredictions = model.Predict(dsTables, Convert.ToDouble(txtRegStd.Text), Convert.ToDouble(txtDecCrit.Text), xfrmThreshold, dblThresholdPowerTransformExp);
 
             VBLogger.GetLogger().LogEvent("60", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
@@ -1026,9 +1054,11 @@ namespace Prediction
             dblCrit = VBCommon.Transforms.Apply.UntransformThreshold(dblCrit, xfrmThreshold, dblThresholdPowerTransformExp);
             dblCrit = VBCommon.Transforms.Apply.TransformThreshold(dblCrit, xfrmImported, dblImportedPowerTransformExp);
 
-            double regStd = Convert.ToDouble(txtRegStd.Text);
-            regStd = VBCommon.Transforms.Apply.UntransformThreshold(regStd, xfrmThreshold, dblThresholdPowerTransformExp);
-            regStd = VBCommon.Transforms.Apply.TransformThreshold(regStd, xfrmImported, dblImportedPowerTransformExp);
+            double dblRegStd = Convert.ToDouble(txtRegStd.Text);
+            dblRegStd = VBCommon.Transforms.Apply.UntransformThreshold(dblRegStd, xfrmThreshold, dblThresholdPowerTransformExp);
+            dblRegStd = VBCommon.Transforms.Apply.TransformThreshold(dblRegStd, xfrmImported, dblImportedPowerTransformExp);
+
+            double dblProbThreshold = Convert.ToDouble(txtProbabilityThreshold.Text);
 
             DataTable dt = new DataTable();
             dt.Columns.Add("ID", typeof(string));
@@ -1042,7 +1072,7 @@ namespace Prediction
             double dblPredValue = 0.0;
             string strId = "";
 
-            List<double> lstExceedanceProbability = model.PredictExceedanceProbability(dsForPrediction);
+            List<double> lstExceedanceProbability = model.PredictExceedanceProbability(dsForPrediction, Convert.ToDouble(txtRegStd.Text), Convert.ToDouble(txtDecCrit.Text), xfrmThreshold, dblThresholdPowerTransformExp);
             for (int i = 0; i < dtPredictions.Rows.Count; i++)
             {
                 dblPredValue = (double)dtPredictions.Rows[i]["CalcValue"];
@@ -1052,7 +1082,7 @@ namespace Prediction
                 dr["Model_Prediction"] = dblPredValue;
                 dr["Decision_Criterion"] = dblCrit;
                 dr["Exceedance_Probability"] = lstExceedanceProbability[i];
-                dr["Regulatory_Standard"] = regStd;
+                dr["Regulatory_Standard"] = dblRegStd;
                 dr["Untransformed"] = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
 
                 /*if (dvt == VBCommon.Transforms.DependentVariableTransforms.Log10)
@@ -1080,10 +1110,20 @@ namespace Prediction
                     if ((rows != null) && (rows.Length > 0))
                     {
                         double dblObs = (double)rows[0][1];
-                        if ((dblPredValue > dblCrit) && (dblObs < regStd))
-                            strErrType = "False Positive";
-                        else if ((dblObs > regStd) && (dblPredValue < dblCrit))
-                            strErrType = "False Negative";
+                        if (rbRaw.Checked)
+                        {
+                            if ((dblPredValue > dblCrit) && (dblObs < dblRegStd))
+                                strErrType = "False Positive";
+                            else if ((dblObs > dblRegStd) && (dblPredValue < dblCrit))
+                                strErrType = "False Negative";
+                        }
+                        else
+                        {
+                            if ((lstExceedanceProbability[i] > dblProbThreshold) && (dblObs < dblRegStd))
+                                strErrType = "False Positive";
+                            else if ((dblObs > dblRegStd) && (lstExceedanceProbability[i] < dblProbThreshold))
+                                strErrType = "False Negative";
+                        }
                     }
                     dr["Error_Type"] = strErrType;
                 }
@@ -1166,18 +1206,70 @@ namespace Prediction
         //load the prediction form
         private void frmIPyPrediction_Load(object sender, EventArgs e)
         {
-            cmforResponseVar.MenuItems.Add("Define Transform:");
-            cmforResponseVar.MenuItems[0].MenuItems.Add("none", new EventHandler(DefineTransformForRV));
-            cmforResponseVar.MenuItems[0].MenuItems.Add("Log10", new EventHandler(DefineTransformForRV));
-            cmforResponseVar.MenuItems[0].MenuItems.Add("Ln", new EventHandler(DefineTransformForRV));
-            cmforResponseVar.MenuItems[0].MenuItems.Add("Power", new EventHandler(DefineTransformForRV));
+            cmForResponseVar.MenuItems.Add("Define Transform:");
+            cmForResponseVar.MenuItems[0].MenuItems.Add("none", new EventHandler(DefineTransformForRV));
+            cmForResponseVar.MenuItems[0].MenuItems.Add("Log10", new EventHandler(DefineTransformForRV));
+            cmForResponseVar.MenuItems[0].MenuItems.Add("Ln", new EventHandler(DefineTransformForRV));
+            cmForResponseVar.MenuItems[0].MenuItems.Add("Power", new EventHandler(DefineTransformForRV));
             //cmforResponseVar.MenuItems.Add("Untransform", new EventHandler(Untransform));
+
+            cmForStats.MenuItems.Add("Display Transform:");
+            cmForStats.MenuItems[0].MenuItems.Add("none", new EventHandler(ChangeDisplayTransform));
+            cmForStats.MenuItems[0].MenuItems.Add("Log10", new EventHandler(ChangeDisplayTransform));
+            cmForStats.MenuItems[0].MenuItems.Add("Ln", new EventHandler(ChangeDisplayTransform));
+            cmForStats.MenuItems[0].MenuItems.Add("Power", new EventHandler(ChangeDisplayTransform));
 
             //Request that the prediction plugin pass along its list of modeling plugins.
             if (RequestModelPluginList != null)
             {
                 EventArgs args = new EventArgs();
                 RequestModelPluginList(this, args);
+            }
+        }
+
+
+        public void ChangeDisplayTransform(object o, EventArgs e)
+        {
+            //menu response from right click, determine which transform was selected
+            MenuItem mi = (MenuItem)o;
+            string transform = mi.Text;
+            if (transform == VBCommon.Transforms.DependentVariableTransforms.Power.ToString())
+            {
+                frmPowerExponent frmExp = new frmPowerExponent(dtStats, dtStats.Columns.IndexOf(dtStats.Columns["Model_Prediction"]));
+                DialogResult dlgr = frmExp.ShowDialog();
+                if (dlgr != DialogResult.Cancel)
+                {
+                    string sexp = frmExp.Exponent.ToString("n2");
+                    transform += "," + sexp;
+                    xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.Power;
+                    dblDisplayPowerTransformExp = Convert.ToDouble(sexp);
+                    dtStats.Columns["Model_Prediction"].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
+                    //SetTransformCheckmarks(Item: 3);
+                    //state = dtState.dirty;
+                    //NotifyContainer();
+                }
+            }
+            else
+            {
+                if (String.Compare(transform, "Log10", true) == 0)
+                {
+                    xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.Log10;
+                    //SetTransformCheckmarks(Item: 1);
+                }
+                else if (String.Compare(transform, "Ln", true) == 0)
+                {
+                    xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.Ln;
+                    //SetTransformCheckmarks(Item: 2);
+                }
+                else if (String.Compare(transform, "none", true) == 0)
+                {
+                    xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.none;
+                    //SetTransformCheckmarks(Item: 0);
+                }
+
+                dtStats.Columns["Model_Prediction"].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
+                //state = dtState.dirty;
+                //NotifyContainer();
             }
         }
 
@@ -1237,9 +1329,9 @@ namespace Prediction
             for (i = 0; i < 4; i++)
             {
                 if (Item == i)
-                    cmforResponseVar.MenuItems[0].MenuItems[i].Checked = true;
+                    cmForResponseVar.MenuItems[0].MenuItems[i].Checked = true;
                 else
-                    cmforResponseVar.MenuItems[0].MenuItems[i].Checked = false;
+                    cmForResponseVar.MenuItems[0].MenuItems[i].Checked = false;
             }
         }
 
@@ -1610,7 +1702,11 @@ namespace Prediction
                 return;
             }
             //start plotting
-            frmPredictionScatterPlot frmPlot = new frmPredictionScatterPlot(dtObs, dtStats, ObservationColumn:strOutputVariable);
+            string strPredictionColumn;
+            if (rbRaw.Checked) { strPredictionColumn = "Model_Prediction"; }
+            else { strPredictionColumn = "Exceedance_Probability"; }            
+                
+            frmPredictionScatterPlot frmPlot = new frmPredictionScatterPlot(dtObs, dtStats, ObservationColumn:strOutputVariable, PredictionColumn:strPredictionColumn);
             frmPlot.Show();
             //get the transform for plotting
             Int32 intTransform = Convert.ToInt32(xfrmObs);
@@ -1634,7 +1730,7 @@ namespace Prediction
             var exp = dblThresholdPowerTransformExp;
             double exponent = Convert.ToDouble(exp);
             //configure the plot display
-            frmPlot.ConfigureDisplay(decisionThreshold:Convert.ToDouble(txtDecCrit.Text), regulatoryThreshold:Convert.ToDouble(txtRegStd.Text), ObservationTransform:xfrmObs, ObservationExponent:dblObsPowerTransformExp, PredictionTransform:xfrmImported, PredictionExponent:dblImportedPowerTransformExp, ThresholdTransform:xfrmThreshold, ThresholdExponent:dblThresholdPowerTransformExp);
+            frmPlot.ConfigureDisplay(DecisionThreshold:Convert.ToDouble(txtDecCrit.Text), RegulatoryThreshold:Convert.ToDouble(txtRegStd.Text), ProbabilityThreshold:Convert.ToDouble(txtProbabilityThreshold.Text), ObservationTransform:xfrmObs, ObservationExponent:dblObsPowerTransformExp, PredictionTransform:xfrmImported, PredictionExponent:dblImportedPowerTransformExp, ThresholdTransform:xfrmThreshold, ThresholdExponent:dblThresholdPowerTransformExp, RawPredictions:rbRaw.Checked);
         }
 
 
@@ -2027,39 +2123,64 @@ namespace Prediction
         private void dgvObs_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Right) return;
-            showContextMenus((DataGridView)sender, e);
+            ShowContextMenus((DataGridView)sender, e);
+        }
+
+
+        //mouseup after right-click on obs
+        private void dgvStats_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+            ShowContextMenus((DataGridView)sender, e);
         }
 
 
         //show the contextmenu after mouseup to select transform type
-        private void showContextMenus(DataGridView dgv, MouseEventArgs me)
+        private void ShowContextMenus(DataGridView dgv, MouseEventArgs me)
         {
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
             int intColndx = ht.ColumnIndex;
             int intRowndx = ht.RowIndex;
 
-            DataTable _dt = (DataTable)dgvObs.DataSource;
-            if (intRowndx > 0 && intColndx > 0) return; //cell hit, go away
-            //get transform user selected
-            if (intRowndx < 0 && intColndx >= 0)
+            if (dgv == dgvObs)
             {
-                if (intColndx == 1)
+                DataTable _dt = (DataTable)dgvObs.DataSource;
+                if (intRowndx > 0 && intColndx > 0) return; //cell hit, go away
+                //get transform user selected
+                if (intRowndx < 0 && intColndx >= 0)
                 {
-                    /*if (!boolObsTransformed)
-                    { 
-                        //we can transform a response variable
-                        cmforResponseVar.MenuItems[0].Enabled = true;
-                        //but we cannot untransform an untransformed variable
-                        //cmforResponseVar.MenuItems[1].Enabled = false;
-                    }
-                    else
+                    if (intColndx == 1)
                     {
-                        //but we cannot transform a transformed response
-                        cmforResponseVar.MenuItems[0].Enabled = false; 
-                        //but we can untransform a transformed response
-                        //cmforResponseVar.MenuItems[1].Enabled = true;
-                    }*/
-                    cmforResponseVar.Show(dgv, new Point(me.X, me.Y));
+                        /*if (!boolObsTransformed)
+                        { 
+                            //we can transform a response variable
+                            cmforResponseVar.MenuItems[0].Enabled = true;
+                            //but we cannot untransform an untransformed variable
+                            //cmforResponseVar.MenuItems[1].Enabled = false;
+                        }
+                        else
+                        {
+                            //but we cannot transform a transformed response
+                            cmforResponseVar.MenuItems[0].Enabled = false; 
+                            //but we can untransform a transformed response
+                            //cmforResponseVar.MenuItems[1].Enabled = true;
+                        }*/
+                        cmForResponseVar.Show(dgv, new Point(me.X, me.Y));
+                    }
+                }
+            }
+            else if (dgv == dgvStats)
+            {
+                DataTable _dt = (DataTable)dgvStats.DataSource;
+                if (intRowndx > 0 && intColndx > 0) return; //cell hit, go away
+
+                //get transform user selected
+                if (intRowndx < 0 && intColndx >= 0)
+                {
+                    if (intColndx == dgvStats.Columns.IndexOf(dgvStats.Columns["Model_Prediction"]) || intColndx == dgvStats.Columns.IndexOf(dgvStats.Columns["Decision_Criterion"]) || intColndx == dgvStats.Columns.IndexOf(dgvStats.Columns["Regulatory_Standard"]))
+                    {
+                        cmForStats.Show(dgv, new Point(me.X, me.Y));
+                    }
                 }
             }
         }

@@ -43,6 +43,10 @@
             this.dgvStats = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbProbability = new System.Windows.Forms.RadioButton();
+            this.rbRaw = new System.Windows.Forms.RadioButton();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtProbabilityThreshold = new System.Windows.Forms.TextBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.txtPower = new System.Windows.Forms.TextBox();
             this.rbPower = new System.Windows.Forms.RadioButton();
@@ -225,6 +229,7 @@
             this.dgvStats.TabIndex = 4;
             this.dgvStats.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dgvStats_Scroll);
             this.dgvStats.SelectionChanged += new System.EventHandler(this.dgvStats_SelectionChanged);
+            this.dgvStats.MouseUp += new System.Windows.Forms.MouseEventHandler(this.dgvStats_MouseUp);
             // 
             // label2
             // 
@@ -238,17 +243,59 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.rbProbability);
+            this.groupBox1.Controls.Add(this.rbRaw);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.txtProbabilityThreshold);
             this.groupBox1.Controls.Add(this.groupBox7);
             this.groupBox1.Controls.Add(this.label23);
             this.groupBox1.Controls.Add(this.txtRegStd);
             this.groupBox1.Controls.Add(this.label24);
             this.groupBox1.Controls.Add(this.txtDecCrit);
-            this.groupBox1.Location = new System.Drawing.Point(266, 63);
+            this.groupBox1.Location = new System.Drawing.Point(202, 63);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(401, 124);
+            this.groupBox1.Size = new System.Drawing.Size(465, 124);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Model Evaluation Thresholds";
+            // 
+            // rbProbability
+            // 
+            this.rbProbability.AutoSize = true;
+            this.rbProbability.Location = new System.Drawing.Point(27, 51);
+            this.rbProbability.Name = "rbProbability";
+            this.rbProbability.Size = new System.Drawing.Size(14, 13);
+            this.rbProbability.TabIndex = 100;
+            this.rbProbability.UseVisualStyleBackColor = true;
+            // 
+            // rbRaw
+            // 
+            this.rbRaw.AutoSize = true;
+            this.rbRaw.Checked = true;
+            this.rbRaw.Location = new System.Drawing.Point(27, 30);
+            this.rbRaw.Name = "rbRaw";
+            this.rbRaw.Size = new System.Drawing.Size(14, 13);
+            this.rbRaw.TabIndex = 99;
+            this.rbRaw.TabStop = true;
+            this.rbRaw.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.ForeColor = System.Drawing.Color.Blue;
+            this.label3.Location = new System.Drawing.Point(86, 51);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(118, 13);
+            this.label3.TabIndex = 98;
+            this.label3.Text = "Exceedance Probability";
+            // 
+            // txtProbabilityThreshold
+            // 
+            this.txtProbabilityThreshold.Location = new System.Drawing.Point(47, 48);
+            this.txtProbabilityThreshold.Name = "txtProbabilityThreshold";
+            this.txtProbabilityThreshold.Size = new System.Drawing.Size(33, 20);
+            this.txtProbabilityThreshold.TabIndex = 97;
+            this.txtProbabilityThreshold.Text = "50";
             // 
             // groupBox7
             // 
@@ -257,7 +304,7 @@
             this.groupBox7.Controls.Add(this.rbLn);
             this.groupBox7.Controls.Add(this.rbNone);
             this.groupBox7.Controls.Add(this.rbLog10);
-            this.groupBox7.Location = new System.Drawing.Point(223, 12);
+            this.groupBox7.Location = new System.Drawing.Point(312, 12);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(147, 106);
             this.groupBox7.TabIndex = 96;
@@ -320,8 +367,8 @@
             // label23
             // 
             this.label23.AutoSize = true;
-            this.label23.ForeColor = System.Drawing.Color.OliveDrab;
-            this.label23.Location = new System.Drawing.Point(54, 67);
+            this.label23.ForeColor = System.Drawing.Color.LimeGreen;
+            this.label23.Location = new System.Drawing.Point(86, 72);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(148, 13);
             this.label23.TabIndex = 95;
@@ -329,7 +376,7 @@
             // 
             // txtRegStd
             // 
-            this.txtRegStd.Location = new System.Drawing.Point(15, 67);
+            this.txtRegStd.Location = new System.Drawing.Point(47, 69);
             this.txtRegStd.Name = "txtRegStd";
             this.txtRegStd.Size = new System.Drawing.Size(33, 20);
             this.txtRegStd.TabIndex = 94;
@@ -339,8 +386,8 @@
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.ForeColor = System.Drawing.Color.Crimson;
-            this.label24.Location = new System.Drawing.Point(54, 34);
+            this.label24.ForeColor = System.Drawing.Color.Blue;
+            this.label24.Location = new System.Drawing.Point(86, 30);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(145, 13);
             this.label24.TabIndex = 93;
@@ -348,7 +395,7 @@
             // 
             // txtDecCrit
             // 
-            this.txtDecCrit.Location = new System.Drawing.Point(15, 31);
+            this.txtDecCrit.Location = new System.Drawing.Point(47, 27);
             this.txtDecCrit.Name = "txtDecCrit";
             this.txtDecCrit.Size = new System.Drawing.Size(33, 20);
             this.txtDecCrit.TabIndex = 92;
@@ -476,5 +523,9 @@
         private System.Windows.Forms.HelpProvider helpProvider1;
         private System.Windows.Forms.ListBox lbAvailableModels;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtProbabilityThreshold;
+        private System.Windows.Forms.RadioButton rbProbability;
+        private System.Windows.Forms.RadioButton rbRaw;
     }
 }

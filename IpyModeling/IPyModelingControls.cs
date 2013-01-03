@@ -1550,10 +1550,10 @@ namespace IPyModeling
         }
 
 
-        public List<double> Predict(DataSet dsPredictionData)
+        public List<double> Predict(DataSet dsPredictionData, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent)
         {
             try
-            {
+            {                
                 DataTable tblForPrediction = dsPredictionData.Tables["Prediction"];
                 dynamic dynPredictions = ipyInterface.Predict(ipyModel, tblForPrediction);
                 List<double> lstPredictions = ((IList<object>)dynPredictions).Cast<double>().ToList();
@@ -1566,12 +1566,20 @@ namespace IPyModeling
         }
 
 
-        public List<double> PredictExceedanceProbability(DataSet dsPredictionData)
+        public List<double> PredictExceedanceProbability(DataSet dsPredictionData, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent)
         {
             try
             {
+                //Set up the received threshold to match the modeled transform.
+                double dblRegulatoryThreshold = VBCommon.Transforms.Apply.UntransformThreshold(RegulatoryThreshold, ThresholdTransform, ThresholdPowerExponent);
+                dblRegulatoryThreshold = VBCommon.Transforms.Apply.TransformThreshold(dblRegulatoryThreshold, xfrmImported, dblImportedPowerTransformExponent);
+
+                double dblDecisionThreshold = VBCommon.Transforms.Apply.UntransformThreshold(DecisionThreshold, ThresholdTransform, ThresholdPowerExponent);
+                dblDecisionThreshold = VBCommon.Transforms.Apply.TransformThreshold(dblDecisionThreshold, xfrmImported, dblImportedPowerTransformExponent);
+
+                //Now make predictions
                 DataTable tblForPrediction = dsPredictionData.Tables["Prediction"];
-                dynamic dynPredictions = ipyInterface.PredictExceedanceProbability(ipyModel, tblForPrediction);
+                dynamic dynPredictions = ipyInterface.PredictExceedanceProbability(ipyModel, tblForPrediction, dblDecisionThreshold);
                 List<double> lstExceedanceProbability = ((IList<object>)dynPredictions).Cast<double>().ToList();
                 return (lstExceedanceProbability);
             }

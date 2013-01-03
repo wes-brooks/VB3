@@ -35,7 +35,7 @@ namespace Prediction
         
 
         //constructor
-        public frmPredictionScatterPlot(DataTable dtObs, DataTable dtStats, string ObservationColumn="Observation", string PredictionColumn="Model_Prediction")
+        public frmPredictionScatterPlot(DataTable dtObs, DataTable dtStats, string ObservationColumn="Observation", string PredictionColumn="Model_Prediction", bool RawPredictions=true)
         {
             InitializeComponent();
             this.dtObs = dtObs;
@@ -43,26 +43,27 @@ namespace Prediction
             this.strObservationColumn = ObservationColumn;
             this.strPredictionColumn = PredictionColumn;
 
-            scatterPlot.UpdateResults(GetObsPredData());
+            scatterPlot.RawPredictions = RawPredictions;
+            scatterPlot.UpdateResults(GetObsPredData());            
         }
 
         
         //configure display for plot
-        public void ConfigureDisplay(double decisionThreshold, double regulatoryThreshold, string transform, double exponent)
-        {
-            scatterPlot.SetThresholds(decisionThreshold, regulatoryThreshold);
-            scatterPlot.PowerExponent = exponent;
+        public void ConfigureDisplay(double DecisionThreshold, double RegulatoryThreshold, double ProbabilityThreshold, string Transform, double Exponent)        {
+            scatterPlot.SetThresholds(DecisionThreshold, RegulatoryThreshold, ProbabilityThreshold);
+            scatterPlot.PowerExponent = Exponent;
             scatterPlot.UpdateResults(GetObsPredData());
-            scatterPlot.Transform = transform;
+            scatterPlot.Transform = Transform;
         }
 
 
         //configure display for plot
-        public void ConfigureDisplay(double decisionThreshold, double regulatoryThreshold, DependentVariableTransforms ObservationTransform, double ObservationExponent, DependentVariableTransforms PredictionTransform, double PredictionExponent, DependentVariableTransforms ThresholdTransform, double ThresholdExponent)
+        public void ConfigureDisplay(double DecisionThreshold, double RegulatoryThreshold, double ProbabilityThreshold, DependentVariableTransforms ObservationTransform, double ObservationExponent, DependentVariableTransforms PredictionTransform, double PredictionExponent, DependentVariableTransforms ThresholdTransform, double ThresholdExponent, bool RawPredictions=false)
         {
-            scatterPlot.SetThresholds(decisionThreshold, regulatoryThreshold);
+            scatterPlot.SetThresholds(DecisionThreshold, RegulatoryThreshold, ProbabilityThreshold);
             scatterPlot.PowerExponent = ThresholdExponent;
             scatterPlot.Transform = ThresholdTransform.ToString();
+            scatterPlot.RawPredictions = RawPredictions;
 
             xfrmObs = ObservationTransform;
             xfrmPred = PredictionTransform;
@@ -120,7 +121,8 @@ namespace Prediction
 
                     dblArrRecord = new double[2];
                     dblArrRecord[0] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtObs.Rows[j][strObservationColumn]), xfrmObs, dblObsExponent), xfrmThresh, dblThreshExponent);
-                    dblArrRecord[1] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]), xfrmPred, dblPredExponent), xfrmThresh, dblThreshExponent);
+                    if (scatterPlot.RawPredictions) { dblArrRecord[1] = VBCommon.Transforms.Apply.TransformThreshold(VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]), xfrmPred, dblPredExponent), xfrmThresh, dblThreshExponent); }
+                    else { dblArrRecord[1] = Convert.ToDouble(dtStats.Rows[i][strPredictionColumn]); }
                     lstData.Add(dblArrRecord);
                 }
             }
