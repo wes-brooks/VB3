@@ -184,7 +184,11 @@ namespace Prediction
 
             xfrmObs = (DependentVariableTransforms)dictPackedState["xfrmObs"];
             dblObsPowerTransformExp = Convert.ToDouble(dictPackedState["ObsPowerTransformExponent"]);
-            SetTransformCheckmarks(Item: (int)xfrmObs);
+            SetObsTransformCheckmarks(Item: (int)xfrmObs);
+
+            xfrmDisplay = (DependentVariableTransforms)dictPackedState["xfrmDisplay"];
+            dblDisplayPowerTransformExp = Convert.ToDouble(dictPackedState["DisplayPowerTransformExponent"]);
+            SetStatsTransformCheckmarks(Item: (int)xfrmDisplay);
 
             txtPower.Text = dblThresholdPowerTransformExp.ToString();
             txtRegStd.Text = Convert.ToDouble(dictModel["RegulatoryThreshold"]).ToString();
@@ -194,27 +198,39 @@ namespace Prediction
             if ((bool)dictModel["UseRawPredictions"]) { rbRaw.Checked = true; }
             else { rbProbability.Checked = true; }
 
+            if (dictPackedState.ContainsKey("PredictionButtonEnabled") && dictPackedState.ContainsKey("ValidationButtonEnabled"))
+            {
+                if (ButtonStatusEvent != null)
+                {
+                    IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                    dictButtonStates["PredictionButtonEnabled"] = (bool)dictPackedState["PredictionButtonEnabled"];
+                    dictButtonStates["ValidationButtonEnabled"] = (bool)dictPackedState["ValidationButtonEnabled"];
+
+                    ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
+                    ButtonStatusEvent(this, args);
+                }
+            }
 
             //Unpack the current DataGridViews
             dtVariables = DeserializeDataTable(Container: dictPackedState, Slot: "IVData", Title: "Variables");
             if (dtVariables != null)
             {
                 dgvVariables.DataSource = dtVariables;
-                setViewOnGrid(dgvVariables);
+                SetViewOnGrid(dgvVariables);
             }
 
             dtObs = DeserializeDataTable(Container: dictPackedState, Slot: "ObsData", Title: "Observations");
             if (dtObs != null)
             {
                 dgvObs.DataSource = dtObs;
-                setViewOnGrid(dgvObs);
+                SetViewOnGrid(dgvObs);
             }
 
             dtStats = DeserializeDataTable(Container: dictPackedState, Slot: "StatData", Title: "Stats");
             if (dtStats != null)
             {
                 dgvStats.DataSource = dtStats;
-                setViewOnGrid(dgvStats);
+                SetViewOnGrid(dgvStats);
             }
 
             if (model != null)
@@ -264,6 +280,9 @@ namespace Prediction
             dictPluginState.Add("xfrmObs", xfrmObs);
             dictPluginState.Add("ObsPowerTransformExponent", dblObsPowerTransformExp);
 
+            dictPluginState.Add("xfrmDisplay", xfrmDisplay);
+            dictPluginState.Add("DisplayPowerTransformExponent", dblDisplayPowerTransformExp);
+
             try { dblRegulatoryThreshold = Convert.ToDouble(txtRegStd.Text); }
             catch (InvalidCastException) { dblRegulatoryThreshold = -1; }
 
@@ -281,7 +300,17 @@ namespace Prediction
 
             dictPluginState.Add("Model", dictModelState);
             //dictPluginState.Add("Transform", dictTransform);
-            
+
+            if (ButtonStatusEvent != null)
+            {
+                IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates);
+                ButtonStatusEvent(this, args);
+
+                dictPluginState.Add("PredictionButtonEnabled", dictButtonStates["PredictionButtonEnabled"]);
+                dictPluginState.Add("ValidationButtonEnabled", dictButtonStates["ValidationButtonEnabled"]);
+            }
+
             //pack values
             dgvVariables.EndEdit();
             dtVariables = (DataTable)dgvVariables.DataSource;
@@ -444,6 +473,16 @@ namespace Prediction
                 Container.Remove("xfrmThreshold");
             Container.Add("xfrmThreshold", xfrmThreshold);
 
+            //Transform for transform in prediction spreadsheet
+            if (Container.ContainsKey("xfrmDisplay"))
+                Container.Remove("xfrmDisplay");
+            Container.Add("xfrmDisplay", xfrmDisplay);
+
+            //Exponent for regulatory criterion Power transformation
+            if (Container.ContainsKey("xfrmDisplayExponent"))
+                Container.Remove("xfrmDisplayExponent");
+            Container.Add("xfrmDisplayExponent", dblDisplayPowerTransformExp);
+
             //Exponent for regulatory criterion Power transformation
             if (Container.ContainsKey("xfrmThresholdExponent"))
                 Container.Remove("xfrmThresholdExponent");
@@ -559,7 +598,11 @@ namespace Prediction
 
                         xfrmObs = DependentVariableTransforms.none;
                         dblObsPowerTransformExp = 1;
-                        SetTransformCheckmarks(Item: (int)xfrmObs);
+                        SetObsTransformCheckmarks(Item: (int)xfrmObs);
+
+                        /*xfrmDisplay = DependentVariableTransforms.none;
+                        dblDisplayPowerTransformExp = 1;
+                        SetStatsTransformCheckmarks(Item: (int)xfrmDisplay);*/
 
                         //Use the transforms from the packed model object
                         txtPower.Text = dblThresholdPowerTransformExp.ToString();
@@ -627,7 +670,7 @@ namespace Prediction
                         if (dtVariables != null)
                         {
                             dgvVariables.DataSource = dtVariables;
-                            setViewOnGrid(dgvVariables);
+                            SetViewOnGrid(dgvVariables);
                         }
 
                         //First, establish the default (will be overwritten if a version is found within the prediction elements)
@@ -638,7 +681,7 @@ namespace Prediction
                         if (dtObs != null)
                         {
                             dgvObs.DataSource = dtObs;
-                            setViewOnGrid(dgvObs);
+                            SetViewOnGrid(dgvObs);
 
                             if (dictNewModel.ContainsKey("xfrmObs"))
                             {
@@ -653,15 +696,29 @@ namespace Prediction
                                 dblObsPowerTransformExp = 1;
                             }
                         }
-                        SetTransformCheckmarks(Item: (int)xfrmObs);
+                        SetObsTransformCheckmarks(Item: (int)xfrmObs);
 
 
                         dtStats = DeserializeDataTable(Container: dictNewModel, Slot: "StatData", Title: "Stats");
                         if (dtStats != null)
                         {
                             dgvStats.DataSource = dtStats;
-                            setViewOnGrid(dgvStats);
+                            SetViewOnGrid(dgvStats);
+
+                            if (dictNewModel.ContainsKey("xfrmDisplay"))
+                            {
+                                //Use the thresholds and transforms from the prediction elements
+                                xfrmDisplay = (DependentVariableTransforms)(Convert.ToInt32(dictNewModel["xfrmDisplay"]));
+                                dblDisplayPowerTransformExp = Convert.ToDouble(dictNewModel["xfrmDisplayExponent"]);
+                            }
+                            else
+                            {
+                                //Here we are using the default (no transformation).
+                                xfrmDisplay = DependentVariableTransforms.none;
+                                dblDisplayPowerTransformExp = 1;
+                            }
                         }
+                        SetStatsTransformCheckmarks(Item: (int)xfrmDisplay);
                     }
 
                     //determine which transform type box to check
@@ -787,7 +844,8 @@ namespace Prediction
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
 
-            setViewOnGrid(dgvVariables);
+            
+            SetViewOnGrid(dgvVariables);
 
             //Store the imported data in case we want to move to another modeling method
             dgvVariables.EndEdit();
@@ -890,7 +948,7 @@ namespace Prediction
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
 
-            setViewOnGrid(dgvObs);
+            SetViewOnGrid(dgvObs);
 
             //Store the imported data in case we want to move to another modeling method
             dgvObs.EndEdit();
@@ -985,7 +1043,7 @@ namespace Prediction
             foreach (DataGridViewColumn dvgCol in dgvStats.Columns)
                 dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
 
-            setViewOnGrid(dgvStats);
+            SetViewOnGrid(dgvStats);
 
             //Store the predictions in case we want to move to another modeling method
             dgvStats.EndEdit();
@@ -1052,11 +1110,11 @@ namespace Prediction
 
             double dblCrit = Convert.ToDouble(txtDecCrit.Text);
             dblCrit = VBCommon.Transforms.Apply.UntransformThreshold(dblCrit, xfrmThreshold, dblThresholdPowerTransformExp);
-            dblCrit = VBCommon.Transforms.Apply.TransformThreshold(dblCrit, xfrmImported, dblImportedPowerTransformExp);
+            //dblCrit = VBCommon.Transforms.Apply.TransformThreshold(dblCrit, xfrmImported, dblImportedPowerTransformExp);
 
             double dblRegStd = Convert.ToDouble(txtRegStd.Text);
             dblRegStd = VBCommon.Transforms.Apply.UntransformThreshold(dblRegStd, xfrmThreshold, dblThresholdPowerTransformExp);
-            dblRegStd = VBCommon.Transforms.Apply.TransformThreshold(dblRegStd, xfrmImported, dblImportedPowerTransformExp);
+            //dblRegStd = VBCommon.Transforms.Apply.TransformThreshold(dblRegStd, xfrmImported, dblImportedPowerTransformExp);
 
             double dblProbThreshold = Convert.ToDouble(txtProbabilityThreshold.Text);
 
@@ -1067,7 +1125,7 @@ namespace Prediction
             dt.Columns.Add("Exceedance_Probability", typeof(double));
             dt.Columns.Add("Regulatory_Standard", typeof(double));
             dt.Columns.Add("Error_Type", typeof(string));
-            dt.Columns.Add("Untransformed", typeof(double));
+            //dt.Columns.Add("Untransformed", typeof(double));
 
             double dblPredValue = 0.0;
             string strId = "";
@@ -1075,7 +1133,7 @@ namespace Prediction
             List<double> lstExceedanceProbability = model.PredictExceedanceProbability(dsForPrediction, Convert.ToDouble(txtRegStd.Text), Convert.ToDouble(txtDecCrit.Text), xfrmThreshold, dblThresholdPowerTransformExp);
             for (int i = 0; i < dtPredictions.Rows.Count; i++)
             {
-                dblPredValue = (double)dtPredictions.Rows[i]["CalcValue"];
+                dblPredValue = VBCommon.Transforms.Apply.UntransformThreshold((double)dtPredictions.Rows[i]["CalcValue"], xfrmImported, dblImportedPowerTransformExp);
                 DataRow dr = dt.NewRow();
                 strId = (string)dtPredictions.Rows[i]["ID"];
                 dr["ID"] = strId;
@@ -1083,7 +1141,7 @@ namespace Prediction
                 dr["Decision_Criterion"] = dblCrit;
                 dr["Exceedance_Probability"] = lstExceedanceProbability[i];
                 dr["Regulatory_Standard"] = dblRegStd;
-                dr["Untransformed"] = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
+                //dr["Untransformed"] = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
 
                 /*if (dvt == VBCommon.Transforms.DependentVariableTransforms.Log10)
                     dr["Untransformed"] = Math.Pow(10, dblPredValue);
@@ -1109,7 +1167,7 @@ namespace Prediction
 
                     if ((rows != null) && (rows.Length > 0))
                     {
-                        double dblObs = (double)rows[0][1];
+                        double dblObs = VBCommon.Transforms.Apply.UntransformThreshold((double)rows[0][1], xfrmObs, dblObsPowerTransformExp);
                         if (rbRaw.Checked)
                         {
                             if ((dblPredValue > dblCrit) && (dblObs < dblRegStd))
@@ -1129,6 +1187,9 @@ namespace Prediction
                 }
                 dt.Rows.Add(dr);
             }
+            xfrmDisplay = DependentVariableTransforms.none;
+            dblDisplayPowerTransformExp = 1;
+            SetStatsTransformCheckmarks((int)DependentVariableTransforms.none);
             return dt;            
         }
 
@@ -1230,6 +1291,9 @@ namespace Prediction
 
         public void ChangeDisplayTransform(object o, EventArgs e)
         {
+            DependentVariableTransforms xfrmLast = xfrmDisplay;
+            double dblExponentLast = dblDisplayPowerTransformExp;
+
             //menu response from right click, determine which transform was selected
             MenuItem mi = (MenuItem)o;
             string transform = mi.Text;
@@ -1244,7 +1308,7 @@ namespace Prediction
                     xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.Power;
                     dblDisplayPowerTransformExp = Convert.ToDouble(sexp);
                     dtStats.Columns["Model_Prediction"].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
-                    //SetTransformCheckmarks(Item: 3);
+                    SetStatsTransformCheckmarks(Item: 3);
                     //state = dtState.dirty;
                     //NotifyContainer();
                 }
@@ -1254,22 +1318,46 @@ namespace Prediction
                 if (String.Compare(transform, "Log10", true) == 0)
                 {
                     xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    //SetTransformCheckmarks(Item: 1);
+                    SetStatsTransformCheckmarks(Item: 1);
                 }
                 else if (String.Compare(transform, "Ln", true) == 0)
                 {
                     xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.Ln;
-                    //SetTransformCheckmarks(Item: 2);
+                    SetStatsTransformCheckmarks(Item: 2);
                 }
                 else if (String.Compare(transform, "none", true) == 0)
                 {
                     xfrmDisplay = VBCommon.Transforms.DependentVariableTransforms.none;
-                    //SetTransformCheckmarks(Item: 0);
+                    SetStatsTransformCheckmarks(Item: 0);
                 }
-
+                
                 dtStats.Columns["Model_Prediction"].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                 //state = dtState.dirty;
                 //NotifyContainer();
+            }
+
+            for (int i = 0; i < dgvStats.Rows.Count; i++)
+            {
+                //Get the current values
+                DataGridViewRow row = dgvStats.Rows[i];
+                double dblPrediction = Convert.ToDouble(row.Cells["Model_Prediction"].Value);
+                double dblRegulatory = Convert.ToDouble(row.Cells["Regulatory_Standard"].Value);
+                double dblDecision = Convert.ToDouble(row.Cells["Decision_Criterion"].Value);
+
+                //Untransform the current values
+                dblPrediction = VBCommon.Transforms.Apply.UntransformThreshold(dblPrediction, xfrmLast, dblExponentLast);
+                dblRegulatory = VBCommon.Transforms.Apply.UntransformThreshold(dblRegulatory, xfrmLast, dblExponentLast);
+                dblDecision = VBCommon.Transforms.Apply.UntransformThreshold(dblDecision, xfrmLast, dblExponentLast);
+
+                //Apply the new transform
+                dblPrediction = VBCommon.Transforms.Apply.TransformThreshold(dblPrediction, xfrmDisplay, dblDisplayPowerTransformExp);
+                dblRegulatory = VBCommon.Transforms.Apply.TransformThreshold(dblRegulatory, xfrmDisplay, dblDisplayPowerTransformExp);
+                dblDecision = VBCommon.Transforms.Apply.TransformThreshold(dblDecision, xfrmDisplay, dblDisplayPowerTransformExp);
+
+                //Write the transformed values back to the datagridview:
+                row.Cells["Model_Prediction"].Value = dblPrediction;
+                row.Cells["Regulatory_Standard"].Value = dblRegulatory;
+                row.Cells["Decision_Criterion"].Value = dblDecision;
             }
         }
 
@@ -1290,7 +1378,7 @@ namespace Prediction
                     xfrmObs = VBCommon.Transforms.DependentVariableTransforms.Power;
                     dblObsPowerTransformExp = Convert.ToDouble(sexp);
                     dtObs.Columns[1].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
-                    SetTransformCheckmarks(Item: 3);
+                    SetObsTransformCheckmarks(Item: 3);
                     //state = dtState.dirty;
                     //NotifyContainer();
                 }
@@ -1300,17 +1388,17 @@ namespace Prediction
                 if (String.Compare(transform, "Log10", true) == 0)
                 {
                     xfrmObs = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    SetTransformCheckmarks(Item: 1);
+                    SetObsTransformCheckmarks(Item: 1);
                 }
                 else if (String.Compare(transform, "Ln", true) == 0)
                 {
                     xfrmObs = VBCommon.Transforms.DependentVariableTransforms.Ln;
-                    SetTransformCheckmarks(Item: 2);
+                    SetObsTransformCheckmarks(Item: 2);
                 }
                 else if (String.Compare(transform, "none", true) == 0)
                 {
                     xfrmObs = VBCommon.Transforms.DependentVariableTransforms.none;
-                    SetTransformCheckmarks(Item: 0);
+                    SetObsTransformCheckmarks(Item: 0);
                 }
 
                 dtObs.Columns[1].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
@@ -1320,7 +1408,7 @@ namespace Prediction
         }
 
 
-        private void SetTransformCheckmarks(int Item)
+        private void SetObsTransformCheckmarks(int Item)
         {
             int i;
             intCheckedRVTransform = Item;
@@ -1332,6 +1420,22 @@ namespace Prediction
                     cmForResponseVar.MenuItems[0].MenuItems[i].Checked = true;
                 else
                     cmForResponseVar.MenuItems[0].MenuItems[i].Checked = false;
+            }
+        }
+
+
+        private void SetStatsTransformCheckmarks(int Item)
+        {
+            int i;
+            intCheckedRVTransform = Item;
+
+            //Handle the defined transforms' menu:
+            for (i = 0; i < 4; i++)
+            {
+                if (Item == i)
+                    cmForStats.MenuItems[0].MenuItems[i].Checked = true;
+                else
+                    cmForStats.MenuItems[0].MenuItems[i].Checked = false;
             }
         }
 
@@ -1730,7 +1834,7 @@ namespace Prediction
             var exp = dblThresholdPowerTransformExp;
             double exponent = Convert.ToDouble(exp);
             //configure the plot display
-            frmPlot.ConfigureDisplay(DecisionThreshold:Convert.ToDouble(txtDecCrit.Text), RegulatoryThreshold:Convert.ToDouble(txtRegStd.Text), ProbabilityThreshold:Convert.ToDouble(txtProbabilityThreshold.Text), ObservationTransform:xfrmObs, ObservationExponent:dblObsPowerTransformExp, PredictionTransform:xfrmImported, PredictionExponent:dblImportedPowerTransformExp, ThresholdTransform:xfrmThreshold, ThresholdExponent:dblThresholdPowerTransformExp, RawPredictions:rbRaw.Checked);
+            frmPlot.ConfigureDisplay(DecisionThreshold:Convert.ToDouble(txtDecCrit.Text), RegulatoryThreshold:Convert.ToDouble(txtRegStd.Text), ProbabilityThreshold:Convert.ToDouble(txtProbabilityThreshold.Text), ObservationTransform:xfrmObs, ObservationExponent:dblObsPowerTransformExp, PredictionTransform:xfrmDisplay, PredictionExponent:dblDisplayPowerTransformExp, ThresholdTransform:xfrmThreshold, ThresholdExponent:dblThresholdPowerTransformExp, RawPredictions:rbRaw.Checked);
         }
 
 
@@ -1918,7 +2022,7 @@ namespace Prediction
         }
 
 
-        public void setViewOnGrid(DataGridView dgv)
+        public void SetViewOnGrid(DataGridView dgv)
         {
             Cursor.Current = Cursors.WaitCursor;
 
