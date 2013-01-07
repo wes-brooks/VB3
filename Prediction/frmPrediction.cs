@@ -600,9 +600,9 @@ namespace Prediction
                         dblObsPowerTransformExp = 1;
                         SetObsTransformCheckmarks(Item: (int)xfrmObs);
 
-                        /*xfrmDisplay = DependentVariableTransforms.none;
+                        xfrmDisplay = DependentVariableTransforms.none;
                         dblDisplayPowerTransformExp = 1;
-                        SetStatsTransformCheckmarks(Item: (int)xfrmDisplay);*/
+                        SetStatsTransformCheckmarks(Item: (int)xfrmDisplay);
 
                         //Use the transforms from the packed model object
                         txtPower.Text = dblThresholdPowerTransformExp.ToString();
@@ -717,6 +717,12 @@ namespace Prediction
                                 xfrmDisplay = DependentVariableTransforms.none;
                                 dblDisplayPowerTransformExp = 1;
                             }
+                        }
+                        else
+                        {
+                            //Here we are using the default (no transformation).
+                            xfrmDisplay = DependentVariableTransforms.none;
+                            dblDisplayPowerTransformExp = 1;
                         }
                         SetStatsTransformCheckmarks(Item: (int)xfrmDisplay);
                     }
@@ -1110,11 +1116,11 @@ namespace Prediction
 
             double dblCrit = Convert.ToDouble(txtDecCrit.Text);
             dblCrit = VBCommon.Transforms.Apply.UntransformThreshold(dblCrit, xfrmThreshold, dblThresholdPowerTransformExp);
-            //dblCrit = VBCommon.Transforms.Apply.TransformThreshold(dblCrit, xfrmImported, dblImportedPowerTransformExp);
+            dblCrit = VBCommon.Transforms.Apply.TransformThreshold(dblCrit, xfrmDisplay, dblDisplayPowerTransformExp);
 
             double dblRegStd = Convert.ToDouble(txtRegStd.Text);
             dblRegStd = VBCommon.Transforms.Apply.UntransformThreshold(dblRegStd, xfrmThreshold, dblThresholdPowerTransformExp);
-            //dblRegStd = VBCommon.Transforms.Apply.TransformThreshold(dblRegStd, xfrmImported, dblImportedPowerTransformExp);
+            dblRegStd = VBCommon.Transforms.Apply.TransformThreshold(dblRegStd, xfrmDisplay, dblDisplayPowerTransformExp);
 
             double dblProbThreshold = Convert.ToDouble(txtProbabilityThreshold.Text);
 
@@ -1133,7 +1139,9 @@ namespace Prediction
             List<double> lstExceedanceProbability = model.PredictExceedanceProbability(dsForPrediction, Convert.ToDouble(txtRegStd.Text), Convert.ToDouble(txtDecCrit.Text), xfrmThreshold, dblThresholdPowerTransformExp);
             for (int i = 0; i < dtPredictions.Rows.Count; i++)
             {
-                dblPredValue = VBCommon.Transforms.Apply.UntransformThreshold((double)dtPredictions.Rows[i]["CalcValue"], xfrmImported, dblImportedPowerTransformExp);
+                dblPredValue = (double)dtPredictions.Rows[i]["CalcValue"];
+                dblPredValue = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
+                dblPredValue = VBCommon.Transforms.Apply.TransformThreshold(dblPredValue, xfrmDisplay, dblDisplayPowerTransformExp);
                 DataRow dr = dt.NewRow();
                 strId = (string)dtPredictions.Rows[i]["ID"];
                 dr["ID"] = strId;
@@ -1168,6 +1176,7 @@ namespace Prediction
                     if ((rows != null) && (rows.Length > 0))
                     {
                         double dblObs = VBCommon.Transforms.Apply.UntransformThreshold((double)rows[0][1], xfrmObs, dblObsPowerTransformExp);
+                        dblObs = VBCommon.Transforms.Apply.TransformThreshold(dblObs, xfrmDisplay, dblDisplayPowerTransformExp);
                         if (rbRaw.Checked)
                         {
                             if ((dblPredValue > dblCrit) && (dblObs < dblRegStd))
@@ -1187,9 +1196,6 @@ namespace Prediction
                 }
                 dt.Rows.Add(dr);
             }
-            xfrmDisplay = DependentVariableTransforms.none;
-            dblDisplayPowerTransformExp = 1;
-            SetStatsTransformCheckmarks((int)DependentVariableTransforms.none);
             return dt;            
         }
 
