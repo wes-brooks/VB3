@@ -105,6 +105,12 @@
   <ItemGroup>
     <Compile Include="CustomFunctions.cs" />
     <Compile Include="Events.cs" />
+    <Compile Include="frmEnddatURL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEnddatURL.Designer.cs">
+      <DependentUpon>frmEnddatURL.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmPrediction.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -135,6 +141,9 @@
     <Compile Include="Support.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmEnddatURL.resx">
+      <DependentUpon>frmEnddatURL.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmPrediction.resx">
       <DependentUpon>frmPrediction.cs</DependentUpon>
     </EmbeddedResource>

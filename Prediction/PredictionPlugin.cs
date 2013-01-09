@@ -36,6 +36,8 @@ namespace Prediction
         private SimpleActionItem btnPlot;
         private SimpleActionItem btnClear;
         private SimpleActionItem btnExportCSV;
+        private SimpleActionItem btnSetEnddatURL;
+        private SimpleActionItem btnImportFromEnddat;
 
         private RootItem rootIPyPredictionTab;
         
@@ -196,6 +198,21 @@ namespace Prediction
             btnExportCSV.GroupCaption = sGroupCaption;
             btnExportCSV.Enabled = true;
             App.HeaderControl.Add(btnExportCSV);
+
+            //EnDDAT
+            const string strEnddatCaption = "EnDDAT";
+
+            btnSetEnddatURL = new SimpleActionItem(strPanelKey, "Set EnDDAT Data Source", btnSetEnddatURL_Click);
+            btnSetEnddatURL.LargeImage = Properties.Resources.Plot;
+            btnSetEnddatURL.GroupCaption = strEnddatCaption;
+            btnSetEnddatURL.Enabled = true;
+            App.HeaderControl.Add(btnSetEnddatURL);
+
+            btnImportFromEnddat = new SimpleActionItem(strPanelKey, "Import From EnDDAT", btnImportFromEnddat_Click);
+            btnImportFromEnddat.LargeImage = Properties.Resources.Clear;
+            btnImportFromEnddat.GroupCaption = strEnddatCaption;
+            btnImportFromEnddat.Enabled = false;
+            App.HeaderControl.Add(btnImportFromEnddat);
         }
 
 
@@ -275,6 +292,7 @@ namespace Prediction
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
+            _frmPred.NotifiableChangeEvent += new EventHandler(NotifiableChangeHandler);
         }
 
 
@@ -369,6 +387,12 @@ namespace Prediction
         }
 
 
+        private void NotifiableChangeHandler(object sender, EventArgs e)
+        {
+            Broadcast();
+        }
+
+
         //event handler for saving project state
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
@@ -418,6 +442,7 @@ namespace Prediction
             {
                 btnIVDataVal.Enabled = true;
                 btnMakePred.Enabled = true;
+                Broadcast();
             }
             else
             {
@@ -427,10 +452,40 @@ namespace Prediction
         }
 
 
+        //import iv data, sends to form click event
+        void btnSetEnddatURL_Click(object sender, EventArgs e)
+        {
+            bool validated = _frmPred.btnSetEnddatURL_Click(sender, e);
+            if (validated)
+            {
+                btnImportFromEnddat.Enabled = true;
+                Broadcast();
+            }
+            else
+            {
+                btnImportFromEnddat.Enabled = false;
+            }
+        }
+
+
+        //import iv data, sends to form click event
+        void btnImportFromEnddat_Click(object sender, EventArgs e)
+        {
+            bool validated = _frmPred.btnImportFromEnddat_Click(sender, e);
+            if (validated)
+            {
+                btnIVDataVal.Enabled = true;
+                btnMakePred.Enabled = true;
+                Broadcast();
+            }
+        }
+
+
         //import ob data, sends to form click event
         void btnImportOB_Click(object sender, EventArgs e)
         {
-            _frmPred.btnImportObs_Click(sender, e);            
+            _frmPred.btnImportObs_Click(sender, e);
+            Broadcast();
         }
 
         
@@ -439,7 +494,10 @@ namespace Prediction
         {
             bool validated = _frmPred.btnIVDataValidation_Click(sender, e);
             if (validated)
+            {
                 btnMakePred.Enabled = true;
+                Broadcast();
+            }
             else
                 btnMakePred.Enabled = false;
         }
@@ -451,6 +509,7 @@ namespace Prediction
             Cursor.Current = Cursors.WaitCursor;
             _frmPred.btnMakePredictions_Click(sender, e);
            boolComplete = true;
+           Broadcast();
            Cursor.Current = Cursors.Default;
         }
 
@@ -465,7 +524,12 @@ namespace Prediction
         //clear, sends to form click event
         void btnClearTable_Ck(object sender, EventArgs e)
         {
-            _frmPred.btnClearTable_Click(sender, e);
+            DialogResult dgr = MessageBox.Show("This will clear the prediction plugin of all imported data for all models.", "Proceed?", MessageBoxButtons.OKCancel);
+            if (dgr == DialogResult.OK)
+            {
+                _frmPred.btnClearTable_Click(sender, e);
+                Broadcast();
+            }
         }
 
 
@@ -482,11 +546,13 @@ namespace Prediction
             {
                 args.ButtonStatus.Add("PredictionButtonEnabled", btnMakePred.Enabled);
                 args.ButtonStatus.Add("ValidationButtonEnabled", btnIVDataVal.Enabled);
+                args.ButtonStatus.Add("EnddatImportButtonEnabled", btnImportFromEnddat.Enabled);
             }
             else
             {
                 btnIVDataVal.Enabled = args.ButtonStatus["ValidationButtonEnabled"];
                 btnMakePred.Enabled = args.ButtonStatus["PredictionButtonEnabled"];
+                btnImportFromEnddat.Enabled = args.ButtonStatus["EnddatImportButtonEnabled"];
             }
         }
     }

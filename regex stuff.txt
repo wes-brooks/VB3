@@ -1,0 +1,16 @@
+using System.Net;
+using System.Text.RegularExpressions;
+
+            string strData;
+            using (WebClient client = new WebClient())
+            {
+                strData = client.DownloadString(txtURL.Text);
+                string[] strRows = strData.Split('\n');
+                Regex re1 = new Regex("\[[^]]\]");
+                Regex re2 = new Regex("[^0-9a-zA-Z.,\\\"]");
+                strRows[0] = re1.Replace(strRows[0], ".");
+                strRows[0] = re2.Replace(strRows[0], ".");
+
+                strData = String.Join("\n", strRows);
+                txtData.Text = strData;
+            }      

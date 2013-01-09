@@ -7,6 +7,8 @@ using VBCommon;
 using VBCommon.IO;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Prediction
 {
@@ -68,6 +70,12 @@ namespace Prediction
                     dictColMap = colMapper.ColumnMapping;
                     dt = MapInputColumns(dt);
 
+                    if (tblCurrent != null)
+                    {
+                        tblCurrent.Merge(dt);
+                        dt = tblCurrent;
+                    }
+
                     if (!CheckUniqueIDs(dt)) 
                         return null;
                     else 
@@ -84,6 +92,13 @@ namespace Prediction
                 if (tblCurrent != null)
                 {
                     tblCurrent.Merge(dt);
+
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        string colname = col.Caption;
+                        tblCurrent.Columns[colname].SetOrdinal(dt.Columns.IndexOf(colname));
+                    }
+
                     dt = tblCurrent;
                 }
 
@@ -91,6 +106,102 @@ namespace Prediction
                     return null;
                 else
                     return dt;
+            }
+        }
+
+
+        public DataTable ImportFromEnddat(string URL, DataTable tblCurrent)
+        {
+            /*VBCommon.IO.ImportExport import = new ImportExport();
+            DataTable dt = import.Input;
+            if (dt == null)
+                return (null);*/
+            string strEnddatURL = URL;
+            DataTable dt;
+
+            using (WebClient client = new WebClient())
+            {
+                string strData = client.DownloadString(strEnddatURL);
+                strData = strData.Trim();
+                string[] strRows = strData.Split('\n');
+
+                //Deal with illegal characters in the column headers
+                Regex re0 = new Regex("(,)(?!(?:[^\"]|\"[^\"]*\")*$)");
+                Regex re1 = new Regex("(,)(?!(?:[^\']|\'[^\']*\')*$)");
+                Regex re2 = new Regex("(,)(?!(?:[^\\[\\(]|[\\[\\(][^\\]\\)]*[\\]\\)])*$)");
+                Regex re3 = new Regex("[^0-9a-zA-Z.,\\\"]");
+
+                strRows[0] = re0.Replace(strRows[0], ".");
+                strRows[0] = re1.Replace(strRows[0], ".");
+                strRows[0] = re2.Replace(strRows[0], ".");
+                strRows[0] = re3.Replace(strRows[0], ".");
+
+                DataTable data = new DataTable();
+                foreach (string head in strRows[0].Split(','))
+                {
+                    string trimmed = head.Trim('"');
+                    data.Columns.Add(trimmed);
+                }
+
+                for (int i = 1; i < strRows.Length; i++)
+                {
+                    string row = strRows[i];
+                    data.Rows.Add(row.Split(','));
+                }
+
+                dt = data;
+
+                if (dictColMap == null)
+                {
+                    string[] strArrHeaderCaptions = { strLeftCaption, strRightCaption };
+
+                    //Dictionary<string, string> dictFields = new Dictionary<string, string>(dictMainEffects);
+                    frmColumnMapper colMapper = new frmColumnMapper(strArrReferencedVars, dt, strArrHeaderCaptions, true, false);
+                    DialogResult dr = colMapper.ShowDialog();
+
+                    if (dr == DialogResult.OK)
+                    {
+                        dt = colMapper.MappedTable;
+                        dictColMap = colMapper.ColumnMapping;
+                        dt = MapInputColumns(dt);
+
+                        if (tblCurrent != null)
+                        {
+                            tblCurrent.Merge(dt);
+                            dt = tblCurrent;
+                        }
+
+                        if (!CheckUniqueIDs(dt))
+                            return null;
+                        else
+                            return dt;
+                    }
+                    else
+                        return null;
+                }
+                else
+                {
+                    //We shouldn't have existing data unless we have an existing mapping, so assume that tblCurrent!=null lands us here.
+                    dt = MapInputColumns(dt);
+
+                    if (tblCurrent != null)
+                    {
+                        tblCurrent.Merge(dt);
+
+                        foreach (DataColumn col in dt.Columns)
+                        {
+                            string colname = col.Caption;
+                            tblCurrent.Columns[colname].SetOrdinal(dt.Columns.IndexOf(colname));
+                        }
+
+                        dt = tblCurrent;
+                    }
+
+                    if (!CheckUniqueIDs(dt))
+                        return null;
+                    else
+                        return dt;
+                }
             }
         }
 
@@ -114,14 +225,19 @@ namespace Prediction
                 DataRow dr = dt.NewRow();
                 foreach (string meKey in dictColMap.Keys)
                 {
-                    if (String.Compare(meKey, "ID",true) == 0)
+                    if (String.Compare(meKey, "ID", true) == 0)
                         dr[meKey] = tblRawData.Rows[i][dictColMap[meKey]].ToString();
                     else
-                        dr[meKey] = tblRawData.Rows[i][dictColMap[meKey]];
+                    {
+                        if (dictColMap[meKey] == "none")
+                            dr[meKey] = DBNull.Value;
+                        else
+                            dr[meKey] = tblRawData.Rows[i][dictColMap[meKey]];
+                    }
                 }
                 dt.Rows.Add(dr);
             }
-
+            
             if (dt.Columns.Contains("ID"))
                 dt.Columns["ID"].SetOrdinal(0);
 

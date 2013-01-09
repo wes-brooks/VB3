@@ -9,3 +9,4 @@ C:\VB3\Prediction\obj\x86\Debug\Prediction.pdb
 C:\VB3\Prediction\obj\x86\Debug\Prediction.frmColumnMapper.resources
 C:\VB3\Prediction\obj\x86\Debug\Prediction.frmPredictionScatterPlot.resources
 C:\VB3\Prediction\obj\x86\Debug\Prediction.frmPrediction.resources
+C:\VB3\Prediction\obj\x86\Debug\Prediction.frmEnddatURL.resources

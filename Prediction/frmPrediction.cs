@@ -77,10 +77,12 @@ namespace Prediction
         IDictionary<string, object> dictPredictionElements = new Dictionary<string, object>();
         private int intSelectedModel = -1;
         private string strMethod;
+        private string strEnddatURL = null;
         
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
 
+        public event EventHandler NotifiableChangeEvent;
         public event EventHandler<ButtonStatusEventArgs> ButtonStatusEvent;
 
 
@@ -162,7 +164,6 @@ namespace Prediction
             if (!dictPackedState.ContainsKey("Model")) { return; }
             Dictionary<string, object> dictModel = (Dictionary<string, object>)dictPackedState["Model"];
 
-
             //Unpack the transforms
             xfrmModeled = (DependentVariableTransforms)dictPackedState["xfrmModeled"];
             dblModeledPowerTransformExp = Convert.ToDouble(dictPackedState["ModeledPowerTransformExponent"]);
@@ -194,6 +195,7 @@ namespace Prediction
             txtRegStd.Text = Convert.ToDouble(dictModel["RegulatoryThreshold"]).ToString();
             txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
             txtProbabilityThreshold.Text = Convert.ToDouble(dictModel["ProbabilityThreshold"]).ToString();
+            strEnddatURL = dictModel["EnddatURL"].ToString();
 
             if ((bool)dictModel["UseRawPredictions"]) { rbRaw.Checked = true; }
             else { rbProbability.Checked = true; }
@@ -205,6 +207,7 @@ namespace Prediction
                     IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
                     dictButtonStates["PredictionButtonEnabled"] = (bool)dictPackedState["PredictionButtonEnabled"];
                     dictButtonStates["ValidationButtonEnabled"] = (bool)dictPackedState["ValidationButtonEnabled"];
+                    dictButtonStates["EnddatImportButtonEnabled"] = (bool)dictPackedState["EnddatImportButtonEnabled"];
 
                     ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
                     ButtonStatusEvent(this, args);
@@ -292,14 +295,13 @@ namespace Prediction
             //Pack model as string and as model for serializing. need to versions for Json.net serialization (which can't serialize IronPython objects)
             Dictionary<string, object> dictModelState = new Dictionary<string, object>();
             dictModelState.Add("Method", strMethod);
-            //dictModelState.Add("Transform", dictTransform);
             dictModelState.Add("RegulatoryThreshold", dblRegulatoryThreshold);
             dictModelState.Add("DecisionThreshold", dblDecisionThreshold);
             dictModelState.Add("ProbabilityThreshold", Convert.ToDouble(txtProbabilityThreshold.Text));
             dictModelState.Add("UseRawPredictions", rbRaw.Checked);
+            dictModelState.Add("EnddatURL", strEnddatURL);
 
             dictPluginState.Add("Model", dictModelState);
-            //dictPluginState.Add("Transform", dictTransform);
 
             if (ButtonStatusEvent != null)
             {
@@ -309,6 +311,7 @@ namespace Prediction
 
                 dictPluginState.Add("PredictionButtonEnabled", dictButtonStates["PredictionButtonEnabled"]);
                 dictPluginState.Add("ValidationButtonEnabled", dictButtonStates["ValidationButtonEnabled"]);
+                dictPluginState.Add("EnddatImportButtonEnabled", dictButtonStates["EnddatImportButtonEnabled"]);
             }
 
             //pack values
@@ -362,78 +365,86 @@ namespace Prediction
         //when user selects model to use, send it to SetModel()
         private void lbAvailableModels_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            //try
-            //{
-                object selectedItem = lbAvailableModels.SelectedItem;
+            object selectedItem = lbAvailableModels.SelectedItem;
 
-                //didn't select a model
-                if (selectedItem == null)
+            //didn't select a model
+            if (selectedItem == null)
+            {
+                txtModel.Clear();
+                txtPower.Text = "1";
+                txtRegStd.Text = "235";
+                txtProbabilityThreshold.Text = "50";
+                txtDecCrit.Text = "235";
+                strEnddatURL = null;
+                rbNone.Select();
+                rbRaw.Select();
+                strMethod = null;
+                return;
+            }
+
+            string strSelectedItem = selectedItem.ToString();
+            intSelectedModel = lbAvailableModels.SelectedIndex;
+
+            //First, pack up the data/observations/predictions for the current plugin
+            if (strMethod != null)
+            {
+                //Make an entry for this model in dictPredictionElements if none exists
+                if (!dictPredictionElements.ContainsKey(strMethod))
+                    dictPredictionElements.Add(strMethod, new Dictionary<string, object>());
+
+                dgvVariables.EndEdit();
+                dtVariables = (DataTable)dgvVariables.DataSource;
+                if (dtVariables != null)
+                    SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+
+                dgvObs.EndEdit();
+                dtObs = (DataTable)dgvObs.DataSource;
+                if (dtObs != null)
+                    SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
+
+                dgvStats.EndEdit();
+                dtStats = (DataTable)dgvStats.DataSource;
+                if (dtStats != null)
+                    SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
+
+                //Pack up the data transformations
+                PackTransformations(Container: (IDictionary<string, object>)dictPredictionElements[strMethod]);
+
+                //Pack the EnDDaT URL if it exists.
+                if (strEnddatURL != null)
                 {
-                    txtModel.Clear();
-                    txtPower.Clear();
-                    txtRegStd.Clear();
-                    txtDecCrit.Clear();
-                    rbNone.Select();
-                    return;
+                    if (((IDictionary<string, object>)dictPredictionElements[strMethod]).ContainsKey("EnddatURL"))
+                        ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("EnddatURL");
+                    ((IDictionary<string, object>)dictPredictionElements[strMethod]).Add("EnddatURL", strEnddatURL);
                 }
 
-                string strSelectedItem = selectedItem.ToString();
-                intSelectedModel = lbAvailableModels.SelectedIndex;
-
-                //First, pack up the data/observations/predictions for the current plugin
-                if (strMethod != null)
+                if (ButtonStatusEvent != null)
                 {
-                    //Make an entry for this model in dictPredictionElements if none exists
-                    if (!dictPredictionElements.ContainsKey(strMethod))
-                        dictPredictionElements.Add(strMethod, new Dictionary<string, object>());
+                    IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                    ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates);
+                    ButtonStatusEvent(this, args);
 
-                    dgvVariables.EndEdit();
-                    dtVariables = (DataTable)dgvVariables.DataSource;
-                    if (dtVariables != null)
-                        SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
-
-                    dgvObs.EndEdit();
-                    dtObs = (DataTable)dgvObs.DataSource;
-                    if (dtObs != null)
-                        SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
-
-                    dgvStats.EndEdit();
-                    dtStats = (DataTable)dgvStats.DataSource;
-                    if (dtStats != null)
-                        SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
-
-                    //Pack up the data transformations
-                    PackTransformations(Container: (IDictionary<string, object>)dictPredictionElements[strMethod]);
-
-                    if (ButtonStatusEvent != null)
-                    {
-                        IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
-                        ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates);
-                        //IDictionary<string, bool> 
-                        ButtonStatusEvent(this, args);
-
-
-                        ((IDictionary<string, object>)dictPredictionElements[strMethod])["PredictionButtonEnabled"] = dictButtonStates["PredictionButtonEnabled"];
-                        ((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"] = dictButtonStates["ValidationButtonEnabled"];
-                        //((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"] = btnMakePred.Enabled;
-                    }
+                    ((IDictionary<string, object>)dictPredictionElements[strMethod])["PredictionButtonEnabled"] = dictButtonStates["PredictionButtonEnabled"];
+                    ((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"] = dictButtonStates["ValidationButtonEnabled"];
+                    ((IDictionary<string, object>)dictPredictionElements[strMethod])["EnddatImportButtonEnabled"] = dictButtonStates["EnddatImportButtonEnabled"];
                 }
+            }
 
-                //Clear the column mappings
-                IvMap = null;
-                ObsMap = null;
+            //Clear the column mappings
+            IvMap = null;
+            ObsMap = null;
 
-                //clear the grids if another model's info has been used
-                if (corrDT != null)
-                {
-                    this.dgvStats.DataSource = null;
-                    this.dgvObs.DataSource = null;
-                    this.dgvVariables.DataSource = null;
-                }
+            //clear the grids if another model's info has been used
+            if (corrDT != null)
+            {
+                this.dgvStats.DataSource = null;
+                this.dgvObs.DataSource = null;
+                this.dgvVariables.DataSource = null;
+            }
 
-                SetModel(strSelectedItem);
-            //}
-            //catch { }
+            SetModel(strSelectedItem);
+
+            NotifyContainer();
         }
 
 
@@ -591,6 +602,7 @@ namespace Prediction
                         txtRegStd.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
                         txtProbabilityThreshold.Text = "50";
                         rbRaw.Checked = true;
+                        strEnddatURL = null;
 
                         //Grab default transforms from the model.
                         xfrmThreshold = xfrmModeled;
@@ -613,6 +625,7 @@ namespace Prediction
                             IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
                             dictButtonStates["PredictionButtonEnabled"] = false;
                             dictButtonStates["ValidationButtonEnabled"] = false;
+                            dictButtonStates["EnddatImportButtonEnabled"] = false;
 
                             ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
                             ButtonStatusEvent(this, args);
@@ -621,6 +634,11 @@ namespace Prediction
                     else
                     {
                         IDictionary<string, object> dictNewModel = (IDictionary<string, object>)dictPredictionElements[strModelPlugin];
+
+                        if (dictNewModel.ContainsKey("EnddatURL"))
+                        {
+                            strEnddatURL = dictNewModel["EnddatURL"].ToString();
+                        }
 
                         if (dictNewModel.ContainsKey("ObsVariableMapping"))
                         {
@@ -639,6 +657,7 @@ namespace Prediction
                                 IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
                                 dictButtonStates["PredictionButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["PredictionButtonEnabled"];
                                 dictButtonStates["ValidationButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"];
+                                dictButtonStates["EnddatImportButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["EnddatImportButtonEnabled"];
 
                                 ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
                                 ButtonStatusEvent(this, args);
@@ -697,8 +716,7 @@ namespace Prediction
                             }
                         }
                         SetObsTransformCheckmarks(Item: (int)xfrmObs);
-
-
+                        
                         dtStats = DeserializeDataTable(Container: dictNewModel, Slot: "StatData", Title: "Stats");
                         if (dtStats != null)
                         {
@@ -833,13 +851,18 @@ namespace Prediction
                 return(false);
             }
 
-            if (IvMap == null)
+            DataTable dt;
+            try
             {
-                IvMap = new InputMapper(dictMainEffects, "Model Variables", strArrReferencedVars, "Imported Variables");
+                dt = IvMap.ImportFile(tblRaw);
+            }
+            catch
+            {
+                IvMap = new InputMapper(dictMainEffects, "Model Variables", strArrReferencedVars, "Imported Variables");                
+                dt = IvMap.ImportFile(tblRaw);
                 boolNewMapping = true;
             }
-
-            DataTable dt = IvMap.ImportFile(tblRaw);
+                        
             if (dt == null)
                 return (false);
 
@@ -860,13 +883,114 @@ namespace Prediction
             //Store prediction elements in case we want to navigate away from this model and then come back.
             SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
             if (boolNewMapping)
+            {
+                if (((IDictionary<string, object>)(dictPredictionElements[strMethod])).ContainsKey("VariableMapping"))
+                    ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Remove("VariableMapping");
                 ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("VariableMapping", IvMap.PackState());
+            }
+
+            return (true);
+        }
+
+                
+        //import IV datatable
+        public bool btnImportFromEnddat_Click(object sender, EventArgs e)
+        {
+            bool boolNewMapping = false;
+
+            //Get the currently existing data, if there is any.
+            DataTable tblRaw = null;
+            dtVariables = (DataTable)dgvVariables.DataSource;
+            if (dtVariables != null)
+            {
+                if (dtVariables.Rows.Count >= 1)
+                {
+                    dgvVariables.EndEdit();
+                    dtVariables.AcceptChanges();
+                    tblRaw = dtVariables.AsDataView().ToTable();
+                }
+            }
+
+            //check to ensure user chose a model first
+            if (dictMainEffects == null)
+            {
+                MessageBox.Show("You must first pick a model from the Available Models");
+                return(false);
+            }
+
+            DataTable dt;
+            try
+            {
+                dt = IvMap.ImportFromEnddat(strEnddatURL, tblRaw);
+            }
+            catch
+            {
+                IvMap = new InputMapper(dictMainEffects, "Model Variables", strArrReferencedVars, "Imported Variables");
+                dt = IvMap.ImportFromEnddat(strEnddatURL, tblRaw);
+                boolNewMapping = true;
+            }
+
+            if (dt == null)
+                return (false);
+
+            dgvVariables.DataSource = dt;
+
+            foreach (DataGridViewColumn dvgCol in dgvVariables.Columns)
+            {
+                dvgCol.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+                        
+            SetViewOnGrid(dgvVariables);
+
+            //Store the imported data in case we want to move to another modeling method
+            dgvVariables.EndEdit();
+            dtVariables = (DataTable)dgvVariables.DataSource;
+            
+            //Store prediction elements in case we want to navigate away from this model and then come back.
+            SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+            if (boolNewMapping)
+            {
+                if (((IDictionary<string, object>)(dictPredictionElements[strMethod])).ContainsKey("VariableMapping"))
+                    ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Remove("VariableMapping");
+                ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("VariableMapping", IvMap.PackState());
+            }
 
             return (true);
         }
 
 
+        //import IV datatable
+        public bool btnSetEnddatURL_Click(object sender, EventArgs e)
+        {
+            frmEnddatURL enddat_dialog = new frmEnddatURL(strEnddatURL);
+            DialogResult dr = enddat_dialog.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                strEnddatURL = enddat_dialog.URL;
+                
+                Regex reBegin = new Regex("&?beginPosition=[^&]*");
+                Regex reEnd = new Regex("&?endPosition=[^&]*");
+                Regex reInterval = new Regex("&?timeInt=[^&]*");
+                Regex reLatest = new Regex("&?latest=[^&]*");
+                Regex reStyle = new Regex("&?style=[^&]*");
 
+                strEnddatURL = reBegin.Replace(strEnddatURL, "");
+                strEnddatURL = reEnd.Replace(strEnddatURL, "");
+                strEnddatURL = reInterval.Replace(strEnddatURL, "");
+                strEnddatURL = reLatest.Replace(strEnddatURL, "");
+                strEnddatURL = reStyle.Replace(strEnddatURL, "");
+
+                strEnddatURL = strEnddatURL + "&endPosition=now&timeInt=24&style=csv&latest=TRUE";
+
+                return (true);
+            }
+            else
+            { 
+                return false;
+            }
+        }
+
+        
         public void ClearDataGridViews(string Method)
         {
             if (((IDictionary<string, object>)dictPredictionElements).ContainsKey(Method))
@@ -1315,8 +1439,6 @@ namespace Prediction
                     dblDisplayPowerTransformExp = Convert.ToDouble(sexp);
                     dtStats.Columns["Model_Prediction"].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                     SetStatsTransformCheckmarks(Item: 3);
-                    //state = dtState.dirty;
-                    //NotifyContainer();
                 }
             }
             else
@@ -1338,8 +1460,6 @@ namespace Prediction
                 }
                 
                 dtStats.Columns["Model_Prediction"].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
-                //state = dtState.dirty;
-                //NotifyContainer();
             }
 
             for (int i = 0; i < dgvStats.Rows.Count; i++)
@@ -1365,6 +1485,8 @@ namespace Prediction
                 row.Cells["Regulatory_Standard"].Value = dblRegulatory;
                 row.Cells["Decision_Criterion"].Value = dblDecision;
             }
+
+            NotifyContainer();
         }
 
 
@@ -1385,8 +1507,6 @@ namespace Prediction
                     dblObsPowerTransformExp = Convert.ToDouble(sexp);
                     dtObs.Columns[1].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                     SetObsTransformCheckmarks(Item: 3);
-                    //state = dtState.dirty;
-                    //NotifyContainer();
                 }
             }
             else
@@ -1408,9 +1528,9 @@ namespace Prediction
                 }
 
                 dtObs.Columns[1].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
-                //state = dtState.dirty;
-                //NotifyContainer();
             }
+
+            NotifyContainer();
         }
 
 
@@ -1446,127 +1566,6 @@ namespace Prediction
         }
 
 
-        /*private void Untransform(object o, EventArgs e)
-        {
-            if (dtObsOrig != null)
-            {
-                DataColumn dc = dtObsOrig.Columns[1];
-                dc.ColumnName = "Observation";
-                dgvObs.DataSource = dtObsOrig;
-                boolObsTransformed = false;
-
-                foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }
-            }
-        }*/
-
-
-        /*/// <summary>
-        /// response variable transform log10
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="e"></param>
-        private void Log10T(object o, EventArgs e)
-        {           
-            //save changes to ob table
-            dgvObs.EndEdit();
-            DataTable _dt = (DataTable)dgvObs.DataSource;
-            DataTable _dtCopy = _dt.Copy();
-            if (_dt == null) return;
-            dtObsOrig = _dt;
-            //save how many rows and set tranform flag to true
-            double[] dblArrNewvals = new double[_dt.Rows.Count];
-            boolObsTransformed = true;
-
-            for (int i=0;i<_dtCopy.Rows.Count;i++)
-            {
-                _dtCopy.Rows[i][1] = dblArrNewvals[i];                
-            }
-
-            DataColumn dc = _dtCopy.Columns["Observation"];
-            dc.ColumnName = "LOG10[Observation]";
-            //save new dttable to obs table
-            dgvObs.DataSource = _dtCopy;
-
-            if (cmforResponseVar.MenuItems[0].MenuItems.ContainsKey("Log10"))
-            {
-                foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }
-                cmforResponseVar.MenuItems[0].MenuItems["Log10"].Checked = true;
-            }
-        }
-
-
-        // response variable transform LnT
-        private void LnT(object o, EventArgs e)
-        {                      
-            //cmforResponseVar.
-            dgvObs.EndEdit();
-            DataTable _dt = (DataTable)dgvObs.DataSource;
-            DataTable _dtCopy = _dt.Copy();
-            if (_dt == null) return;
-            dtObsOrig = _dt;
-
-            double[] dblArrNewvals = new double[_dt.Rows.Count];
-            boolObsTransformed = true;
-
-            for (int i = 0; i < _dtCopy.Rows.Count; i++)
-            {
-                _dtCopy.Rows[i][1] = dblArrNewvals[i];
-            }
-            DataColumn dc = _dtCopy.Columns["Observation"];
-            dc.ColumnName = "LN[Observation]";
-
-            dgvObs.DataSource = _dtCopy;
-
-            if (cmforResponseVar.MenuItems[0].MenuItems.ContainsKey("Ln"))
-            {
-                foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }
-                cmforResponseVar.MenuItems[0].MenuItems["Ln"].Checked = true;
-            }
-        }
-
-
-        // response variable transform PowerT
-        private void PowerT(object o, EventArgs e)
-        {
-            dgvObs.EndEdit();
-            DataTable _dt = (DataTable)dgvObs.DataSource;
-            DataTable _dtCopy = _dt.Copy();
-            if (_dt == null) return;
-            dtObsOrig = _dt;
-            
-            frmPowerExponent frmExp = new frmPowerExponent(_dt, 1);
-            DialogResult dlgr = frmExp.ShowDialog();
-            if (dlgr != DialogResult.Cancel)
-            {
-                double[] dblNewvals = new double[_dt.Rows.Count];
-                dblNewvals = frmExp.TransformedValues;
-                if (frmExp.TransformMessage != "")
-                {
-                    MessageBox.Show("Cannot Power transform variable. " + frmExp.TransformMessage, "VB Transform Rule", MessageBoxButtons.OK);
-                    return;
-                }
-
-                boolObsTransformed = true;
-                string strSexp = frmExp.Exponent.ToString("n2");
-                for (int i = 0; i < _dtCopy.Rows.Count; i++)
-                {
-                    _dtCopy.Rows[i][1] = dblNewvals[i];
-                }
-
-                DataColumn dc = _dtCopy.Columns["Observation"];
-                dc.ColumnName = "POWER[" + strSexp+ ",Observation]";
-                dgvObs.DataSource = _dtCopy;
-
-                if (cmforResponseVar.MenuItems[0].MenuItems.ContainsKey("Power"))
-                {
-                    foreach (MenuItem item in cmforResponseVar.MenuItems[0].MenuItems) { item.Checked = false; }                        
-                    cmforResponseVar.MenuItems[0].MenuItems["Power"].Checked = true;
-                }
-            }
-        }*/
-        
-
-        //export the predictions table
         public void btnExportTable_Click(object sender, EventArgs e)
         {
             //end and save edits on all 3 tables
@@ -2387,6 +2386,16 @@ namespace Prediction
                 }
             }
             return tblData;
+        }
+
+
+        private void NotifyContainer()
+        {
+            if (NotifiableChangeEvent != null)
+            {
+                EventArgs e = new EventArgs();
+                NotifiableChangeEvent(this, e);
+            }
         }
     }
 }

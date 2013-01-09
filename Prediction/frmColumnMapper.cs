@@ -63,6 +63,7 @@ namespace Prediction
             DataGridViewComboBoxColumn dgComboCol = new DataGridViewComboBoxColumn();
             dgComboCol.HeaderText = strArrHeaderCaptions[1];
             dgComboCol.Width = 220;
+            dgComboCol.Items.AddRange("none");
             dgComboCol.Items.AddRange(listImportedColumnNames.ToArray());
 
             dataGridView1.Columns.Add(dgTextCol);
@@ -76,6 +77,8 @@ namespace Prediction
 
                 if (dtMapped.Columns.Contains(strArrMainEffects[i]))
                     dataGridView1.Rows[i].Cells[1].Value = strArrMainEffects[i];
+                else
+                    dataGridView1.Rows[i].Cells[1].Value = "none";
             }
 
             //default the id/obs col selections to first/second cols
