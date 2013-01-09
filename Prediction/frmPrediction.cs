@@ -77,7 +77,7 @@ namespace Prediction
         IDictionary<string, object> dictPredictionElements = new Dictionary<string, object>();
         private int intSelectedModel = -1;
         private string strMethod;
-        private string strEnddatURL = null;
+        private string strEnddatURL = "";
         
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
@@ -375,7 +375,7 @@ namespace Prediction
                 txtRegStd.Text = "235";
                 txtProbabilityThreshold.Text = "50";
                 txtDecCrit.Text = "235";
-                strEnddatURL = null;
+                strEnddatURL = "";
                 rbNone.Select();
                 rbRaw.Select();
                 strMethod = null;
@@ -578,8 +578,8 @@ namespace Prediction
                     xfrmModeled = (DependentVariableTransforms)dictPackedState["xfrmThreshold"];
                     dblModeledPowerTransformExp = Convert.ToDouble(dictPackedState["ThresholdPowerTransformExponent"]);
 
-                    xfrmImported = (DependentVariableTransforms)dictPackedState["xfrmImported"];
-                    dblImportedPowerTransformExp = Convert.ToDouble(dictPackedState["ImportedPowerTransformExponent"]);
+                    xfrmImported = (DependentVariableTransforms)dictPackedDatasheet["DepVarTransform"];
+                    dblImportedPowerTransformExp = Convert.ToDouble(dictPackedDatasheet["DepVarExponent"]);
                                         
                     //format txtModel textbox
                     string strModelExpression = model.ModelString();
@@ -602,7 +602,7 @@ namespace Prediction
                         txtRegStd.Text = ((double)dictModel["RegulatoryThreshold"]).ToString();
                         txtProbabilityThreshold.Text = "50";
                         rbRaw.Checked = true;
-                        strEnddatURL = null;
+                        strEnddatURL = "";
 
                         //Grab default transforms from the model.
                         xfrmThreshold = xfrmModeled;
@@ -1042,14 +1042,14 @@ namespace Prediction
 
             //Get the currently existing data, if there is any.
             DataTable tblRaw = null;
-            dtVariables = (DataTable)dgvVariables.DataSource;
-            if (dtVariables != null)
+            dtObs = (DataTable)dgvObs.DataSource;
+            if (dtObs != null)
             {
-                if (dtVariables.Rows.Count >= 1)
+                if (dtObs.Rows.Count >= 1)
                 {
-                    dgvVariables.EndEdit();
-                    dtVariables.AcceptChanges();
-                    tblRaw = dtVariables.AsDataView().ToTable();
+                    dgvObs.EndEdit();
+                    dtObs.AcceptChanges();
+                    tblRaw = dtObs.AsDataView().ToTable();
                 }
             }
 
@@ -1060,14 +1060,20 @@ namespace Prediction
                 return;
             }
 
-            if (ObsMap == null)
+            DataTable dt;
+            try
+            {
+                dt = ObsMap.ImportFile(tblRaw);
+            }
+            catch
             {
                 string[] strArrObsColumns = { "ID", strOutputVariable };
                 ObsMap = new InputMapper("Obs IDs", strArrObsColumns, "Obs");
+                dt = ObsMap.ImportFile(tblRaw);
                 boolNewMapping = true;
             }
 
-            DataTable dt = ObsMap.ImportFile(tblRaw);
+            
             if (dt == null)
                 return;
 
@@ -1085,7 +1091,11 @@ namespace Prediction
             dtObs = (DataTable)dgvObs.DataSource;
             SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
             if (boolNewMapping)
+            {
+                if (((IDictionary<string, object>)(dictPredictionElements[strMethod])).ContainsKey("ObsVariableMapping"))
+                    ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Remove("ObsVariableMapping");
                 ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("ObsVariableMapping", ObsMap.PackState());
+            }
         }
 
 

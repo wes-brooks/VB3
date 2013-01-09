@@ -118,10 +118,20 @@ namespace Prediction
                 return (null);*/
             string strEnddatURL = URL;
             DataTable dt;
-
+            
             using (WebClient client = new WebClient())
             {
-                string strData = client.DownloadString(strEnddatURL);
+                string strData;
+                try
+                {
+                    strData = client.DownloadString(strEnddatURL);
+                }
+                catch
+                {
+                    System.Windows.Forms.MessageBox.Show("There was an error loading data from the EnDDaT web service");
+                    return null;
+                }
+
                 strData = strData.Trim();
                 string[] strRows = strData.Split('\n');
 

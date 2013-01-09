@@ -1210,6 +1210,7 @@ namespace VBCommon.Controls
                 dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
                 dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
                 dictPackedState.Add("DepVarTransform", this.DependentVariableTransform);
+                dictPackedState.Add("DepVarExponent", this.PowerTransformExponent);
                 dictPackedState.Add("CheckedTransformMenu", this.intCheckedMenu);
                 dictPackedState.Add("CheckedTransformItem", this.intCheckedItem);
                 

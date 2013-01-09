@@ -32,10 +32,10 @@ namespace VirtualBeach
             //Set the main application window to be the "Shell" 
             Shell = this;
             this.statusBar.Dock = DockStyle.Bottom;
-            appManager.LoadExtensions();
+            appManager.LoadExtensions();            
             this.FormClosed += new FormClosedEventHandler(Dispose);
 
-            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));
+            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));        
         }
 
         public AppManager appManager { get; set; }

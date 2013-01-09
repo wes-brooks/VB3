@@ -200,16 +200,16 @@ namespace Prediction
             App.HeaderControl.Add(btnExportCSV);
 
             //EnDDAT
-            const string strEnddatCaption = "EnDDAT";
+            const string strEnddatCaption = "EnDDaT";
 
-            btnSetEnddatURL = new SimpleActionItem(strPanelKey, "Set EnDDAT Data Source", btnSetEnddatURL_Click);
-            btnSetEnddatURL.LargeImage = Properties.Resources.Plot;
+            btnSetEnddatURL = new SimpleActionItem(strPanelKey, "Set EnDDaT Data Source", btnSetEnddatURL_Click);
+            btnSetEnddatURL.LargeImage = Properties.Resources.URL;
             btnSetEnddatURL.GroupCaption = strEnddatCaption;
             btnSetEnddatURL.Enabled = true;
             App.HeaderControl.Add(btnSetEnddatURL);
 
-            btnImportFromEnddat = new SimpleActionItem(strPanelKey, "Import From EnDDAT", btnImportFromEnddat_Click);
-            btnImportFromEnddat.LargeImage = Properties.Resources.Clear;
+            btnImportFromEnddat = new SimpleActionItem(strPanelKey, "Import From EnDDaT", btnImportFromEnddat_Click);
+            btnImportFromEnddat.LargeImage = Properties.Resources.ImportIV;
             btnImportFromEnddat.GroupCaption = strEnddatCaption;
             btnImportFromEnddat.Enabled = false;
             App.HeaderControl.Add(btnImportFromEnddat);

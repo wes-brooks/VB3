@@ -177,7 +177,7 @@ namespace VBProjectManager
 
         static void InitLogFile(string logFileName)
         {
-            string logFileDir = logFileName.Substring(0, logFileName.LastIndexOf(Path.PathSeparator));
+            string logFileDir = logFileName.Substring(0, logFileName.LastIndexOf(Path.DirectorySeparatorChar));
             if (!Directory.Exists(logFileDir))
                 Directory.CreateDirectory(logFileDir);
 
