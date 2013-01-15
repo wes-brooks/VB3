@@ -409,7 +409,13 @@ namespace VBCommon.Controls
             //barList is a PointPairList with the high and low values.
 
             //All that is left to do is add any points that are above or below the end of the whiskers.
-            SortedList<string, double> datevalue = getlist(tags, iv);
+            double[] ivtemp = new double[iv.Length];
+            for (int i = 0; i < iv.Length; i++)
+            {
+                ivtemp[i] = iv[i];
+            }
+
+            SortedList<string, double> datevalue = getlist(tags, ivtemp);
 
             GraphPane gp = new GraphPane();
 
@@ -428,18 +434,18 @@ namespace VBCommon.Controls
 
             //Add the values
             DescriptiveStats ds = new DescriptiveStats();
-            ds.getStats(iv);
+            ds.getStats(ivtemp);
             double median = ds.Median;
             medians.Add(0, median);
-            double hivalue = percentile(iv, 75);
-            double lovalue = percentile(iv, 25);
+            double hivalue = percentile(ivtemp, 75);
+            double lovalue = percentile(ivtemp, 25);
             hiLowList.Add(0, hivalue, lovalue);
             double iqr = 1.5 * (hivalue - lovalue);
             double upperLimit = hivalue + iqr;
             double lowerLimit = lovalue - iqr;
             //The wiskers must end on an actual data point
-            double wiskerlo = ValueNearestButGreater(iv, lowerLimit);
-            double wiskerhi = ValueNearestButLess(iv, upperLimit);
+            double wiskerlo = ValueNearestButGreater(ivtemp, lowerLimit);
+            double wiskerhi = ValueNearestButLess(ivtemp, upperLimit);
             barList.Add(0, wiskerlo, wiskerhi);
 
             var upperouts = (from kv in datevalue

@@ -437,8 +437,15 @@ namespace VBCommon.Controls
         // response variable transform log10
         public void log10T(object o, EventArgs e)
         {
-            //can only transform the response variable and the response variable can not be a transformed ME or and interacted ME
-            double[] newvals = new double[dt.Rows.Count];
+            VBCommon.Transforms.Transformer t = new VBCommon.Transforms.Transformer(dt, intSelectedColIndex);
+            double[] newvals = t.LOG10;
+            string strMessage = t.Message;
+
+            if (strMessage != "")
+            {
+                MessageBox.Show("Cannot Log-transform variable. " + strMessage, "VB Transform Rule", MessageBoxButtons.OK);
+                return;
+            }
 
             string newcolname = "LOG10[" + dt.Columns[intSelectedColIndex].Caption + "]";
             performTOperation(dt, newcolname, intSelectedColIndex, newvals);
@@ -508,7 +515,7 @@ namespace VBCommon.Controls
                     //set properties of old one
                     dtCopy.Columns[selectedColIndex].ExtendedProperties[VBCommon.Globals.HIDDEN] = true;
 
-                    dt = dtCopy;
+                    this.dt =  dt = dtCopy;
                     maintainGrid(dgv, dt, selectedColIndex, strResponseVarColName);
                     UpdateListView();
 
@@ -566,7 +573,15 @@ namespace VBCommon.Controls
         // response variable transform natural log
         public void lnT(object o, EventArgs e)
         {
-            double[] newvals = new double[dt.Rows.Count];
+            VBCommon.Transforms.Transformer t = new VBCommon.Transforms.Transformer(dt, intSelectedColIndex);
+            double[] newvals = t.LOGE;
+            string strMessage = t.Message;
+
+            if (strMessage != "")
+            {
+                MessageBox.Show("Cannot Log-transform variable. " + strMessage, "VB Transform Rule", MessageBoxButtons.OK);
+                return;
+            }
 
             string newcolname = "LN[" + dt.Columns[intSelectedColIndex].Caption + "]";
             performTOperation(dt, newcolname, intSelectedColIndex, newvals);
@@ -803,21 +818,15 @@ namespace VBCommon.Controls
                         strResponseVarColName = dtCopy.Columns[intSelectedColIndex].Caption;
                         intResponseVarColIndex = intSelectedColIndex;
 
-                        //UpdateListView(VBCommon.Globals.listvals.NHIDDENCOLS, --intNhiddencols);
                         break;
                     }
                 }
 
                 dt = dtCopy;
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
-                /*//count iv columns and update list
-                int nonivs = intNhiddencols > 0 ? 3 : 2;
-                intNivs = dt.Columns.Count - nonivs;
-                UpdateListView(VBCommon.Globals.listvals.NIVS, intNivs);
-                //and rv name
-                UpdateListView(VBCommon.Globals.listvals.RVCOLNAME, strResponseVarColName);*/
                 UpdateListView();
 
+                SetTransformCheckmarks(Menu: -1, Item: -1);
                 state = dtState.dirty;
                 NotifyContainer();
             }
@@ -1094,7 +1103,8 @@ namespace VBCommon.Controls
         // user click captured - decide what menu items are appropriate and show them
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
         {            
-            dtColumnInformation dtCI = new dtColumnInformation(dt);
+            if (dtCI == null)
+                dtCI = new dtColumnInformation(dt);
 
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
             int colndx = ht.ColumnIndex;

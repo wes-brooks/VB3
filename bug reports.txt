@@ -1,0 +1,44 @@
+Becky:
+Wesley, A few dead ends I ran into in Virtual Beach:
+ 
+GBM: when I used the drop variables button, I ended up with overlaid graphs. 
+Also, this might have been user error, but on the GBM Model tab under Depenedent Variable is: I selected the Log10 radio button for dependent variable, then tried to run I got a message that there were "no exceedences in the data - had I forgot to tell it about a transformation?" I had defined the transform as log10 on both the global datasheet and the GBM datasheet. Then it wouldn't let me switch back to the "value" button. When I reloaded the whole program and dataset and ran it without selecting the log10 button, it worked.
+
+PLS: I tried to switch the response variable column to the raw ecoli data (not the log10 column), but the raw ecoli data still showed up in the list on the variable selection tab, then it had an error when I tried to run the model.
+
+MLR: Model tab: IV Filter box: the clear list and add to list buttons don't work.
+
+Prediction tab: when I click on an available model (ie PLS) I get an unexpected character error (Line 1, Column 24). I've double checked, my dataset has no special characters or spaces in the headers. Then the import data button has an error, and none of the variables are listed in the column mapper.
+
+
+
+Steve:
+Transforms are not working when multiple were chose.
+
+Pearson correlation coefficients greater than 1 (up to 1359121)
+
+Transforms very slow when choosing just one. I think the log transform may have been causing at least part of the problem.  
+
+PLS gave unhandled exception when first running. Tried again and it worked.
+
+PLS :remove variables" option gave unhandled exception. I could never get that to work and eventually VB froze and I had to kill the process.
+
+Now that you have had sufficient time to recover from the running clinic exercised on the Green and Gold and the weekend to think deeply about VB, can you send me an update on what you think is reasonable for presentation at the workshop in the VB3.0 world? At a min, let's still plan the stats methods on Tuesday and demos of what ever you feel comfortable with on Wednesday. I just need a fee for what that will take timewise so I can finalize the plan for Wed afternoon.
+
+
+Mike G:
+1) Transforming the response variable column leads to a column of all zeroes in certain situations. Maybe this is a result of having zeroes or negative values in that column?
+
+2) The "transform" button on the datasheet produces a weird table. I've seen pearson correlation coefficients way outside their real range of -1 to 1. The p-values of these coefficients are often NaN, too.
+
+3) When you change the response variable on the datasheet and then move to MLR, the response variable is listed amongst the independent variables on the "variable selection" subtab. This may be a problem with the MLR code and how it interprets the information its receiving from the datasheet, or it could be an issue with the datasheet definition of that variable - not sure on this one.
+
+
+
+
+Mike C:
+1) Transforming the response variable. Kurt and I see where you still have the logic for how to handle the transforming of negative numbers, transforming numbers close to zero, handling columns with lots of zeroes, etc., but I think this logic only gets invoked when people use the "transform" button. I'm not sure, but I think you missed invoking this logic when the user manually transforms the response variable using the right-click menu on the response variable column header, and that is causing errors when the response column contains funny values (zeroes, negatives, numbers close to zero)...
+
+2) In general, the "transform" button produces nasty results. I see pearson correlation coefficients of +/- 10,000 or more when by definition they should only be -1 to 1. Also, the p-values on the correlation coefficients are pretty much always "NaN" which indicates an issue there, too. Maybe if the program correctly computed the pearson coefficient, then the p-value would work as well...
+
+

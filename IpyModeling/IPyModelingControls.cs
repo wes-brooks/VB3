@@ -303,24 +303,24 @@ namespace IPyModeling
 
 
         //set the model with incoming datatable information
-        public void SetModelData() //(DataTable data)
+        public void SetModelData()
         {
             Cursor.Current = Cursors.WaitCursor;
 
             //Datasheet's packed state coming in
-            DataTable dtCorr_ = dsControl1.DT;
-            DataView dvCorr_ = dtCorr_.DefaultView;
+            DataTable dtCorr = dsControl1.DT;
+            DataView dvCorr = dtCorr.DefaultView;
 
             List<string> list = new List<string>();
 
-            list.Add(dtCorr_.Columns[0].ColumnName);
-            list.Add(dtCorr_.Columns[1].ColumnName);
+            list.Add(dtCorr.Columns[0].ColumnName);
+            list.Add(dsControl1.ResponseVarColName);
 
             int intNumVars = lbIndVariables.Items.Count;
             for (int i = 0; i < intNumVars; i++)
                 list.Add(lbIndVariables.Items[i].ToString());
 
-            DataTable data = this.tblModelData = dvCorr_.ToTable("ModelData", false, list.ToArray());
+            DataTable data = this.tblModelData = dvCorr.ToTable("ModelData", false, list.ToArray());
 
             int intI = 0;
             bool boolFinished = false;
@@ -332,28 +332,13 @@ namespace IPyModeling
                     if (data.Columns[intI].ExtendedProperties.ContainsKey("responsevardefinedtransform"))
                     {
                         //Unpack the user's selected transformation of the dependent variable.
-                        //double dblExponent = 1;
-                        //string strTransform = data.Columns[intI].ExtendedProperties["responsevardefinedtransform"].ToString();
                         xfrmImported = (DependentVariableTransforms)Enum.Parse(typeof(DependentVariableTransforms), data.Columns[intI].ExtendedProperties["responsevardefinedtransform"].ToString());
                         if (xfrmImported == DependentVariableTransforms.Power)
                             dblImportedPowerTransformExponent = dsControl1.PowerTransformExponent;
 
                         this.dblMandateThreshold = VBCommon.Transforms.Apply.UntransformThreshold(Convert.ToDouble(tbThreshold.Text), xfrmThreshold, dblThresholdPowerTransformExponent);
                         this.dblMandateThreshold = VBCommon.Transforms.Apply.TransformThreshold(dblMandateThreshold, xfrmImported, dblImportedPowerTransformExponent);
-                        /*if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.none.ToString(), 0) == 0)
-                            this.rbValue.Checked = true;
-                        else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Ln.ToString(), 0) == 0)
-                            this.rbLoge.Checked = true;
-                        else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Log10.ToString(), 0) == 0)
-                            this.rbLog10.Checked = true;
-                        else if (String.Compare(strTransform, VBCommon.Transforms.DependentVariableTransforms.Power.ToString(), 0) == 0)
-                            this.rbPower.Checked = true;
-                        else
-                            this.rbValue.Checked = true;*/
-                        //disable columns
-                        //ChangeControlStatus(false);
-                        //enable regulatory threshold
-                        //ChangeThresholdControlStatus(true);
+
                         boolFinished = true;
                     }
                 }
@@ -548,14 +533,22 @@ namespace IPyModeling
             tabControl1.SelectedIndex = 0;
             
             List<string> lstFieldList = new List<string>();
-            for (int i = 2; i < _dtFull.Columns.Count; i++)
+            for (int i = 1; i < _dtFull.Columns.Count; i++)
             {
-                if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
+                bool bDependentVariableColumn = false;
+
+                if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVAR))
+                {
+                    if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR].ToString() == "True")
+                        bDependentVariableColumn = true;
+                }
+
+                if (!bDependentVariableColumn && _dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
                 {
                     if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
                         lstFieldList.Add(_dtFull.Columns[i].ColumnName);
                 }
-                else
+                else if (!bDependentVariableColumn)
                     lstFieldList.Add(_dtFull.Columns[i].ColumnName);
             }
 
@@ -596,9 +589,17 @@ namespace IPyModeling
             tabControl1.SelectedIndex = 0;
 
             List<string> lstFieldList = new List<string>();
-            for (int i = 2; i < _dtFull.Columns.Count; i++)
+            for (int i = 1; i < _dtFull.Columns.Count; i++)
             {
-                if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
+                bool bDependentVariableColumn = false;
+
+                if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVAR))
+                {
+                    if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR].ToString() == "True")
+                        bDependentVariableColumn = true;
+                }
+
+                if (!bDependentVariableColumn && _dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
                 {
                     if (!_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN))
                     {
@@ -612,7 +613,6 @@ namespace IPyModeling
                     }
                 }
                 else { }
-                    //lstFieldList.Add(_dtFull.Columns[i].ColumnName);
             }
 
             intNumObs = _dtFull.Rows.Count;
@@ -707,7 +707,7 @@ namespace IPyModeling
         public void btnRemoveInputVariablesFromModelingTab_Click(object sender, EventArgs e)
         {
             List<ListViewItem> items = new List<ListViewItem>();
-            List<ListItem> candidates = lbIndVariables.Items.Cast<ListItem>().ToList<ListItem>();
+            List<ListItem> candidates;
 
             //Make a list of the variables we're removing from the model.
             for (int i = 0; i < lvModel.SelectedIndices.Count; i++)
@@ -720,7 +720,8 @@ namespace IPyModeling
             foreach (ListViewItem lvi in items)
             {
                 string search = lvi.Text;
-                int index = candidates.Select((item, i) => new { Item=item, Index=i }).Single(s => s.Item.DisplayItem == search).Index;
+                candidates = lbIndVariables.Items.Cast<ListItem>().ToList<ListItem>();
+                int index = candidates.Select((item, i) => new { Item = item, Index = i }).Single(s => s.Item.DisplayItem == search).Index;
 
                 ListItem li = (ListItem)lbIndVariables.Items[index];                    
                 lbIndVariables.Items.Remove(li);
@@ -769,17 +770,27 @@ namespace IPyModeling
         //This button runs the modeling method associated with this pane.
         public void btnRun_Click(object sender, EventArgs e)
         {
+            //Make sure that there is at least one exceedance and one non-exceedance:
+            List<double> lstOutput = new List<double>();
+            foreach (DataRow row in tblModelData.Rows) { lstOutput.Add(Convert.ToDouble(row[dsControl1.ResponseVarColName])); }
+            int intExceedances = lstOutput.Count(y => y > dblMandateThreshold);
+            if (intExceedances == 0)
+            {
+                MessageBox.Show("There are no exceedances in the training data! Did you forget to tell me about a transformation?");
+                return;
+            }
+
+            int intNonExceedances = lstOutput.Count(y => y <= dblMandateThreshold);
+            if (intNonExceedances == 0)
+            {
+                MessageBox.Show("There are no non-exceedances in the training data! Did you forget to tell me about a transformation?");
+                return;
+            }
+
             ClearModelingTab();
             Cursor.Current = Cursors.WaitCursor;
 
             VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            
-            //check to see if the model tab was clicked first (otherwise will get error half way thru model run)
-            /*if (tblModelData == null)
-            {
-                MessageBox.Show("You must select the model tab before running the model.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }*/
 
             //Now this modeling tab has been touched.
             boolVirgin = false;
@@ -840,37 +851,10 @@ namespace IPyModeling
             //Remove the ID field:
             tblData.Columns.Remove(tblData.Columns[0].Caption);
 
-            //Make sure that there is at least one exceedance and one non-exceedance:
-            List<double> lstOutput = new List<double>();
-            foreach (DataRow row in tblData.Rows) { lstOutput.Add(Convert.ToDouble(row[strTarget])); }
-            int intExceedances = lstOutput.Count(y => y > dblThreshold);
-            if (intExceedances == 0)
-            {
-                MessageBox.Show("There are no exceedances in the training data! Did you forget to tell me about a transformation?");
-                return;
-            }
-
-            int intNonExceedances = lstOutput.Count(y => y <= dblThreshold);
-            if (intNonExceedances == 0)
-            {
-                MessageBox.Show("There are no non-exceedances in the training data! Did you forget to tell me about a transformation?");
-                return;
-            }
-
-
-
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
             dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblSpecificity, regulatory_threshold: dblThreshold, method: strMethod);
             
             Cursor.Current = Cursors.WaitCursor;
-            
-            /*//if cancel was clicked, get out of here
-            if (stopRun)
-            {
-                NotifyPropChanged(boolRunning);
-                
-                return;
-            }*/
             
             this.ipyModel = validation_results[1];
             PopulateResults(this.ipyModel);
