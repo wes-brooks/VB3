@@ -1273,62 +1273,66 @@ namespace Prediction
             List<double> lstExceedanceProbability = model.PredictExceedanceProbability(dsForPrediction, Convert.ToDouble(txtRegStd.Text), Convert.ToDouble(txtDecCrit.Text), xfrmThreshold, dblThresholdPowerTransformExp);
             for (int i = 0; i < dtPredictions.Rows.Count; i++)
             {
-                dblPredValue = (double)dtPredictions.Rows[i]["CalcValue"];
-                dblPredValue = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
-                dblPredValue = VBCommon.Transforms.Apply.TransformThreshold(dblPredValue, xfrmDisplay, dblDisplayPowerTransformExp);
-                DataRow dr = dt.NewRow();
-                strId = (string)dtPredictions.Rows[i]["ID"];
-                dr["ID"] = strId;
-                dr["Model_Prediction"] = dblPredValue;
-                dr["Decision_Criterion"] = dblCrit;
-                dr["Exceedance_Probability"] = lstExceedanceProbability[i];
-                dr["Regulatory_Standard"] = dblRegStd;
-                //dr["Untransformed"] = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
-
-                /*if (dvt == VBCommon.Transforms.DependentVariableTransforms.Log10)
-                    dr["Untransformed"] = Math.Pow(10, dblPredValue);
-                else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Ln)
-                    dr["Untransformed"] = Math.Pow(Math.E, dblPredValue);
-                else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Power)
+                try
                 {
-                    double dblPower = (double)dictTransform["Exponent"];
-                    if (dblPower == double.NaN)
-                        dblPower = 1.0;
+                    dblPredValue = (double)dtPredictions.Rows[i]["CalcValue"];
+                    dblPredValue = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
+                    dblPredValue = VBCommon.Transforms.Apply.TransformThreshold(dblPredValue, xfrmDisplay, dblDisplayPowerTransformExp);
+                    DataRow dr = dt.NewRow();
+                    strId = (string)dtPredictions.Rows[i]["ID"];
+                    dr["ID"] = strId;
+                    dr["Model_Prediction"] = dblPredValue;
+                    dr["Decision_Criterion"] = dblCrit;
+                    dr["Exceedance_Probability"] = lstExceedanceProbability[i];
+                    dr["Regulatory_Standard"] = dblRegStd;
+                    //dr["Untransformed"] = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
 
-                    dr["Untransformed"] = Math.Sign(dblPredValue) * Math.Pow(Math.Abs(dblPredValue), (1.0 / dblPower));
-                }
-                else //No transform
-                    dr["Untransformed"] = dblPredValue;*/
-
-                //determine if we have an error and its type
-                //No guarentee we have same num of obs as we do predictions or that we have any obs at all
-                if ((dtObs != null) && (dtObs.Rows.Count > 0))
-                {
-                    string strErrType = "";
-                    DataRow[] rows = dtObs.Select("ID = '" + strId + "'");
-
-                    if ((rows != null) && (rows.Length > 0))
+                    /*if (dvt == VBCommon.Transforms.DependentVariableTransforms.Log10)
+                        dr["Untransformed"] = Math.Pow(10, dblPredValue);
+                    else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Ln)
+                        dr["Untransformed"] = Math.Pow(Math.E, dblPredValue);
+                    else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Power)
                     {
-                        double dblObs = VBCommon.Transforms.Apply.UntransformThreshold((double)rows[0][1], xfrmObs, dblObsPowerTransformExp);
-                        dblObs = VBCommon.Transforms.Apply.TransformThreshold(dblObs, xfrmDisplay, dblDisplayPowerTransformExp);
-                        if (rbRaw.Checked)
-                        {
-                            if ((dblPredValue > dblCrit) && (dblObs < dblRegStd))
-                                strErrType = "False Positive";
-                            else if ((dblObs > dblRegStd) && (dblPredValue < dblCrit))
-                                strErrType = "False Negative";
-                        }
-                        else
-                        {
-                            if ((lstExceedanceProbability[i] > dblProbThreshold) && (dblObs < dblRegStd))
-                                strErrType = "False Positive";
-                            else if ((dblObs > dblRegStd) && (lstExceedanceProbability[i] < dblProbThreshold))
-                                strErrType = "False Negative";
-                        }
+                        double dblPower = (double)dictTransform["Exponent"];
+                        if (dblPower == double.NaN)
+                            dblPower = 1.0;
+
+                        dr["Untransformed"] = Math.Sign(dblPredValue) * Math.Pow(Math.Abs(dblPredValue), (1.0 / dblPower));
                     }
-                    dr["Error_Type"] = strErrType;
+                    else //No transform
+                        dr["Untransformed"] = dblPredValue;*/
+
+                    //determine if we have an error and its type
+                    //No guarentee we have same num of obs as we do predictions or that we have any obs at all
+                    if ((dtObs != null) && (dtObs.Rows.Count > 0))
+                    {
+                        string strErrType = "";
+                        DataRow[] rows = dtObs.Select("ID = '" + strId + "'");
+
+                        if ((rows != null) && (rows.Length > 0))
+                        {
+                            double dblObs = VBCommon.Transforms.Apply.UntransformThreshold((double)rows[0][1], xfrmObs, dblObsPowerTransformExp);
+                            dblObs = VBCommon.Transforms.Apply.TransformThreshold(dblObs, xfrmDisplay, dblDisplayPowerTransformExp);
+                            if (rbRaw.Checked)
+                            {
+                                if ((dblPredValue > dblCrit) && (dblObs < dblRegStd))
+                                    strErrType = "False Positive";
+                                else if ((dblObs > dblRegStd) && (dblPredValue < dblCrit))
+                                    strErrType = "False Negative";
+                            }
+                            else
+                            {
+                                if ((lstExceedanceProbability[i] > dblProbThreshold) && (dblObs < dblRegStd))
+                                    strErrType = "False Positive";
+                                else if ((dblObs > dblRegStd) && (lstExceedanceProbability[i] < dblProbThreshold))
+                                    strErrType = "False Negative";
+                            }
+                        }
+                        dr["Error_Type"] = strErrType;
+                    }
+                    dt.Rows.Add(dr);
                 }
-                dt.Rows.Add(dr);
+                catch { System.Windows.Forms.MessageBox.Show(String.Format("i = {0}", i)); }
             }
             return dt;            
         }
