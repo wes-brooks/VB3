@@ -138,6 +138,7 @@
     <None Include="Resources\EPAmanipulate.PNG" />
     <None Include="Resources\EPAtransform.PNG" />
     <Content Include="Resources\GoToPrediction.png" />
+    <None Include="Resources\redX.png" />
     <Content Include="Resources\Run.png" />
     <None Include="Resources\running_process.png" />
     <Content Include="Resources\Test.png" />

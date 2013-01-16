@@ -24,8 +24,6 @@ namespace VirtualBeach
         /// </summary>
         public ContainerForm()
         {
-            try
-            {
             InitializeComponent();
             
             //The AppManager is a piece of DotSpatial that we'll use only here and there.
@@ -34,21 +32,10 @@ namespace VirtualBeach
             //Set the main application window to be the "Shell" 
             Shell = this;
             this.statusBar.Dock = DockStyle.Bottom;
-
-                appManager.LoadExtensions();
-            
-
-
+            appManager.LoadExtensions();            
             this.FormClosed += new FormClosedEventHandler(Dispose);
 
-            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));
-        
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message);
-                MessageBox.Show(e.StackTrace);
-            }
+            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));        
         }
 
         public AppManager appManager { get; set; }

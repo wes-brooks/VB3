@@ -123,6 +123,13 @@ namespace VBDatasheet.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap redX {
+            get {
+                object obj = ResourceManager.GetObject("redX", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap Test {
             get {
                 object obj = ResourceManager.GetObject("Test", resourceCulture);

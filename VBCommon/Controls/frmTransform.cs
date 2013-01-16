@@ -395,7 +395,7 @@ namespace VBCommon.Controls
                             if (!skip)
                             {
                                 vararray = varlist.ToArray();
-                                Pcoeff = deparray.Covariance(vararray) / deparray.StandardDeviation() / deparray.StandardDeviation(); // VBCommon.Statistics.Correlation(deparray, vararray);
+                                Pcoeff = deparray.Covariance(vararray) / vararray.StandardDeviation() / deparray.StandardDeviation(); // VBCommon.Statistics.Correlation(deparray, vararray);
                                 //skip variable transforms that have invalid correlation coefficients....
                                 if (Pcoeff.Equals(double.NaN)) continue;
                                 if (kv.Key.ToString() == Enum.GetName(_transform, _tnames.power) ||

@@ -33,7 +33,7 @@ namespace VBCommon.Metadata
                         bool boolColStatus;
                         string strEnabledStatus = _dt.Columns[c].ExtendedProperties["enabled"].ToString();
                        
-                        if (strEnabledStatus == "false") boolColStatus = false;
+                        if (strEnabledStatus == "False") boolColStatus = false;
                         else boolColStatus = true;
 
                         dictColstatus.Add(_dt.Columns[c].ColumnName.ToString(), boolColStatus);                    

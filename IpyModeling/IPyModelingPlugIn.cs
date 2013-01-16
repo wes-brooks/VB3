@@ -63,12 +63,6 @@ namespace IPyModeling
         }
 
 
-        private void Handler1(object sender, EventArgs e)
-        {
-
-        }
-
-
         public void Hide()
         {
             boolVisible = false;
@@ -188,7 +182,7 @@ namespace IPyModeling
             App.HeaderControl.Add(btnRun);
 
             btnDropVariables = new SimpleActionItem(strPanelKey, "Drop Variable(s)", btnDropVariables_Click);
-            btnDropVariables.LargeImage = Properties.Resources.running_process;
+            btnDropVariables.LargeImage = Properties.Resources.redX;
             btnDropVariables.GroupCaption = rGroupCaption;
             btnDropVariables.Enabled = false;
             App.HeaderControl.Add(btnDropVariables);
@@ -554,9 +548,10 @@ namespace IPyModeling
                 MessageBox.Show("You must chose variables first and go to model tab before selecting Run", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            innerIronPythonControl.btnRun_Click(sender, e);
 
-            if (boolRunning)
+            bool bSuccess = innerIronPythonControl.btnRun_Click(sender, e);
+
+            if (boolRunning || !bSuccess)
                 return;
 
             MakeActive();

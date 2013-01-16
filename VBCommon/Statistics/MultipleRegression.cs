@@ -37,7 +37,7 @@ namespace VBCommon.Statistics
         private double[] _observedValues = null;
 
         private double[] arrOutputData = null;
-        private double[] arrInputData = null;
+        private double[][] arrInputData = null;
         private string strOutputName;
         private string strInputName;
 
@@ -51,19 +51,60 @@ namespace VBCommon.Statistics
         private double _WSresidPvalue = double.NaN;
         private double _WSresidNormStatVal = double.NaN;
 
-        public MultipleRegression(DataTable dataTable, string dependentVariable, string[] independendVariables)
+        public MultipleRegression(DataTable dataTable, string dependentVariable, string[] independentVariables)
         {
             _dataTable = dataTable;
-            _dependentVar = dependentVariable;
-            _independentVars = independendVariables;
+            strOutputName = _dependentVar = dependentVariable;
+            _independentVars = independentVariables;
+
+            arrOutputData = dataTable.Columns[dependentVariable].ToArray();
+            arrInputData = new double[dataTable.Rows.Count][];
+
+            Dictionary<int, int> dictColMap = new Dictionary<int, int>();
+            for (int k = 0; k < independentVariables.Length; k++)
+            {
+                for (int j = 0; j < dataTable.Columns.Count; j++)
+                    {
+                        if (dataTable.Columns[j].Caption == independentVariables[k])
+                            dictColMap.Add(k,j);
+                    }
+            }
+
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                double[] temp = new double[independentVariables.Length];
+                for (int k = 0; k < independentVariables.Length; k++)
+                {
+                    temp[k] = Convert.ToDouble(dataTable.Rows[i].ItemArray[dictColMap[k]]);
+                }
+                arrInputData[i] = temp;
+            }
             //_data = new VariableCollection(dataTable);
         }
 
 
-        public MultipleRegression(double[] OutputData, double[] InputData, string OutputName="", string InputName="")
+        public MultipleRegression(double[] OutputData, double[][] InputData, string OutputName = "", string InputName = "")
         {
             arrOutputData = OutputData;
             arrInputData = InputData;
+
+            strOutputName = OutputName;
+            strInputName = InputName;
+
+            _independentVars = new string[1] { InputName };
+
+            //_model = new MultipleRegression(
+        }
+
+
+        public MultipleRegression(double[] OutputData, double[] InputData, string OutputName = "", string InputName = "")
+        {
+            arrOutputData = OutputData;
+            arrInputData = new double[InputData.Length][];
+            for (int i = 0; i < InputData.Length; i++)
+            {
+                arrInputData[i] = new double[] { InputData[i] };
+            }
 
             strOutputName = OutputName;
             strInputName = InputName;
@@ -182,16 +223,19 @@ namespace VBCommon.Statistics
             // containing all variables.
             //LinearRegressionModel model = new LinearRegressionModel(_dataTable, _dependentVar, _independentVars);
             double[][] input = new double[arrInputData.Length][]; // {arrInputData};
-            double[,] input2 = new double[arrInputData.Length,2]; // {arrInputData};
+            double[,] input2 = new double[arrInputData.Length, arrInputData[0].Length+1]; // {arrInputData};
             for(int i=0; i<arrInputData.Length; i++)
             {
-                input[i] = new double[] {arrInputData[i]};
+                input[i] = arrInputData[i];
 
-                input2[i,0] = 1;
-                input2[i,1] = arrInputData[i];
+                input2[i, 0] = 1;
+                for (int j = 1; j <= arrInputData[0].Length; j++)
+                {
+                    input2[i,j] = arrInputData[i][j - 1];
+                }
             }
 
-            string[] inputNames = new string[] {strInputName};
+            string[] inputNames = _independentVars;
 
             Accord.Statistics.Analysis.MultipleLinearRegressionAnalysis M2 = new Accord.Statistics.Analysis.MultipleLinearRegressionAnalysis(inputs: input, outputs: arrOutputData, inputNames: inputNames, outputName: strOutputName, intercept: true);
             M2.Compute();
@@ -308,7 +352,7 @@ namespace VBCommon.Statistics
             {
                 for(int j=0; j<_independentVars.Length; j++)
                 {
-                    centered[i, j] = input2[i, j + 1];
+                    centered[i, j] = input2[i,j + 1];
                 }
             }
 

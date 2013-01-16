@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Collections;
+using Accord.Statistics;
+using Accord.Statistics.Distributions.Univariate;
 //using Extreme.Statistics;
 //using Extreme.Statistics.Distributions;
 
@@ -106,18 +108,18 @@ namespace VBCommon.Statistics
         {
             double Pval = double.NaN;
 
-    //        int degreeF = n - 2;
-    //        double tscore = pcoeff / Math.Sqrt((1 - Math.Pow(pcoeff, 2.0d)) / degreeF);
-    //        StudentTDistribution tDist = new StudentTDistribution(degreeF);
+            int degreeF = n - 2;
+            double tscore = pcoeff / Math.Sqrt((1 - Math.Pow(pcoeff, 2.0d)) / degreeF);
+            TDistribution tDist = new TDistribution(degreeF);
 
-    //        if (tscore < 0)
-    //        {
-    //            Pval = 2 * tDist.DistributionFunction(tscore);
-    //        }
-    //        else
-    //        {
-    //            Pval = 2 * (1 - tDist.DistributionFunction(tscore));
-    //        }
+            if (tscore < 0)
+            {
+                Pval = 2 * tDist.DistributionFunction(tscore);
+            }
+            else
+            {
+                Pval = 2 * (1 - tDist.DistributionFunction(tscore));
+            }
 
             return Pval;
         }

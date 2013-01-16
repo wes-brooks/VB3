@@ -1103,8 +1103,7 @@ namespace VBCommon.Controls
         // user click captured - decide what menu items are appropriate and show them
         public void showContextMenus(DataGridView dgv, MouseEventArgs me, DataTable dt)
         {            
-            if (dtCI == null)
-                dtCI = new dtColumnInformation(dt);
+            dtCI = new dtColumnInformation(dt);
 
             DataGridView.HitTestInfo ht = dgv.HitTest(me.X, me.Y);
             int colndx = ht.ColumnIndex;
@@ -1358,8 +1357,9 @@ namespace VBCommon.Controls
 
         public void registerNewCols(DataTable dt)
         {
-            DTCI = new dtColumnInformation(dt);
-            //          _dtCI = dtColumnInformation.getdtCI(dt, false);
+            if (DTCI==null)
+                DTCI = new dtColumnInformation(dt);
+
             foreach (DataColumn c in dt.Columns)
             {
                 if (!DTCI.GetColStatus(c.ColumnName))

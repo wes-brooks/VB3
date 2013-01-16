@@ -768,7 +768,7 @@ namespace IPyModeling
 
 
         //This button runs the modeling method associated with this pane.
-        public void btnRun_Click(object sender, EventArgs e)
+        public bool btnRun_Click(object sender, EventArgs e)
         {
             //Make sure that there is at least one exceedance and one non-exceedance:
             List<double> lstOutput = new List<double>();
@@ -777,14 +777,14 @@ namespace IPyModeling
             if (intExceedances == 0)
             {
                 MessageBox.Show("There are no exceedances in the training data! Did you forget to tell me about a transformation?");
-                return;
+                return false;
             }
 
             int intNonExceedances = lstOutput.Count(y => y <= dblMandateThreshold);
             if (intNonExceedances == 0)
             {
                 MessageBox.Show("There are no non-exceedances in the training data! Did you forget to tell me about a transformation?");
-                return;
+                return false;
             }
 
             ClearModelingTab();
@@ -817,7 +817,9 @@ namespace IPyModeling
             boolRunning = false;
             SetRunButtonStatus(to: true);
             VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            Cursor.Current = Cursors.Default;            
+            Cursor.Current = Cursors.Default;
+
+            return true;
         }
 
 

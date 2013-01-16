@@ -177,6 +177,9 @@
   <ItemGroup>
     <None Include="Resources\EPAvalidate.PNG" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\redX.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetPath)  $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)</PostBuildEvent>
