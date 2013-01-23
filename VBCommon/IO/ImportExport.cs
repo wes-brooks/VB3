@@ -144,7 +144,6 @@ namespace VBCommon.IO
                 return false;
 
             FileInfo fi = new FileInfo(fileName);
-            //if files exists createTable will fail...
 
             if (File.Exists(fileName))
             {
@@ -154,13 +153,6 @@ namespace VBCommon.IO
             }
 
             string extension = fi.Extension;
-
-            //if (extension != ".xls" && extension != ".xlsx" && extension != ".csv")
-            //{
-            //    MessageBox.Show("Try again - only xls files working for sure.",
-            //        "Save will fail if file exists.", MessageBoxButtons.OK);
-            //    return;
-            //}
 
             //Dealing with an Excel file
             if ((String.Compare(".xls", extension, true) == 0) || (String.Compare(".xlsx", extension, true) == 0))

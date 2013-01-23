@@ -862,8 +862,8 @@ namespace Prediction
                 dt = IvMap.ImportFile(tblRaw);
                 boolNewMapping = true;
             }
-                        
-            if (dt == null)
+
+            if (dt == null || dt.Rows.Count == 0)
                 return (false);
 
             dgvVariables.DataSource = dt;
@@ -930,7 +930,7 @@ namespace Prediction
                 boolNewMapping = true;
             }
 
-            if (dt == null)
+            if (dt == null || dt.Rows.Count==0)
                 return (false);
 
             dgvVariables.DataSource = dt;
@@ -1332,7 +1332,13 @@ namespace Prediction
                     }
                     dt.Rows.Add(dr);
                 }
-                catch { System.Windows.Forms.MessageBox.Show(String.Format("i = {0}", i)); }
+                catch (Exception e)
+                {
+                    System.Windows.Forms.MessageBox.Show(String.Format("i = {0}", i));
+                    System.Windows.Forms.MessageBox.Show(e.Message);
+                    System.Windows.Forms.MessageBox.Show(lstExceedanceProbability[i].ToString());
+                    
+                }
             }
             return dt;            
         }

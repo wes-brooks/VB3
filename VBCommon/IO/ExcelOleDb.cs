@@ -44,12 +44,12 @@ namespace VBCommon.IO
             _fileName = fileName;
             _firstRowHeaders = firstRowHeaders;
 
-            setConnection();
+            SetConnection();
         }
 
         
 
-        private bool validate()
+        private bool Validate()
         {
             if ((_fileName == null) || (_fileName == ""))
             {
@@ -64,13 +64,12 @@ namespace VBCommon.IO
                 throw new Exception("File must be of type .xls or .xlsx: " + _fileName);
 
             return true;
-
         }
 
-        private void setConnectionString()
+
+        private void SetConnectionString()
         {
             //modified connection string to put quotes around data source and added mode=read/write
-
             string excelConnString = "Provider=Microsoft.{0}.OLEDB.{1};Data Source='{2}';Mode=ReadWrite;Extended Properties=\'Excel {3};HDR={4}\'";
            
             string headers = "";
@@ -90,20 +89,19 @@ namespace VBCommon.IO
             {
                 // For Excel 2007 File  Format
                 _connString = string.Format(excelConnString, "Ace", "12.0", _fileName, "12.0", headers);
-            }                                  
-            
+            }                                             
         }
 
 
-        private void setConnection()
+        private void SetConnection()
         {
             if (_conn == null)
             {
-                setConnectionString();
+                SetConnectionString();
                 _conn = new OleDbConnection(_connString);
             }
-
         }
+
 
         /// <summary>
         /// Read an Excel worksheet in workbook
@@ -114,6 +112,7 @@ namespace VBCommon.IO
         {
             return Read(worksheet, "");
         }
+
 
         /// <summary>
         /// Read an Excel worksheet in workbook
@@ -139,14 +138,9 @@ namespace VBCommon.IO
                 OleDbCommand cmd = new OleDbCommand(query);
                 cmd.Connection = _conn;
                 OleDbDataAdapter adpt = new OleDbDataAdapter(cmd);
-                //onReadProgress(30);
-
-                //DataSet ds = new DataSet();
-                //onReadProgress(50);
 
                 DataTable dt = new DataTable();
                 adpt.Fill(dt);
-                //onReadProgress(100);
 
                 if (dt != null)
                 {
@@ -162,9 +156,8 @@ namespace VBCommon.IO
                 string msg = ex.Message;
                 return null;
             }
-
-
         }
+
 
         /// <summary>
         /// Retrieves the worksheets in a an Excel file
@@ -204,28 +197,6 @@ namespace VBCommon.IO
         /// <returns></returns>
         public bool WriteTable(string tableName, Dictionary<string, string> tableDefination)
         {
-            ////this works
-            //try
-            //{
-            //    OleDbConnection conn = new OleDbConnection
-            //        ("Provider=Microsoft.Jet.OLEDB.4.0;Data Source='C:\\temp\\delme1.xls';Extended Properties='Excel 8.0;HDR=Yes'");
-            //        //Provider=Microsoft.Jet.OLEDB.4.0;Data Source='C:\vb4\DataFiles\delme2.xls';Extended Properties='Excel 8.0;HDR=YES'
-            //        //Provider=Microsoft.Jet.OLEDB.4.0;Data Source='C:\vb4\DataFiles\delme3.xls';Extended Properties='Excel 8.0;HDR=Yes'
-            //    conn.Open();
-            //    OleDbCommand cmd = new OleDbCommand("CREATE TABLE [BiteMe] ([Column1] string, [Column2] string)", conn);
-            //    //CREATE TABLE [RawData$]([Date] char(255),[logEcoli] char(255),[turbidity] char(255))
-            //    cmd.ExecuteNonQuery();
-            //    //return false;
-            //}
-            //catch (Exception)
-            //{
-            //    return false;
-            //}
-            ////return true;
-
-            //so... all this gnashing and hair pulling: source needed quotes around filename (connection) and
-            //column names needed square brackets around names (table).  bitch.
-
             try
             {
                 OleDbCommand cmd = new OleDbCommand(
@@ -296,6 +267,7 @@ namespace VBCommon.IO
             return sb.ToString();
         }
 
+
         //Generates InsertStatement from a DataRow.
         private string GenerateInsertStatement(DataRow dr)
         {
@@ -304,8 +276,7 @@ namespace VBCommon.IO
             StringBuilder sb = new StringBuilder();
             bool firstcol = true;
             sb.AppendFormat("INSERT INTO [{0}](", dr.Table.TableName);
-
-
+            
             foreach (DataColumn dc in dr.Table.Columns)
             {
                 if (!firstcol)
@@ -358,8 +329,7 @@ namespace VBCommon.IO
         public void CloseConnection()
         {
             _conn.Close();
+            _conn.Dispose();
         }
-
-
     }
 }

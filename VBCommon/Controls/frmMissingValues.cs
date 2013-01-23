@@ -343,7 +343,7 @@ namespace VBCommon.Controls
                 {
                     _dgv.Rows[rndx].Cells[cndx].Selected = true;
                     _dtRI.SetRowStatus(_dt.Rows[rndx][0].ToString(), false);
-                    _dt = _tu.filterDataTableRows(_dt, _dtRI);
+                    _dt = _tu.FilterDataTableRows(_dt, _dtRI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true;
@@ -359,7 +359,7 @@ namespace VBCommon.Controls
                         _dtRI.SetRowStatus(_dt.Rows[r][0].ToString(), false);
 
                     }
-                    _dt = _tu.filterDataTableRows(_dt, _dtRI);
+                    _dt = _tu.FilterDataTableRows(_dt, _dtRI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true; 
@@ -374,7 +374,7 @@ namespace VBCommon.Controls
                         _dtRI.SetRowStatus(_dt.Rows[r][0].ToString(), false);
 
                     }
-                    _dt = _tu.filterDataTableRows(_dt, _dtRI);
+                    _dt = _tu.FilterDataTableRows(_dt, _dtRI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true;
@@ -388,7 +388,7 @@ namespace VBCommon.Controls
                 {
                     _dgv.Rows[rndx].Cells[cndx].Selected = true;
                     _dtCI.SetColStatus(_dt.Columns[cndx].Caption, false);
-                    _dt = _tu.filterDisabledCols(_dt);
+                    _dt = _tu.FilterDisabledCols(_dt, _dtCI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true;
@@ -404,7 +404,7 @@ namespace VBCommon.Controls
                         _dtCI.SetColStatus(_dt.Columns[c].Caption, false);
 
                     }
-                    _dt = _tu.filterDisabledCols(_dt);
+                    _dt = _tu.FilterDisabledCols(_dt, _dtCI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true;
@@ -419,7 +419,7 @@ namespace VBCommon.Controls
                         _dtCI.SetColStatus(_dt.Columns[c].Caption, false);
 
                     }
-                    _dt = _tu.filterDisabledCols(_dt);
+                    _dt = _tu.FilterDisabledCols(_dt, _dtCI);
                     _dt.AcceptChanges();
                     _dgv.DataSource = _dt;
                     breakloop = true;

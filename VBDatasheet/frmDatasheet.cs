@@ -85,11 +85,11 @@ namespace VBDatasheet
             DataTable dataDT = new DataTable("Imported Data");
             VBCommon.IO.ImportExport import = new VBCommon.IO.ImportExport();
             if ((dataDT = import.Input) == null) return false;
-
+            
             //check for unique records or blanks
             string errcolname = string.Empty;
             int errndx = 0;
-            if (!recordIndexUnique(dataDT, out errndx))
+            if (!RecordIndexUnique(dataDT, out errndx))
             {
                 MessageBox.Show("Unable to import datasets with non-unique record identifiers.\n" +
                                 "Fix your datatable by assuring unique record identifier values\n" +
@@ -100,7 +100,7 @@ namespace VBDatasheet
             }
             //check for spaces
             string offendingCol = string.Empty;
-            if (datasetHasSpacesinColNmaes(dataDT, out offendingCol))
+            if (DatasetHasSpacesinColNames(dataDT, out offendingCol))
             {
                 MessageBox.Show("Cannot import datasets with spaces in column names.\nEdit your dataset and re-import.\n" +
                     "First offending column encountered = " + offendingCol,
@@ -150,7 +150,7 @@ namespace VBDatasheet
 
 
         //check for spaces
-        private bool datasetHasSpacesinColNmaes(DataTable dataDT, out string name)
+        private bool DatasetHasSpacesinColNames(DataTable dataDT, out string name)
         {
             name = string.Empty;
             foreach (DataColumn dc in (dataDT.Columns))
@@ -163,7 +163,7 @@ namespace VBDatasheet
 
 
         // test all cells in the datetime column for uniqueness
-        private bool recordIndexUnique(DataTable dt, out int where)
+        private bool RecordIndexUnique(DataTable dt, out int where)
         {
             Dictionary<string, int> temp = new Dictionary<string, int>();
             int ndx = -1;
@@ -191,26 +191,21 @@ namespace VBDatasheet
 
 
         //validate data
-        public void btnValidateData_Click(object sender, EventArgs e)
+        public bool btnValidateData_Click(object sender, EventArgs e)
         {
             DataTable savedt = dsControl1.DT.Copy();
             frmMissingValues frmMissing = new frmMissingValues(dsControl1.dgv, dsControl1.DT, dsControl1.DTRI, dsControl1.DTCI);
             frmMissing.ShowDialog();
+
             //when whatever checks we're doing are good, enable the manipulation buttons
             if (frmMissing.Status)
             {
                 dsControl1.DT = frmMissing.ValidatedDT;
                 dsControl1.dgv.Enabled = true;
-                //update list in case they've deleted cols/rows
-                /*dsControl1.UpdateListView(VBCommon.Globals.listvals.NCOLS, dsControl1.DT.Columns.Count);
-                int nonivs = dsControl1.HiddenCols + 2;
-                dsControl1.NumberIVs = dsControl1.DT.Columns.Count - nonivs;
-                dsControl1.UpdateListView(VBCommon.Globals.listvals.NIVS, dsControl1.NumberIVs);
-                int recount = dsControl1.DT.Rows.Count;
-                dsControl1.UpdateListView(VBCommon.Globals.listvals.NROWS, recount);*/
                 dsControl1.UpdateListView();
                 dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
                 boolValidated = true;
+                return true;
             }
             else
             {
@@ -220,6 +215,7 @@ namespace VBDatasheet
                 dsControl1.DTRI = new VBCommon.Metadata.dtRowInformation(dsControl1.DT);
                 dsControl1.DTCI = new VBCommon.Metadata.dtColumnInformation(dsControl1.DT);
                 boolValidated = false;
+                return false;
             }
         }
 

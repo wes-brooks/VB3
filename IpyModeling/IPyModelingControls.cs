@@ -351,7 +351,7 @@ namespace IPyModeling
 
 
         //Clear the control
-        public void ClearModelingTab()
+        public void ClearModelingTab(bool PreserveVariables=false)
         {
             ipyModel = null;
 
@@ -368,9 +368,10 @@ namespace IPyModeling
 
             listCandidateSpecificity = null;
             listCandidateThresholds = null;
-
-            lvModel.Items.Clear();
+                        
             lvValidation.Items.Clear();
+            if (!PreserveVariables)
+                lvModel.Items.Clear();
 
             tbThreshold.Text = "235";
             lblDecisionThreshold.Text = "";
@@ -741,23 +742,17 @@ namespace IPyModeling
 
                 if (boolFoundIdx == false)
                     lbAvailableVariables.Items.Insert(intJ, li);
+
+                lvModel.Items.Remove(lvi);                
             }
+            lvModel.Update();
 
             lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
-            ClearModelingTab();
+            ClearModelingTab(PreserveVariables: true);
             RaiseUpdateNotification();
         }
-
-
-        /*//used for IronPython-based modeling tab to begin the modeling process
-        public DataTable CreateModelDataTable()
-        {
-
-            
-            return dtModel;
-        }*/
 
 
         //Enable or disable the regulatory threshold control, then raise an event to do the same up the chain in the containing Form.

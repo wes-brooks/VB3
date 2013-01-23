@@ -27,3 +27,4 @@ C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmManipulate.resources
 C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmPcoeff.resources
 C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmPCPlots.resources
 C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmTransform.resources
+C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.VariableSelection.resources

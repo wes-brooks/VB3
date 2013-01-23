@@ -379,11 +379,21 @@ namespace VBDatasheet
 
         void btnValidate_Click(object sender, EventArgs e)
         {
-            _frmDatasheet.btnValidateData_Click(sender, e);
-            btnComputeAO.Enabled = true;
-            btnManipulate.Enabled = true;
-            btnTransform.Enabled = true;
-            btnGoToModeling.Enabled = true;
+            bool bSuccess = _frmDatasheet.btnValidateData_Click(sender, e);
+            if (bSuccess)
+            {
+                btnComputeAO.Enabled = true;
+                btnManipulate.Enabled = true;
+                btnTransform.Enabled = true;
+                btnGoToModeling.Enabled = true;
+            }
+            else
+            {
+                btnComputeAO.Enabled = false;
+                btnManipulate.Enabled = false;
+                btnTransform.Enabled = false;
+                btnGoToModeling.Enabled = false;
+            }
         }
 
 

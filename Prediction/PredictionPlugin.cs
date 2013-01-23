@@ -444,11 +444,11 @@ namespace Prediction
                 btnMakePred.Enabled = true;
                 Broadcast();
             }
-            else
+            /*else
             {
                 btnIVDataVal.Enabled = false;
                 btnMakePred.Enabled = false;
-            }
+            }*/
         }
 
 

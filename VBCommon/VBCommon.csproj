@@ -121,6 +121,12 @@
     <Compile Include="Controls\frmUV.Designer.cs">
       <DependentUpon>frmUV.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\VariableSelection.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\VariableSelection.designer.cs">
+      <DependentUpon>VariableSelection.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataGridViewPrinter.cs" />
     <Compile Include="Expressions\ExpressionBuilder.cs" />
     <Compile Include="Expressions\ExpressionExecution.cs" />
@@ -174,6 +180,7 @@
     <Compile Include="Signaller.cs" />
     <Compile Include="Spatial\Site.cs" />
     <Compile Include="Spatial\WaterCurrentComponents.cs" />
+    <Compile Include="Spatial\WaveComponents.cs" />
     <Compile Include="Spatial\WindComponents.cs" />
     <Compile Include="Statistics\AndersonDarlingNormality.cs">
       <SubType>Code</SubType>
@@ -246,6 +253,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\frmVariableSpecification.resx">
       <DependentUpon>frmVariableSpecification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\VariableSelection.resx">
+      <DependentUpon>VariableSelection.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -70,13 +70,15 @@ namespace VBCommon.Metadata
             }
 
 
-            public DataTable filterDisabledCols(DataTable dt)
+            public DataTable FilterDisabledCols(DataTable dt, dtColumnInformation dtci=null)
             {
                 //filter out disabled columns
                 DataTable dtCopy = dt.Copy();
 
-                dtColumnInformation dtCI = new dtColumnInformation(dt);
-                foreach (KeyValuePair<string, bool> kv in dtCI.DTColInfo)
+                if (dtci==null)
+                    dtci = new dtColumnInformation(dt);
+
+                foreach (KeyValuePair<string, bool> kv in dtci.DTColInfo)
                 {
                     if (kv.Value) continue; 
                     if (dtCopy.Columns.Contains(kv.Key))
@@ -87,7 +89,7 @@ namespace VBCommon.Metadata
             }
 
 
-            public DataTable filterDataTableRows(DataTable dt, dtRowInformation dtri)
+            public DataTable FilterDataTableRows(DataTable dt, dtRowInformation dtri)
             {
                 //filter out disabled rows
                 DataTable dtCopy = dt.Copy();
