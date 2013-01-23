@@ -242,7 +242,8 @@ namespace Prediction
                         if (dictColMap[meKey] == "none")
                             dr[meKey] = DBNull.Value;
                         else
-                            dr[meKey] = tblRawData.Rows[i][dictColMap[meKey]];
+                            try { dr[meKey] = tblRawData.Rows[i][dictColMap[meKey]]; }
+                            catch (ArgumentException e) { dr[meKey] = DBNull.Value; }                                    
                     }
                 }
                 dt.Rows.Add(dr);
