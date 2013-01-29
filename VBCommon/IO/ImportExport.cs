@@ -41,7 +41,15 @@ namespace VBCommon.IO
         {
             get 
             {
-                Import();
+                try
+                {
+                    Import();
+                }
+                catch (Exception ex)
+                {
+                    _dt = null;
+                }
+
                 return _dt; 
             }
         }
@@ -90,20 +98,28 @@ namespace VBCommon.IO
                 string[] names = excelDb.GetWorksheetNames();
                 
                 //If there is only 1 worksheet in a workbook, lets not make the user select it.  Just open it.
-                if (names.Length == 1)
-                    selectedWorksheet = names[0];
+                if (names != null)
+                {
+                    if (names.Length == 1)
+                        selectedWorksheet = names[0];
+                    else
+                    {
+                        frmChooseWorksheet chooseWorkSheet = new frmChooseWorksheet(fi.Name, names);
+                        dr = chooseWorkSheet.ShowDialog();
+
+                        if (dr == DialogResult.Cancel || chooseWorkSheet.SelectedWorksheetName == null ||
+                            chooseWorkSheet.SelectedWorksheetName == "")
+                            return;
+
+                        selectedWorksheet = chooseWorkSheet.SelectedWorksheetName;
+                    }
+                    _dt = excelDb.Read(selectedWorksheet);
+                }
                 else
                 {
-                    frmChooseWorksheet chooseWorkSheet = new frmChooseWorksheet(fi.Name, names);
-                    dr = chooseWorkSheet.ShowDialog();
-
-                    if (dr == DialogResult.Cancel || chooseWorkSheet.SelectedWorksheetName == null ||
-                        chooseWorkSheet.SelectedWorksheetName == "")
-                        return;
-
-                    selectedWorksheet = chooseWorkSheet.SelectedWorksheetName;
+                    _dt = null;
+                    selectedWorksheet = "";
                 }
-                _dt = excelDb.Read(selectedWorksheet);
                 
                 if ((_dt == null) || (_dt.Rows.Count < 1))
                     throw new Exception("The following Excel file and worksheet could not be imported: " + fileName + " : " + selectedWorksheet);

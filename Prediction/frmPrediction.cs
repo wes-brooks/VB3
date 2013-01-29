@@ -78,6 +78,9 @@ namespace Prediction
         private int intSelectedModel = -1;
         private string strMethod;
         private string strEnddatURL = "";
+        private string strEnddatTimezone = "";
+        private string strEnddatTimestamp = "";
+        private bool bUseTimestamp = false;
         
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
@@ -196,6 +199,9 @@ namespace Prediction
             txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
             txtProbabilityThreshold.Text = Convert.ToDouble(dictModel["ProbabilityThreshold"]).ToString();
             strEnddatURL = dictModel["EnddatURL"].ToString();
+            strEnddatTimezone = dictModel["EnddatTimezone"].ToString();
+            strEnddatTimestamp = dictModel["EnddatTimestamp"].ToString();
+            bUseTimestamp = (bool)dictModel["UseEnddatTimestamp"];
 
             if ((bool)dictModel["UseRawPredictions"]) { rbRaw.Checked = true; }
             else { rbProbability.Checked = true; }
@@ -300,6 +306,9 @@ namespace Prediction
             dictModelState.Add("ProbabilityThreshold", Convert.ToDouble(txtProbabilityThreshold.Text));
             dictModelState.Add("UseRawPredictions", rbRaw.Checked);
             dictModelState.Add("EnddatURL", strEnddatURL);
+            dictModelState.Add("EnddatTimezone", strEnddatTimezone);
+            dictModelState.Add("EnddatTimestamp", strEnddatTimestamp);
+            dictModelState.Add("UseEnddatTimestamp", bUseTimestamp);
 
             dictPluginState.Add("Model", dictModelState);
 
@@ -417,6 +426,26 @@ namespace Prediction
                         ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("EnddatURL");
                     ((IDictionary<string, object>)dictPredictionElements[strMethod]).Add("EnddatURL", strEnddatURL);
                 }
+
+                //Pack the EnDDaT Timezone if it exists.
+                if (strEnddatTimezone != null)
+                {
+                    if (((IDictionary<string, object>)dictPredictionElements[strMethod]).ContainsKey("EnddatTimezone"))
+                        ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("EnddatTimezone");
+                    ((IDictionary<string, object>)dictPredictionElements[strMethod]).Add("EnddatTimezone", strEnddatTimezone);
+                }
+
+                //Pack the EnDDaT Timestamp if it exists.
+                if (strEnddatTimestamp != null)
+                {
+                    if (((IDictionary<string, object>)dictPredictionElements[strMethod]).ContainsKey("EnddatTimestamp"))
+                        ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("EnddatTimestamp");
+                    ((IDictionary<string, object>)dictPredictionElements[strMethod]).Add("EnddatTimestamp", strEnddatTimestamp);
+                }
+
+                if (((IDictionary<string, object>)dictPredictionElements[strMethod]).ContainsKey("UseEnddatTimestamp"))
+                    ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("UseEnddatTimestamp");
+                ((IDictionary<string, object>)dictPredictionElements[strMethod]).Add("UseEnddatTimestamp", bUseTimestamp);
 
                 if (ButtonStatusEvent != null)
                 {
@@ -638,6 +667,21 @@ namespace Prediction
                         if (dictNewModel.ContainsKey("EnddatURL"))
                         {
                             strEnddatURL = dictNewModel["EnddatURL"].ToString();
+                        }
+
+                        if (dictNewModel.ContainsKey("EnddatTimezone"))
+                        {
+                            strEnddatTimezone = dictNewModel["EnddatTimezone"].ToString();
+                        }
+
+                        if (dictNewModel.ContainsKey("EnddatTimestamp"))
+                        {
+                            strEnddatTimestamp = dictNewModel["EnddatTimestamp"].ToString();
+                        }
+
+                        if (dictNewModel.ContainsKey("UseEnddatTimestamp"))
+                        {
+                            bUseTimestamp = (bool)dictNewModel["UseEnddatTimestamp"];
                         }
 
                         if (dictNewModel.ContainsKey("ObsVariableMapping"))
@@ -967,12 +1011,16 @@ namespace Prediction
             if (dr == DialogResult.OK)
             {
                 strEnddatURL = enddat_dialog.URL;
+                bUseTimestamp = enddat_dialog.UseTimestamp;
+                strEnddatTimestamp = enddat_dialog.Timestamp;
+                strEnddatTimezone = enddat_dialog.Timezone;
                 
                 Regex reBegin = new Regex("&?beginPosition=[^&]*");
                 Regex reEnd = new Regex("&?endPosition=[^&]*");
                 Regex reInterval = new Regex("&?timeInt=[^&]*");
                 Regex reLatest = new Regex("&?latest=[^&]*");
                 Regex reStyle = new Regex("&?style=[^&]*");
+                Regex reTimezone = new Regex("&?TZ=[^&]*");
 
                 strEnddatURL = reBegin.Replace(strEnddatURL, "");
                 strEnddatURL = reEnd.Replace(strEnddatURL, "");
@@ -980,8 +1028,41 @@ namespace Prediction
                 strEnddatURL = reLatest.Replace(strEnddatURL, "");
                 strEnddatURL = reStyle.Replace(strEnddatURL, "");
 
-                strEnddatURL = strEnddatURL + "&endPosition=now&timeInt=24&style=csv&latest=TRUE";
+                if (bUseTimestamp)
+                {
+                    strEnddatURL = reBegin.Replace(strEnddatURL, "");
 
+                    if (strEnddatTimezone == "Local time")
+                    {
+                        strEnddatTimezone = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).ToString().Split(':')[0].Trim();
+                    }
+                    else
+                    {
+                        strEnddatTimezone = strEnddatTimezone.Split(':')[0].Trim();
+                    }
+
+                    if (strEnddatTimezone[0] == '-' && strEnddatTimezone.Length == 2)
+                    {
+                        strEnddatTimezone = "-0" + strEnddatTimezone[1];
+                    }
+
+                    string strDate;
+                    if (strEnddatTimestamp != "")
+                    {
+                        strDate = DateTime.Today.Subtract(new TimeSpan(1,0,0,0)).GetDateTimeFormats()[5].ToString();
+                    }
+                    else
+                    {
+                        strDate =  DateTime.Today.GetDateTimeFormats()[5].ToString();
+                    }
+                    string strTimestamp = strDate + "T" + strEnddatTimestamp + strEnddatTimezone + "00";
+
+                    strEnddatURL = strEnddatURL + "&style=csv&TZ=" + strEnddatTimezone + "&datetime=" + strTimestamp;
+                }
+                else
+                {
+                    strEnddatURL = strEnddatURL + "&style=csv&latest=TRUE";
+                }
                 return (true);
             }
             else

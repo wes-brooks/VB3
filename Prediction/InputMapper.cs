@@ -112,10 +112,6 @@ namespace Prediction
 
         public DataTable ImportFromEnddat(string URL, DataTable tblCurrent)
         {
-            /*VBCommon.IO.ImportExport import = new ImportExport();
-            DataTable dt = import.Input;
-            if (dt == null)
-                return (null);*/
             string strEnddatURL = URL;
             DataTable dt;
             

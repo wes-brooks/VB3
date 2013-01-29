@@ -12,7 +12,9 @@ namespace Prediction
     public partial class frmEnddatURL : Form
     {
         private string strEnddatURL = null;
-
+        private string strTimestamp = null;
+        private string strTimezone = null;
+        private bool bMostRecent = true;
 
         public frmEnddatURL(string CurrentURL)
         {
@@ -34,6 +36,24 @@ namespace Prediction
         }
 
 
+        public bool UseTimestamp
+        {
+            get { return !bMostRecent; }
+        }
+
+
+        public string Timestamp
+        {
+            get { return strTimestamp; }
+        }
+
+
+        public string Timezone
+        {
+            get { return strTimezone; }
+        }
+
+
         public string URL
         {
             get { return strEnddatURL; }
@@ -43,6 +63,9 @@ namespace Prediction
         private void btnOK_Click(object sender, EventArgs e)
         {
             strEnddatURL = txtEnddatURL.Text;
+            strTimestamp = tbTimestamp.Text.Trim();
+            strTimezone = cbTimezone.SelectedItem.ToString();
+            bMostRecent = rbMostRecent.Checked;
 
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.Close();

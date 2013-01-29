@@ -537,7 +537,6 @@ namespace VBCommon.Controls
             foreach (DataColumn c in dt.Columns)
             {
                 bool colisT = c.ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM);
-                bool colisI = c.ExtendedProperties.ContainsKey(VBCommon.Globals.OPERATION);
                 if (colisT == true) return true;
             }
             return false;
@@ -557,6 +556,19 @@ namespace VBCommon.Controls
         }
 
 
+        // determine if the table has decomposed data columns
+        //true if table has decomposed columns, false otherwise</returns>
+        public bool hasDCols()
+        {
+            foreach (DataColumn c in dt.Columns)
+            {
+                bool colisD = c.ExtendedProperties.ContainsKey(VBCommon.Globals.DECOMPOSITION);
+                if (colisD == true) return true;
+            }
+            return false;
+        }
+
+
         // determine if the table has either transformed IV columns OR manipulated columns
         public bool hasOorTCols()
         {
@@ -567,6 +579,20 @@ namespace VBCommon.Controls
                 if (colisI == true || colisT == true) return true;
             }
             return false;
+        }
+
+
+        // determine if the table has either transformed IV columns OR manipulated columns
+        public bool AllColsAreMainEffects()
+        {
+            foreach (DataColumn c in dt.Columns)
+            {
+                bool colisT = c.ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM);
+                bool colisI = c.ExtendedProperties.ContainsKey(VBCommon.Globals.OPERATION);
+                bool colisD = c.ExtendedProperties.ContainsKey(VBCommon.Globals.DECOMPOSITION);
+                if (colisI == true || colisT == true || colisD == true) return false;
+            }
+            return true;
         }
       
 
@@ -948,7 +974,7 @@ namespace VBCommon.Controls
         public void SetResponse(object sender, EventArgs e)
         {
             DialogResult dlgr = DialogResult.Yes;
-            if (hasTCols())
+            if (!AllColsAreMainEffects())
             {
                 dlgr = MessageBox.Show("Changing response variable results in removal of created columns; Proceed (Y?N)",
                 "Are you sure you want to continue?", MessageBoxButtons.YesNo);
@@ -964,7 +990,7 @@ namespace VBCommon.Controls
                 dt.Columns[intResponseVarColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = false;
 
                 //filter transformed cols
-                if (hasTCols()) dt = filterTcols(dt);
+                if (!AllColsAreMainEffects()) dt = FilterCols(dt);
 
                 if (testValueAttribute(dt.Columns[strResponseVarColName], VBCommon.Globals.DEPENDENTVARIBLETRANSFORM))
                 {
@@ -1416,6 +1442,26 @@ namespace VBCommon.Controls
             {
                 bool transformed = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM);
                 if (transformed == true)
+                    if (dtCopy.Columns.Contains(dt.Columns[c].Caption.ToString()))
+                        dtCopy.Columns.Remove(dt.Columns[c].Caption.ToString());
+            }
+            dtCopy.AcceptChanges();
+            return dtCopy;
+        }
+
+
+        public DataTable FilterCols(DataTable dt)
+        {
+            //filter transformed columns
+            DataTable dtCopy = dt.Copy();
+
+            for (int c = 0; c < dt.Columns.Count; c++)
+            {
+                bool transformed = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM);
+                bool decomposition = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.DECOMPOSITION);
+                bool interaction = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.OPERATION);
+
+                if (transformed || decomposition || interaction)
                     if (dtCopy.Columns.Contains(dt.Columns[c].Caption.ToString()))
                         dtCopy.Columns.Remove(dt.Columns[c].Caption.ToString());
             }

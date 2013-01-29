@@ -36,7 +36,7 @@
             this.cbCurrentSpeedColumn = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnOk = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -47,9 +47,16 @@
             this.label5 = new System.Windows.Forms.Label();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.cbWaveDirection = new System.Windows.Forms.ComboBox();
+            this.cbWaveHeight = new System.Windows.Forms.ComboBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox2
@@ -59,9 +66,9 @@
             this.groupBox2.Controls.Add(this.cbCurrentDirectionColumn);
             this.groupBox2.Controls.Add(this.cbCurrentSpeedColumn);
             this.groupBox2.Controls.Add(this.label7);
-            this.groupBox2.Location = new System.Drawing.Point(108, 196);
+            this.groupBox2.Location = new System.Drawing.Point(12, 165);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(309, 147);
+            this.groupBox2.Size = new System.Drawing.Size(310, 147);
             this.groupBox2.TabIndex = 11;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Current Data";
@@ -111,7 +118,8 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(287, 422);
+            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.Location = new System.Drawing.Point(168, 508);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(74, 23);
             this.btnCancel.TabIndex = 14;
@@ -119,15 +127,15 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // button1
+            // btnOk
             // 
-            this.button1.Location = new System.Drawing.Point(166, 422);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(74, 23);
-            this.button1.TabIndex = 13;
-            this.button1.Text = "Ok";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnOk.Location = new System.Drawing.Point(248, 508);
+            this.btnOk.Name = "btnOk";
+            this.btnOk.Size = new System.Drawing.Size(74, 23);
+            this.btnOk.TabIndex = 0;
+            this.btnOk.Text = "Ok";
+            this.btnOk.UseVisualStyleBackColor = true;
+            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
             // groupBox1
             // 
@@ -136,9 +144,9 @@
             this.groupBox1.Controls.Add(this.cbWindDirectionColumn);
             this.groupBox1.Controls.Add(this.cbWindSpeedColumn);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(108, 43);
+            this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(309, 147);
+            this.groupBox1.Size = new System.Drawing.Size(310, 147);
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Wind Data";
@@ -188,9 +196,9 @@
             // 
             // txtRotationAngle
             // 
-            this.txtRotationAngle.Location = new System.Drawing.Point(274, 358);
+            this.txtRotationAngle.Location = new System.Drawing.Point(179, 471);
             this.txtRotationAngle.Name = "txtRotationAngle";
-            this.txtRotationAngle.Size = new System.Drawing.Size(100, 20);
+            this.txtRotationAngle.Size = new System.Drawing.Size(101, 20);
             this.txtRotationAngle.TabIndex = 12;
             this.txtRotationAngle.Validating += new System.ComponentModel.CancelEventHandler(this.txtRotationAngle_Validating);
             this.txtRotationAngle.Validated += new System.EventHandler(this.txtRotationAngle_Validated);
@@ -198,7 +206,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(148, 361);
+            this.label5.Location = new System.Drawing.Point(75, 474);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(98, 13);
             this.label5.TabIndex = 15;
@@ -208,14 +216,74 @@
             // 
             this.errorProvider1.ContainerControl = this;
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this.label9);
+            this.groupBox3.Controls.Add(this.cbWaveDirection);
+            this.groupBox3.Controls.Add(this.cbWaveHeight);
+            this.groupBox3.Controls.Add(this.label10);
+            this.groupBox3.Location = new System.Drawing.Point(12, 318);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(310, 147);
+            this.groupBox3.TabIndex = 16;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Wave Data";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(18, 100);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(76, 13);
+            this.label8.TabIndex = 4;
+            this.label8.Text = "Direction (deg)";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(56, 62);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(38, 13);
+            this.label9.TabIndex = 3;
+            this.label9.Text = "Height";
+            // 
+            // cbWaveDirection
+            // 
+            this.cbWaveDirection.FormattingEnabled = true;
+            this.cbWaveDirection.Location = new System.Drawing.Point(100, 97);
+            this.cbWaveDirection.Name = "cbWaveDirection";
+            this.cbWaveDirection.Size = new System.Drawing.Size(187, 21);
+            this.cbWaveDirection.TabIndex = 4;
+            // 
+            // cbWaveHeight
+            // 
+            this.cbWaveHeight.FormattingEnabled = true;
+            this.cbWaveHeight.Location = new System.Drawing.Point(100, 54);
+            this.cbWaveHeight.Name = "cbWaveHeight";
+            this.cbWaveHeight.Size = new System.Drawing.Size(187, 21);
+            this.cbWaveHeight.TabIndex = 3;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(10, 27);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(140, 13);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Specify wave data columns:";
+            // 
             // frmUV
             // 
+            this.AcceptButton = this.btnOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(545, 472);
+            this.CancelButton = this.btnCancel;
+            this.ClientSize = new System.Drawing.Size(335, 543);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnOk);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.txtRotationAngle);
             this.Controls.Add(this.label5);
@@ -227,6 +295,8 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -241,7 +311,7 @@
         private System.Windows.Forms.ComboBox cbCurrentSpeedColumn;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
@@ -252,5 +322,11 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ErrorProvider errorProvider1;
         private System.Windows.Forms.HelpProvider helpProvider1;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.ComboBox cbWaveDirection;
+        private System.Windows.Forms.ComboBox cbWaveHeight;
+        private System.Windows.Forms.Label label10;
     }
 }

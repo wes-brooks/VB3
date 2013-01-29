@@ -168,11 +168,15 @@ namespace VBCommon.IO
             DataTable dt = GetSchema();
             List<string> names = new List<string>();
 
-            for (int i = 0; i < dt.Rows.Count; i++)
-                names.Add(dt.Rows[i]["TABLE_NAME"].ToString());
+            if (dt != null)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                    names.Add(dt.Rows[i]["TABLE_NAME"].ToString());
 
-            return names.ToArray();
-            
+                return names.ToArray();
+            }
+            else
+                return null;
         }
 
         /// <summary>
@@ -182,10 +186,18 @@ namespace VBCommon.IO
         private DataTable GetSchema()
         {
             DataTable dtSchema = null;
-            if (_conn.State != ConnectionState.Open) _conn.Open();
-            object[] args = new object[] { null, null, null, "TABLE" };
-            dtSchema = _conn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, args);
-            return dtSchema;
+            try
+            {
+                if (_conn.State != ConnectionState.Open) _conn.Open();
+                object[] args = new object[] { null, null, null, "TABLE" };
+                dtSchema = _conn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, args);
+                return dtSchema;
+            }
+            catch (System.Data.OleDb.OleDbException ex)
+            {
+                System.Windows.Forms.MessageBox.Show(String.Format("An error occured while opening the file: {0}", ex.Message));
+                return null;
+            }
         }
 
 
