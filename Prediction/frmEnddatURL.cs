@@ -16,12 +16,18 @@ namespace Prediction
         private string strTimezone = null;
         private bool bMostRecent = true;
 
-        public frmEnddatURL(string CurrentURL)
+        public frmEnddatURL(string URL, string Timestamp, string Timezone, bool UseTimestamp)
         {
-            if (CurrentURL != null)
-            {
-                strEnddatURL = CurrentURL;
-            }
+            if (URL != null)
+                strEnddatURL = URL;
+
+            if (Timestamp != null)
+                strTimestamp = Timestamp;
+
+            if (Timezone != null)
+                strTimezone = Timezone;
+
+            bMostRecent = UseTimestamp;
 
             InitializeComponent();
         }
@@ -30,9 +36,15 @@ namespace Prediction
         private void frmEnddatURL_Load(object sender, EventArgs e)
         {
             if (strEnddatURL != null)
-            {
                 txtEnddatURL.Text = strEnddatURL;
-            }
+
+            if (strTimestamp != null)
+                tbTimestamp.Text = strTimestamp;
+
+            if (strTimezone != null)
+                cbTimezone.SelectedItem = strTimezone;
+
+            rbManual.Checked = bMostRecent;
         }
 
 

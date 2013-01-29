@@ -152,6 +152,7 @@
             this.dgvVariables.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvVariables_DataError);
             this.dgvVariables.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dgvVariables_Scroll);
             this.dgvVariables.SelectionChanged += new System.EventHandler(this.dgvVariables_SelectionChanged);
+            this.dgvVariables.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgvVariables_RowsAdded);
             // 
             // splitContainer2
             // 

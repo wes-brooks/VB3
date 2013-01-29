@@ -33,54 +33,51 @@ namespace Prediction
         private ContextMenu cmForStats = new ContextMenu();
         private Dictionary<string, string> dictMainEffects;
 
-        private IModel model = null;
+        private IModel model;
         public List<Lazy<IModel, IDictionary<string, object>>> models;
         public event EventHandler RequestModelPluginList;
 
-        private string[] strArrReferencedVars = null;
+        private string[] strArrReferencedVars;
         private DataTable corrDT; 
-        private List<ListItem> lstIndVars = null;
-        private string strOutputVariable = "Output";
+        private List<ListItem> lstIndVars;
+        private string strOutputVariable;
 
-        InputMapper IvMap = null;
-        InputMapper ObsMap = null;
-        private DataTable dtVariables = null;
-        private DataTable dtObs = null;
-        private DataTable dtStats = null;
+        InputMapper IvMap;
+        InputMapper ObsMap;
+        private DataTable dtVariables;
+        private DataTable dtObs;
+        private DataTable dtStats;
 
-        //private Dictionary<string, object> dictTransform = new Dictionary<string, object>();
-        private DataTable dtObsOrig = null;
-        private bool boolObsTransformed = false;
         private int intCheckedRVTransform;
 
         //The transform of the model's original data:
         private DependentVariableTransforms xfrmImported;
-        private double dblImportedPowerTransformExp = double.NaN;
+        private double dblImportedPowerTransformExp;
 
         //The transform of the modeling threshold:
         private DependentVariableTransforms xfrmModeled;
-        private double dblModeledPowerTransformExp = double.NaN;
+        private double dblModeledPowerTransformExp;
 
         //The transform for entries in the Observations data table:
         private DependentVariableTransforms xfrmObs;
-        private double dblObsPowerTransformExp = double.NaN;
+        private double dblObsPowerTransformExp;
 
         //The transform applied to the regulatory threshold:
         private DependentVariableTransforms xfrmThreshold;
-        private double dblThresholdPowerTransformExp = double.NaN;
+        private double dblThresholdPowerTransformExp;
 
         //The transform for entries in the Observations data table:
         private DependentVariableTransforms xfrmDisplay;
-        private double dblDisplayPowerTransformExp = double.NaN;
+        private double dblDisplayPowerTransformExp;
         
         List<string> listModels = new List<string>();
-        IDictionary<string, object> dictPredictionElements = new Dictionary<string, object>();
-        private int intSelectedModel = -1;
+        IDictionary<string, object> dictPredictionElements;
+        private int intSelectedModel;
         private string strMethod;
-        private string strEnddatURL = "";
-        private string strEnddatTimezone = "";
-        private string strEnddatTimestamp = "";
-        private bool bUseTimestamp = false;
+        private string strEnddatURL;
+        private string strEnddatTimezone;
+        private string strEnddatTimestamp;
+        private bool bUseTimestamp;
         
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
@@ -93,6 +90,37 @@ namespace Prediction
         public frmPrediction()
         {
             InitializeComponent();
+            InitializeInterface();
+        }
+
+
+        private void InitializeInterface()
+        {
+            model = null;
+            strArrReferencedVars = null;
+            lstIndVars = null;
+            strOutputVariable = null;
+
+            IvMap = null;
+            ObsMap = null;
+            dtVariables = null;
+            dtObs = null;
+            dtStats = null;
+
+            dblImportedPowerTransformExp = double.NaN;
+            dblModeledPowerTransformExp = double.NaN;
+            dblObsPowerTransformExp = double.NaN;
+            dblThresholdPowerTransformExp = double.NaN;
+            dblDisplayPowerTransformExp = double.NaN;
+
+            intSelectedModel = -1;
+            dictPredictionElements = new Dictionary<string, object>();
+            dictMainEffects = null;
+
+            strEnddatURL = null;
+            strEnddatTimezone = null;
+            strEnddatTimestamp = null;
+            bUseTimestamp = false;
         }
 
 
@@ -637,6 +665,12 @@ namespace Prediction
                         xfrmThreshold = xfrmModeled;
                         dblThresholdPowerTransformExp = dblModeledPowerTransformExp;
 
+                        dgvVariables.DataSource = InitializeIVData();
+                        SetViewOnGrid(dgvVariables);
+
+                        dgvObs.DataSource = InitializeObsData();
+                        SetViewOnGrid(dgvObs);
+
                         xfrmObs = DependentVariableTransforms.none;
                         dblObsPowerTransformExp = 1;
                         SetObsTransformCheckmarks(Item: (int)xfrmObs);
@@ -735,6 +769,12 @@ namespace Prediction
                             dgvVariables.DataSource = dtVariables;
                             SetViewOnGrid(dgvVariables);
                         }
+                        else
+                        {
+                            dgvVariables.DataSource = InitializeIVData();
+                            SetViewOnGrid(dgvVariables);
+                            dgvVariables.AllowUserToAddRows = true;
+                        }                        
 
                         //First, establish the default (will be overwritten if a version is found within the prediction elements)
                         xfrmObs = DependentVariableTransforms.none;
@@ -758,6 +798,11 @@ namespace Prediction
                                 xfrmObs = DependentVariableTransforms.none;
                                 dblObsPowerTransformExp = 1;
                             }
+                        }
+                        else
+                        {
+                            dgvObs.DataSource = InitializeObsData();
+                            SetViewOnGrid(dgvObs);
                         }
                         SetObsTransformCheckmarks(Item: (int)xfrmObs);
                         
@@ -804,6 +849,60 @@ namespace Prediction
                     else
                         rbNone.Checked = true;
                 }
+            }
+        }
+
+
+        private DataTable InitializeIVData()
+        {
+            if (dictMainEffects != null)
+            {
+                //Create the datatable and initialize it with the ID column
+                DataTable dt = new DataTable();
+                dt.Columns.Add("ID", typeof(string));
+
+                //Add a column to the datatable for each predictor
+                foreach (string meKey in dictMainEffects.Keys)
+                {
+                    if (String.Compare(meKey, "ID", true) != 0)
+                        dt.Columns.Add(meKey, typeof(double));
+                }
+
+                return dt;
+            }
+            else
+                return null;
+        }
+
+
+        private DataTable InitializeObsData()
+        {
+            if (strOutputVariable != null)
+            {
+                //Create the datatable and initialize it with the ID column
+                DataTable dt = new DataTable();
+                dt.Columns.Add("ID", typeof(string));
+                dt.Columns.Add(strOutputVariable, typeof(double));
+                return dt;
+            }
+            else
+                return null;
+        }
+
+
+        private void dgvVariables_RowsAdded(object sender, EventArgs e)
+        {
+            if (dgvVariables.Rows.Count != 2)
+                return;
+
+            if (ButtonStatusEvent != null)
+            {                
+                Dictionary<string, bool> dictButtonState = new Dictionary<string, bool>();
+                dictButtonState.Add("ValidationButtonEnabled", true);
+                dictButtonState.Add("PredictionButtonEnabled", true);
+
+                ButtonStatusEventArgs args = new ButtonStatusEventArgs(StatusDictionary:dictButtonState, Set:true);
+                ButtonStatusEvent(this, args);
             }
         }
 
@@ -965,6 +1064,54 @@ namespace Prediction
             DataTable dt;
             try
             {
+                if (bUseTimestamp)
+                {
+                    string strTimezone;
+                    string strDate;
+                    string strTimestamp;
+                                        
+                    if (strEnddatTimezone == "Local time")
+                    {
+                        strTimezone = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).ToString().Split(':')[0].Trim();
+                    }
+                    else
+                    {
+                        strTimezone = strEnddatTimezone.Split(':')[0].Trim();
+                    }
+
+                    //Prepend a zero if necessary:
+                    if (strTimezone[0] == '-' && strTimezone.Length == 2)
+                    {
+                        strTimezone = "-0" + strTimezone[1];
+                    }
+                    else if (strTimezone[0] == '+' && strTimezone.Length == 2)
+                    {
+                        strTimezone = "+0" + strTimezone[1];
+                    }
+
+                    //Determine whether the timestamp occured most recently today or yesterday:
+                    DateTime now = DateTime.Now;
+                    int hour = Convert.ToInt32(strEnddatTimestamp.Split(':')[0]);
+                    int minute = Convert.ToInt32(strEnddatTimestamp.Split(':')[1]);
+                    DateTime dtTimestamp = new DateTime(now.Year, now.Month, now.Day, hour, minute, 0);
+
+                    if (dtTimestamp.CompareTo(DateTime.Now) > 0)
+                    {
+                        strDate = DateTime.Today.Subtract(new TimeSpan(1, 0, 0, 0)).GetDateTimeFormats()[5].ToString();
+                    }
+                    else
+                    {
+                        strDate = DateTime.Today.GetDateTimeFormats()[5].ToString();
+                    }
+
+                    strTimestamp = strDate + "T" + strEnddatTimestamp + strTimezone + "00";
+                    strEnddatURL = strEnddatURL + "&style=csv&TZ=" + strTimezone + "&datetime=" + strTimestamp;
+                }
+                else
+                {
+                    strEnddatURL = strEnddatURL + "&style=csv&latest=TRUE";
+                }
+
                 dt = IvMap.ImportFromEnddat(strEnddatURL, tblRaw);
             }
             catch
@@ -1006,7 +1153,7 @@ namespace Prediction
         //import IV datatable
         public bool btnSetEnddatURL_Click(object sender, EventArgs e)
         {
-            frmEnddatURL enddat_dialog = new frmEnddatURL(strEnddatURL);
+            frmEnddatURL enddat_dialog = new frmEnddatURL(strEnddatURL, strEnddatTimestamp, strEnddatTimezone, bUseTimestamp);
             DialogResult dr = enddat_dialog.ShowDialog();
             if (dr == DialogResult.OK)
             {
@@ -1021,48 +1168,22 @@ namespace Prediction
                 Regex reLatest = new Regex("&?latest=[^&]*");
                 Regex reStyle = new Regex("&?style=[^&]*");
                 Regex reTimezone = new Regex("&?TZ=[^&]*");
-
+                Regex reDatetime = new Regex("&?datetime=[^&]*");
+                
                 strEnddatURL = reBegin.Replace(strEnddatURL, "");
                 strEnddatURL = reEnd.Replace(strEnddatURL, "");
                 strEnddatURL = reInterval.Replace(strEnddatURL, "");
                 strEnddatURL = reLatest.Replace(strEnddatURL, "");
                 strEnddatURL = reStyle.Replace(strEnddatURL, "");
+                strEnddatURL = reTimezone.Replace(strEnddatURL, "");
+                strEnddatURL = reDatetime.Replace(strEnddatURL, "");
 
-                if (bUseTimestamp)
-                {
-                    strEnddatURL = reBegin.Replace(strEnddatURL, "");
+                //Make sure the timestamp looks like HH:MM:SS
+                if (strEnddatTimestamp.Split(':').Length == 1)
+                    strEnddatTimestamp = strEnddatTimestamp + ":00:00";
+                else if (strEnddatTimestamp.Split(':').Length == 2)
+                    strEnddatTimestamp = strEnddatTimestamp + ":00";
 
-                    if (strEnddatTimezone == "Local time")
-                    {
-                        strEnddatTimezone = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).ToString().Split(':')[0].Trim();
-                    }
-                    else
-                    {
-                        strEnddatTimezone = strEnddatTimezone.Split(':')[0].Trim();
-                    }
-
-                    if (strEnddatTimezone[0] == '-' && strEnddatTimezone.Length == 2)
-                    {
-                        strEnddatTimezone = "-0" + strEnddatTimezone[1];
-                    }
-
-                    string strDate;
-                    if (strEnddatTimestamp != "")
-                    {
-                        strDate = DateTime.Today.Subtract(new TimeSpan(1,0,0,0)).GetDateTimeFormats()[5].ToString();
-                    }
-                    else
-                    {
-                        strDate =  DateTime.Today.GetDateTimeFormats()[5].ToString();
-                    }
-                    string strTimestamp = strDate + "T" + strEnddatTimestamp + strEnddatTimezone + "00";
-
-                    strEnddatURL = strEnddatURL + "&style=csv&TZ=" + strEnddatTimezone + "&datetime=" + strTimestamp;
-                }
-                else
-                {
-                    strEnddatURL = strEnddatURL + "&style=csv&latest=TRUE";
-                }
                 return (true);
             }
             else
@@ -1862,7 +1983,7 @@ namespace Prediction
 
 
         //clear tables. set all to null
-        public void btnClearTable_Click(object sender, EventArgs e)
+        public void btnClear_Click(object sender, EventArgs e)
         {
             dgvVariables.DataSource = null;
             dgvObs.DataSource = null;
@@ -1885,8 +2006,13 @@ namespace Prediction
             dictPredictionElements = new Dictionary<string, object>(); ;
             lbAvailableModels.ClearSelected();
 
-            dgvVariables.DataSource = CreateEmptyIVsDataTable();
-            dgvObs.DataSource = CreateEmptyObservationsDataTable();
+            InitializeInterface();
+
+            dgvVariables.DataSource = InitializeIVData();
+            dgvObs.DataSource = InitializeObsData();
+
+            SetViewOnGrid(dgvVariables);
+            SetViewOnGrid(dgvObs);
         }
 
 
@@ -1944,7 +2070,7 @@ namespace Prediction
         }
 
 
-        private DataTable CreateEmptyIVsDataTable()
+        /*private DataTable CreateEmptyIVsDataTable()
         {
             //We are going to put an ID column first.
             //ID is used to link IV and Obs records.
@@ -1966,7 +2092,7 @@ namespace Prediction
             dt.Columns.Add("Observation", typeof(double));
 
             return dt;
-        }
+        }*/
 
         //selected variable change 
         private void dgvVariables_SelectionChanged(object sender, EventArgs e)
@@ -2297,6 +2423,7 @@ namespace Prediction
         public bool btnIVDataValidation_Click(object sender, EventArgs e)
         {
             //check for non unique records, blank records
+            dgvVariables.EndEdit();
             DataTable dt = dgvVariables.DataSource as DataTable;
             if ((dt == null) ||(dt.Rows.Count < 1))
                 return(false);

@@ -187,7 +187,7 @@ namespace Prediction
             btnPlot.Enabled = true;
             App.HeaderControl.Add(btnPlot);
 
-            btnClear = new SimpleActionItem(strPanelKey, "Clear", btnClearTable_Ck);
+            btnClear = new SimpleActionItem(strPanelKey, "Clear", btnClear_Click);
             btnClear.LargeImage = Properties.Resources.Clear;
             btnClear.GroupCaption = sGroupCaption;
             btnClear.Enabled = true;
@@ -522,12 +522,16 @@ namespace Prediction
 
 
         //clear, sends to form click event
-        void btnClearTable_Ck(object sender, EventArgs e)
+        void btnClear_Click(object sender, EventArgs e)
         {
             DialogResult dgr = MessageBox.Show("This will clear the prediction plugin of all imported data for all models.", "Proceed?", MessageBoxButtons.OKCancel);
             if (dgr == DialogResult.OK)
             {
-                _frmPred.btnClearTable_Click(sender, e);
+                _frmPred.btnClear_Click(sender, e);
+                btnIVDataVal.Enabled = false;
+                btnMakePred.Enabled = false;
+                btnImportFromEnddat.Enabled = false;
+
                 Broadcast();
             }
         }
@@ -550,9 +554,9 @@ namespace Prediction
             }
             else
             {
-                btnIVDataVal.Enabled = args.ButtonStatus["ValidationButtonEnabled"];
-                btnMakePred.Enabled = args.ButtonStatus["PredictionButtonEnabled"];
-                btnImportFromEnddat.Enabled = args.ButtonStatus["EnddatImportButtonEnabled"];
+                if (args.ButtonStatus.ContainsKey("ValidationButtonEnabled")) { btnIVDataVal.Enabled = args.ButtonStatus["ValidationButtonEnabled"]; }
+                if (args.ButtonStatus.ContainsKey("PredictionButtonEnabled")) { btnMakePred.Enabled = args.ButtonStatus["PredictionButtonEnabled"]; }
+                if (args.ButtonStatus.ContainsKey("EnddatImportButtonEnabled")) { btnImportFromEnddat.Enabled = args.ButtonStatus["EnddatImportButtonEnabled"]; }
             }
         }
     }

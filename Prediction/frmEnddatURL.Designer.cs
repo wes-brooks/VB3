@@ -96,7 +96,7 @@
             "-8:00 (ADT/PST)",
             "-9:00 (HDT/AST)",
             "-10:00 (HST)"});
-            this.cbTimezone.Location = new System.Drawing.Point(117, 18);
+            this.cbTimezone.Location = new System.Drawing.Point(130, 17);
             this.cbTimezone.Name = "cbTimezone";
             this.cbTimezone.Size = new System.Drawing.Size(116, 21);
             this.cbTimezone.TabIndex = 4;
@@ -105,9 +105,9 @@
             // 
             this.tbTimestamp.Location = new System.Drawing.Point(72, 18);
             this.tbTimestamp.Name = "tbTimestamp";
-            this.tbTimestamp.Size = new System.Drawing.Size(39, 20);
+            this.tbTimestamp.Size = new System.Drawing.Size(52, 20);
             this.tbTimestamp.TabIndex = 2;
-            this.tbTimestamp.Text = "00:00";
+            this.tbTimestamp.Text = "00:00:00";
             this.tbTimestamp.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // rbMostRecent

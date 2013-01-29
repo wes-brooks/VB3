@@ -1065,8 +1065,6 @@ namespace IPyModeling
             try { dblRegulatoryThreshold = Convert.ToDouble(RegulatoryThreshold); }
             catch (InvalidCastException) { dblRegulatoryThreshold = -1; }
 
-
-
             //if just adding to stack, go to different pack to be used in setData()
             if (Model == null)
                 return dictPluginState;
