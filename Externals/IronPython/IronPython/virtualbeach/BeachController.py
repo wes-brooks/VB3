@@ -55,7 +55,6 @@ def ValidatePLS(data, target, folds='', **args):
         exceedances = float(sum(exceedance == True))
         
         for prediction in predictions:
-            print prediction
             tp = np.where(validation_actual[predictions >= prediction] >= regulatory)[0].shape[0]
             fp = np.where(validation_actual[predictions >= prediction] < regulatory)[0].shape[0]
             tn = np.where(validation_actual[predictions < prediction] < regulatory)[0].shape[0]
@@ -173,7 +172,6 @@ def ValidateGAM(data, target, folds='', **args):
         exceedances = float(sum(exceedance == True))
         
         for prediction in predictions:
-            print prediction
             tp = np.where(validation_actual[predictions >= prediction] >= regulatory)[0].shape[0]
             fp = np.where(validation_actual[predictions >= prediction] < regulatory)[0].shape[0]
             tn = np.where(validation_actual[predictions < prediction] < regulatory)[0].shape[0]
@@ -282,7 +280,6 @@ def ValidateGBM(data, target, folds='', **args):
         exceedances = float(sum(exceedance == True))
         
         for prediction in predictions:
-            print prediction
             tp = np.where(validation_actual[predictions >= prediction] >= regulatory)[0].shape[0]
             fp = np.where(validation_actual[predictions >= prediction] < regulatory)[0].shape[0]
             tn = np.where(validation_actual[predictions < prediction] < regulatory)[0].shape[0]

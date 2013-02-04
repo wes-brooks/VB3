@@ -1328,7 +1328,7 @@ namespace Prediction
             List<int[]> lstBadCells = VBCommon.IO.ImportExport.GetBadCellsByRow(tblRaw, "");
             if (lstBadCells.Count > 0)
             {
-                MessageBox.Show("There are errors in the data");
+                MessageBox.Show("There are errors in the data. Run data validation to find and correct them.");
                 return;
             }
 

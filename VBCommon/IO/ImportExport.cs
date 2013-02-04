@@ -47,6 +47,7 @@ namespace VBCommon.IO
                 }
                 catch (Exception ex)
                 {
+                    System.Windows.Forms.MessageBox.Show(String.Format("There was an error while trying to import the data. Is the spreadsheet also open in Excel? Error message: {0}", ex.Message));
                     _dt = null;
                 }
 

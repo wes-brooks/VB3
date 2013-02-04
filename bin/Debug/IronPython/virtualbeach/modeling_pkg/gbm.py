@@ -277,7 +277,11 @@ class Model(object):
         data_frame = utils.DictionaryToR(data_dictionary)
         prediction_params = {'object': self.model, 'newdata': data_frame, 'n.trees': self.trees }
         prediction = r.Call(function='predict', **prediction_params).AsVector()
-        prediction = np.array(prediction, dtype=float).squeeze()
+        
+        if (prediction.shape[0]==1):
+            prediction = np.array(prediction, dtype=float)
+        else:
+            prediction = np.array(prediction, dtype=float).squeeze()
         
         return [float(item) for item in prediction]
         

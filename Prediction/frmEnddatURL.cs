@@ -76,7 +76,8 @@ namespace Prediction
         {
             strEnddatURL = txtEnddatURL.Text;
             strTimestamp = tbTimestamp.Text.Trim();
-            strTimezone = cbTimezone.SelectedItem.ToString();
+            try { strTimezone = cbTimezone.SelectedItem.ToString(); }
+            catch (NullReferenceException) { strTimezone = "UTC"; }
             bMostRecent = rbMostRecent.Checked;
 
             this.DialogResult = System.Windows.Forms.DialogResult.OK;

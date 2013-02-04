@@ -50,8 +50,8 @@ def DotNetToArray(data):
     
     #Now copy the NaN-free rows of the DataView into an array:
     raw_table = [ list(row) for row in data_view ]
-    data_array = np.array( raw_table )[flags]
-    data_array = np.array(data_array, dtype=float)
+    data_array = np.array(raw_table, ndmin=2)[flags]
+    data_array = np.array(data_array, dtype=float, ndmin=2)
 
     return [headers, data_array]
     

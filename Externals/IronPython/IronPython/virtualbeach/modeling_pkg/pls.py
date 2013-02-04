@@ -172,7 +172,10 @@ class Model(object):
         if not threshold:
             threshold = self.threshold
             
-        prediction = self.PredictValues(data_dictionary)[:,self.ncomp-1].squeeze()
+        prediction = self.PredictValues(data_dictionary)[:,self.ncomp-1]
+        if (prediction.shape[0] > 1):
+            prediction = prediction.squeeze()
+            
         se = self.Extract('RMSEP')
         nonexceedance_probability = r.Call(function='pnorm', q=np.array((threshold-prediction)/se, dtype=float)).AsVector()
         exceedance_probability = [100*float(1-item) for item in nonexceedance_probability]
@@ -180,8 +183,11 @@ class Model(object):
 
         
     def Predict(self, data_dictionary, **args):
-        prediction = self.PredictValues(data_dictionary)
-        return [float(item) for item in prediction[:,self.ncomp-1].squeeze()]
+        prediction = self.PredictValues(data_dictionary)        
+        if (prediction.shape[0]==1):
+            return [float(item) for item in prediction[:,self.ncomp-1]]
+        else:
+            return [float(item) for item in prediction[:,self.ncomp-1].squeeze()]
         
         
     def CrossValidation(self, cv_method=0, **args):
