@@ -7,6 +7,7 @@ from .. import utils
 from .. import RDotNetWrapper as rdn
 import string
 import os
+from utils import Event
 
 #Import the pls library into R, and connect python to R.
 rdn.r.EagerEvaluate("library(pls)") 

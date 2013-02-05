@@ -75,6 +75,17 @@ namespace VBCommon
         }
 
 
+        //Tell the plugins to pack their states into the undo stack
+        public void SetUndoPoint(IDictionary<string, IDictionary<string, object>> dictPackedStates)
+        {
+            if (ProjectSaved != null) //Has some method been told to handle this event?
+            {
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
+                ProjectSaved(this, e);
+            }
+        }
+
+
         //Tell the plugins to unpack themselves from the saved state
         public void UnpackProjectState(IDictionary<string, IDictionary<string, object>> dictPackedStates)
         {

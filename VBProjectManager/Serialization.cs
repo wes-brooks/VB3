@@ -45,6 +45,9 @@ namespace VBProjectManager
 
             string strProjectStateJson = StateToString(dictPluginStates);
             File.WriteAllText(strPathName, strProjectStateJson);
+
+            logger.LogEvent(String.Format("Project File Name: {0}", strProjectName), Globals.messageIntent.UserOnly, Globals.targetSStrip.StatusStrip1);
+            logger.LogEvent(String.Format("Project saved to {0}", strProjectName), Globals.messageIntent.LogFileOnly, Globals.targetSStrip.None);
         }
 
 
@@ -100,6 +103,9 @@ namespace VBProjectManager
             UndoStack.Clear();
             RedoStack.Clear();
             signaller.PushToUndoStack();
+
+            logger.LogEvent(String.Format("Project File Name: {0}", strPathName), Globals.messageIntent.UserOnly, Globals.targetSStrip.StatusStrip1);
+            logger.LogEvent(String.Format("Project opened from {0}", strPathName), Globals.messageIntent.LogFileOnly, Globals.targetSStrip.None);
         }
 
 
