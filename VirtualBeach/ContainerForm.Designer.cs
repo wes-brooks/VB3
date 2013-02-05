@@ -62,7 +62,7 @@ namespace VirtualBeach
             this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
             this.toolStripStatusLabel2.Size = new System.Drawing.Size(269, 17);
             this.toolStripStatusLabel2.Spring = true;
-            this.toolStripStatusLabel2.Text = "Project Name:     Beach Name:    ";
+            this.toolStripStatusLabel2.Text = "Beach Name:    ";
             // 
             // toolStripStatusLabel3
             // 
