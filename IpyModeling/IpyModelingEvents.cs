@@ -1,9 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
+using System.ComponentModel;
 
 namespace IPyModeling
 {
+    //Delegate and callback event args for the asynchronous model computation
+    public class ModelArgs
+    {
+        DataTable tblData;
+        string strTarget, strMethod;
+        double dblSpecificity, dblThreshold;
+        dynamic ipyInterface;
+
+        public ModelArgs(DataTable Data, string Target, double Specificity, double Threshold, string Method, dynamic Interface)
+        {
+            tblData = Data;
+            strTarget = Target;
+            strMethod = Method;
+            dblSpecificity = Specificity;
+            dblThreshold = Threshold;
+            ipyInterface = Interface;
+        }
+
+        public DataTable Data
+        {
+            get { return tblData; }
+        }
+
+        public string Target
+        {
+            get { return strTarget; }
+        }
+
+        public string Method
+        {
+            get { return strMethod; }
+        }
+
+        public double Specificity
+        {
+            get { return dblSpecificity; }
+        }
+
+        public double Threshold
+        {
+            get { return dblSpecificity; }
+        }
+
+        public dynamic Interface
+        {
+            get {return ipyInterface;}
+        }
+    }
+
+    //private delegate ModelProgressEvent ModelProgressEventDelegate;
+
+
     /*//This event is raised to pass a message to the container's logger.
     public class LogMessageEvent : EventArgs
     {

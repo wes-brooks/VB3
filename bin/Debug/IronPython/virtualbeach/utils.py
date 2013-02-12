@@ -12,6 +12,34 @@ import RDotNetWrapper as rdn
 from System import Array
 
 
+class Event():
+    def __init__(self):
+        self.handlers = set()
+
+    def Handle(self, handler):
+        self.handlers.add(handler)
+        return self
+
+    def Unhandle(self, handler):
+        try:
+            self.handlers.remove(handler)
+        except:
+            raise ValueError("Handler is not handling this event, so cannot unhandle it.")
+        return self
+
+    def Fire(self, *args, **kargs):
+        for handler in self.handlers:
+            handler(*args, **kargs)
+
+    def GetHandlerCount(self):
+        return len(self.handlers)
+
+    __iadd__ = Handle
+    __isub__ = Unhandle
+    __call__ = Fire
+    __len__  = GetHandlerCount
+
+
 def MakeConverters(headers):
     '''Numpy's loadtxt uses 'converters' to cast data to floats.
     This function generates a converter for each column.'''

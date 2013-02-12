@@ -44,6 +44,8 @@ class BeachInterface(object):
 
     def __init__(self):
         self.u = utils
+        self.ProgressEvent = utils.Event()
+        Control.ProgressEvent += self.HandleProgressUpdate
 
     def Validate(self, data, target, specificity='', folds='', method='PLS', **args):
         '''This is the main function in the script. It uses the PLS modeling classes to build a predictive model.'''
@@ -128,6 +130,12 @@ class BeachInterface(object):
         return utils.ProbabilityOfExceedance(prediction, threshold, se)
         #exceedance_probability = 1-norm.cdf(x=prediction, loc=threshold, scale=se)
         #return double(exceedance_probability.squeeze())
+        
+    
+    def HandleProgressUpdate(self, *args, **kwargs):
+        print kwargs
+        if "message" in kwargs: print kwargs["message"]
+        self.ProgressEvent(*args, **kwargs)
 
     
 Interface = BeachInterface()

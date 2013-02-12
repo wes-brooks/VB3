@@ -2,12 +2,14 @@ from modeling_pkg import pls, gbm, gam#, logistic, pls_parallel
 methods = {'pls':pls, 'boosting':gbm, 'gbm':gbm, 'gam':gam}
 
 import utils
+from utils import Event
 
 import numpy as np
 import copy
 
 boosting_iterations = 2000
 
+ProgressEvent = Event()
 
 def ValidatePLS(data, target, folds='', **args):
     '''Creates a PLS model and tests its performance with cross-validation.'''
@@ -33,6 +35,7 @@ def ValidatePLS(data, target, folds='', **args):
         validation_dict = dict( zip(headers, np.transpose(validation_data)) )
 
         model = pls.Model(data=model_dict, target=target, **args)
+        ProgressEvent(message="Model " + str(f) + " of " + str(folds[-1]) + " built.", progress=(f-0.5)/len(folds))
 
         predictions = np.array(model.Predict(validation_dict))
         validation_actual = validation_dict[ target ]
@@ -76,6 +79,7 @@ def ValidatePLS(data, target, folds='', **args):
         
         specificity = np.array(specificity)
         sensitivity = np.array(sensitivity)
+        ProgressEvent(message="Model " + str(f) + " of " + str(folds[-1]) + " validated.", progress=float(f)/len(folds))
         
         tpos = np.array(tpos)
         tneg = np.array(tneg)

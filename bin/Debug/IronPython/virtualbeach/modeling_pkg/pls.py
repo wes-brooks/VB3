@@ -7,6 +7,7 @@ from .. import utils
 from .. import RDotNetWrapper as rdn
 import string
 import os
+from utils import Event
 
 #Import the pls library into R, and connect python to R.
 rdn.r.EagerEvaluate("library(pls)") 
@@ -175,7 +176,7 @@ class Model(object):
         prediction = self.PredictValues(data_dictionary)[:,self.ncomp-1]
         if (prediction.shape[0] > 1):
             prediction = prediction.squeeze()
-        
+            
         se = self.Extract('RMSEP')
         nonexceedance_probability = r.Call(function='pnorm', q=np.array((threshold-prediction)/se, dtype=float)).AsVector()
         exceedance_probability = [100*float(1-item) for item in nonexceedance_probability]
@@ -183,7 +184,7 @@ class Model(object):
 
         
     def Predict(self, data_dictionary, **args):
-        prediction = self.PredictValues(data_dictionary)
+        prediction = self.PredictValues(data_dictionary)        
         if (prediction.shape[0]==1):
             return [float(item) for item in prediction[:,self.ncomp-1]]
         else:

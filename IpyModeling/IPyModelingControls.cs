@@ -13,6 +13,7 @@ using System.Globalization;
 using IPyCommon;
 using VBCommon;
 using System.Threading;
+using System.Collections.Specialized;
 using Newtonsoft.Json;
 using VBDatasheet;
 using VBProjectManager;
@@ -26,6 +27,8 @@ namespace IPyModeling
         //Get access to the IronPython interface:
         private dynamic ipyInterface = IPyInterface.Interface;
         protected dynamic ipyModel = null;
+        private BackgroundWorker bgwModelWorker = new BackgroundWorker();
+        private static double dblProgressRangeLow, dblProgressRangeHigh;
 
         //Class member definitions:
         //Events:
@@ -97,6 +100,9 @@ namespace IPyModeling
             //Request access to the IronPython interface.
             RequestIronPythonInterface();
 
+            //ModelProgressEventDelegate mped = new ModelProgressEventDelegate(ReportProgress);
+            //ipyInterface.ProgressEvent.Handle(mped);
+
             //Create the delegate that will raise the event that requests model data
             //this.VariableSelectionTab.Enter += new EventHandler(DataTabEnter);
             //this.TabPageEntered
@@ -104,7 +110,10 @@ namespace IPyModeling
             //ResetIPyProject += new EventHandler(this.ResetProject);
             ModelingTabControl.TabPages[2].Paint += new PaintEventHandler(ModelTabEntered);
             ModelingTabControl.TabPages[3].Paint += new PaintEventHandler(DiagnosticTabEntered);
-            this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);            
+            this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);
+
+            bgwModelWorker.DoWork += new DoWorkEventHandler(bg_DoWork);
+            bgwModelWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bg_RunWorkerCompleted);
         }
 
 
@@ -785,7 +794,7 @@ namespace IPyModeling
             ClearModelingTab();
             Cursor.Current = Cursors.WaitCursor;
 
-            VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            VBLogger.GetLogger().LogEvent("5", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
             //Now this modeling tab has been touched.
             boolVirgin = false;
@@ -794,20 +803,21 @@ namespace IPyModeling
             SetRunButtonStatus(to: false);
             if (ipyInterface == null) RequestIronPythonInterface();
 
-            VBLogger.GetLogger().LogEvent("30", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            VBLogger.GetLogger().LogEvent("10", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
             boolInitialControlStatus = boolControlStatus;
             ChangeControlStatus(false);
-            VBLogger.GetLogger().LogEvent("40", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-
             SetModelData();
+            VBLogger.GetLogger().LogEvent("15", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+
+            SetProgressRange(Low: 15, High: 90);
             MakeModel(tblModelData);
 
-            VBLogger.GetLogger().LogEvent("80", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.WaitCursor;
 
             Application.DoEvents();
-            VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            VBLogger.GetLogger().LogEvent("95", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             
             boolRunning = false;
             SetRunButtonStatus(to: true);
@@ -850,14 +860,20 @@ namespace IPyModeling
 
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
             dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblSpecificity, regulatory_threshold: dblThreshold, method: strMethod);
-            
-            Cursor.Current = Cursors.WaitCursor;
-            
+            ModelingComplete(validation_results);
+
+            // Start the asynchronous task. 
+            //bgwModelWorker.RunWorkerAsync(new ModelArgs(Data:tblData, Target:strTarget, Specificity:dblSpecificity, Threshold:dblThreshold, Method:strMethod, Interface:ipyInterface));
+        }
+
+
+        protected void ModelingComplete(dynamic validation_results)
+        {
             this.ipyModel = validation_results[1];
             PopulateResults(this.ipyModel);
 
             //Now extract the valid thresholds and the corresponding specificities
-            dblSpecificity = Convert.ToDouble(ipyModel.specificity);
+            double dblSpecificity = Convert.ToDouble(ipyModel.specificity);
             dynamic thresholding = ipyInterface.GetPossibleSpecificities(this.ipyModel);
             this.listCandidateThresholds = ((IList<object>)(((IList<object>)thresholding)[0])).Cast<double>().ToList();
             this.listCandidateSpecificity = ((IList<object>)(((IList<object>)thresholding)[1])).Cast<double>().ToList();
@@ -904,6 +920,31 @@ namespace IPyModeling
             boolComplete = true;
             RaiseUpdateNotification();
             return;
+        }
+
+
+        /*public Thread StartModelingThread(DataTable Data, string Target, double Specificity, double Threshold, string Method)
+        {
+            ValidateModelCompleted mcDel = new ValidateModelCompleted(ModelingComplete);
+            var t = new Thread(() => ValidateModelAsync(Data, Target, Specificity, Threshold, Method, mcDel));
+            t.Start();
+            return t;
+        }*/
+
+
+        static void bg_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            dynamic result = (dynamic)(e.Result);
+            ModelingComplete(result);
+        }
+
+        static void bg_DoWork(object sender, DoWorkEventArgs e)
+        {
+            ModelArgs args = (ModelArgs)(e.Argument);
+            dynamic ipyInterface = args.Interface;
+
+            dynamic validation_results = ipyInterface.Validate(args.Data, args.Target, args.Specificity, regulatory_threshold: args.Threshold, method: args.Method);
+            e.Result = validation_results;
         }
 
 
@@ -1722,6 +1763,22 @@ namespace IPyModeling
             zgcDiagnostic.AxisChange();
             master.AxisChange();
             zgcDiagnostic.Refresh();
+        }
+
+
+        private void SetProgressRange(double Low, double High)
+        {
+            dblProgressRangeLow = Low;
+            dblProgressRangeHigh = High;
+        }
+
+
+        public void ReportProgress(string message, double progress)
+        {
+            int modelingProgress;
+            modelingProgress = Convert.ToInt32(progress * (dblProgressRangeHigh - dblProgressRangeLow) + dblProgressRangeLow);
+
+            VBLogger.GetLogger().LogEvent(modelingProgress.ToString(), Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);            
         }
     }
 }

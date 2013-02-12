@@ -17,7 +17,7 @@ class Event():
         self.handlers = set()
 
     def Handle(self, handler):
-        self.handler.add(handler)
+        self.handlers.add(handler)
         return self
 
     def Unhandle(self, handler):
