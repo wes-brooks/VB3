@@ -105,17 +105,12 @@ class Model(object):
         self.ncomp_max = int(list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2])
         
         #Use cross-validation to find the best number of components in the model.
-        print "next up: GetActual()"
         self.GetActual()
-        print "next up: CrossValidation()"
         self.CrossValidation(**args)
-        print "next up: GetFitted()"
         self.GetFitted()
         
         #Establish a decision threshold
-        print "next up: Threshold (" + str(specificity) + ")"
         self.Threshold(specificity)
-        print "done"
 
 
     def Extract(self, model_part, **args):
@@ -279,8 +274,7 @@ class Model(object):
             self.ncomp = int( min(good_ncomp)+1 )
         
 
-    def Threshold(self, specificity=0.92):
-        print specificity
+    def Threshold(self, specificity=0.9):
         self.specificity = specificity
     
         if not hasattr(self, 'actual'):
@@ -293,11 +287,8 @@ class Model(object):
         try:
             #non_exceedances = self.array_fitted[np.where(self.array_actual < self.regulatory_threshold)[0]]
             non_exceedances = [self.fitted[i] for i in range(len(self.fitted)) if self.actual[i] < self.regulatory_threshold]
-            print non_exceedances
             self.threshold = utils.Quantile(non_exceedances, specificity)
-            print self.threshold
             self.specificity = float(len([x for x in non_exceedances if x < self.threshold])) / len(non_exceedances)
-            print self.specificity
 
         #This error should only happen if somehow there are no non-exceedances in the training data.
         except IndexError: self.threshold = self.regulatory_threshold

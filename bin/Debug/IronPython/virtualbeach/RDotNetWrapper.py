@@ -16,7 +16,6 @@ import RDotNetExtensions
 
 from System import Array
 import array
-#import numpy as np
 
 #Fire up the interface to R
 r = RDotNet.REngine.CreateInstance("RDotNet", output=RDotNet.Internals.OutputMode.Quiet)
@@ -52,7 +51,7 @@ class Wrap():
                 
             elif isinstance(params[item], (array.array, list)):
                 try:
-                    temp = aray.array('d', params[item])
+                    temp = array.array('d', params[item])
                 except OverflowError:
                     temp = params[item]
                 

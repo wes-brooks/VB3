@@ -1,5 +1,5 @@
-from modeling_pkg import pls#, gbm, gam#, logistic, pls_parallel
-methods = {'pls':pls}#, 'boosting':gbm, 'gbm':gbm, 'gam':gam}
+from modeling_pkg import pls, gbm#, gam#, logistic, pls_parallel
+methods = {'pls':pls, 'boosting':gbm}#, 'gbm':gbm, 'gam':gam}
 
 import utils
 #from utils import Event
@@ -11,27 +11,24 @@ import array
 boosting_iterations = 2000
 
 ProgressEvent = utils.ProgressEvent()
-
+ModelValidationCompleteEvent = utils.ModelValidationCompleteEvent()
 
 from utils import UIThread, BGThread
     
 
 @BGThread
-def ValidatePLS(data, target, threshold, specificity, folds='', **args):
+def ValidatePLS(data, target, threshold, specificity, folds='', callback='', **args):
     '''Creates a PLS model and tests its performance with cross-validation.'''
     
     #convert the data from a .NET DataTable or DataView into a numpy array
     [headers, data] = utils.DotNetToArray(data)
     target = str(target)
-    regulatory = threshold
+    regulatory = copy.copy(threshold)
     
     #randomly assign the data to cross-validation folds
     if not folds: folds = 5 
     fold = utils.Partition(data, folds)
-    print fold
-    #data_dict = dict( zip(headers, np.transpose(data)) )
     data_dict = dict( zip(headers, [array.array('d', [row[i] for row in data]) for i in range(len(data[0]))] ))
-    print data_dict
     folds = [i+1 for i in range(folds)]
     
     #Make a model for each fold and validate it.
@@ -39,13 +36,11 @@ def ValidatePLS(data, target, threshold, specificity, folds='', **args):
     for f in folds:
         model_data = [data[i] for i in range(len(data)) if fold[i]!=f]
         validation_data = [data[i] for i in range(len(data)) if fold[i]==f]
-        print model_data
-        print validation_data
         
         model_dict = dict( zip(headers, [array.array('d', [row[i] for row in model_data]) for i in range(len(model_data[0]))]) )
         validation_dict = dict( zip(headers, [array.array('d', [row[i] for row in validation_data]) for i in range(len(validation_data[0]))]) )
 
-        model = pls.Model(data=model_dict, target=target, threshold=threshold, specificity=specificity, **args)
+        model = pls.Model(data=model_dict, target=target, threshold=regulatory, specificity=specificity, **args)
         ProgressEvent(message="Model " + str(f) + " of " + str(folds[-1]) + " built.", progress=(f-0.5)/len(folds))
 
         predictions = list(model.Predict(validation_dict))
@@ -100,9 +95,89 @@ def ValidatePLS(data, target, threshold, specificity, folds='', **args):
         result = dict(threshold=threshold, sensitivity=sensitivity, specificity=spec, tpos=tpos, tneg=tneg, fpos=fpos, fneg=fneg )
         results.append(result)
 
-    model = pls.Model(data=data_dict, target=target, threshold=threshold, specificity=specificity, **args)
+    model = pls.Model(data=data_dict, target=target, threshold=regulatory, specificity=specificity, **args)
     
-    return (results, model)
+    if not callback: return (results, model)
+    else: ModelValidationCompleteEvent(result=(results, model), callback=callback)
+    
+    
+@BGThread
+def ValidateGBM(data, target, threshold, specificity, folds='', callback='', **args):
+    '''Creates a GBM model and tests its performance with cross-validation.'''
+    
+    #convert the data from a .NET DataTable or DataView into a numpy array
+    [headers, data] = utils.DotNetToArray(data)
+    target = str(target)
+    regulatory = copy.copy(threshold)
+    
+    #randomly assign the data to cross-validation folds
+    if not folds: folds = 5 
+    fold = utils.Partition(data, folds)
+    data_dict = dict( zip(headers, [array.array('d', [row[i] for row in data]) for i in range(len(data[0]))] ))
+    folds = [i+1 for i in range(folds)]
+    
+    #Make a model for each fold and validate it.
+    results = list()
+    for f in folds:
+        model_data = [data[i] for i in range(len(data)) if fold[i]!=f]
+        validation_data = [data[i] for i in range(len(data)) if fold[i]==f]
+        
+        model_dict = dict( zip(headers, [array.array('d', [row[i] for row in model_data]) for i in range(len(model_data[0]))]) )
+        validation_dict = dict( zip(headers, [array.array('d', [row[i] for row in validation_data]) for i in range(len(validation_data[0]))]) )
+
+        model = gbm.Model(data=model_dict, target=target, threshold=regulatory, specificity=specificity, **args)
+        ProgressEvent(message="Model " + str(f) + " of " + str(folds[-1]) + " built.", progress=(f-0.5)/len(folds))
+
+        predictions = list(model.Predict(validation_dict))
+        validation_actual = list(validation_dict[target])
+        exceedance = [validation_actual[i] > regulatory for i in range(len(validation_actual))]
+        
+        fitted = list(model.fitted)
+        actual = list(model.actual)
+        candidates = [fitted[i] for i in range(len(fitted)) if actual[i]<regulatory]
+        num_candidates = float(len(candidates))
+        
+        spec = list()
+        sensitivity = list()
+        threshold = list()
+        tpos = list()
+        tneg = list()
+        fpos = list()
+        fneg = list()
+        total = len(model_data)
+        non_exceedances = float(len(exceedance) - sum(exceedance))
+        exceedances = float(sum(exceedance))
+        
+        for prediction in predictions:
+            tp = len([i for i in range(len(predictions)) if predictions[i] >= prediction and validation_actual[i] >= regulatory])
+            fp = len([i for i in range(len(predictions)) if predictions[i] >= prediction and validation_actual[i] < regulatory])
+            tn = len([i for i in range(len(predictions)) if predictions[i] < prediction and validation_actual[i] < regulatory])
+            fn = len([i for i in range(len(predictions)) if predictions[i] < prediction and validation_actual[i] >= regulatory])
+        
+            tpos.append(tp)
+            fpos.append(fp)
+            tneg.append(tn)
+            fneg.append(fn)
+            
+            try: candidate_threshold = max([x for x in candidates if x <= prediction])
+            except: candidate_threshold = min(candidates)
+            spec.append(len([i for i in range(len(fitted)) if actual[i]<regulatory and fitted[i]<candidate_threshold]) / num_candidates)
+            sensitivity.append(len([i for i in range(len(fitted)) if actual[i]>=regulatory and fitted[i]>=candidate_threshold]) / float(len(actual) - num_candidates))
+            
+            #the first candidate threshold that would be below this threshold
+            try: threshold.append(max([x for x in fitted if x <= prediction]))
+            except: threshold.append(max(fitted))
+        
+        ProgressEvent(message="Model " + str(f) + " of " + str(folds[-1]) + " validated.", progress=float(f)/len(folds))
+        
+        result = dict(threshold=threshold, sensitivity=sensitivity, specificity=spec, tpos=tpos, tneg=tneg, fpos=fpos, fneg=fneg )
+        results.append(result)
+
+    model = gbm.Model(data=data_dict, target=target, threshold=regulatory, specificity=specificity, **args)
+    
+    if not callback: return (results, model)
+    else: ModelValidationCompleteEvent(result=(results, model), callback=callback)    
+
     
     
 def SpecificityChart(results):
@@ -127,7 +202,7 @@ def SpecificityChart(results):
         for fold in results:
             indx = [i for i in range(len(fold['specificity'])) if fold['specificity'][i] <= specificity]
             if indx:
-                indx = indx[ [i for i in indx if fold['specificity'][i] == max([fold['specificity'][j] for j in indx])][0] ]
+                indx = [i for i in indx if fold['specificity'][i] == max([fold['specificity'][j] for j in indx])][0]
             
                 tpos[-1] += fold['tpos'][indx]
                 fpos[-1] += fold['fpos'][indx]

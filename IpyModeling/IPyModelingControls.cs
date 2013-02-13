@@ -29,6 +29,7 @@ namespace IPyModeling
         protected dynamic ipyModel = null;
         private static double dblProgressRangeLow, dblProgressRangeHigh;
         public delegate void ModelProgressEventDelegate(string message, double progress);
+        public delegate void ModelValidationCompleteDelegate(dynamic result);
 
         //Class member definitions:
         //Events:
@@ -810,17 +811,6 @@ namespace IPyModeling
             SetProgressRange(Low: 15, High: 90);
             MakeModel(tblModelData);
 
-            VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            Cursor.Current = Cursors.WaitCursor;
-
-            Application.DoEvents();
-            VBLogger.GetLogger().LogEvent("95", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            
-            boolRunning = false;
-            SetRunButtonStatus(to: true);
-            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            Cursor.Current = Cursors.Default;
-
             return true;
         }
 
@@ -858,8 +848,9 @@ namespace IPyModeling
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
             //dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod);
             //ModelingComplete(validation_results);
-                       
-            ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod);
+
+            ModelValidationCompleteDelegate callbackDelegate = new ModelValidationCompleteDelegate(ModelingComplete);
+            ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod, callback: callbackDelegate);
 
             // Start the asynchronous task. 
             //bgwModelWorker.RunWorkerAsync(new ModelArgs(Data:tblData, Target:strTarget, Specificity:dblSpecificity, Threshold:dblThreshold, Method:strMethod, Interface:ipyInterface));
@@ -918,6 +909,18 @@ namespace IPyModeling
             //Work's done; let's go home.
             boolComplete = true;
             RaiseUpdateNotification();
+
+            VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            Cursor.Current = Cursors.WaitCursor;
+
+            Application.DoEvents();
+            VBLogger.GetLogger().LogEvent("95", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+
+            boolRunning = false;
+            SetRunButtonStatus(to: true);
+            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            Cursor.Current = Cursors.Default;
+
             return;
         }
 

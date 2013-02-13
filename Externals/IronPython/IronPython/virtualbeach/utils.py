@@ -1,8 +1,8 @@
 import random
-import numpy as np
+#import numpy as np
 import datetime
 import random
-from numpy import where, nonzero
+#from numpy import where, nonzero
 
 from dateutil import parser, relativedelta
 from datetime import datetime
@@ -10,12 +10,48 @@ import re
 
 import RDotNetWrapper as rdn
 from System import Array
+import array
+import math
+
+import System
+import System.Threading
+from System.Threading import SynchronizationContext, WaitCallback, ThreadPool, SendOrPostCallback
+
+#Defines a decorator that causes a function to execute on a background thread
+def BGThread(fun):
+    def argUnpacker(args):
+        oldSyncContext = SynchronizationContext.Current
+        try:
+            SynchronizationContext.SetSynchronizationContext(args[-1])
+            fun(*args[:-1])
+        finally: SynchronizationContext.SetSynchronizationContext(oldSyncContext)
+
+    def wrapper(*args):
+        args2 = args + (SynchronizationContext.Current,)
+        ThreadPool.QueueUserWorkItem(WaitCallback(argUnpacker), args2)
+
+    return wrapper
+    
+    
+#Defines a decorator that causes a function to execute on the UI thread
+def UIThread(fun):
+    def unpack(args):
+        ret = fun(*args)
+        if ret != None:
+            import warnings
+            warnings.warn(fun.__name__ + " function returned " + str(ret) + " but that return value isn't propigated to the calling thread")
+            
+    def wrapper(*args):
+        if SynchronizationContext.Current == None: fun(*args)
+        else: SynchronizationContext.Current.Send(SendOrPostCallback(unpack), args)
+
+    return wrapper
 
 
-class Event():
+class Event(object):
     def __init__(self):
         self.handlers = set()
-
+        
     def Handle(self, handler):
         self.handlers.add(handler)
         return self
@@ -27,9 +63,65 @@ class Event():
             raise ValueError("Handler is not handling this event, so cannot unhandle it.")
         return self
 
-    def Fire(self, *args, **kargs):
+    def Fire(self, *args, **kwargs):
         for handler in self.handlers:
-            handler(*args, **kargs)
+            handler(*args, **kwargs)
+
+    def GetHandlerCount(self):
+        return len(self.handlers)
+
+    __iadd__ = Handle
+    __isub__ = Unhandle
+    __call__ = Fire
+    __len__  = GetHandlerCount
+    
+    
+class ProgressEvent(object):
+    def __init__(self):
+        self.handlers = set()
+        
+    def Handle(self, handler):
+        self.handlers.add(handler)
+        return self
+
+    def Unhandle(self, handler):
+        try:
+            self.handlers.remove(handler)
+        except:
+            raise ValueError("Handler is not handling this event, so cannot unhandle it.")
+        return self
+
+    def Fire(self, message='', progress=0):
+        for handler in self.handlers:
+            handler(message, progress)
+
+    def GetHandlerCount(self):
+        return len(self.handlers)
+
+    __iadd__ = Handle
+    __isub__ = Unhandle
+    __call__ = Fire
+    __len__  = GetHandlerCount
+    
+    
+class ModelValidationCompleteEvent(object):
+    def __init__(self):
+        self.handlers = set()
+        
+    def Handle(self, handler):
+        self.handlers.add(handler)
+        return self
+
+    def Unhandle(self, handler):
+        try:
+            self.handlers.remove(handler)
+        except:
+            raise ValueError("Handler is not handling this event, so cannot unhandle it.")
+        return self
+
+    def Fire(self, result='', callback=''):
+        for handler in self.handlers:
+            handler(result, callback)
 
     def GetHandlerCount(self):
         return len(self.handlers)
@@ -52,9 +144,30 @@ def MakeConverters(headers):
 def Converter(value):
     '''If value cannot be immediately converted to a float, then return a NaN.'''
     try: return float(value or 'nan')
-    except ValueError: return np.nan
+    except ValueError: return float('nan')
+    
+    
+def std(values):
+    mean = sum(values) / len(values)
+    SS = sum([(x - mean)**2 for x in values])
+    return (1.0/(len(values)-1)) * SS
 
+    
+def median(values):
+    values.sort()
+    if len(values)==0:
+        median = float('nan')
+    elif len(values)%2 == 0:
+        #have to take avg of middle two
+        i = len(values)/2
+        median = (values[i] + values[i-1])/2
+    else:
+        #find the middle (remembering that lists start at 0)
+        i = (len(values)-1)/2
+        median = values[i]
+    return median
 
+    
 def DotNetToArray(data):
     '''Copy the contents of a .NET DataView into a numpy array with a list of headers'''
     
@@ -73,13 +186,12 @@ def DotNetToArray(data):
     
     #Find which rows of the DataView contain NaNs:
     nan_rows = [ sum( [isinstance(item, System.DBNull) for item in row] ) for row in data_view ]
-    flags = np.ones(len(data_view), dtype=bool)
-    flags[ np.nonzero(nan_rows) ] = False
+    flags = [not bool(nan_rows[i]) for i in range(len(nan_rows))]
     
     #Now copy the NaN-free rows of the DataView into an array:
-    raw_table = [ list(row) for row in data_view ]
-    data_array = np.array(raw_table, ndmin=2)[flags]
-    data_array = np.array(data_array, dtype=float, ndmin=2)
+    raw_table = [list(data_view[i]) for i in range(len(data_view)) if flags[i]]
+    data_array = [array.array('d', row) for row in raw_table]
+    #data_array = np.array(data_array, dtype=float, ndmin=2)
 
     return [headers, data_array]
     
@@ -103,7 +215,7 @@ def DictionaryToR(data_dictionary, name=''):
     
     #each column of the dictionary should be a numpy array
     for col in data_dictionary:
-        if data_dictionary[col].dtype in [int, float]:
+        if data_dictionary[col].typecode in ['f', 'd']:
             df[col] = r.CreateNumericVector( Array[float](data_dictionary[col]) ).AsVector()
         else:
             df[col] = r.CreateCharacterVector( Array[str](data_dictionary[col]) ).AsVector()
@@ -139,13 +251,11 @@ def Draw(count, max):
 def Quantile(list, q):
     '''Find the value at the specified quantile of the list.'''
     if q>1 or q<0:
-        return np.nan
+        return float('nan')
     else:
-        list = np.sort(list)
-        position = np.ceil(q * (len(list)-1) )
-        
-        #if len(list) > position+1 : position += 1
-        
+        list.sort()
+        position = int(math.ceil(q * (len(list)-1)))
+        print list[position]
         return list[position]
         
 
@@ -154,191 +264,36 @@ def NonStandardDeviation(list, pivot):
     for item in list:
         var = var + (item-pivot)**2
         
-    return np.sqrt( var/len(list) )
+    return math.sqrt( var/len(list) )
 
     
-def ImportFile(file_name):
-    '''Import a ULP-type data file'''
 
-    #open the data source file and read the headers
-    infile = file_name
-    f = open(infile, 'r')
-    headers = f.readline().rstrip('\n').split(',')
-    
-    #strip the blank headers and the 'Date' header
-    headers = filter(lambda x: x!='', h)
-    headers = flatten(['year', 'julian', headers[1:]])
-    
-    #define a couple of objects we'll use later on.
-    data = list()
-    finished = False
-    
-    #loop until the end of the file:
-    while not finished:
-        line = f.readline()
-        
-        #continue unless we're at the end of the file
-        if not line:
-            finished = True
-        else:
-            values = line.rstrip('\n').split(',')
-            
-            #only process data that has some value in the first field
-            if not values[0]: pass
-            else:
-                #get only those columns with a valid header
-                v = np.array(values)
-                v = v[indx]
-                values = list(v)
-                
-                #convert the date into our expected form
-                date_obj = ObjectifyDate(values[0])
-                julian = Julian(date_obj)
-                
-                #flatten the data into a numpy array (from a list of lists)
-                data_row = flatten([date_obj.year, julian, values[1:]])
-                data_row = np.array(data_row)
-                
-                #add this row of data to the big list.
-                data.append(data_row)
-
-    #Remove blank rows:
-    data = filter(lambda x: '' not in x, data)
-    
-    #make the big list into a big array
-    data = np.array(data)
-    data = data.astype(float)
-    
-    return [headers, data]
-
-
-def Factorize(data, target='year', headers='', levels='', return_levels=False):
-    '''Turn target into a factor whose coefficients will sum-to-zero'''
-
-    #if the data is not originally a dictionary, turn it into one.
-    if type(data) is dict:
-        passed_dict = True
-    else:
-        data = dict( zip(headers, data.transpose()) )
-        passed_dict = False
-
-    original = data.pop(target)
-
-    #Decide what levels the factor can take (prepend the column name to make sure levels are strings)
-    if not levels:
-        levels = [ target+str(int(i)) for i in np.unique(original)]
-
-    #If levels are passed  to the function, then code the factor into those levels
-    else: pass
-
-    #Produce the ways to code this factor (number of columns is one fewer than the number of levels. The last level is coded -1,...,-1)
-    labels = np.diag( np.ones(len(levels)-1) )
-    labels = np.vstack( (labels, -1*np.ones(len(levels)-1)) )
-    missing = np.zeros(len(levels)-1)
-
-    factorized = list()
-
-    #Code each observation appropriately.
-    for obs in original:
-        if target+str(obs) in levels: factorized.append( labels[levels.index(target+str(obs)),:] )
-        else: factorized.append( missing )
-
-    factorized = np.array(factorized)    
-
-    #Add the new columns to the data dictionary.
-    for level in levels[:-1]:
-        data[ str(level) ] = factorized[:,levels.index(level)].squeeze()
-
-    #If the data was passed as an array, return an array
-    if not passed_dict:
-        data_array = np.array(data.values()).transpose()
-        headers = data.keys()
-
-        if not return_levels: return [headers, data_array]
-        else: return [headers, data_array, levels]
-
-    #Otherwise, return a dictionary.
-    else:
-        if not return_levels: return data
-        else: return [data, levels]
-
-
-def ReadCSV(file, NA_flag=-99999):
-    '''Read a csv data file and return a list that \nconsists of the column headers and the data'''
-    infile = file
-
-    headers = open(infile, 'r').readline().lower().rstrip('\n').split(',')
-    data_in = np.loadtxt(fname=infile, skiprows=1, dtype=float, unpack=False, delimiter=',', converters=MakeConverters(headers))
-        
-    #remove any rows with NA's
-    nan_rows = np.nonzero(np.isnan(data_in))[0]
-    mask = np.ones( data_in.shape[0], dtype=bool )
-    mask[nan_rows]=False
-    data_in = data_in[mask,:]
-    
-    #Now remove rows with NA_flags
-    data_in = filter(lambda x: NA_flag not in x, data_in)
-    data_in = np.array(data_in)
-
-    return [headers, data_in]
-
-    
-def WriteCSV(array, columns, location):
-    '''Creates a .csv file out of the contents of the array.'''
-    out_file = open(location, 'w')
-    
-    for item in range( len(columns) ):
-        out_file.write(columns[item])
-        if item < len(columns)-1: out_file.write(',')
-        else: out_file.write('\n')
-        
-    for row in range( array.shape[0] ):
-        for item in range( array.shape[1] ):
-            out_file.write( str(array[row,item]) )
-            if item < array.shape[1]-1: out_file.write(',')
-            else: out_file.write('\n')
-    
-    out_file.close()
 
 
 def Partition(data, folds):
     '''Partition the data set into random, equal-sized folds for cross-validation'''
     
     #If we've called for leave-one-out CV (folds will be like 'n' or 'LOO' or 'leave-one-out')
-    if str(folds).lower()[0]=='l' or str(folds).lower()[0]=='n' or folds>data.shape[0]:
-        fold = range(data.shape[0])
+    if str(folds).lower()[0]=='l' or str(folds).lower()[0]=='n' or folds>len(data):
+        fold = range(len(data))
     
     #Otherwise, randomly permute the data, then use contiguously-permuted chunks for CV
     else:
         #Initialization
-        indices = range(data.shape[0])
-        fold = np.ones(data.shape[0]) * folds
-        quantiles = np.arange(folds, dtype=float) / folds
+        indices = range(len(data))
+        fold = [folds for i in range(len(data))]
+        quantiles = [float(x) / folds for x in range(folds)]
         
         #Proceed through the quantiles in reverse order, labelling the ith fold at each step. Ignore the zeroth quantile.
         for i in range(folds)[::-1][:-1]:
-            fold[:Quantile(indices, quantiles[i])+1] = i
+            q = Quantile(indices, quantiles[i])+1
+            fold[:q] = [i for j in range(q)]
             
         #Now permute the fold assignments
-        fold = np.random.permutation(fold)
+        random.shuffle(fold)
         
     return fold
-
-
-def Split(data, headers, year):
-    '''Partition the supplied data set into training and validation sets''' 
     
-    #model_data is the set of observations that we'll use to train the model.
-    model_data = data[ where(data[:,headers.index('year')]<year)[0], : ]
-    
-    #validation_data is the set of observations we'll use to test the model's predictive ability.
-    validation_data = data[ where(data[:,headers.index('year')]==year)[0], : ]
-    
-    model_dict = dict(zip(headers, np.transpose(model_data)))
-    validation_dict = dict(zip(headers, np.transpose(validation_data)))
-
-    return [model_data, validation_data]
-
 
 def ObjectifyTime(time_string):
     '''Create a time object from from a time string'''
@@ -390,32 +345,6 @@ def MatchDictionaries(dict1, dict2):
             dict_matched[key] = val_list
 
     return dict_matched
-    
-
-def MatchData(struct1, struct2):
-    '''Create a new data structure from the matching headers of two separate data structures'''
-    
-    #unpack the parameters
-    [headers1, array1] = struct1
-    [headers2, array2] = struct2
-    
-    #create new lists that we will fill
-    matched_headers = list()
-    matched_values = list()
-    
-    #find the headers that appear in both structures
-    for col in headers1:
-        if col in headers2:
-            #combine data from the matching columns
-            val_list = [list(array1[:,headers1.index(col)]), list(array2[:,headers2.index(col)])]
-            val_list = flatten(val_list)
-            
-            matched_headers.append(col)
-            matched_values.append(val_list)
-    
-    #turn the combined data into an array and return it with the headers
-    matched_values = np.transpose( np.array(matched_values) )
-    return [matched_headers, matched_values]
     
     
 def flatten(x):

@@ -1,4 +1,5 @@
-﻿import numpy as np
+﻿#import numpy as np
+import array
 import random
 import copy
 import re
@@ -7,7 +8,6 @@ from .. import utils
 from .. import RDotNetWrapper as rdn
 import string
 import os
-from utils import Event
 
 #Import the pls library into R, and connect python to R.
 rdn.r.EagerEvaluate("library(pls)") 
@@ -30,7 +30,7 @@ class Model(object):
         
         #Get the data into R 
         self.data_frame = utils.DictionaryToR(self.data_dictionary)
-        self.data_dictionary = copy.deepcopy(self.data_dictionary)
+        self.data_dictionary = copy.copy(self.data_dictionary)        
         self.num_predictors = len(self.data_dictionary.keys()) - 1
         
         #First, save the serialized R object to disk (so it can be read from within R)
@@ -63,7 +63,7 @@ class Model(object):
                 
         #Get the number of columns from the validation step
         #(Might be fewer than the number of predictor variables if n<p)
-        self.ncomp_max = list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2]
+        self.ncomp_max = int(list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2])
             
         #Use cross-validation to find the best number of components in the model.
         self.GetActual()
@@ -82,7 +82,6 @@ class Model(object):
         else: self.threshold = 2.3711   # if there is no 'threshold' key, then use the default (2.3711)
         self.regulatory_threshold = self.threshold
         
-        if 'AR_part' in args: self.AR_part = args['AR_part']
         if 'specificity' in args: specificity=args['specificity']
         else: specificity=0.9
         
@@ -90,7 +89,7 @@ class Model(object):
         self.target = args['target']
         data = args['data']
         self.data_frame = utils.DictionaryToR(data)
-        self.data_dictionary = copy.deepcopy(data)
+        self.data_dictionary = copy.copy(data)
         self.num_predictors = len(self.data_dictionary.keys()) - 1
         
         #Generate a PLS model in R.
@@ -98,13 +97,13 @@ class Model(object):
         self.pls_params = {'formula' : self.formula, \
             'data' : self.data_frame, \
             'validation' : 'LOO', \
-            'x' : True }        
+            'x' : True }    
         self.model = r.Call(function='plsr', **self.pls_params).AsList()
         
         #Get the number of columns from the validation step
         #(Might be fewer than the number of predictor variables if n<p)
-        self.ncomp_max = list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2]
-
+        self.ncomp_max = int(list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2])
+        
         #Use cross-validation to find the best number of components in the model.
         self.GetActual()
         self.CrossValidation(**args)
@@ -118,6 +117,8 @@ class Model(object):
         try: container = args['extract_from']
         except KeyError: container = self.model
         
+        print "Extracting " + model_part
+        
         #use R's coef function to extract the model coefficients
         if model_part == 'coef':
             part = list(r.Call(function='coef', object=self.model, ncomp=self.ncomp, intercept=True).AsVector())
@@ -125,12 +126,12 @@ class Model(object):
         #use R's MSEP function to estimate the variance.
         elif model_part == 'MSEP':
             #part = list( r.Call(function='MSEP', object=self.model).AsVector() )
-            part = sum((self.array_fitted-self.array_actual)**2)/self.array_fitted.shape[0]
+            part = sum([(self.fitted[i] - self.actual[i])**2 for i in range(len(self.fitted))]) / len(self.fitted)
             #part = part['val'].AsVector()[self.ncomp]
             
         #use R's RMSEP function to estimate the standard error.
         elif model_part == 'RMSEP':
-            part = (sum((self.array_fitted-self.array_actual)**2)/self.array_fitted.shape[0])**(0.5)
+            part = (sum([(self.fitted[i] - self.actual[i])**2 for i in range(len(self.fitted))]) / len(self.fitted))**0.5
             #part = part['val'].AsVector()[self.ncomp]
             #part = list( r.Call(function='RMSEP', object=self.model).AsList() )
         
@@ -153,82 +154,107 @@ class Model(object):
         prediction_params = {'object': self.model, 'newdata': data_frame }
         
         prediction = r.Call(function='predict', **prediction_params).AsVector()
-        prediction = np.array( prediction, dtype=float )
+        prediction = array.array('d', prediction)
+        #prediction = np.array( prediction, dtype=float )
         
         #Reshape the vector of predictions
         columns = min(self.num_predictors, self.ncomp_max)
-        rows = len(prediction) / columns
-        prediction.shape = (columns, rows)
-        prediction = prediction.transpose()
-
+        rows = len(prediction) / columns        
+        #prediction.shape = (columns, rows)
+        
+        pp = []
+        for k in range(int(columns)):
+            b = k * rows
+            e = b + rows
+            pp.append(array.array('d', prediction[b:e]))
+        prediction = pp
+        
+        #prediction = prediction.transpose()
         return prediction
         
         
     def PredictExceedances(self, data_dictionary, **args):
         prediction = self.PredictValues(data_dictionary)
-        return np.array(prediction[:,self.ncomp-1] >= self.threshold, dtype=int)
+        return [int(p) >= self.threshold for p in prediction[self.ncomp-1]]
         
         
     def PredictExceedanceProbability(self, data_dictionary, threshold, **args):
         if not threshold:
             threshold = self.threshold
             
-        prediction = self.PredictValues(data_dictionary)[:,self.ncomp-1]
-        if (prediction.shape[0] > 1):
-            prediction = prediction.squeeze()
+        #prediction = self.PredictValues(data_dictionary)[:,self.ncomp-1]
+        prediction = self.PredictValues(data_dictionary)[self.ncomp-1]
+        #if (prediction.shape[0] > 1):
+        #    prediction = prediction.squeeze()
             
         se = self.Extract('RMSEP')
-        nonexceedance_probability = r.Call(function='pnorm', q=np.array((threshold-prediction)/se, dtype=float)).AsVector()
+        #nonexceedance_probability = r.Call(function='pnorm', q=np.array((threshold-prediction)/se, dtype=float)).AsVector()
+        nonexceedance_probability = r.Call(function='pnorm', q=array.array('d', (threshold-prediction)/se)).AsVector()
         exceedance_probability = [100*float(1-item) for item in nonexceedance_probability]
         return exceedance_probability
 
         
     def Predict(self, data_dictionary, **args):
         prediction = self.PredictValues(data_dictionary)        
-        if (prediction.shape[0]==1):
-            return [float(item) for item in prediction[:,self.ncomp-1]]
-        else:
-            return [float(item) for item in prediction[:,self.ncomp-1].squeeze()]
-        
+        #if (prediction.shape[0]==1):
+        #    return [float(item) for item in prediction[:,self.ncomp-1]]
+        #else:
+        #    return [float(item) for item in prediction[:,self.ncomp-1].squeeze()]
+        return [float(item) for item in prediction[self.ncomp-1]]
+
         
     def CrossValidation(self, cv_method=0, **args):
         '''Select ncomp by the requested CV method'''
         validation = self.model['validation'].AsDataFrame()
-       
+        print "in"
+        
         #method 0: select the fewest components with PRESS within 1 stdev of the least PRESS (by the bootstrap)
         if cv_method == 0: #Use the bootstrap to find the standard deviation of the MSEP
             #Get the leave-one-out CV error from R:
             columns = min(self.num_predictors, self.ncomp_max)
-            cv = np.array( validation['pred'].AsVector() )
+            #cv = np.array( validation['pred'].AsVector() )
+            cv = array.array('d', validation['pred'].AsVector())
             rows = len(cv) / columns
-            cv.shape = (columns, rows)
-            cv = cv.transpose()
+            #cv.shape = (columns, rows)
+            #cv = cv.transpose()
+            cc = []
+            for k in range(int(columns)):
+                b = k * rows
+                e = b + rows
+                cc.append(array.array('d', cv[b:e]))
+            cv = cc
             
-            PRESS = map(lambda x: sum((cv[:,x]-self.array_actual)**2), range(cv.shape[1]))
-            ncomp = np.argmin(PRESS)
+            #PRESS = map(lambda x: sum((cv[:,x]-self.array_actual)**2), range(cv.shape[1]))
+            PRESS = [sum([(cv[i][j]-self.actual[j])**2 for j in range(rows)]) for i in range(int(columns))]
+            #ncomp = np.argmin(PRESS)
+            ncomp = [i for i in range(len(PRESS)) if PRESS[i]==min(PRESS)][0]
+            print ncomp
             
-            cv_squared_error = (cv[:,ncomp]-self.array_actual)**2
-            sample_space = xrange(cv.shape[0])
+            #cv_squared_error = (cv[:,ncomp]-self.array_actual)**2
+            cv_squared_error = [(cv[ncomp][j]-self.actual[j])**2 for j in range(int(rows))]
+            sample_space = xrange(rows)
             
             PRESS_stdev = list()
             
             #Cache random number generator and int's constructor for a speed boost
             _random, _int = random.random, int
             
-            for i in np.arange(100):
+            for i in range(100):
                 PRESS_bootstrap = list()
                 
-                for j in np.arange(100):
-                    PRESS_bootstrap.append( sum([cv_squared_error[_int(_random()*cv.shape[0])] for i in sample_space]) )
+                for j in range(100):
+                    #PRESS_bootstrap.append( sum([cv_squared_error[_int(_random()*cv.shape[0])] for i in sample_space]) )
+                    PRESS_bootstrap.append( sum([cv_squared_error[_int(_random()*rows)] for i in sample_space]) )
                     
-                PRESS_stdev.append( np.std(PRESS_bootstrap) )
+                PRESS_stdev.append( utils.std(PRESS_bootstrap) )
                 
-            med_stdev = np.median(PRESS_stdev)
+            med_stdev = utils.median(PRESS_stdev)
             
             #Maximum allowable PRESS is the minimum plus one standard deviation
             #good_ncomp = mlab.find( PRESS < min(PRESS) + med_stdev )
-            good_ncomp = np.where( PRESS < min(PRESS) + med_stdev )[0]
+            good_ncomp = [i for i in range(len(PRESS)) if PRESS[i] < min(PRESS) + med_stdev]
             self.ncomp = int( min(good_ncomp)+1 )
+            print "out"
             
         #method 1: select the fewest components w/ PRESS less than the minimum plus a 4% of the range
         if cv_method==1:
@@ -237,18 +263,18 @@ class Model(object):
             PRESS = list( validation['PRESS'] )
     
             #the range is the difference between the greatest and least PRESS values
-            PRESS_range = abs(PRESS0 - np.min(PRESS))
+            PRESS_range = abs(PRESS0 - min(PRESS))
             
             #Maximum allowable PRESS is the minimum plus a fraction of the range.
-            max_CV_error = np.min(PRESS) + PRESS_range/25
+            max_CV_error = min(PRESS) + PRESS_range/25
             #good_ncomp = mlab.find(PRESS < max_CV_error)
-            good_ncomp = np.where(PRESS < max_CV_error)[0]
+            good_ncomp = [i for i in range(len(PRESS)) if PRESS[i] < max_CV_error]
     
             #choose the most parsimonious model that satisfies that criterion
             self.ncomp = int( min(good_ncomp)+1 )
         
 
-    def Threshold(self, specificity=0.92):
+    def Threshold(self, specificity=0.9):
         self.specificity = specificity
     
         if not hasattr(self, 'actual'):
@@ -259,9 +285,10 @@ class Model(object):
 
         #Decision threshold is the [specificity] quantile of the fitted values for non-exceedances in the training set.
         try:
-            non_exceedances = self.array_fitted[np.where(self.array_actual < self.regulatory_threshold)[0]]
+            #non_exceedances = self.array_fitted[np.where(self.array_actual < self.regulatory_threshold)[0]]
+            non_exceedances = [self.fitted[i] for i in range(len(self.fitted)) if self.actual[i] < self.regulatory_threshold]
             self.threshold = utils.Quantile(non_exceedances, specificity)
-            self.specificity = float(sum(non_exceedances < self.threshold))/non_exceedances.shape[0]
+            self.specificity = float(len([x for x in non_exceedances if x < self.threshold])) / len(non_exceedances)
 
         #This error should only happen if somehow there are no non-exceedances in the training data.
         except IndexError: self.threshold = self.regulatory_threshold
@@ -270,26 +297,29 @@ class Model(object):
     def GetActual(self):
         #Get the fitted counts from the model.
         columns = min(self.num_predictors, self.ncomp_max)
-        fitted_values = np.array( self.model['fitted.values'].AsVector() )
-        rows = len(fitted_values) / columns
-        fitted_values.shape = (columns, rows)
-        fitted_values = fitted_values.transpose()[:,0]
+        fitted = array.array('d', self.model['fitted.values'].AsVector())
+        rows = len(fitted) / columns
+        #fitted_values.shape = (columns, rows)
+        #fitted_values = fitted_values.transpose()[:,0]
+        ff = []
+        for k in range(columns):
+            b = k * rows
+            e = b + rows
+            ff.append(array.array('d', fitted[b:e]))
+        fitted = ff[0]
         
-        #If this is the second stage of an AR model, then incorporate the AR predictions.
-        if hasattr(self, 'AR_part'):
-            mask = np.ones( self.AR_part.shape[0], dtype=bool )
-            #nan_rows = mlab.find( np.isnan(self.AR_part[:,0]) )
-            #nan_rows = np.where( np.isnan(self.AR_part[:,0]) )[0]
-            
-            mask[ nan_rows ] = False
-            fitted_values += self.AR_part[mask,0]
-
         #Recover the actual counts by adding the residuals to the fitted counts.
-        residual_values = np.array( self.model['residuals'].AsVector() )
-        residual_values.shape = (columns, rows)
-        residual_values = residual_values.transpose()[:,0]
+        residuals = array.array('d', self.model['residuals'].AsVector())
+        #residuals.shape = (columns, rows)
+        #residuals = residuals.transpose()[:,0]
+        rr = []
+        for k in range(columns):
+            b = k * rows
+            e = b + rows
+            rr.append(array.array('d', residuals[b:e]))
+        residuals = rr[0]
         
-        self.array_actual = np.array( fitted_values + residual_values ).squeeze()
+        self.array_actual = array.array('d',  [fitted[i] + residuals[i] for i in range(len(fitted))])
         self.actual = list(self.array_actual)
         
         
@@ -301,21 +331,19 @@ class Model(object):
             
         #Get the fitted counts from the model so we can compare them to the actual counts.
         columns = min(self.num_predictors, self.ncomp_max)
-        fitted_values = np.array( self.model['fitted.values'].AsVector() )
-        rows = len(fitted_values) / columns
-        fitted_values.shape = (columns, rows)
-        fitted_values = fitted_values.transpose()[:,self.ncomp-1]
+        fitted = array.array('d', self.model['fitted.values'].AsVector())
+        rows = len(fitted) / columns
+        #fitted.shape = (columns, rows)
+        #fitted = fitted.transpose()[:,self.ncomp-1]
+        ff = []
+        for k in range(columns):
+            b = k * rows
+            e = b + rows
+            ff.append(array.array('d', fitted[b:e]))
+        fitted = ff[self.ncomp-1]
         
-        #If this is the second stage of an AR model, then incorporate the AR predictions.
-        if hasattr(self, 'AR_part'):
-            mask = np.ones( self.AR_part.shape[0], dtype=bool )
-            #nan_rows = mlab.find( np.isnan(self.AR_part[:,0]) )
-            nan_rows = np.where( np.isnan(self.AR_part[:,0]) )[0]
-            mask[ nan_rows ] = False
-            fitted_values += self.AR_part[mask,0]
-        
-        self.array_fitted = fitted_values
-        self.array_residual = self.array_actual - self.array_fitted
+        self.array_fitted = fitted
+        self.array_residual = array.array('d', [self.array_actual[i] - self.array_fitted[i] for i in range(rows)])
         
         self.fitted = list(self.array_fitted)
         self.residual = self.residuals = list(self.array_residual)
@@ -327,14 +355,14 @@ class Model(object):
         self.names.remove(self.target)
 
         #Now get the model coefficients from R.
-        coefficients = np.array( self.Extract('coef') )
-        coefficients = coefficients.flatten()
+        coefficients = array.array('d', self.Extract('coef'))
+        #coefficients = coefficients.flatten()
         
         #Get the standard deviations (from the data_dictionary) and package the influence in a dictionary.
         raw_influence = list()
         
         for i in range( len(self.names) ):
-            standard_deviation = np.std( self.data_dictionary[self.names[i]] )
+            standard_deviation = utils.std( self.data_dictionary[self.names[i]] )
             raw_influence.append( float(abs(standard_deviation * coefficients[i+1])) )
  
         self.influence = dict( zip(self.names, [float(x/sum(raw_influence)) for x in raw_influence]) )

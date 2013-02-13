@@ -27,31 +27,33 @@ sys.path[0] = cwd + '\\IronPython\\bin\\IronPython 2.7'
 clr.AddReference("mtrand.dll")
 clr.AddReference("System.Data")
 clr.AddReference("DotNetExtensions")
-import numpy as np
 import System
 import pickle
 import re
+import array
 
 #Set the R_HOME environment variable
 os.environ["R_HOME"] = cwd + '\\IronPython\\bin\\R-2.15.1'
 
 from IronPython.virtualbeach import utils
+from IronPython.virtualbeach.utils import UIThread, BGThread
 import IronPython.virtualbeach.BeachController as Control
 
 
 class BeachInterface(object):
-
     def __init__(self):
         self.u = utils
-        self.ProgressEvent = utils.Event()
-        Control.ProgressEvent += self.HandleProgressUpdate
+        self.ProgressEvent = utils.ProgressEvent()
+        Control.ProgressEvent += self.HandleProgressEvent
+        Control.ModelValidationCompleteEvent += self.HandleModelValidationCompleteEvent
 
-    def Validate(self, data, target, specificity='', folds='', method='PLS', **args):
+        
+    def Validate(self, data, target, threshold, specificity='', folds='', method='PLS', callback='', **args):
         '''This is the main function in the script. It uses the PLS modeling classes to build a predictive model.'''
         
         #parse the inputs
         target = str(target)
-        args['specificity'] = specificity
+        #args['specificity'] = specificity
         
         #initialize the objects where we will drop the results
         result_list = list()
@@ -60,7 +62,7 @@ class BeachInterface(object):
         
         #parse the modeling method and then call it
         Validate = getattr(Control, "Validate" + method)
-        return Validate(data, target, **args)
+        result = Validate(data, target, threshold, specificity, folds, callback, **args)
         
 
     def SpecificityChart(self, validation_results):
@@ -71,8 +73,8 @@ class BeachInterface(object):
     def GetPossibleSpecificities(self, model):   
         '''Find out what values specificity could take if we count out one non-exceedance at a time.'''
         regulatory_threshold = model.regulatory_threshold
-        thresholds = np.sort(model.array_fitted[np.where(model.array_actual < regulatory_threshold)[0]])
-        specificities = [x/float(thresholds.shape[0]) for x in range(thresholds.shape[0])]
+        thresholds = sorted([model.fitted[i] for i in range(len(model.fitted)) if model.actual[i] <= regulatory_threshold])
+        specificities = [x/float(len(thresholds)) for x in range(len(thresholds))]
         return [[float(x) for x in thresholds], list(specificities)]
         
         
@@ -112,7 +114,7 @@ class BeachInterface(object):
     def Predict(self, model, data):
         '''Use the model to predict the value that its output will take over the observations in the data.'''
         [headers, data] = utils.DotNetToArray(data)
-        data_dict = dict( zip(headers, np.transpose(data)) )
+        data_dict = dict( zip(headers, [array.array('d', [row[i] for row in data]) for i in range(len(data[0]))]) )
         predictions = model.Predict(data_dict)
         return list(predictions)
         
@@ -120,7 +122,7 @@ class BeachInterface(object):
     def PredictExceedanceProbability(self, model, data, threshold=''):
         '''Use the model to predict the probability of exceeding the threshold.'''
         [headers, data] = utils.DotNetToArray(data)
-        data_dict = dict( zip(headers, np.transpose(data)) )
+        data_dict = dict( zip(headers, [array.array('d', [row[i] for row in data]) for i in range(len(data[0]))]) )
         predictions = model.PredictExceedanceProbability(data_dict, threshold)
         return predictions
         
@@ -131,11 +133,14 @@ class BeachInterface(object):
         #return double(exceedance_probability.squeeze())
         
     
-    def HandleProgressUpdate(self, *args, **kwargs):
-        print kwargs
-        if "message" in kwargs: print kwargs["message"]
-        self.ProgressEvent(*args, **kwargs)
+    @utils.UIThread
+    def HandleProgressEvent(self, message='', progress=0):
+        self.ProgressEvent(message, progress)
 
+        
+    @utils.UIThread
+    def HandleModelValidationCompleteEvent(self, result='', callback=''):
+        callback(result)
     
 Interface = BeachInterface()
 

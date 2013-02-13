@@ -48,10 +48,38 @@ def UIThread(fun):
     return wrapper
 
 
-class ProgressEvent():
+class Event(object):
     def __init__(self):
         self.handlers = set()
+        
+    def Handle(self, handler):
+        self.handlers.add(handler)
+        return self
 
+    def Unhandle(self, handler):
+        try:
+            self.handlers.remove(handler)
+        except:
+            raise ValueError("Handler is not handling this event, so cannot unhandle it.")
+        return self
+
+    def Fire(self, *args, **kwargs):
+        for handler in self.handlers:
+            handler(*args, **kwargs)
+
+    def GetHandlerCount(self):
+        return len(self.handlers)
+
+    __iadd__ = Handle
+    __isub__ = Unhandle
+    __call__ = Fire
+    __len__  = GetHandlerCount
+    
+    
+class ProgressEvent(object):
+    def __init__(self):
+        self.handlers = set()
+        
     def Handle(self, handler):
         self.handlers.add(handler)
         return self
@@ -66,6 +94,34 @@ class ProgressEvent():
     def Fire(self, message='', progress=0):
         for handler in self.handlers:
             handler(message, progress)
+
+    def GetHandlerCount(self):
+        return len(self.handlers)
+
+    __iadd__ = Handle
+    __isub__ = Unhandle
+    __call__ = Fire
+    __len__  = GetHandlerCount
+    
+    
+class ModelValidationCompleteEvent(object):
+    def __init__(self):
+        self.handlers = set()
+        
+    def Handle(self, handler):
+        self.handlers.add(handler)
+        return self
+
+    def Unhandle(self, handler):
+        try:
+            self.handlers.remove(handler)
+        except:
+            raise ValueError("Handler is not handling this event, so cannot unhandle it.")
+        return self
+
+    def Fire(self, result='', callback=''):
+        for handler in self.handlers:
+            handler(result, callback)
 
     def GetHandlerCount(self):
         return len(self.handlers)

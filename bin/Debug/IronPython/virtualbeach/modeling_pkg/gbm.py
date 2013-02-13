@@ -1,10 +1,12 @@
-import numpy as np
+#import numpy as np
 import random
 import copy
 from .. import utils
 from .. import RDotNetWrapper as rdn
 import string
 import os
+import array
+import math
 
 #Import the gbm library to R and import the R engine
 rdn.r.EagerEvaluate("library(gbm)")
@@ -35,7 +37,7 @@ class Model(object):
         self.folds = model_struct['folds']
         self.trees = model_struct['trees']
         self.actual = model_struct['actual']
-        self.array_actual = np.array(self.actual)
+        self.array_actual = array.array('d', self.actual)
         
     	#First, save the serialized R object to disk (so it can be read from within R)
     	robject_file = "gbm" + "".join(random.choice(string.letters) for i in xrange(10)) + ".robj"        
@@ -121,9 +123,9 @@ class Model(object):
         except KeyError: self.folds = 5   # if there is no 'folds' key, then use the default 5-fold CV
 
         #Store some object data
-        self.data_dictionary = data = copy.deepcopy(args['data'])
+        self.data_dictionary = data = copy.copy(args['data'])
         self.target = target = args['target']
-        self.array_actual = data[target][np.sum(np.isnan(data.values()), axis=0)==0].squeeze()
+        self.array_actual = array.array('d', data[target])
         self.actual = list(self.array_actual)
                 
         #Check to see if a weighting method has been specified in the function's arguments
@@ -185,20 +187,21 @@ class Model(object):
 
     def AssignWeights(self, method=0):
         '''Weight the observations in the training set based on their distance from the threshold.'''
-        deviation = (self.data_dictionary[self.target]-self.regulatory_threshold)/np.std(self.data_dictionary[self.target])
+        std = utils.std(self.actual)
+        print std
+        print self.regulatory_threshold
+        print self.actual
+        deviation = [(x-self.regulatory_threshold)/std for x in self.actual]
+        print 'deviation: ' + str(deviation)
         
         #Integer weighting: weight is the observation's rounded-up whole number of standard deviations from the threshold.
         if method == 1: 
-            weights = np.ones( len(deviation) )
-            breaks = range( int( np.floor(min(deviation)) ), int( np.ceil(max(deviation)) ) )
+            weights = [1 for i in deviation]
+            breaks = range( int(math.floor(min(deviation))), int(math.ceil(max(deviation))) )
 
-            for i in breaks:
-                #find all observations that meet the upper and lower criteria, separately
-                first_slice = np.where(deviation > i)[0]
-                second_slice = np.where(deviation < i+1)[0]
-                
-                #now find all the observations that meet both criteria simultaneously
-                rows = filter( lambda x: x in first_slice, second_slice )
+            for i in breaks:                
+                #Find all the observations that meet both criteria simultaneously
+                rows = [j for j in range(len(deviation)) if deviation[j] >= i and deviation[j] < i+1]
                 
                 #Decide how many times to replicate each slice of data
                 if i<=0:
@@ -206,46 +209,46 @@ class Model(object):
                 else:
                     replicates = 2*i
                     
-                weights[rows] = replicates + 1
+                weights = [replicates+1 if k in rows else weights[k] for k in range(len(weights))]
                 
         #Continuous weighting: weight is the observation's distance (in standard deviations) from the threshold.      
         elif method == 2:
-            weights = abs(deviation)
+            weights = [abs(x) for x in deviation]
 
         #put more weight on exceedances
         elif method == 3:
             #initialize all weights to one.
-            weights = np.ones( len(deviation) )
+            weights = [1 for i in deviation]
 
             #apply weight to the exceedances
-            rows = np.where( deviation > 0 )[0]
-            weights[rows] = self.cost[1]
+            rows = [i for i in range(len(deviation)) if deviation[i] > 0]
+            weights = [self.cost[1] if i in rows else weights[i] for i in range(len(weights))]
 
             #apply weight to the non-exceedances
-            rows = np.where( deviation <= 0 )[0]
-            weights[rows] = self.cost[0]
+            rows = [i for i in range(len(deviation)) if deviation[i] <= 0]
+            weights = [self.cost[0] if i in rows else weights[i] for i in range(len(weights))]
 
         #put more weight on exceedances AND downweight near the threshold
         elif method == 4:
             #initialize all weights to one.
-            weights = np.ones( len(deviation) )
+            weights = [1 for i in deviation]
 
             #apply weight to the exceedances
-            rows = np.where( deviation > 0 )[0]
-            weights[rows] = self.cost[1]
+            rows = [i for i in range(len(deviation)) if deviation[i] > 0]
+            weights = [self.cost[1] if i in rows else weights[i] for i in range(len(weights))]
 
             #apply weight to the non-exceedances
-            rows = np.where( deviation <= 0 )[0]
-            weights[rows] = self.cost[0]
+            rows = [i for i in range(len(deviation)) if deviation[i] <= 0]
+            weights = [self.cost[0] if i in rows else weights[i] for i in range(len(weights))]
 
             #downweight near the threshold
-            rows = np.where( abs(deviation) <= 0.25 )[0]
-            weights[rows] = weights[rows]/4.
+            rows = [i for i in range(len(deviation)) if abs(deviation[i]) <= 0.25]
+            weights = [weights[i]/4. if i in rows else weights[i] for i in range(len(weights))]
 
         #No weights: all weights are one.
-        else: weights = np.ones( len(deviation) )
+        else: weights = [1 for i in deviation]
             
-        return weights
+        return array.array('d', weights)
             
 
     def Discretize(self, raw):
@@ -253,9 +256,9 @@ class Model(object):
         #discretized = np.zeros(raw.shape[0], dtype=int)
         #discretized[ raw >= self.regulatory_threshold ] = 1
         #discretized[ raw < self.regulatory_threshold ] = -1
-        discretized = np.array(raw >= self.regulatory_threshold, dtype=int)
+        discretized = [int(x >= self.regulatory_threshold) for x in raw]
         
-        return discretized
+        return array.array('l', discretized)
         
 
     def Extract(self, model_part, **args):
@@ -278,12 +281,9 @@ class Model(object):
         prediction_params = {'object': self.model, 'newdata': data_frame, 'n.trees': self.trees }
         prediction = r.Call(function='predict', **prediction_params).AsVector()
         
-        if (prediction.shape[0]==1):
-            prediction = np.array(prediction, dtype=float)
-        else:
-            prediction = np.array(prediction, dtype=float).squeeze()
+        print prediction
         
-        return [float(item) for item in prediction]
+        return [float(x) for x in prediction]
         
         
     def PredictExceedanceProbability(self, data_dictionary, threshold, **args):
@@ -291,21 +291,19 @@ class Model(object):
             threshold=self.threshold
             
         #Get the predicted values and the error variance for those predictions
-        se = np.sqrt(sum([x**2 for x in self.residuals]) / len(self.residuals))
+        se = math.sqrt(sum([x**2 for x in self.residuals]) / len(self.residuals))
         raw = self.Predict(data_dictionary, **args)
-        adjusted = [(item-threshold)/se for item in raw]
+        adjusted = [(x-threshold)/se for x in raw]
         
         #Now produce the probability of exceedance:
-        exceedance_probability = r.Call(function='pnorm', q=np.array(adjusted, dtype=float)).AsVector()        
-        return [100*float(item) for item in exceedance_probability]
+        exceedance_probability = r.Call(function='pnorm', q=array.array('d', adjusted)).AsVector()        
+        return [100*float(x) for x in exceedance_probability]
         
 
     def Validate(self, data_dictionary):
         predictions = self.Predict(data_dictionary)
         actual = data_dictionary[self.target]
-
         p = predictions
-
         raw = list()
     
         for k in range(len(predictions)):
@@ -315,7 +313,7 @@ class Model(object):
             f_neg = int(predictions[k] <  self.threshold and actual[k] >= self.regulatory_threshold)
             raw.append([t_pos, t_neg, f_pos, f_neg])
         
-        raw = np.array(raw)
+        #raw = np.array(raw)
         
         return raw
         
@@ -323,11 +321,13 @@ class Model(object):
     def GetFitted(self, **params):
         params = {'object':self.model, 'n.trees':self.trees, 'newdata':self.data_frame}
         self.fitted = list(r.Call("predict", **params).AsNumeric())        
-        self.array_fitted = np.array(self.fitted, dtype=float)
-        self.array_residuals = self.array_actual - self.array_fitted
-        self.array_actual = np.array(self.array_residuals + self.array_fitted, dtype=float)
-        self.actual = [float(x) for x in self.array_actual]
-        self.residuals = [float(x) for x in self.array_residuals]
+        self.array_fitted = array.array('d', self.fitted)
+        print 'get residuals'
+        self.residual = self.residuals = [self.actual[k] - self.fitted[k] for k in range(len(self.fitted))]
+        print 'got residuals'
+        self.actual = [self.residuals[k] + self.fitted[k] for k in range(len(self.fitted))]
+        self.array_actual = array.array('d', self.actual)
+        self.array_residuals = array.array('d', self.residuals)
 
         
     def GetInfluence(self):
@@ -342,8 +342,8 @@ class Model(object):
         self.influence = dict(zip(vars, influence))
         self.vars = [str(vars[k]) for k in range(len(vars)) if influence[k]>5]
         return self.influence
-        
 
+    
     def Threshold(self, specificity=0.9):
         self.specificity = specificity
         
@@ -352,14 +352,13 @@ class Model(object):
 
         #Decision threshold is the [specificity] quantile of the fitted values for non-exceedances in the training set.
         try:
-            non_exceedances = self.array_fitted[np.where(self.array_actual < self.regulatory_threshold)[0]]
+            #non_exceedances = self.array_fitted[np.where(self.array_actual < self.regulatory_threshold)[0]]
+            non_exceedances = [self.fitted[i] for i in range(len(self.fitted)) if self.actual[i] < self.regulatory_threshold]
             self.threshold = utils.Quantile(non_exceedances, specificity)
-            self.specificity = float(sum(non_exceedances < self.threshold))/non_exceedances.shape[0]
+            self.specificity = float(len([x for x in non_exceedances if x < self.threshold])) / len(non_exceedances)
 
         #This error should only happen if somehow there are no non-exceedances in the training data.
-        except ZeroDivisionError:
-            self.threshold = 0        
-            self.specificity = 1
+        except IndexError: self.threshold = self.regulatory_threshold
         
         
     def Plot(self, **plotargs ):
