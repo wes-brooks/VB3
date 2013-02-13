@@ -27,8 +27,8 @@ namespace IPyModeling
         //Get access to the IronPython interface:
         private dynamic ipyInterface = IPyInterface.Interface;
         protected dynamic ipyModel = null;
-        private BackgroundWorker bgwModelWorker = new BackgroundWorker();
         private static double dblProgressRangeLow, dblProgressRangeHigh;
+        public delegate void ModelProgressEventDelegate(string message, double progress);
 
         //Class member definitions:
         //Events:
@@ -100,8 +100,8 @@ namespace IPyModeling
             //Request access to the IronPython interface.
             RequestIronPythonInterface();
 
-            //ModelProgressEventDelegate mped = new ModelProgressEventDelegate(ReportProgress);
-            //ipyInterface.ProgressEvent.Handle(mped);
+            ModelProgressEventDelegate mped = new ModelProgressEventDelegate(ReportProgress);
+            ipyInterface.ProgressEvent.Handle(mped);
 
             //Create the delegate that will raise the event that requests model data
             //this.VariableSelectionTab.Enter += new EventHandler(DataTabEnter);
@@ -111,9 +111,6 @@ namespace IPyModeling
             ModelingTabControl.TabPages[2].Paint += new PaintEventHandler(ModelTabEntered);
             ModelingTabControl.TabPages[3].Paint += new PaintEventHandler(DiagnosticTabEntered);
             this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);
-
-            bgwModelWorker.DoWork += new DoWorkEventHandler(bg_DoWork);
-            bgwModelWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bg_RunWorkerCompleted);
         }
 
 
@@ -859,8 +856,10 @@ namespace IPyModeling
             tblData.Columns.Remove(tblData.Columns[0].Caption);
 
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
-            dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblSpecificity, regulatory_threshold: dblThreshold, method: strMethod);
-            ModelingComplete(validation_results);
+            //dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod);
+            //ModelingComplete(validation_results);
+                       
+            ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod);
 
             // Start the asynchronous task. 
             //bgwModelWorker.RunWorkerAsync(new ModelArgs(Data:tblData, Target:strTarget, Specificity:dblSpecificity, Threshold:dblThreshold, Method:strMethod, Interface:ipyInterface));
@@ -930,22 +929,6 @@ namespace IPyModeling
             t.Start();
             return t;
         }*/
-
-
-        static void bg_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            dynamic result = (dynamic)(e.Result);
-            ModelingComplete(result);
-        }
-
-        static void bg_DoWork(object sender, DoWorkEventArgs e)
-        {
-            ModelArgs args = (ModelArgs)(e.Argument);
-            dynamic ipyInterface = args.Interface;
-
-            dynamic validation_results = ipyInterface.Validate(args.Data, args.Target, args.Specificity, regulatory_threshold: args.Threshold, method: args.Method);
-            e.Result = validation_results;
-        }
 
 
         protected void InitializeValidationChart()

@@ -36,23 +36,23 @@ import re
 os.environ["R_HOME"] = cwd + '\\IronPython\\bin\\R-2.15.1'
 
 from IronPython.virtualbeach import utils
+from IronPython.virtualbeach.utils import UIThread, BGThread
 import IronPython.virtualbeach.BeachController as Control
 
 
-
 class BeachInterface(object):
-
     def __init__(self):
         self.u = utils
-        self.ProgressEvent = utils.Event()
+        self.ProgressEvent = utils.ProgressEvent()
         Control.ProgressEvent += self.HandleProgressUpdate
 
-    def Validate(self, data, target, specificity='', folds='', method='PLS', **args):
+        
+    def Validate(self, data, target, threshold, specificity='', folds='', method='PLS', **args):
         '''This is the main function in the script. It uses the PLS modeling classes to build a predictive model.'''
         
         #parse the inputs
         target = str(target)
-        args['specificity'] = specificity
+        #args['specificity'] = specificity
         
         #initialize the objects where we will drop the results
         result_list = list()
@@ -61,7 +61,7 @@ class BeachInterface(object):
         
         #parse the modeling method and then call it
         Validate = getattr(Control, "Validate" + method)
-        return Validate(data, target, **args)
+        return Validate(data, target, threshold, specificity, folds, **args)
         
 
     def SpecificityChart(self, validation_results):
@@ -132,10 +132,9 @@ class BeachInterface(object):
         #return double(exceedance_probability.squeeze())
         
     
-    def HandleProgressUpdate(self, *args, **kwargs):
-        print kwargs
-        if "message" in kwargs: print kwargs["message"]
-        self.ProgressEvent(*args, **kwargs)
+    @utils.UIThread
+    def HandleProgressUpdate(self, message='', progress=0):
+        self.ProgressEvent(message, progress)
 
     
 Interface = BeachInterface()

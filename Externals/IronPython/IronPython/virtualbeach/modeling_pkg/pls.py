@@ -78,7 +78,7 @@ class Model(object):
     
     def Create(self, **args):
         #Check to see if a threshold has been specified in the function's arguments
-        if 'regulatory_threshold' in args: self.threshold = args['regulatory_threshold']
+        if 'threshold' in args: self.threshold = args['threshold']
         else: self.threshold = 2.3711   # if there is no 'threshold' key, then use the default (2.3711)
         self.regulatory_threshold = self.threshold
         

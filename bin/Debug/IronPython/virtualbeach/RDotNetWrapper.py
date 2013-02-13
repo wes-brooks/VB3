@@ -15,7 +15,8 @@ import RDotNet
 import RDotNetExtensions
 
 from System import Array
-import numpy as np
+import array
+#import numpy as np
 
 #Fire up the interface to R
 r = RDotNet.REngine.CreateInstance("RDotNet", output=RDotNet.Internals.OutputMode.Quiet)
@@ -40,7 +41,7 @@ class Wrap():
                 if params[item] is True: params[item] = "TRUE"
                 else: params[item] = "FALSE"    
             
-            elif isinstance(params[item], (float, int, np.number)): #convert numeric types to strings
+            elif isinstance(params[item], (float, int)):#, np.number)): #convert numeric types to strings
                 params[item] = str(params[item])
 
             elif isinstance(params[item], RDotNet.SymbolicExpression):
@@ -49,11 +50,14 @@ class Wrap():
                 r.SetSymbol(robj_name, params[item])
                 params[item] = robj_name
                 
-            elif isinstance(params[item], (np.ndarray, list)):
-                temp = np.array( params[item] )
+            elif isinstance(params[item], (array.array, list)):
+                try:
+                    temp = aray.array('d', params[item])
+                except OverflowError:
+                    temp = params[item]
                 
                 #move the array into R
-                if temp.dtype in [int, float]:
+                if temp.typecode in ['d', 'f']:
                     temp = r.CreateNumericVector( Array[float](temp) ).AsVector()
                 else:
                     temp = r.CreateCharacterVector( Array[str](temp) ).AsVector()
