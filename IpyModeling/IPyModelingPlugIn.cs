@@ -39,6 +39,7 @@ namespace IPyModeling
         private SimpleActionItem btnComputeAO;
         private SimpleActionItem btnManipulate;
         private SimpleActionItem btnTransform;
+        private SimpleActionItem btnCancel;
         private SimpleActionItem btnDropVariables;
                 
         //Raise a message
@@ -119,6 +120,8 @@ namespace IPyModeling
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
             innerIronPythonControl.ModelUpdated += new EventHandler(HandleUpdate);
             innerIronPythonControl.ModelingTabControl.SelectedIndexChanged += new EventHandler(UpdateControlStatus);
+            innerIronPythonControl.ModelingCompleteEvent += new EventHandler(ModelingComplete);
+            innerIronPythonControl.ModelingCanceledEvent += new EventHandler(ModelingCanceled);
             //innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
             //innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
             //innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
@@ -181,17 +184,19 @@ namespace IPyModeling
             btnRun.Enabled = false;
             App.HeaderControl.Add(btnRun);
 
-            btnDropVariables = new SimpleActionItem(strPanelKey, "Drop Variable(s)", btnDropVariables_Click);
-            btnDropVariables.LargeImage = Properties.Resources.redX;
-            btnDropVariables.GroupCaption = rGroupCaption;
-            btnDropVariables.Enabled = false;
-            App.HeaderControl.Add(btnDropVariables);
-
-            /*btnCancel = new SimpleActionItem(strPanelKey, "Cancel", btnCancel_Click);
-            btnCancel.LargeImage = Properties.Resources.Cancel;
+            btnCancel= new SimpleActionItem(strPanelKey, "Cancel", btnCancel_Click);
+            btnCancel.LargeImage = Properties.Resources.redX;
             btnCancel.GroupCaption = rGroupCaption;
             btnCancel.Enabled = false;
-            App.HeaderControl.Add(btnCancel);*/
+            App.HeaderControl.Add(btnCancel);
+
+            string strVarsCaption = "Variable Selection";
+
+            btnDropVariables = new SimpleActionItem(strPanelKey, "Drop Variable(s)", btnDropVariables_Click);
+            btnDropVariables.LargeImage = Properties.Resources.Remove;
+            btnDropVariables.GroupCaption = strVarsCaption;
+            btnDropVariables.Enabled = false;
+            App.HeaderControl.Add(btnDropVariables);
         }
 
 
@@ -215,6 +220,26 @@ namespace IPyModeling
             }
             //if ((e.ActivePanelKey.ToString() == "DataSheetPanel" || e.ActivePanelKey.ToString() == "kVBLocation") && boolVisible)
             //    Hide();
+        }
+
+
+        //event handler when a plugin is selected from tabs
+        void ModelingComplete(object sender, EventArgs e)
+        {
+            boolComplete = true;
+            btnDropVariables.Enabled = true;
+            btnCancel.Enabled = false;
+            btnRun.Enabled = true;
+        }
+
+
+        //event handler when a plugin is selected from tabs
+        void ModelingCanceled(object sender, EventArgs e)
+        {
+            btnCancel.Enabled = false;
+            btnRun.Enabled = true;
+            btnDropVariables.Enabled = false;
+            Broadcast();
         }
 
 
@@ -543,6 +568,8 @@ namespace IPyModeling
 
         void btnRun_Click(object sender, EventArgs e)
         {
+            boolComplete = false;
+
             if (innerIronPythonControl.lbIndVariables.Items.Count == 0)
             {
                 MessageBox.Show("You must chose variables first and go to model tab before selecting Run", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -554,9 +581,11 @@ namespace IPyModeling
             if (boolRunning || !bSuccess)
                 return;
 
-            MakeActive();
-            boolComplete = true;
-            btnDropVariables.Enabled = true;
+            btnCancel.Enabled = true;
+            btnRun.Enabled = false;
+            btnDropVariables.Enabled = false;
+            
+            MakeActive();            
         }
 
 
@@ -584,9 +613,17 @@ namespace IPyModeling
         }*/
 
 
+        void btnCancel_Click(object sender, EventArgs e)
+        {
+            innerIronPythonControl.btnCancel_Click(sender, e);
+            boolComplete = false;
+        }
+
+
         void btnDropVariables_Click(object sender, EventArgs e)
         {
             innerIronPythonControl.btnRemoveInputVariablesFromModelingTab_Click(sender, e);
+            boolComplete = false;
         }
 
 

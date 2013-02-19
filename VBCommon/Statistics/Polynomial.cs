@@ -95,10 +95,10 @@ namespace VBCommon.Statistics
         private void computePoly(DataTable result)
         {
             //throw new NotImplementedException();
-            _polytransform = new double [_modelDT.Rows.Count];
-            _intercept = (double)result.Rows[0]["Value"];
-            _c1 = (double)result.Rows[1]["Value"];
-            _c2 = (double)result.Rows[2]["Value"];
+            _polytransform = new double [_modelDT.Rows.Count];            
+            _c1 = (double)result.Rows[0]["Value"];
+            _c2 = (double)result.Rows[1]["Value"];
+            _intercept = (double)result.Rows[2]["Value"];
             int n = 0;
             foreach (DataRow r in _modelDT.Rows)
             { 

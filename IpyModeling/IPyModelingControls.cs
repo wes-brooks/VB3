@@ -30,11 +30,14 @@ namespace IPyModeling
         private static double dblProgressRangeLow, dblProgressRangeHigh;
         public delegate void ModelProgressEventDelegate(string message, double progress);
         public delegate void ModelValidationCompleteDelegate(dynamic result);
+        protected bool bAnticipatingModel = false;
 
         //Class member definitions:
         //Events:
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event EventHandler ModelUpdated;
+        public event EventHandler ModelingCanceledEvent;
+        public event EventHandler ModelingCompleteEvent;
         public event EventHandler<RunButtonStatusArgs> RunButtonStatusChanged;
 
         public event EventHandler ManipulateDataTab;
@@ -127,6 +130,12 @@ namespace IPyModeling
             lbIndVariables.Items.Clear();
 
             ClearModelingTab();
+        }
+
+
+        public bool AnticipatingModel
+        {
+            get { return bAnticipatingModel; }
         }
 
 
@@ -852,86 +861,102 @@ namespace IPyModeling
             ModelValidationCompleteDelegate callbackDelegate = new ModelValidationCompleteDelegate(ModelingComplete);
             ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod, callback: callbackDelegate);
 
-            // Start the asynchronous task. 
-            //bgwModelWorker.RunWorkerAsync(new ModelArgs(Data:tblData, Target:strTarget, Specificity:dblSpecificity, Threshold:dblThreshold, Method:strMethod, Interface:ipyInterface));
+            bAnticipatingModel = true;
         }
 
 
         protected void ModelingComplete(dynamic validation_results)
         {
-            this.ipyModel = validation_results[1];
-            PopulateResults(this.ipyModel);
-
-            //Now extract the valid thresholds and the corresponding specificities
-            double dblSpecificity = Convert.ToDouble(ipyModel.specificity);
-            dynamic thresholding = ipyInterface.GetPossibleSpecificities(this.ipyModel);
-            this.listCandidateThresholds = ((IList<object>)(((IList<object>)thresholding)[0])).Cast<double>().ToList();
-            this.listCandidateSpecificity = ((IList<object>)(((IList<object>)thresholding)[1])).Cast<double>().ToList();
-
-            //The following is a bit of python code to initialize the decision threshold at the default specificity.
-            this.intThresholdIndex = (int)thresholding[1].index(dblSpecificity);
-
-            //Extract the number of false positives, true positives, false negatives, and true negatives.
-            object objCounts = ipyInterface.SpecificityChart(validation_results[0]);
-            List<object> x = ((IList<object>)((IList<object>)objCounts)[0]).Cast<object>().ToList();
-            List<object> tp = ((IList<object>)((IList<object>)objCounts)[1]).Cast<object>().ToList();
-            List<object> tn = ((IList<object>)((IList<object>)objCounts)[2]).Cast<object>().ToList();
-            List<object> fp = ((IList<object>)((IList<object>)objCounts)[3]).Cast<object>().ToList();
-            List<object> fn = ((IList<object>)((IList<object>)objCounts)[4]).Cast<object>().ToList();
-
-            //Convert the validation counts to doubles and move them from the temporary lists above into more permanent lists.
-            for (int i = 0; i < x.Count; i++)
+            if (AnticipatingModel)
             {
-                listValidationSpecificity.Add(Convert.ToDouble(x[i]));
-                listTruePos.Add(Convert.ToDouble(tp[i]));
-                listTrueNeg.Add(Convert.ToDouble(tn[i]));
-                listFalsePos.Add(Convert.ToDouble(fp[i]));
-                listFalseNeg.Add(Convert.ToDouble(fn[i]));
+                this.ipyModel = validation_results[1];
+                PopulateResults(this.ipyModel);
+
+                //Now extract the valid thresholds and the corresponding specificities
+                double dblSpecificity = Convert.ToDouble(ipyModel.specificity);
+                dynamic thresholding = ipyInterface.GetPossibleSpecificities(this.ipyModel);
+                this.listCandidateThresholds = ((IList<object>)(((IList<object>)thresholding)[0])).Cast<double>().ToList();
+                this.listCandidateSpecificity = ((IList<object>)(((IList<object>)thresholding)[1])).Cast<double>().ToList();
+
+                //The following is a bit of python code to initialize the decision threshold at the default specificity.
+                this.intThresholdIndex = (int)thresholding[1].index(dblSpecificity);
+
+                //Extract the number of false positives, true positives, false negatives, and true negatives.
+                object objCounts = ipyInterface.SpecificityChart(validation_results[0]);
+                List<object> x = ((IList<object>)((IList<object>)objCounts)[0]).Cast<object>().ToList();
+                List<object> tp = ((IList<object>)((IList<object>)objCounts)[1]).Cast<object>().ToList();
+                List<object> tn = ((IList<object>)((IList<object>)objCounts)[2]).Cast<object>().ToList();
+                List<object> fp = ((IList<object>)((IList<object>)objCounts)[3]).Cast<object>().ToList();
+                List<object> fn = ((IList<object>)((IList<object>)objCounts)[4]).Cast<object>().ToList();
+
+                //Convert the validation counts to doubles and move them from the temporary lists above into more permanent lists.
+                for (int i = 0; i < x.Count; i++)
+                {
+                    listValidationSpecificity.Add(Convert.ToDouble(x[i]));
+                    listTruePos.Add(Convert.ToDouble(tp[i]));
+                    listTrueNeg.Add(Convert.ToDouble(tn[i]));
+                    listFalsePos.Add(Convert.ToDouble(fp[i]));
+                    listFalseNeg.Add(Convert.ToDouble(fn[i]));
+                }
+
+                /*//if cancel was clicked, get out of here
+                if (stopRun)
+                {
+                    NotifyPropChanged(boolRunning);
+                    stopRun = false;
+                    return;
+                }*/
+
+                InitializeValidationChart();
+                UpdateDiagnostics();
+                AnnotateChart();
+
+                //Enable the thresholding controls and the model-selection button.
+                pnlThresholdingButtons.Visible = true;
+                ChangeControlStatus(boolInitialControlStatus);
+                ChangeThresholdControlStatus(true);
+
+                //Work's done; let's go home.
+                boolComplete = true;
+                RaiseUpdateNotification();
+
+                VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+                Cursor.Current = Cursors.WaitCursor;
+
+                Application.DoEvents();
+                VBLogger.GetLogger().LogEvent("95", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+
+                boolRunning = false;
+                SetRunButtonStatus(to: true);
+                VBLogger.GetLogger().LogEvent("Model building complete on the " + strMethod + " plugin.");
+                VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+                Cursor.Current = Cursors.Default;
+
+                if (ModelingCompleteEvent != null)
+                {
+                    EventArgs args = new EventArgs();
+                    ModelingCompleteEvent(this, args);
+                }
             }
-
-            /*//if cancel was clicked, get out of here
-            if (stopRun)
-            {
-                NotifyPropChanged(boolRunning);
-                stopRun = false;
-                return;
-            }*/
-
-            InitializeValidationChart();
-            UpdateDiagnostics();
-            AnnotateChart();
-
-            //Enable the thresholding controls and the model-selection button.
-            pnlThresholdingButtons.Visible = true;
-            ChangeControlStatus(boolInitialControlStatus);
-            ChangeThresholdControlStatus(true);
-
-            //Work's done; let's go home.
-            boolComplete = true;
-            RaiseUpdateNotification();
-
-            VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            Cursor.Current = Cursors.WaitCursor;
-
-            Application.DoEvents();
-            VBLogger.GetLogger().LogEvent("95", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-
-            boolRunning = false;
-            SetRunButtonStatus(to: true);
-            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            Cursor.Current = Cursors.Default;
-
             return;
         }
 
 
-        /*public Thread StartModelingThread(DataTable Data, string Target, double Specificity, double Threshold, string Method)
+        public void btnCancel_Click(object sender, EventArgs e)
         {
-            ValidateModelCompleted mcDel = new ValidateModelCompleted(ModelingComplete);
-            var t = new Thread(() => ValidateModelAsync(Data, Target, Specificity, Threshold, Method, mcDel));
-            t.Start();
-            return t;
-        }*/
+            bAnticipatingModel = false;
+            boolComplete = false;
+
+            if (ModelingCanceledEvent != null)
+            {
+                EventArgs args = new EventArgs();
+                ModelingCanceledEvent(this, args);
+            }
+
+            VBLogger.GetLogger().LogEvent("Model building was cancelled on the " + strMethod + " plugin.");
+            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            Cursor.Current = Cursors.Default;
+        }
 
 
         protected void InitializeValidationChart()
@@ -1761,10 +1786,13 @@ namespace IPyModeling
 
         public void ReportProgress(string message, double progress)
         {
-            int modelingProgress;
-            modelingProgress = Convert.ToInt32(progress * (dblProgressRangeHigh - dblProgressRangeLow) + dblProgressRangeLow);
+            if (AnticipatingModel)
+            {
+                int modelingProgress;
+                modelingProgress = Convert.ToInt32(progress * (dblProgressRangeHigh - dblProgressRangeLow) + dblProgressRangeLow);
 
-            VBLogger.GetLogger().LogEvent(modelingProgress.ToString(), Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);            
+                VBLogger.GetLogger().LogEvent(modelingProgress.ToString(), Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            }
         }
     }
 }
