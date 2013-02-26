@@ -28,14 +28,12 @@ namespace IPyModeling
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Modeling;
         private RootItem rootHeaderItem;
 
-        //IDictionary<string, object> dictPlugin = null;
-
         //instance of  class
         protected IPyModeling.IPyModelingControl innerIronPythonControl;
         private VBCommon.Signaller signaller;
+
         //ribbon buttons
         private SimpleActionItem btnRun;
-        //private SimpleActionItem btnCancel;
         private SimpleActionItem btnComputeAO;
         private SimpleActionItem btnManipulate;
         private SimpleActionItem btnTransform;
@@ -51,6 +49,7 @@ namespace IPyModeling
         public Boolean boolVisible;
         public Boolean boolRunning;
         public Boolean boolVirgin = true;
+        public Boolean boolChanged = false;
 
         private string strTopPlugin = string.Empty;
 
@@ -122,10 +121,6 @@ namespace IPyModeling
             innerIronPythonControl.ModelingTabControl.SelectedIndexChanged += new EventHandler(UpdateControlStatus);
             innerIronPythonControl.ModelingCompleteEvent += new EventHandler(ModelingComplete);
             innerIronPythonControl.ModelingCanceledEvent += new EventHandler(ModelingCanceled);
-            //innerIronPythonControl.boolStopRun += new IPyModelingControl.BoolStopEvent(HandleBoolStopRun);
-            //innerIronPythonControl.ManipulateDataTab += new EventHandler(HandleManipulateDataTab);
-            //innerIronPythonControl.ModelTab += new EventHandler(HandleModelTab);
-            //innerIronPythonControl.VariableTab += new EventHandler(HandleVariableTab);
             
             base.Activate();
             //Hide();
@@ -315,6 +310,7 @@ namespace IPyModeling
                         {
                             //boolVirgin = false;
                             innerIronPythonControl.SetData(e.PackedPluginState);
+                            boolChanged = true;
                             //Show();
                         }
                     }
@@ -325,13 +321,14 @@ namespace IPyModeling
                     {
                         boolComplete = false;
                         innerIronPythonControl.SetData(e.PackedPluginState);
+                        boolChanged = true;
                     }
                     //Show();
                 }
             }
             else
             {
-                //This handles an undo:
+                /*//This handles an undo:
                 try
                 {
                     if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
@@ -356,7 +353,7 @@ namespace IPyModeling
                         }
                     }
                 }
-                catch { }
+                catch { }*/
             }       
         }
 
@@ -476,6 +473,8 @@ namespace IPyModeling
         //when modeling makes changes, event broadcasts changes to those listening
         public void Broadcast()
         {
+            boolChanged = true;
+
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = innerIronPythonControl.PackState();
             dictPackedState["Origin"] = strPanelKey;
@@ -515,16 +514,27 @@ namespace IPyModeling
         //event handler for saving project state
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            //go pack state, add complete and visible, and add to dictionary of plugins
-            IDictionary<string, object> packedState = innerIronPythonControl.PackState();
-
-            if (packedState != null)
+            if (!e.Undo || boolChanged)
             {
-                packedState.Add("Complete", boolComplete);
-                packedState.Add("Visible", boolVisible);
-                packedState.Add("Virgin", boolVirgin);
-                
-                e.PackedPluginStates.Add(strPanelKey, packedState);
+                //go pack state, add complete and visible, and add to dictionary of plugins
+                IDictionary<string, object> packedState = innerIronPythonControl.PackState();
+
+                if (packedState != null)
+                {
+                    packedState.Add("Complete", boolComplete);
+                    packedState.Add("Visible", boolVisible);
+                    packedState.Add("Virgin", boolVirgin);
+
+                    if (!e.Undo)
+                    {
+                        e.PackedPluginStates.Add(strPanelKey, packedState);
+                    }
+                    else
+                    {
+                        e.Store.Add(Utilities.RandomString(10), packedState);
+                        boolChanged = false;
+                    }
+                }
             }
         }
 
@@ -549,7 +559,8 @@ namespace IPyModeling
                 //else
                 //    Show();        
             }
-            else
+
+            else if (!e.Undo)
             {
                 innerIronPythonControl.Clear();
             }
@@ -626,16 +637,14 @@ namespace IPyModeling
             boolComplete = false;
         }
 
+        protected void ControlChangeEventHandler(object sender, EventArgs e)
+        {
+            this.boolChanged = true;
+        }
 
         //change has been made within modeling, need to update
         private void HandleUpdate(object sender, EventArgs e)
         {
-            /*if (boolComplete)
-            {
-                boolComplete = false;
-                MakeActive();
-                Cursor.Current = Cursors.Default;
-            }*/
             Broadcast();
         }
     }

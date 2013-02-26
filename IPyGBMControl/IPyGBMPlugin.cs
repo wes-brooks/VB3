@@ -16,6 +16,7 @@ namespace IPyGBMPlugin
             innerIronPythonControl = new IPyGBMControl.IPyGBMControl();
             strPanelKey = "GBMPanel";
             strPanelCaption = "GBM";
+            innerIronPythonControl.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
         }
 
 

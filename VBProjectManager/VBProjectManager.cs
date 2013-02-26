@@ -41,19 +41,19 @@ namespace VBProjectManager
         private SimpleActionItem btnRedo;
 
         private string strUndoRedoDictionaryPath;
-        private PersistentDictionary<string, string> UndoRedoDict;
+        private PersistentDictionary<string, string> UndoRedoBackend;
+        private PluginStateDictionary UndoRedoDict;
         
-
         //constructor
         public VBProjectManager()
         {
             strLogFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach", "VirtualBeach.log");
             logger = VBLogger.GetLogger();
             VBLogger.SetLogFileName(strLogFile);
-            
 
-            strUndoRedoDictionaryPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach", String.Concat("UndoRedo", RandomString(10), ".esent"));
-            UndoRedoDict = new PersistentDictionary<string, string>(strUndoRedoDictionaryPath);
+            strUndoRedoDictionaryPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach", String.Concat("UndoRedo", Utilities.RandomString(10), ".esent"));
+            UndoRedoBackend = new PersistentDictionary<string, string>(strUndoRedoDictionaryPath);
+            UndoRedoDict = new PluginStateDictionary(UndoRedoBackend);
 
             signaller = new VBCommon.Signaller();
         }
@@ -270,15 +270,15 @@ namespace VBProjectManager
                 string strCurrentStateKey = UndoStack.Pop().ToString();
                 string strLastStateKey = UndoStack.Peek().ToString();
 
-                string strCurrentStateJson = UndoRedoDict[strCurrentStateKey];
-                string strLastStateJson = UndoRedoDict[strLastStateKey];
+                string strCurrentStateJson = UndoRedoBackend[strCurrentStateKey];
+                string strLastStateJson = UndoRedoBackend[strLastStateKey];
 
-                IDictionary<string, IDictionary<string, object>> dictCurrentState = StringToState(strCurrentStateJson);
-                IDictionary<string, IDictionary<string, object>> dictLastState = StringToState(strLastStateJson);
+                IDictionary<string, IDictionary<string, object>> dictCurrentState = Utilities.StringToStates(strCurrentStateJson);
+                IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
 
                 //raise unpack event, sending packed plugins dictionary
                 RedoStack.Push(strCurrentStateKey);
-                signaller.UnpackProjectState(dictLastState);
+                signaller.UnpackProjectState(dictLastState, Undo: true);
 
                 if (RedoStack.Count > 0)
                     btnRedo.Enabled = true;                
@@ -293,12 +293,12 @@ namespace VBProjectManager
             if (RedoStack.Count > 0)
             {
                 string strLastStateKey = RedoStack.Pop().ToString();
-                string strLastStateJson = UndoRedoDict[strLastStateKey];
-                IDictionary<string, IDictionary<string, object>> dictLastState = StringToState(strLastStateJson);
+                string strLastStateJson = UndoRedoBackend[strLastStateKey];
+                IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
 
                 //raise unpack event, sending packed plugins dictionary
                 UndoStack.Push(strLastStateKey);
-                signaller.UnpackProjectState(dictLastState);
+                signaller.UnpackProjectState(dictLastState, Undo: true);
 
                 
                 if (RedoStack.Count > 0)
@@ -309,22 +309,21 @@ namespace VBProjectManager
         }
 
         
-        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
-        {
-        }
+        //We're required to implement this function as part of the IPlugin interface
+        private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e) { }
 
 
         private void PushCurrentState(object sender, EventArgs e)
         {
             //Dictionary to store each plugin's state for saving
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
-            signaller.RaiseSaveRequest(dictPluginStates);
+            signaller.RaiseSaveRequest(dictPluginStates, Undo: true, Store: UndoRedoDict);
 
             //PersistentDictionary-based undo and redo:
-            string strProjectStateJson = StateToString(dictPluginStates);
-            string strKey = RandomString(10);
-            UndoRedoDict.Add(key: strKey, value: strProjectStateJson);
-            UndoStack.Push(strKey);        
+            //string strProjectStateJson = Utilities.StatesToString(dictPluginStates);
+            //string strKey = Utilities.RandomString(10);
+            //UndoRedoBackend.Add(key: strKey, value: strProjectStateJson);
+            //UndoStack.Push(strKey);        
             RedoStack.Clear();
 
             //Manage the state of the undo/redo buttons.
@@ -335,7 +334,8 @@ namespace VBProjectManager
 
         public void ApplicationsClosedHandler(object sender, EventArgs e)
         {
-            UndoRedoDict.Dispose();
+            UndoRedoDict = null;
+            UndoRedoBackend.Dispose();
 
             PersistentDictionaryFile.DeleteFiles(strUndoRedoDictionaryPath);
             Directory.Delete(strUndoRedoDictionaryPath);
@@ -347,22 +347,5 @@ namespace VBProjectManager
             IDictionary<string, object> packedState = PackState();
             signaller.RaiseBroadcastRequest(this, packedState);
         }
-
-
-        //Generate random strings for use as keys to the Undo/Redo dictionaries
-        private static Random random = new Random((int)DateTime.Now.Ticks);//thanks to McAden
-        private string RandomString(int size)
-        {
-            StringBuilder builder = new StringBuilder();
-            char ch;
-            for (int i = 0; i < size; i++)
-            {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
-                builder.Append(ch);
-            }
-
-            return builder.ToString();
-        }
-
     }
 }

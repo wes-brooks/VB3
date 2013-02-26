@@ -65,17 +65,17 @@ namespace VBCommon
 
 
         //Tell the plugins to pack their states into the dictionary for saving
-        public void RaiseSaveRequest(IDictionary<string, IDictionary<string, object>> dictPackedStates)
+        public void RaiseSaveRequest(IDictionary<string, IDictionary<string, object>> dictPackedStates, bool Undo=false, IDictionary<string, IDictionary<string, object>> Store=null)
         {
             if (ProjectSaved != null) //Has some method been told to handle this event?
             {
-                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates, Undo, Store);
                 ProjectSaved(this, e);
             }
         }
 
 
-        //Tell the plugins to pack their states into the undo stack
+        /*//Tell the plugins to pack their states into the undo stack
         public void SetUndoPoint(IDictionary<string, IDictionary<string, object>> dictPackedStates)
         {
             if (ProjectSaved != null) //Has some method been told to handle this event?
@@ -83,21 +83,21 @@ namespace VBCommon
                 SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
                 ProjectSaved(this, e);
             }
-        }
+        }*/
 
 
         //Tell the plugins to unpack themselves from the saved state
-        public void UnpackProjectState(IDictionary<string, IDictionary<string, object>> dictPackedStates)
+        public void UnpackProjectState(IDictionary<string, IDictionary<string, object>> dictPackedStates, bool Undo=false)
         {
             if (ProjectOpened != null) //Has some method been told to handle this event?
             {
-                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates, Undo);
                 ProjectOpened(this, e);
             }
         }
 
 
-        //Raise the unpack event request so that each plugin can unpack it's state
+        /*//Raise the unpack event request so that each plugin can unpack it's state
         public void RaiseUnpackRequest(string key, object value)
         {
             if (UnpackRequest != null) //Has some method been told to handle this event?
@@ -105,7 +105,7 @@ namespace VBCommon
                 UnpackEventArgs e = new UnpackEventArgs(key, value);
                 UnpackRequest(this, e);
             }
-        }
+        }*/
 
 
         [System.ComponentModel.Composition.Export("Signalling.PushToUndoStack")]

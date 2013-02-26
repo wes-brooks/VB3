@@ -1284,7 +1284,7 @@ namespace VBCommon.Controls
 
                 //filter diabled rows and columns
                 tblFiltered = this.filterDataTableRows(tblFiltered);
-                Utilities.TableUtils tableutils = new Utilities.TableUtils(tblFiltered);
+                Metadata.Utilities.TableUtils tableutils = new Metadata.Utilities.TableUtils(tblFiltered);
                 tblFiltered = tableutils.filterRVHcols(tblFiltered);
                 dictPackedState.Add("DataSheetDatatable", tblFiltered);
             }

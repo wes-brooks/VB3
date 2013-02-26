@@ -42,6 +42,7 @@ namespace VBDatasheet
         private Boolean boolVisible = true;
         private Boolean boolFirstPass = true;
         private Boolean boolClean = true;
+        private Boolean boolChanged = false;
 
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -96,6 +97,7 @@ namespace VBDatasheet
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
 
             _frmDatasheet.NotifiableDataEvent += new EventHandler(NotifiableDataEventHandler);
+            _frmDatasheet.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
             base.Activate();
         }
 
@@ -235,9 +237,10 @@ namespace VBDatasheet
             if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.Map & ((IPlugin)sender).Complete)
             {
                 _frmDatasheet.SetLocation(e.PackedPluginState);
+                boolChanged = true;
             }
 
-            //This handles an undo:
+            /*//This handles an undo:
             try
             {
                 if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
@@ -253,7 +256,7 @@ namespace VBDatasheet
                     }
                 }
             }
-            catch { }
+            catch { }*/
         }
 
 
@@ -269,11 +272,12 @@ namespace VBDatasheet
 
         public void Broadcast()
         {
+            boolChanged = true;
             IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
 
             if (dictPackedState == null)
                 return;
-
+                        
             dictPackedState.Add("Clean", boolClean);
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
@@ -286,14 +290,25 @@ namespace VBDatasheet
 
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
+            if (!e.Undo || boolChanged)
+            {
+                IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
 
-            dictPackedState.Add("Clean", boolClean);
-            dictPackedState.Add("Complete", boolComplete);
-            dictPackedState.Add("Visible", boolVisible);
-            dictPackedState.Add("FirstPass", boolFirstPass);
+                dictPackedState.Add("Clean", boolClean);
+                dictPackedState.Add("Complete", boolComplete);
+                dictPackedState.Add("Visible", boolVisible);
+                dictPackedState.Add("FirstPass", boolFirstPass);
 
-            e.PackedPluginStates.Add(strPanelKey, dictPackedState);
+                if (!e.Undo)
+                {
+                    e.PackedPluginStates.Add(strPanelKey, dictPackedState);
+                }
+                else
+                {
+                    e.Store.Add(Utilities.RandomString(10), dictPackedState);
+                    boolChanged = false;
+                }
+            }
         }
 
 
@@ -326,7 +341,7 @@ namespace VBDatasheet
                 }
                 _frmDatasheet.UnpackState(dictPlugin);
             }
-            else
+            else if (!e.Undo)
             {
                 Activate();
             }
@@ -416,6 +431,11 @@ namespace VBDatasheet
             //once you leave here, changes made to ds clear for next time here
             boolFirstPass = false;
             boolClean = true;
+        }
+
+        private void ControlChangeEventHandler(object sender, EventArgs e)
+        {
+            this.boolChanged = true;
         }
     }
 }

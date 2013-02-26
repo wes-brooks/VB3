@@ -38,6 +38,7 @@ namespace IPyModeling
         public event EventHandler ModelUpdated;
         public event EventHandler ModelingCanceledEvent;
         public event EventHandler ModelingCompleteEvent;
+        public event EventHandler ControlChangeEvent;
         public event EventHandler<RunButtonStatusArgs> RunButtonStatusChanged;
 
         public event EventHandler ManipulateDataTab;
@@ -898,14 +899,6 @@ namespace IPyModeling
                     listFalsePos.Add(Convert.ToDouble(fp[i]));
                     listFalseNeg.Add(Convert.ToDouble(fn[i]));
                 }
-
-                /*//if cancel was clicked, get out of here
-                if (stopRun)
-                {
-                    NotifyPropChanged(boolRunning);
-                    stopRun = false;
-                    return;
-                }*/
 
                 InitializeValidationChart();
                 UpdateDiagnostics();

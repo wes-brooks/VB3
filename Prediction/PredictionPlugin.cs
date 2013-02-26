@@ -44,6 +44,7 @@ namespace Prediction
         //complete and visible flags
         public Boolean boolComplete;
         public Boolean boolVisible;
+        public Boolean boolChanged = false;
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
@@ -60,6 +61,7 @@ namespace Prediction
             strPanelKey = "Prediction";
             strPanelCaption = "Prediction";
             _frmPred.ButtonStatusEvent += new EventHandler<ButtonStatusEventArgs>(_frmPred_ButtonStatusEvent);
+            _frmPred.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
         }
 
         
@@ -334,7 +336,8 @@ namespace Prediction
 
                 _frmPred.ClearDataGridViews(e.PackedPluginState["Method"].ToString());
                 boolComplete = false;
-
+                boolChanged = true;
+                
                 /*//if the prediction is complete and the model was cleared, clear the prediction
                 if (boolComplete) // && (bool)e.PackedPluginState["CleanPredict"])
                 {
@@ -348,7 +351,7 @@ namespace Prediction
                         _frmPred.ClearMethod(e.PackedPluginState["Method"].ToString());
                 }*/
             }
-            else
+            /*else
             {
                 //This handles an undo:
                 try
@@ -362,22 +365,24 @@ namespace Prediction
                             boolVisible = (bool)dictPlugin["Visible"];
                             boolComplete = (bool)dictPlugin["Complete"];
 
-                            /*if (boolVisible)
+                            if (boolVisible)
                                 Show();
                             else
-                                Hide();*/
+                                Hide();
 
                             _frmPred.UnpackState(dictPlugin);
                         }
                     }
                 }
                 catch { }
-            }
+            }*/
         }
 
 
         public void Broadcast()
         {
+            boolChanged = true;
+
             IDictionary<string, object> dictPackedState = _frmPred.PackState();
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
@@ -396,11 +401,22 @@ namespace Prediction
         //event handler for saving project state
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            IDictionary<string, object> dictPackedState = _frmPred.PackState();
-            dictPackedState.Add("Complete", boolComplete);
-            dictPackedState.Add("Visible", boolVisible);
-              
-            e.PackedPluginStates.Add(strPanelKey, dictPackedState);
+            if (!e.Undo || boolChanged)
+            {
+                IDictionary<string, object> dictPackedState = _frmPred.PackState();
+                dictPackedState.Add("Complete", boolComplete);
+                dictPackedState.Add("Visible", boolVisible);
+
+                if (!e.Undo)
+                {
+                    e.PackedPluginStates.Add(strPanelKey, dictPackedState);
+                }
+                else
+                {
+                    e.Store.Add(Utilities.RandomString(10), dictPackedState);
+                    boolChanged = false;
+                }
+            }
         }
 
 
@@ -486,6 +502,11 @@ namespace Prediction
         {
             _frmPred.btnImportObs_Click(sender, e);
             Broadcast();
+        }
+
+        void ControlChangeEventHandler(object sender, EventArgs e)
+        {
+            this.boolChanged = true;
         }
 
         

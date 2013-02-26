@@ -37,6 +37,8 @@ namespace Prediction
         public List<Lazy<IModel, IDictionary<string, object>>> models;
         public event EventHandler RequestModelPluginList;
 
+        public event EventHandler ControlChangeEvent;
+
         private string[] strArrReferencedVars;
         private DataTable corrDT; 
         private List<ListItem> lstIndVars;

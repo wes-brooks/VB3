@@ -36,7 +36,7 @@ namespace VBCommon.Controls
         private string strReplacestring = string.Empty;
         private string strFindstring = string.Empty;
 
-        private Utilities.TableUtils _tu = null;
+        private Metadata.Utilities.TableUtils _tu = null;
         private dtColumnInformation _dtCI = null;
         private dtRowInformation _dtRI = null;
 
@@ -83,7 +83,7 @@ namespace VBCommon.Controls
         {
             InitializeComponent();
 
-            _tu = new Utilities.TableUtils(dt);
+            _tu = new Metadata.Utilities.TableUtils(dt);
             _dtRI = new dtRowInformation(dt);
             _dtCI = new dtColumnInformation(dt);
 
@@ -105,7 +105,7 @@ namespace VBCommon.Controls
         {
             InitializeComponent();
 
-            _tu = new Utilities.TableUtils(dt);
+            _tu = new Metadata.Utilities.TableUtils(dt);
             _dtRI = dtri;
             _dtCI = dtci;
 

@@ -29,7 +29,8 @@ namespace VBDatasheet
         private bool boolValidated;
 
         private double dblOrientation;
-        
+
+        public event EventHandler ControlChangeEvent;
         public event EventHandler NotifiableDataEvent;
 
         //constructor

@@ -181,27 +181,19 @@ class Model(object):
     def PredictExceedanceProbability(self, data_dictionary, threshold, **args):
         if not threshold:
             threshold = self.threshold
-            
-        #prediction = self.PredictValues(data_dictionary)[:,self.ncomp-1]
-        prediction = self.PredictValues(data_dictionary)[self.ncomp-1]
-        #if (prediction.shape[0] > 1):
-        #    prediction = prediction.squeeze()
-            
+        
+        prediction = self.PredictValues(data_dictionary)[self.ncomp-1]    
         se = self.Extract('RMSEP')
-        #nonexceedance_probability = r.Call(function='pnorm', q=np.array((threshold-prediction)/se, dtype=float)).AsVector()
-        nonexceedance_probability = r.Call(function='pnorm', q=array.array('d', (threshold-prediction)/se)).AsVector()
+        
+        nonexceedance_probability = r.Call(function='pnorm', q=array.array('d', [(threshold-x)/se for x in prediction])).AsVector()
         exceedance_probability = [100*float(1-item) for item in nonexceedance_probability]
         return exceedance_probability
-
-        
+    
+    
     def Predict(self, data_dictionary, **args):
-        prediction = self.PredictValues(data_dictionary)        
-        #if (prediction.shape[0]==1):
-        #    return [float(item) for item in prediction[:,self.ncomp-1]]
-        #else:
-        #    return [float(item) for item in prediction[:,self.ncomp-1].squeeze()]
+        prediction = self.PredictValues(data_dictionary)
         return [float(item) for item in prediction[self.ncomp-1]]
-
+    
         
     def CrossValidation(self, cv_method=0, **args):
         '''Select ncomp by the requested CV method'''

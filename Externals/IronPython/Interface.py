@@ -53,7 +53,6 @@ class BeachInterface(object):
         
         #parse the inputs
         target = str(target)
-        #args['specificity'] = specificity
         
         #initialize the objects where we will drop the results
         result_list = list()
