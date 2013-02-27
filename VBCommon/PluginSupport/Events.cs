@@ -85,29 +85,33 @@ namespace VBCommon.PluginSupport
     public class SerializationEventArgs : EventArgs
     {
         private IDictionary<string, IDictionary<string, object>> packedStates;
-        private bool bUndo;
-        private IDictionary<string, IDictionary<string, object>> dictStateStore;
 
-        public SerializationEventArgs(IDictionary<string, IDictionary<string, object>> dictSerializable, bool Undo=false, IDictionary<string, IDictionary<string, object>> Store=null)
+        public SerializationEventArgs(IDictionary<string, IDictionary<string, object>> dictSerializable)
         {
             this.packedStates = dictSerializable;
-            this.bUndo = Undo;
-            this.dictStateStore = Store;
+
         }
 
         public IDictionary<string, IDictionary<string, object>> PackedPluginStates
         {
             get { return packedStates; }
         }
+    }
 
+
+    //Defines the event arguments used when packing up a project to be saved
+    public class UndoRedoEventArgs : EventArgs
+    {
+        private IDictionary<string, IDictionary<string, object>> dictStateStore;
+
+        public UndoRedoEventArgs(IDictionary<string, IDictionary<string, object>> Store = null)
+        {
+            this.dictStateStore = Store;
+        }
+        
         public IDictionary<string, IDictionary<string, object>> Store
         {
             get { return dictStateStore; }
-        }
-
-        public bool Undo
-        {
-            get { return bUndo; }
         }
     }
 

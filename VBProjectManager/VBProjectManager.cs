@@ -34,16 +34,21 @@ namespace VBProjectManager
         public static string VBProjectsPath = null;
         private Boolean boolComplete = false;
         private Boolean boolVisible = false;
+        private Boolean boolChanged = false;
 
-        private Stack UndoStack = new Stack();
-        private Stack RedoStack = new Stack();
+        //private Stack<string> UndoStack;
+        //private Stack<string> RedoStack;
+
         private SimpleActionItem btnUndo;
         private SimpleActionItem btnRedo;
 
         private string strUndoRedoDictionaryPath;
         private PersistentDictionary<string, string> UndoRedoBackend;
         private PluginStateDictionary UndoRedoDict;
-        
+
+        private Stack<string> UndoKeys;
+        private Stack<string> RedoKeys;
+
         //constructor
         public VBProjectManager()
         {
@@ -61,6 +66,9 @@ namespace VBProjectManager
 
         public override void Activate()
         {
+            UndoKeys = new Stack<string>();
+            RedoKeys = new Stack<string>();
+
             short n = 0;
 
             //Add an Open button to the application ("File") menu.
@@ -100,7 +108,7 @@ namespace VBProjectManager
             n++;
 
             //add an undo button to application ("Edit") menu... ??
-            btnUndo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Undo", Undo);
+            btnUndo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Undo", UndoMenuItem_Click);
             btnUndo.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnUndo.LargeImage = Resources.Undo_16x16;
             btnUndo.ToolTipText = "Undo the last action";
@@ -110,7 +118,7 @@ namespace VBProjectManager
             n++;
 
             //add a redo button to application ("Edit") menu... ??
-            btnRedo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Redo", Redo);
+            btnRedo = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Redo", RedoMenuItem_Click);
             btnRedo.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnRedo.LargeImage = Resources.Redo_16x16;
             btnRedo.ToolTipText = "Redo the last undo action";
@@ -250,7 +258,12 @@ namespace VBProjectManager
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener); //loop through plugins ck for min pluginType to make that active when plugin opened.
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
-            signaller.PopulateUndoStackRequested += new EventHandler(PushCurrentState);
+
+            signaller.UndoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Undo);
+            signaller.RedoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Redo);
+            signaller.TriggerUndoStackEvent += new EventHandler(AddPluginStatesToUndoStack);
+            signaller.UndoStackEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(PushToStack);
+
             App.Disposed += new EventHandler(ApplicationsClosedHandler);
         }
 
@@ -263,47 +276,49 @@ namespace VBProjectManager
 
 
         //pop off last stack for undo
-        public void Undo(object sender, EventArgs e)
+        public void UndoMenuItem_Click(object sender, EventArgs e)
         {
-            if (UndoStack.Count > 1)
-            {
-                string strCurrentStateKey = UndoStack.Pop().ToString();
-                string strLastStateKey = UndoStack.Peek().ToString();
+            //if (UndoStack.Count > 1)
+            //{
+                //string strCurrentStateKey = UndoStack.Pop().ToString();
+                //string strLastStateKey = UndoStack.Peek().ToString();
 
-                string strCurrentStateJson = UndoRedoBackend[strCurrentStateKey];
-                string strLastStateJson = UndoRedoBackend[strLastStateKey];
+                //string strCurrentStateJson = UndoRedoBackend[strCurrentStateKey];
+                //string strLastStateJson = UndoRedoBackend[strLastStateKey];
 
-                IDictionary<string, IDictionary<string, object>> dictCurrentState = Utilities.StringToStates(strCurrentStateJson);
-                IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
+                //IDictionary<string, IDictionary<string, object>> dictCurrentState = Utilities.StringToStates(strCurrentStateJson);
+                //IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
 
                 //raise unpack event, sending packed plugins dictionary
-                RedoStack.Push(strCurrentStateKey);
-                signaller.UnpackProjectState(dictLastState, Undo: true);
+                //RedoStack.Push(strCurrentStateKey);
+                //signaller.UnpackProjectState(dictLastState, Undo: true, Store: UndoRedoDict);
+                
+                signaller.SignalUndo(Store: UndoRedoDict);
 
-                if (RedoStack.Count > 0)
+                if (RedoKeys.Count > 0)
                     btnRedo.Enabled = true;                
-                if (UndoStack.Count == 1)
+                if (UndoKeys.Count == 1)
                     btnUndo.Enabled = false;
-            }
+            //}
         }
 
 
-        public void Redo(object sender, EventArgs e)
+        public void RedoMenuItem_Click(object sender, EventArgs e)
         {
-            if (RedoStack.Count > 0)
+            if (RedoKeys.Count > 0)
             {
-                string strLastStateKey = RedoStack.Pop().ToString();
-                string strLastStateJson = UndoRedoBackend[strLastStateKey];
-                IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
+                //string strLastStateKey = RedoStack.Pop().ToString();
+                //string strLastStateJson = UndoRedoBackend[strLastStateKey];
+                //IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
 
                 //raise unpack event, sending packed plugins dictionary
-                UndoStack.Push(strLastStateKey);
-                signaller.UnpackProjectState(dictLastState, Undo: true);
+                //UndoStack.Push(strLastStateKey);
+                signaller.SignalRedo(Store: UndoRedoDict);
 
                 
-                if (RedoStack.Count > 0)
+                if (RedoKeys.Count > 0)
                     btnRedo.Enabled = true;
-                if (UndoStack.Count == 1)
+                if (UndoKeys.Count == 1)
                     btnUndo.Enabled = false;
             }
         }
@@ -313,18 +328,18 @@ namespace VBProjectManager
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e) { }
 
 
-        private void PushCurrentState(object sender, EventArgs e)
+        private void AddPluginStatesToUndoStack(object sender, EventArgs e)
         {
             //Dictionary to store each plugin's state for saving
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
-            signaller.RaiseSaveRequest(dictPluginStates, Undo: true, Store: UndoRedoDict);
+            signaller.UndoStack(Store: UndoRedoDict);
 
             //PersistentDictionary-based undo and redo:
             //string strProjectStateJson = Utilities.StatesToString(dictPluginStates);
             //string strKey = Utilities.RandomString(10);
             //UndoRedoBackend.Add(key: strKey, value: strProjectStateJson);
             //UndoStack.Push(strKey);        
-            RedoStack.Clear();
+            //RedoStack.Clear();
 
             //Manage the state of the undo/redo buttons.
             btnUndo.Enabled = true;
@@ -344,6 +359,7 @@ namespace VBProjectManager
 
         public void Broadcast()
         {
+            boolChanged = true;
             IDictionary<string, object> packedState = PackState();
             signaller.RaiseBroadcastRequest(this, packedState);
         }

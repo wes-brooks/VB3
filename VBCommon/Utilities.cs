@@ -168,7 +168,6 @@ namespace VBCommon
                 }
                 dictPluginStates.Add(strPluginKey, dictPluginState);
             }
-
             return dictPluginStates;
         }
 
@@ -176,7 +175,8 @@ namespace VBCommon
         public static IDictionary<string, object> StringToState(string Serialized)
         {
             string strProjectStateJson = Serialized;
-            var listPackedPluginState = JsonConvert.DeserializeObject<Dictionary<string, object>>(strProjectStateJson);
+            //Newtonsoft.Json.Linq.JArray jarray = (Newtonsoft.Json.Linq.JArray)JsonConvert.DeserializeObject(strProjectStateJson);
+            //var listPackedPluginState = JsonConvert.DeserializeObject<Dictionary<string, object>>(strProjectStateJson);
 
             //Instantiate some objects for later use.
             Dictionary<string, string> dictJsonRep = new Dictionary<string, string>();

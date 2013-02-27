@@ -44,6 +44,10 @@ namespace VBDatasheet
         private Boolean boolClean = true;
         private Boolean boolChanged = false;
 
+        private Stack<string> UndoKeys;
+        private Stack<string> RedoKeys;
+        private string strUndoRedoKey;
+
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
@@ -89,6 +93,9 @@ namespace VBDatasheet
         public override void Activate()
         {
             _frmDatasheet = new frmDatasheet();
+            UndoKeys = new Stack<string>();
+            RedoKeys = new Stack<string>();
+
             AddRibbon("Activate");
             AddPanel();
 
@@ -227,6 +234,10 @@ namespace VBDatasheet
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
+            signaller.UndoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Undo);
+            signaller.RedoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Redo);
+            signaller.UndoStackEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(PushToStack);
+            
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
         
@@ -284,31 +295,20 @@ namespace VBDatasheet
             dictPackedState.Add("FirstPass", boolFirstPass);
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
-            signaller.PushToUndoStack();
+            signaller.TriggerUndoStack();
         }
 
 
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            if (!e.Undo || boolChanged)
-            {
-                IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
+            IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
 
-                dictPackedState.Add("Clean", boolClean);
-                dictPackedState.Add("Complete", boolComplete);
-                dictPackedState.Add("Visible", boolVisible);
-                dictPackedState.Add("FirstPass", boolFirstPass);
+            dictPackedState.Add("Clean", boolClean);
+            dictPackedState.Add("Complete", boolComplete);
+            dictPackedState.Add("Visible", boolVisible);
+            dictPackedState.Add("FirstPass", boolFirstPass);
 
-                if (!e.Undo)
-                {
-                    e.PackedPluginStates.Add(strPanelKey, dictPackedState);
-                }
-                else
-                {
-                    e.Store.Add(Utilities.RandomString(10), dictPackedState);
-                    boolChanged = false;
-                }
-            }
+            e.PackedPluginStates.Add(strPanelKey, dictPackedState);
         }
 
 
@@ -317,10 +317,6 @@ namespace VBDatasheet
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-
-                //check to see if there already is a datasheet open, if so, close it before opening a saved project
-                /*if (this.Visible)
-                    this.Hide();*/
 
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];
@@ -341,10 +337,112 @@ namespace VBDatasheet
                 }
                 _frmDatasheet.UnpackState(dictPlugin);
             }
-            else if (!e.Undo)
+            else
             {
                 Activate();
             }
+        }
+
+
+        private void PushToStack(object sender, UndoRedoEventArgs args)
+        {
+            if (boolChanged)
+            {
+                IDictionary<string, object> dictPackedState = _frmDatasheet.PackState();
+
+                dictPackedState.Add("Clean", boolClean);
+                dictPackedState.Add("Complete", boolComplete);
+                dictPackedState.Add("Visible", boolVisible);
+                dictPackedState.Add("FirstPass", boolFirstPass);
+
+                string strKey = Utilities.RandomString(10);
+                args.Store.Add(strKey, dictPackedState);
+                UndoKeys.Push(strKey);
+                RedoKeys.Clear();
+                boolChanged = false;
+            }
+            else
+            {
+                try
+                {
+                    string strKey = UndoKeys.Peek();
+                    UndoKeys.Push(strKey);
+                    RedoKeys.Clear();
+                }
+                catch { }
+            }
+        }
+
+
+        private void Undo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Pop();
+                string strPastKey = UndoKeys.Peek();
+                RedoKeys.Push(strCurrentKey);
+
+                if (strCurrentKey != strPastKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strPastKey];
+
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    boolComplete = (bool)dictPlugin["Complete"];
+                    boolClean = (bool)dictPlugin["Clean"];
+                    boolFirstPass = (bool)dictPlugin["FirstPass"];
+
+                    if (boolVisible)
+                    {
+                        this.Show();
+
+                        if (boolComplete)
+                        {
+                            btnComputeAO.Enabled = true;
+                            btnGoToModeling.Enabled = true;
+                            btnManipulate.Enabled = true;
+                            btnTransform.Enabled = true;
+                        }
+                    }
+                    _frmDatasheet.UnpackState(dictPlugin);
+                }
+            }
+            catch { }
+        }
+
+
+        private void Redo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Peek();
+                string strNextKey = RedoKeys.Pop();
+                UndoKeys.Push(strNextKey);
+
+                if (strCurrentKey != strNextKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strNextKey];
+
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    boolComplete = (bool)dictPlugin["Complete"];
+                    boolClean = (bool)dictPlugin["Clean"];
+                    boolFirstPass = (bool)dictPlugin["FirstPass"];
+
+                    if (boolVisible)
+                    {
+                        this.Show();
+
+                        if (boolComplete)
+                        {
+                            btnComputeAO.Enabled = true;
+                            btnGoToModeling.Enabled = true;
+                            btnManipulate.Enabled = true;
+                            btnTransform.Enabled = true;
+                        }
+                    }
+                    _frmDatasheet.UnpackState(dictPlugin);
+                }
+            }
+            catch { }
         }
 
 

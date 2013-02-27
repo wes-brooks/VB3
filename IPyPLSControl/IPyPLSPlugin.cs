@@ -13,10 +13,14 @@ namespace IPyPLSPlugin
     {
         public IPyPLSPlugin()
         {
+            base.strPanelKey = "PLSPanel";
+            base.strPanelCaption = "PLS";
+        }
+
+        public override void Activate()
+        {
             innerIronPythonControl = new IPyPLSControl.IPyPLSControl();
-            strPanelKey = "PLSPanel";
-            strPanelCaption = "PLS";
-            innerIronPythonControl.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
+            base.Activate();
         }
 
 

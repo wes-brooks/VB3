@@ -13,6 +13,10 @@ namespace VBCommon
         public delegate void SerializationEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event SerializationEventHandler<SerializationEventArgs> ProjectSaved;
         public event SerializationEventHandler<SerializationEventArgs> ProjectOpened;
+        public event SerializationEventHandler<UndoRedoEventArgs> UndoEvent;
+        public event SerializationEventHandler<UndoRedoEventArgs> RedoEvent;
+        public event SerializationEventHandler<UndoRedoEventArgs> UndoStackEvent;
+        public event EventHandler TriggerUndoStackEvent;
 
         //Request that plugins unpack their state
         public delegate void EventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
@@ -27,14 +31,10 @@ namespace VBCommon
         public delegate void HeaderClickEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event HeaderClickEventHandler<DotSpatial.Controls.Header.RootItemEventArgs> HeaderClickEvent;
 
-        public delegate void PluginMessageHandler<TArgs>(string sender, TArgs args) where TArgs : EventArgs;
-        //public event PluginMessageHandler<PluginArgs> PluginMessageReceived;
-
         //event for broadcasting
         public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
 
-        public event EventHandler PopulateUndoStackRequested;
 
         public Signaller() {}
 
@@ -65,56 +65,64 @@ namespace VBCommon
 
 
         //Tell the plugins to pack their states into the dictionary for saving
-        public void RaiseSaveRequest(IDictionary<string, IDictionary<string, object>> dictPackedStates, bool Undo=false, IDictionary<string, IDictionary<string, object>> Store=null)
-        {
-            if (ProjectSaved != null) //Has some method been told to handle this event?
-            {
-                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates, Undo, Store);
-                ProjectSaved(this, e);
-            }
-        }
-
-
-        /*//Tell the plugins to pack their states into the undo stack
-        public void SetUndoPoint(IDictionary<string, IDictionary<string, object>> dictPackedStates)
+        public void RaiseSaveRequest(IDictionary<string, IDictionary<string, object>> dictPackedStates)
         {
             if (ProjectSaved != null) //Has some method been told to handle this event?
             {
                 SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
                 ProjectSaved(this, e);
             }
-        }*/
+        }
 
 
         //Tell the plugins to unpack themselves from the saved state
-        public void UnpackProjectState(IDictionary<string, IDictionary<string, object>> dictPackedStates, bool Undo=false)
+        public void UnpackProjectState(IDictionary<string, IDictionary<string, object>> dictPackedStates)
         {
             if (ProjectOpened != null) //Has some method been told to handle this event?
             {
-                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates, Undo);
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
                 ProjectOpened(this, e);
             }
         }
 
 
-        /*//Raise the unpack event request so that each plugin can unpack it's state
-        public void RaiseUnpackRequest(string key, object value)
+        public void SignalUndo(IDictionary<string, IDictionary<string, object>> Store = null)
         {
-            if (UnpackRequest != null) //Has some method been told to handle this event?
+            if (UndoEvent != null) //Has some method been told to handle this event?
             {
-                UnpackEventArgs e = new UnpackEventArgs(key, value);
-                UnpackRequest(this, e);
+                UndoRedoEventArgs e = new UndoRedoEventArgs(Store);
+                UndoEvent(this, e);
             }
-        }*/
+        }
+
+
+        public void SignalRedo(IDictionary<string, IDictionary<string, object>> Store = null)
+        {
+            if (RedoEvent != null) //Has some method been told to handle this event?
+            {
+                UndoRedoEventArgs e = new UndoRedoEventArgs(Store);
+                RedoEvent(this, e);
+            }
+        }
 
 
         [System.ComponentModel.Composition.Export("Signalling.PushToUndoStack")]
-        public void PushToUndoStack()
+        public void TriggerUndoStack()
         {
-            if (PopulateUndoStackRequested != null)
+            if (TriggerUndoStackEvent != null)
             {
                 EventArgs e = new EventArgs();
-                PopulateUndoStackRequested(this, e);
+                TriggerUndoStackEvent(this, e);
+            }
+        }
+
+
+        public void UndoStack(IDictionary<string, IDictionary<string, object>> Store)
+        {
+            if (UndoStackEvent != null)
+            {
+                UndoRedoEventArgs e = new UndoRedoEventArgs(Store);
+                UndoStackEvent(this, e);
             }
         }
 

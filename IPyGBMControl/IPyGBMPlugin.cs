@@ -13,12 +13,15 @@ namespace IPyGBMPlugin
     {
         public IPyGBMPlugin()
         {
-            innerIronPythonControl = new IPyGBMControl.IPyGBMControl();
-            strPanelKey = "GBMPanel";
-            strPanelCaption = "GBM";
-            innerIronPythonControl.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
+            base.strPanelKey = "GBMPanel";
+            base.strPanelCaption = "GBM";
         }
 
+        public override void Activate()
+        {
+            innerIronPythonControl = new IPyGBMControl.IPyGBMControl();
+            base.Activate();
+        }
 
         public List<double> Predict(System.Data.DataSet dsPredictionData, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent) { return (innerIronPythonControl.Predict(dsPredictionData, RegulatoryThreshold, DecisionThreshold, ThresholdTransform, ThresholdPowerExponent)); }
         public List<double> PredictExceedanceProbability(System.Data.DataSet dsPredictionData, double RegulatoryThreshold, double DecisionThreshold, VBCommon.Transforms.DependentVariableTransforms ThresholdTransform, double ThresholdPowerExponent) { return (innerIronPythonControl.PredictExceedanceProbability(dsPredictionData, RegulatoryThreshold, DecisionThreshold, ThresholdTransform, ThresholdPowerExponent)); }

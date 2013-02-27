@@ -100,16 +100,13 @@ namespace VBProjectManager
             }
 
             //Reset the undo stack
-            UndoStack.Clear();
-            RedoStack.Clear();
-            signaller.PushToUndoStack();
+            UndoKeys.Clear();
+            RedoKeys.Clear();
+            signaller.TriggerUndoStack();
 
             logger.LogEvent(String.Format("Project File Name: {0}", strPathName), Globals.messageIntent.UserOnly, Globals.targetSStrip.StatusStrip1);
             logger.LogEvent(String.Format("Project opened from {0}", strPathName), Globals.messageIntent.LogFileOnly, Globals.targetSStrip.None);
-        }
-
-
-        
+        }             
 
 
         //raise event to pack each plugin for saving and add to PackedPluginStates dictionary
@@ -130,6 +127,75 @@ namespace VBProjectManager
             {
                 //Set this plugin to an empty state.
             }
+        }
+
+
+        private void PushToStack(object sender, UndoRedoEventArgs args)
+        {
+            if (boolChanged)
+            {
+                IDictionary<string, object> dictPackedState = PackState();
+
+                string strKey = Utilities.RandomString(10);
+                args.Store.Add(strKey, dictPackedState);
+                UndoKeys.Push(strKey);
+                RedoKeys.Clear();
+                boolChanged = false;
+            }
+            else
+            {
+                try
+                {
+                    string strKey = UndoKeys.Peek();
+                    UndoKeys.Push(strKey);
+                    RedoKeys.Clear();
+                }
+                catch
+                {
+                    IDictionary<string, object> dictPackedState = PackState();
+                    string strKey = Utilities.RandomString(10);
+                    args.Store.Add(strKey, dictPackedState);
+                    UndoKeys.Push(strKey);
+                    RedoKeys.Clear();
+                    boolChanged = false;
+                }
+            }
+        }
+
+
+        private void Undo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Pop();
+                string strPastKey = UndoKeys.Peek();
+                RedoKeys.Push(strCurrentKey);
+
+                if (strCurrentKey != strPastKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strPastKey];
+                    this.UnpackState(dictPlugin);
+                }
+            }
+            catch { }
+        }
+
+
+        private void Redo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Peek();
+                string strNextKey = RedoKeys.Pop();
+                UndoKeys.Push(strNextKey);
+
+                if (strCurrentKey != strNextKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strNextKey];
+                    this.UnpackState(dictPlugin);
+                }
+            }
+            catch { }
         }
 
                

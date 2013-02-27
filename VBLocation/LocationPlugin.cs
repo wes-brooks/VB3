@@ -287,7 +287,7 @@ namespace VBLocation
             dictPackedState.Add("Visible", boolVisible);
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
-            signaller.PushToUndoStack();
+            signaller.TriggerUndoStack();
         }
 
 

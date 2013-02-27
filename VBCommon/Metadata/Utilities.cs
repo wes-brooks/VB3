@@ -96,7 +96,7 @@ namespace VBCommon.Metadata
                 Dictionary<string, bool> rstatus = dtri.DTRowInfo;
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
-                    if (!rstatus[dtCopy.Rows[i][0].ToString()])
+                    if (!rstatus[dt.Rows[i][0].ToString()])
                         dtCopy.Rows[i].Delete();
                 }
                 dtCopy.AcceptChanges();

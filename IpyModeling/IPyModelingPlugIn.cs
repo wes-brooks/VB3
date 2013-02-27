@@ -23,8 +23,8 @@ namespace IPyModeling
         [Import("Shell")]
         private ContainerControl Shell { get; set; }
 
-        protected string strPanelKey = "GenericIronPythonModelPanelKey";
-        protected string strPanelCaption = "GenericIronPythonModelPanelCaption";
+        protected string strPanelKey;// = "GenericIronPythonModelPanelKey";
+        protected string strPanelCaption;// = "GenericIronPythonModelPanelCaption";
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Modeling;
         private RootItem rootHeaderItem;
 
@@ -48,8 +48,11 @@ namespace IPyModeling
         public Boolean boolComplete = false;
         public Boolean boolVisible;
         public Boolean boolRunning;
-        public Boolean boolVirgin = true;
+        public Boolean boolVirgin;
         public Boolean boolChanged = false;
+
+        private Stack<string> UndoKeys;
+        private Stack<string> RedoKeys;
 
         private string strTopPlugin = string.Empty;
 
@@ -65,18 +68,22 @@ namespace IPyModeling
 
         public void Hide()
         {
+            if (boolVisible) { boolChanged = true; }
             boolVisible = false;
+            
             App.HeaderControl.RemoveAll();
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
         }
 
 
         public void Show()
-        {            
+        {
+            if (!boolVisible) { boolChanged = true; }
+            boolVisible = true;
+            
             AddRibbon("Show");
             ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);
-            boolVisible = true; 
+            App.HeaderControl.SelectRoot(strPanelKey);            
         }
 
 
@@ -111,6 +118,9 @@ namespace IPyModeling
 
         public override void Activate()
         {
+            UndoKeys = new Stack<string>();
+            RedoKeys = new Stack<string>();
+
             AddPanel();
             AddRibbon("Activate");
             
@@ -121,9 +131,11 @@ namespace IPyModeling
             innerIronPythonControl.ModelingTabControl.SelectedIndexChanged += new EventHandler(UpdateControlStatus);
             innerIronPythonControl.ModelingCompleteEvent += new EventHandler(ModelingComplete);
             innerIronPythonControl.ModelingCanceledEvent += new EventHandler(ModelingCanceled);
-            
+
+            boolVirgin = true;
+
             base.Activate();
-            //Hide();
+            Hide();
         }
 
 
@@ -282,6 +294,9 @@ namespace IPyModeling
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
+            signaller.UndoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Undo);
+            signaller.RedoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Redo);
+            signaller.UndoStackEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(PushToStack);
 
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
@@ -290,31 +305,29 @@ namespace IPyModeling
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {            
-            if (!(bool)((IPlugin)sender).Complete)
-                return;
+            //if (!(bool)((IPlugin)sender).Complete)
+            //    return;
 
             //if datasheet updated itself, set data with changes
             if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {
-                IDictionary<string, object> dictPluginState = (IDictionary<string, object>)(e.PackedPluginState);
-                if (!(bool)dictPluginState["Complete"])
+                if (!(bool)((IPlugin)sender).Complete)
                 {
-                    //this.Hide();
+                    Hide();
                     return;
                 }
-                else if (boolVirgin)
+                /*else if (boolVirgin)
                 {
                     if (dictPluginState != null)
                     {
                         if (dictPluginState.Count > 3)
                         {
-                            //boolVirgin = false;
                             innerIronPythonControl.SetData(e.PackedPluginState);
                             boolChanged = true;
                             //Show();
                         }
                     }
-                }
+                }*/
                 else
                 {
                     if (!(bool)e.PackedPluginState["Clean"])
@@ -323,41 +336,11 @@ namespace IPyModeling
                         innerIronPythonControl.SetData(e.PackedPluginState);
                         boolChanged = true;
                     }
-                    //Show();
+                    Show();
                 }
-            }
-            else
-            {
-                /*//This handles an undo:
-                try
-                {
-                    if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
-                    {
-                        if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
-                        {
-                            IDictionary<string, object> dictPlugin = e.PackedPluginState;
-
-                            //Show();
-                            //MakeActive();
-
-                            innerIronPythonControl.UnpackState(dictPlugin);
-
-                            boolComplete = (bool)dictPlugin["Complete"];
-                            boolVisible = (bool)dictPlugin["Visible"];
-                            boolVirgin = (bool)dictPlugin["Virgin"];
-
-                            //if (boolVisible)
-                                //Show();
-                            //else
-                                //Hide();
-                        }
-                    }
-                }
-                catch { }*/
-            }       
+            }                
         }
-
-
+        
 
         public void UpdateControlStatus(object sender, EventArgs e)
         {
@@ -404,72 +387,6 @@ namespace IPyModeling
         }
 
 
-        /*public void HandleManipulateDataTab(object sender, EventArgs e)
-        {
-            //only have manipulate datasheet buttons enabled when on Manipulate Datasheet tab
-            try
-            {
-                btnComputeAO.Enabled = true;
-                btnManipulate.Enabled = true;
-                btnTransform.Enabled = true;
-                btnRun.Enabled = false;
-            }
-            catch
-            { }
-        }
-
-        
-        public void HandleModelTab(object sender, EventArgs e)
-        {
-            // only have model buttons enabled
-            try
-            {
-                btnComputeAO.Enabled = false;
-                btnManipulate.Enabled = false;
-                btnTransform.Enabled = false;
-                btnRun.Enabled = true;
-            }
-            catch
-            { }
-        }
-
-        
-        public void HandleVariableTab(object sender, EventArgs e)
-        {
-            //no buttons enabled for the variable selection tab
-            try
-            {
-                btnComputeAO.Enabled = false;
-                btnManipulate.Enabled = false;
-                btnTransform.Enabled = false;
-                btnRun.Enabled = false;
-            }
-            catch
-            { }
-        }*/
-
-
-        /*//handles broadcasting each change to be added to the stack
-        public void HandleAddToStack(object sender, EventArgs e)
-        {            
-            if (boolComplete)
-            {
-                DialogResult dlgr = MessageBox.Show("Changes in data and/or data attributes have occurred.\nPrevious modeling results will be erased. Proceed?", "Proceed to Modeling.", MessageBoxButtons.OKCancel);
-                if (dlgr == DialogResult.Cancel)
-                {
-                    //then use that stack here to undo??
-                    return;
-                }
-                else if (dlgr == DialogResult.OK)
-                {
-                    boolComplete = false;
-                    innerIronPythonControl.ClearModelingTab();
-                }
-            }
-            Broadcast();
-        }*/
-
-
         //when modeling makes changes, event broadcasts changes to those listening
         public void Broadcast()
         {
@@ -489,7 +406,7 @@ namespace IPyModeling
             dictPackedState.Add("Visible", boolVisible);
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
-            signaller.PushToUndoStack();
+            signaller.TriggerUndoStack();
         }
 
 
@@ -514,27 +431,16 @@ namespace IPyModeling
         //event handler for saving project state
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            if (!e.Undo || boolChanged)
+            //go pack state, add complete and visible, and add to dictionary of plugins
+            IDictionary<string, object> packedState = innerIronPythonControl.PackState();
+
+            if (packedState != null)
             {
-                //go pack state, add complete and visible, and add to dictionary of plugins
-                IDictionary<string, object> packedState = innerIronPythonControl.PackState();
+                packedState.Add("Complete", boolComplete);
+                packedState.Add("Visible", boolVisible);
+                packedState.Add("Virgin", boolVirgin);
 
-                if (packedState != null)
-                {
-                    packedState.Add("Complete", boolComplete);
-                    packedState.Add("Visible", boolVisible);
-                    packedState.Add("Virgin", boolVirgin);
-
-                    if (!e.Undo)
-                    {
-                        e.PackedPluginStates.Add(strPanelKey, packedState);
-                    }
-                    else
-                    {
-                        e.Store.Add(Utilities.RandomString(10), packedState);
-                        boolChanged = false;
-                    }
-                }
+                e.PackedPluginStates.Add(strPanelKey, packedState);
             }
         }
 
@@ -559,10 +465,110 @@ namespace IPyModeling
                 //else
                 //    Show();        
             }
-
-            else if (!e.Undo)
+            else
             {
                 innerIronPythonControl.Clear();
+            }
+        }
+
+
+        private void PushToStack(object sender, UndoRedoEventArgs args)
+        {
+            if (boolChanged)
+            {
+                //go pack state, add complete and visible, and add to dictionary of plugins
+                IDictionary<string, object> packedState = innerIronPythonControl.PackState();
+
+                if (packedState != null)
+                {
+                    packedState.Add("Complete", boolComplete);
+                    packedState.Add("Visible", boolVisible);
+                    packedState.Add("Virgin", boolVirgin);
+
+                        string strKey = Utilities.RandomString(10);
+                        args.Store.Add(strKey, packedState);
+                        UndoKeys.Push(strKey);
+                        RedoKeys.Clear();
+                        boolChanged = false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    string strKey = UndoKeys.Peek();
+                    UndoKeys.Push(strKey);
+                    RedoKeys.Clear();
+                }
+                catch { }
+            }            
+        }
+
+
+        private void Undo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Pop();
+                string strPastKey = UndoKeys.Peek();
+                RedoKeys.Push(strCurrentKey);
+
+                if (strCurrentKey != strPastKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strPastKey];
+
+                    //Show();
+                    //MakeActive();
+
+                    innerIronPythonControl.UnpackState(dictPlugin);
+
+                    boolComplete = (bool)dictPlugin["Complete"];
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    boolVirgin = (bool)dictPlugin["Virgin"];
+
+                    if (!boolVisible)
+                        Hide();
+                    else
+                        Show();
+                }
+            }
+            catch
+            {
+                Activate();
+            }
+        }
+
+
+        private void Redo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Peek();
+                string strNextKey = RedoKeys.Pop();
+                UndoKeys.Push(strNextKey);
+
+                if (strCurrentKey != strNextKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strNextKey];
+
+                    //Show();
+                    //MakeActive();
+
+                    innerIronPythonControl.UnpackState(dictPlugin);
+
+                    boolComplete = (bool)dictPlugin["Complete"];
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    boolVirgin = (bool)dictPlugin["Virgin"];
+
+                    if (!boolVisible)
+                        Hide();
+                    else
+                        Show(); 
+                }
+            }
+            catch
+            {
+                Activate();
             }
         }
 
@@ -600,30 +606,6 @@ namespace IPyModeling
         }
 
 
-        /*void btnCancel_Click(object sender, EventArgs e)
-        {
-            boolRunning = false;
-            innerIronPythonControl.btnCancel_Click(sender, e);
-        }*/
-
-        
-        /*//handle when model boolean Running flag changes
-        private void HandleRunCancelEnableState(bool val)
-        {
-            if (boolRunning)
-            {
-                Cursor.Current = Cursors.WaitCursor;
-                btnRun.Enabled = false;
-                //btnCancel.Enabled = true;
-            }
-            else
-            {
-                btnRun.Enabled = true;
-                //btnCancel.Enabled = false;
-            }
-        }*/
-
-
         void btnCancel_Click(object sender, EventArgs e)
         {
             innerIronPythonControl.btnCancel_Click(sender, e);
@@ -637,10 +619,6 @@ namespace IPyModeling
             boolComplete = false;
         }
 
-        protected void ControlChangeEventHandler(object sender, EventArgs e)
-        {
-            this.boolChanged = true;
-        }
 
         //change has been made within modeling, need to update
         private void HandleUpdate(object sender, EventArgs e)

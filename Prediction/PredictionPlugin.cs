@@ -25,8 +25,8 @@ namespace Prediction
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Prediction;
         
         private VBCommon.Signaller signaller;
-        protected string strPanelKey;
-        protected string strPanelCaption;
+        private const string strPanelKey = "Prediction";
+        private const string strPanelCaption = "Prediction";
         
         //ribbon buttons
         private SimpleActionItem btnImportIV;
@@ -49,20 +49,13 @@ namespace Prediction
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
 
+        private Stack<string> UndoKeys;
+        private Stack<string> RedoKeys;
+        private string strUndoRedoKey;
 
         //Raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<VBCommon.PluginSupport.MessageArgs> MessageSent;
-
-
-        public PredictionPlugin()
-        {
-            _frmPred = new frmPrediction();
-            strPanelKey = "Prediction";
-            strPanelCaption = "Prediction";
-            _frmPred.ButtonStatusEvent += new EventHandler<ButtonStatusEventArgs>(_frmPred_ButtonStatusEvent);
-            _frmPred.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
-        }
 
         
         //deactivate this plugin
@@ -75,34 +68,24 @@ namespace Prediction
         }
 
 
-        //hide this plugin
         public void Hide()
         {
+            if (boolVisible) { boolChanged = true; }
+            boolVisible = false;
+
             App.HeaderControl.RemoveAll();
             ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
-            boolVisible = false;
         }
 
 
         public void Show()
-        {            
-            if (boolVisible)
-            {
-                //If this plugin is already visible, then do nothing.
-                return;
-            }
-            else
-            {                
-                //boolHasBeenVisible = true;
-                AddRibbon("Show");
-
-                if (boolComplete)
-                {
-                    ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-                    App.HeaderControl.SelectRoot(strPanelKey);
-                }
-            }
+        {
+            if (!boolVisible) { boolChanged = true; }
             boolVisible = true;
+
+            AddRibbon("Show");
+            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+            App.HeaderControl.SelectRoot(strPanelKey);
         }
 
 
@@ -116,7 +99,15 @@ namespace Prediction
         //initial activation
         public override void Activate()
         {
+            UndoKeys = new Stack<string>();
+            RedoKeys = new Stack<string>();
+
+            _frmPred = new frmPrediction();
+
+            _frmPred.ButtonStatusEvent += new EventHandler<ButtonStatusEventArgs>(_frmPred_ButtonStatusEvent);
+            _frmPred.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
             _frmPred.RequestModelPluginList += new EventHandler(PassModelPluginList);
+            _frmPred.NotifiableChangeEvent += new EventHandler(NotifiableChangeHandler);
             
             AddPanel();
             AddRibbon("Activate");
@@ -127,6 +118,7 @@ namespace Prediction
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
 
             base.Activate();
+            Hide();
         }
 
 
@@ -293,8 +285,12 @@ namespace Prediction
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
+            signaller.UndoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Undo);
+            signaller.RedoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Redo);
+            signaller.UndoStackEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(PushToStack);
+            
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
-            _frmPred.NotifiableChangeEvent += new EventHandler(NotifiableChangeHandler);
+            
         }
 
 
@@ -324,58 +320,19 @@ namespace Prediction
                 if ((bool)e.PackedPluginState["Complete"])
                 {
                     _frmPred.AddModel(e.PackedPluginState["Method"].ToString());
-                    /*if (!boolVisible)
-                        Show();*/
+                    Show();
                 }
                 else
                 {
                     int intValidModels = _frmPred.ClearMethod(e.PackedPluginState["Method"].ToString());
-                    /*if (intValidModels == 0)
-                        Hide();*/
+                    if (intValidModels == 0)
+                        Hide();
                 }
 
                 _frmPred.ClearDataGridViews(e.PackedPluginState["Method"].ToString());
                 boolComplete = false;
                 boolChanged = true;
-                
-                /*//if the prediction is complete and the model was cleared, clear the prediction
-                if (boolComplete) // && (bool)e.PackedPluginState["CleanPredict"])
-                {
-                    _frmPred.ClearDataGridViews(e.PackedPluginState["Method"].ToString());
-                    boolComplete = false;
-
-                    //add the modified model to list of Available Models if just changed (not cleared)
-                    if ((bool)e.PackedPluginState["Complete"])
-                        _frmPred.AddModel(e.PackedPluginState["Method"].ToString());
-                    else
-                        _frmPred.ClearMethod(e.PackedPluginState["Method"].ToString());
-                }*/
-            }
-            /*else
-            {
-                //This handles an undo:
-                try
-                {
-                    if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
-                    {
-                        if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
-                        {
-                            IDictionary<string, object> dictPlugin = e.PackedPluginState;
-
-                            boolVisible = (bool)dictPlugin["Visible"];
-                            boolComplete = (bool)dictPlugin["Complete"];
-
-                            if (boolVisible)
-                                Show();
-                            else
-                                Hide();
-
-                            _frmPred.UnpackState(dictPlugin);
-                        }
-                    }
-                }
-                catch { }
-            }*/
+            }           
         }
 
 
@@ -388,7 +345,7 @@ namespace Prediction
             dictPackedState.Add("Visible", boolVisible);
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
-            signaller.PushToUndoStack();
+            signaller.TriggerUndoStack();
         }
 
 
@@ -401,22 +358,11 @@ namespace Prediction
         //event handler for saving project state
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
-            if (!e.Undo || boolChanged)
-            {
-                IDictionary<string, object> dictPackedState = _frmPred.PackState();
-                dictPackedState.Add("Complete", boolComplete);
-                dictPackedState.Add("Visible", boolVisible);
+            IDictionary<string, object> dictPackedState = _frmPred.PackState();
+            dictPackedState.Add("Complete", boolComplete);
+            dictPackedState.Add("Visible", boolVisible);
 
-                if (!e.Undo)
-                {
-                    e.PackedPluginStates.Add(strPanelKey, dictPackedState);
-                }
-                else
-                {
-                    e.Store.Add(Utilities.RandomString(10), dictPackedState);
-                    boolChanged = false;
-                }
-            }
+            e.PackedPluginStates.Add(strPanelKey, dictPackedState);
         }
 
 
@@ -427,16 +373,83 @@ namespace Prediction
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
                
-                boolVisible = (bool)dictPlugin["Visible"];
+                boolVisible = (bool)dictPlugin["Visible"];                
                 boolComplete = (bool)dictPlugin["Complete"];
-
-                /*if (boolVisible)
-                    Show();
-                else 
-                    Hide();*/
+                if (boolVisible) { Show(); }
 
                 _frmPred.UnpackState(e.PackedPluginStates[strPanelKey]);
             }
+        }
+
+
+        private void PushToStack(object sender, UndoRedoEventArgs args)
+        {
+            if (boolChanged)
+            {
+                IDictionary<string, object> dictPackedState = _frmPred.PackState();
+                dictPackedState.Add("Complete", boolComplete);
+                dictPackedState.Add("Visible", boolVisible);
+
+                string strKey = Utilities.RandomString(10);
+                args.Store.Add(strKey, dictPackedState);
+                UndoKeys.Push(strKey);
+                RedoKeys.Clear();
+                boolChanged = false;
+            }
+            else
+            {
+                try
+                {
+                    string strKey = UndoKeys.Peek();
+                    UndoKeys.Push(strKey);
+                    RedoKeys.Clear();
+                }
+                catch { }
+            }
+        }
+
+
+        private void Undo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Pop();
+                string strPastKey = UndoKeys.Peek();
+                RedoKeys.Push(strCurrentKey);
+
+                if (strCurrentKey != strPastKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strPastKey];
+
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    boolComplete = (bool)dictPlugin["Complete"];
+
+                    _frmPred.UnpackState(dictPlugin);
+                }
+            }
+            catch { }
+        }
+
+
+        private void Redo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Peek();
+                string strNextKey = RedoKeys.Pop();
+                UndoKeys.Push(strNextKey);
+
+                if (strCurrentKey != strNextKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strNextKey];
+
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    boolComplete = (bool)dictPlugin["Complete"];
+
+                    _frmPred.UnpackState(dictPlugin);
+                }
+            }
+            catch { }
         }
 
 

@@ -1227,6 +1227,7 @@ namespace IPyModeling
                 //Now restore the elements of the user interface.
                 this.pnlThresholdingButtons.Visible = (bool)dictProjectState["ThresholdingButtonsVisible"];
             }
+            else { ClearModelingTab(); }
 
             //Now set the selected tab to whatever was on top when the project was saved.
             tabControl1.SelectedIndex = (int)(dictProjectState["ActiveTab"]); //model

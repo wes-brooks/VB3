@@ -36,7 +36,6 @@ namespace Prediction
         private IModel model;
         public List<Lazy<IModel, IDictionary<string, object>>> models;
         public event EventHandler RequestModelPluginList;
-
         public event EventHandler ControlChangeEvent;
 
         private string[] strArrReferencedVars;
@@ -84,6 +83,7 @@ namespace Prediction
         private string strModelTabClean;
         public event EventHandler ModelTabStateRequested;
 
+        private Boolean boolAllowNotification = true;
         public event EventHandler NotifiableChangeEvent;
         public event EventHandler<ButtonStatusEventArgs> ButtonStatusEvent;
 
@@ -119,9 +119,9 @@ namespace Prediction
             dictPredictionElements = new Dictionary<string, object>();
             dictMainEffects = null;
 
-            strEnddatURL = null;
-            strEnddatTimezone = null;
-            strEnddatTimestamp = null;
+            strEnddatURL = "";
+            strEnddatTimezone = "";
+            strEnddatTimestamp = "";
             bUseTimestamp = false;
         }
 
@@ -147,7 +147,10 @@ namespace Prediction
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {
             if (dictPackedState.Count == 0) return;
-                        
+
+            //Temporarily disable notification of changes that occur during unpacking.
+            boolAllowNotification = false;
+
             if (dictPackedState.ContainsKey("PredictionElements"))
             {
                 dictPredictionElements = (IDictionary<string, object>)dictPackedState["PredictionElements"];
@@ -252,21 +255,21 @@ namespace Prediction
 
             //Unpack the current DataGridViews
             dtVariables = DeserializeDataTable(Container: dictPackedState, Slot: "IVData", Title: "Variables");
-            if (dtVariables != null)
+            //if (dtVariables != null)
             {
                 dgvVariables.DataSource = dtVariables;
                 SetViewOnGrid(dgvVariables);
             }
 
             dtObs = DeserializeDataTable(Container: dictPackedState, Slot: "ObsData", Title: "Observations");
-            if (dtObs != null)
+            //if (dtObs != null)
             {
                 dgvObs.DataSource = dtObs;
                 SetViewOnGrid(dgvObs);
             }
 
             dtStats = DeserializeDataTable(Container: dictPackedState, Slot: "StatData", Title: "Stats");
-            if (dtStats != null)
+            //if (dtStats != null)
             {
                 dgvStats.DataSource = dtStats;
                 SetViewOnGrid(dgvStats);
@@ -280,6 +283,9 @@ namespace Prediction
             {
                 txtModel.Text = "";
             }
+
+            //Now re-enable notification events.
+            boolAllowNotification = true;
         }
 
 
@@ -450,7 +456,7 @@ namespace Prediction
                 PackTransformations(Container: (IDictionary<string, object>)dictPredictionElements[strMethod]);
 
                 //Pack the EnDDaT URL if it exists.
-                if (strEnddatURL != null)
+                if (strEnddatURL != "")
                 {
                     if (((IDictionary<string, object>)dictPredictionElements[strMethod]).ContainsKey("EnddatURL"))
                         ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("EnddatURL");
@@ -458,7 +464,7 @@ namespace Prediction
                 }
 
                 //Pack the EnDDaT Timezone if it exists.
-                if (strEnddatTimezone != null)
+                if (strEnddatTimezone != "")
                 {
                     if (((IDictionary<string, object>)dictPredictionElements[strMethod]).ContainsKey("EnddatTimezone"))
                         ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("EnddatTimezone");
@@ -466,7 +472,7 @@ namespace Prediction
                 }
 
                 //Pack the EnDDaT Timestamp if it exists.
-                if (strEnddatTimestamp != null)
+                if (strEnddatTimestamp != "")
                 {
                     if (((IDictionary<string, object>)dictPredictionElements[strMethod]).ContainsKey("EnddatTimestamp"))
                         ((IDictionary<string, object>)dictPredictionElements[strMethod]).Remove("EnddatTimestamp");
@@ -2621,7 +2627,7 @@ namespace Prediction
 
         private void NotifyContainer()
         {
-            if (NotifiableChangeEvent != null)
+            if (NotifiableChangeEvent != null && boolAllowNotification)
             {
                 EventArgs e = new EventArgs();
                 NotifiableChangeEvent(this, e);
