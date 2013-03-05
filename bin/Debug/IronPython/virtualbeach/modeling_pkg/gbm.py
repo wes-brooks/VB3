@@ -331,6 +331,9 @@ class Model(object):
 
         
     def GetInfluence(self):
+        self.names = self.data_dictionary.keys()
+        self.names.remove(self.target)
+        
         summary = r.Call(function='summary.gbm', object=self.model, plotit=False).AsList()
         indx = [int(i) for i in summary[0].AsVector()]
 
@@ -339,7 +342,7 @@ class Model(object):
         vars = [levels[i-1] for i in indx]
         
         #Create a dictionary with all the influences and a list of those variables with influence greater than 1%.
-        self.influence = dict(zip(vars, influence))
+        self.influence = dict(zip(self.names, influence))
         self.vars = [str(vars[k]) for k in range(len(vars)) if influence[k]>5]
         return self.influence
 

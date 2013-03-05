@@ -13,6 +13,7 @@ using VBCommon.PluginSupport;
 using Newtonsoft.Json;
 
 
+
 namespace VBProjectManager
 {
     public partial class VBProjectManager
@@ -198,21 +199,20 @@ namespace VBProjectManager
             catch { }
         }
 
-               
         //pack plugin for saving, returns packed state
         public IDictionary<string, object> PackState()
         {
             IDictionary<string, object> dictPackedState = new Dictionary<string, object>();
             dictPackedState.Add("TopPlugin", strTopPlugin);
             dictPackedState.Add("ProjectName", ProjectName);
-            
+
             return dictPackedState;
         }
 
-        
+
         //unpack plugin, assigning values from incoming dictionary
         public void UnpackState(IDictionary<string, object> dictPackedState)
-        {  
+        {
             this.strTopPlugin = (string)dictPackedState["TopPlugin"];
             this.ProjectName = (string)dictPackedState["ProjectName"];
         }

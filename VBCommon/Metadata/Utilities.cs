@@ -135,7 +135,7 @@ namespace VBCommon.Metadata
                         bool isH = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                         if (isH == true)
                         {
-                            if ((bool)dt.Columns[c].ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
+                            if (dt.Columns[c].ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
                             {
                                 if (dtCopy.Columns.Contains(dt.Columns[c].Caption))
                                     dtCopy.Columns.Remove(dt.Columns[c].Caption);
@@ -147,7 +147,6 @@ namespace VBCommon.Metadata
                 return dtCopy;
             }
 
-
             public DataTable filterCatVars(DataTable dt)
             {
                 DataTable dtCopy = dt.Copy();
@@ -157,7 +156,7 @@ namespace VBCommon.Metadata
                     bool hascat = dt.Columns[c].ExtendedProperties.ContainsKey(VBCommon.Globals.CATEGORICAL);
                     if (hascat == true)
                     {
-                        if ((bool)dt.Columns[c].ExtendedProperties[VBCommon.Globals.CATEGORICAL] == true)
+                        if (dt.Columns[c].ExtendedProperties[VBCommon.Globals.CATEGORICAL].ToString() == "True")
                         {
 
                             if (dtCopy.Columns.Contains(dt.Columns[c].Caption))
@@ -265,7 +264,7 @@ namespace VBCommon.Metadata
                     bool hasHidden = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                     if (!hasHidden) continue;
 
-                    if ((bool)dc.ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
+                    if (dc.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
                     {
                         if (!dtCopy.Columns.Contains(dc.Caption))
                         {
@@ -296,7 +295,7 @@ namespace VBCommon.Metadata
                         hasAttr = dc.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                         if (hasAttr)
                         {
-                            if ((bool)dc.ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
+                            if (dc.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
                             {
                                 dc.ExtendedProperties[VBCommon.Globals.HIDDEN] = false;
                             }
@@ -350,7 +349,7 @@ namespace VBCommon.Metadata
                     bool hashidden = c.ExtendedProperties.ContainsKey(VBCommon.Globals.HIDDEN);
                     if (hashidden == true)
                     {
-                        if ((bool)c.ExtendedProperties[VBCommon.Globals.HIDDEN] == true)
+                        if (c.ExtendedProperties[VBCommon.Globals.HIDDEN].ToString() == "True")
                             { dgv.Columns[c.ColumnName].Visible = false; }
                     }
 
@@ -359,7 +358,7 @@ namespace VBCommon.Metadata
                     if (hasattribute)
                     {
                         selectedColIndex = dt.Columns.IndexOf(c);
-                        if ((bool)c.ExtendedProperties[VBCommon.Globals.ENABLED] != true)
+                        if (c.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Red;
@@ -455,7 +454,7 @@ namespace VBCommon.Metadata
                     if (hasattribute)
                     {
                         int selectedColIndex = dt.Columns.IndexOf(c);
-                        if ((bool)c.ExtendedProperties[VBCommon.Globals.ENABLED] != true)
+                        if (c.ExtendedProperties[VBCommon.Globals.ENABLED].ToString() != "True")
                         {
                             for (int r = 0; r < dgv.Rows.Count; r++)
                                 dgv[selectedColIndex, r].Style.ForeColor = Color.Red;

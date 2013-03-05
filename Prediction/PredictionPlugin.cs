@@ -42,8 +42,8 @@ namespace Prediction
         private RootItem rootIPyPredictionTab;
         
         //complete and visible flags
-        public Boolean boolComplete;
-        public Boolean boolVisible;
+        public Boolean boolComplete = false;
+        public Boolean boolVisible = false;
         public Boolean boolChanged = false;
 
         //this plugin was clicked
@@ -70,22 +70,28 @@ namespace Prediction
 
         public void Hide()
         {
-            if (boolVisible) { boolChanged = true; }
-            boolVisible = false;
+            if (boolVisible)
+            {
+                boolChanged = true;
+                boolVisible = false;
 
-            App.HeaderControl.RemoveAll();
-            ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+                App.HeaderControl.RemoveAll();
+                ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            }
         }
 
 
         public void Show()
         {
-            if (!boolVisible) { boolChanged = true; }
-            boolVisible = true;
+            if (!boolVisible)
+            {
+                boolChanged = true;
+                boolVisible = true;
 
-            AddRibbon("Show");
-            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);
+                AddRibbon("Show");
+                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                App.HeaderControl.SelectRoot(strPanelKey);
+            }
         }
 
 
@@ -372,10 +378,11 @@ namespace Prediction
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-               
+
+                if ((bool)dictPlugin["Visible"]) { Show(); }
+                else { Hide(); }
                 boolVisible = (bool)dictPlugin["Visible"];                
-                boolComplete = (bool)dictPlugin["Complete"];
-                if (boolVisible) { Show(); }
+                boolComplete = (bool)dictPlugin["Complete"];                
 
                 _frmPred.UnpackState(e.PackedPluginStates[strPanelKey]);
             }
@@ -420,10 +427,11 @@ namespace Prediction
                 if (strCurrentKey != strPastKey)
                 {
                     IDictionary<string, object> dictPlugin = args.Store[strPastKey];
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
 
                     boolVisible = (bool)dictPlugin["Visible"];
                     boolComplete = (bool)dictPlugin["Complete"];
-
                     _frmPred.UnpackState(dictPlugin);
                 }
             }
@@ -442,10 +450,11 @@ namespace Prediction
                 if (strCurrentKey != strNextKey)
                 {
                     IDictionary<string, object> dictPlugin = args.Store[strNextKey];
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
 
                     boolVisible = (bool)dictPlugin["Visible"];
                     boolComplete = (bool)dictPlugin["Complete"];
-
                     _frmPred.UnpackState(dictPlugin);
                 }
             }

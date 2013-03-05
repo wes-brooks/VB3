@@ -518,10 +518,10 @@
             this.groupBox12.Controls.Add(this.rbLog10);
             this.groupBox12.Location = new System.Drawing.Point(6, 45);
             this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(162, 96);
+            this.groupBox12.Size = new System.Drawing.Size(173, 96);
             this.groupBox12.TabIndex = 91;
             this.groupBox12.TabStop = false;
-            this.groupBox12.Text = "Dependent Variable is:";
+            this.groupBox12.Text = "Threshold entry is transformed:";
             // 
             // label1
             // 
@@ -595,9 +595,9 @@
             this.groupBox13.Controls.Add(this.label35);
             this.groupBox13.Controls.Add(this.label36);
             this.groupBox13.Controls.Add(this.label37);
-            this.groupBox13.Location = new System.Drawing.Point(174, 45);
+            this.groupBox13.Location = new System.Drawing.Point(185, 45);
             this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Size = new System.Drawing.Size(189, 96);
+            this.groupBox13.Size = new System.Drawing.Size(178, 96);
             this.groupBox13.TabIndex = 90;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Current US Regulatory Standards";

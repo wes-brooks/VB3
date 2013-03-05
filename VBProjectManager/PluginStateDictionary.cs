@@ -9,7 +9,7 @@ using VBCommon;
 
 namespace VBProjectManager
 {
-    class PluginStateDictionary : IDictionary<string, IDictionary<string, object>>
+    public class PluginStateDictionary : IDictionary<string, IDictionary<string, object>>
     {
         private IDictionary<string, string> dictBackend;
         public ICollection<string> Keys { get { return dictBackend.Keys; } }

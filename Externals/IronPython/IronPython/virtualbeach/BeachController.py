@@ -1,5 +1,5 @@
 from modeling_pkg import pls, gbm#, gam#, logistic, pls_parallel
-methods = {'pls':pls, 'boosting':gbm}#, 'gbm':gbm, 'gam':gam}
+methods = {'pls':pls, 'boosting':gbm, 'gbm':gbm} #, 'gam':gam}
 
 import utils
 #from utils import Event

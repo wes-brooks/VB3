@@ -35,6 +35,7 @@ namespace VBCommon.Controls
         private int intSelectedRowIndex = -1;
         private int intResponseVarColIndex = 1;
         private string strResponseVarColName = string.Empty;
+        private string strResponseVarColNameAsImported = string.Empty;
         private string strSelectedColName = string.Empty;
 
         private enum AddReplace { Add, Replace };
@@ -142,6 +143,16 @@ namespace VBCommon.Controls
             get { return this.strResponseVarColName; }
             set { strResponseVarColName = value; }
         }
+
+
+        //returns dependent variable column name
+        [JsonProperty]
+        public string ResponseVarColNameAsImported
+        {
+            get { return this.strResponseVarColNameAsImported; }
+            set { strResponseVarColNameAsImported = value; }
+        }
+
 
         //return selected column name
         [JsonProperty]
@@ -453,6 +464,7 @@ namespace VBCommon.Controls
 
             intResponseVarColIndex = dt.Columns.IndexOf(newcolname);
             strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
+            depVarTransform = VBCommon.Transforms.DependentVariableTransforms.Log10;
             SetTransformCheckmarks(Menu: 0, Item: 0);
 
             state = dtState.dirty;
@@ -511,13 +523,18 @@ namespace VBCommon.Controls
                     strResponseVarColName = newcolname;
                     intResponseVarColIndex = dtCopy.Columns.IndexOf(strResponseVarColName);
                     dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLETRANSFORM] = true;
+                    dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
 
                     //set properties of old one
                     dtCopy.Columns[selectedColIndex].ExtendedProperties[VBCommon.Globals.HIDDEN] = true;
+                    dtCopy.Columns[selectedColIndex].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
 
                     this.dt =  dt = dtCopy;
                     maintainGrid(dgv, dt, selectedColIndex, strResponseVarColName);
                     UpdateListView();
+
+                    //Disable "Define Transform" menu
+                    cmforResponseVar.MenuItems[3].Enabled = false;
 
                     state = dtState.dirty;
                     NotifyContainer();
@@ -840,6 +857,7 @@ namespace VBCommon.Controls
                     {
                         c.ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
                         c.ExtendedProperties[VBCommon.Globals.HIDDEN] = false;
+                        c.ExtendedProperties[VBCommon.Globals.ENABLED] = true;
                         intSelectedColIndex = dtCopy.Columns.IndexOf(c);
                         strResponseVarColName = dtCopy.Columns[intSelectedColIndex].Caption;
                         intResponseVarColIndex = intSelectedColIndex;
@@ -852,7 +870,9 @@ namespace VBCommon.Controls
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
                 UpdateListView();
 
+                //Re-enable "Define Transform" menu and clear all checkmarks
                 SetTransformCheckmarks(Menu: -1, Item: -1);
+                cmforResponseVar.MenuItems[3].Enabled = true;
                 state = dtState.dirty;
                 NotifyContainer();
             }
@@ -900,6 +920,17 @@ namespace VBCommon.Controls
                 dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = transform;
                 state = dtState.dirty;
                 NotifyContainer();
+            }
+
+            if (!(String.Compare(transform, "none", true) == 0))
+            {
+                //Disable "Perform Transform" menu
+                cmforResponseVar.MenuItems[0].Enabled = false;
+            }
+            else
+            {
+                //Enable "Perform Transform" menu
+                cmforResponseVar.MenuItems[0].Enabled = true;
             }
         }
 
@@ -1001,7 +1032,10 @@ namespace VBCommon.Controls
 
                 intResponseVarColIndex = dt.Columns.IndexOf(strSelectedColName);
                 strResponseVarColName = dt.Columns[intResponseVarColIndex].Caption;
-                SetTransformCheckmarks(Menu: 3, Item: 0);
+                strResponseVarColNameAsImported = dt.Columns[intResponseVarColIndex].Caption;
+                SetTransformCheckmarks(Menu: -1, Item: -1);
+                cmforResponseVar.MenuItems[0].Enabled = true;
+                cmforResponseVar.MenuItems[3].Enabled = true;
                 maintainGrid(dgv, dt, intSelectedColIndex, strResponseVarColName);
                 UpdateListView();
 
@@ -1242,6 +1276,7 @@ namespace VBCommon.Controls
                 //pack up mainEffect columns for Prediction
                 dictPackedState.Add("CurrentColIndex", this.SelectedColIndex);
                 dictPackedState.Add("DepVarColName", this.ResponseVarColName);
+                dictPackedState.Add("DepVarColNameAsImported", this.ResponseVarColNameAsImported);
                 dictPackedState.Add("DTColInfo", this.DTCI.DTColInfo);
                 dictPackedState.Add("DTRowInfo", this.DTRI.DTRowInfo);
                 dictPackedState.Add("DepVarTransform", this.DependentVariableTransform);
@@ -1357,10 +1392,13 @@ namespace VBCommon.Controls
                 this.DependentVariableTransform = (VBCommon.Transforms.DependentVariableTransforms)Enum.Parse(typeof(VBCommon.Transforms.DependentVariableTransforms), depVarTran);
                 this.ResponseVarColName = (string)dictPackedState["DepVarColName"];
                 this.ResponseVarColIndex = this.DT.Columns.IndexOf(this.ResponseVarColName);
+                this.ResponseVarColNameAsImported = (string)dictPackedState["DepVarColNameAsImported"];
 
                 this.intCheckedMenu = Convert.ToInt32(dictPackedState["CheckedTransformMenu"]);
                 this.intCheckedItem = Convert.ToInt32(dictPackedState["CheckedTransformItem"]);
                 SetTransformCheckmarks(Menu: intCheckedMenu, Item: intCheckedItem);
+                if (intCheckedMenu == 0) { cmforResponseVar.MenuItems[3].Enabled = false; }
+                else if (intCheckedMenu == 3 && intCheckedItem > 0) { cmforResponseVar.MenuItems[0].Enabled = false; }
 
                 maintainGrid(this.dgv, this.DT, this.SelectedColIndex, this.ResponseVarColName);
                 this.FileName = (string)dictPackedState["fileName"];

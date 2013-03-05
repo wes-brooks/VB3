@@ -40,6 +40,10 @@
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbProb = new System.Windows.Forms.RadioButton();
+            this.rbRaw = new System.Windows.Forms.RadioButton();
+            this.lblProb = new System.Windows.Forms.Label();
+            this.txtProbabilityThreshold = new System.Windows.Forms.TextBox();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
             this.txtPwrValue = new System.Windows.Forms.TextBox();
             this.rbPwrValue = new System.Windows.Forms.RadioButton();
@@ -52,10 +56,6 @@
             this.label11 = new System.Windows.Forms.Label();
             this.tbThresholdDec = new System.Windows.Forms.TextBox();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
-            this.lblProb = new System.Windows.Forms.Label();
-            this.txtProbabilityThreshold = new System.Windows.Forms.TextBox();
-            this.rbRaw = new System.Windows.Forms.RadioButton();
-            this.rbProb = new System.Windows.Forms.RadioButton();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox10.SuspendLayout();
@@ -73,9 +73,9 @@
             this.groupBox3.Controls.Add(this.tbFP);
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.label17);
-            this.groupBox3.Location = new System.Drawing.Point(6, 205);
+            this.groupBox3.Location = new System.Drawing.Point(3, 205);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(226, 148);
+            this.groupBox3.Size = new System.Drawing.Size(229, 148);
             this.groupBox3.TabIndex = 9;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Model Evaluation";
@@ -177,7 +177,6 @@
             this.groupBox2.Controls.Add(this.lblProb);
             this.groupBox2.Controls.Add(this.txtProbabilityThreshold);
             this.groupBox2.Controls.Add(this.groupBox10);
-            this.groupBox2.Controls.Add(this.btnXYPlot);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.tbThresholdReg);
             this.groupBox2.Controls.Add(this.label11);
@@ -189,6 +188,44 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Plot Thresholds";
             // 
+            // rbProb
+            // 
+            this.rbProb.AutoSize = true;
+            this.rbProb.Location = new System.Drawing.Point(7, 23);
+            this.rbProb.Name = "rbProb";
+            this.rbProb.Size = new System.Drawing.Size(14, 13);
+            this.rbProb.TabIndex = 90;
+            this.rbProb.UseVisualStyleBackColor = true;
+            // 
+            // rbRaw
+            // 
+            this.rbRaw.AutoSize = true;
+            this.rbRaw.Checked = true;
+            this.rbRaw.Location = new System.Drawing.Point(7, 46);
+            this.rbRaw.Name = "rbRaw";
+            this.rbRaw.Size = new System.Drawing.Size(14, 13);
+            this.rbRaw.TabIndex = 89;
+            this.rbRaw.TabStop = true;
+            this.rbRaw.UseVisualStyleBackColor = true;
+            // 
+            // lblProb
+            // 
+            this.lblProb.AutoSize = true;
+            this.lblProb.ForeColor = System.Drawing.Color.Blue;
+            this.lblProb.Location = new System.Drawing.Point(77, 23);
+            this.lblProb.Name = "lblProb";
+            this.lblProb.Size = new System.Drawing.Size(105, 13);
+            this.lblProb.TabIndex = 88;
+            this.lblProb.Text = "Probability Threshold";
+            // 
+            // txtProbabilityThreshold
+            // 
+            this.txtProbabilityThreshold.Location = new System.Drawing.Point(27, 20);
+            this.txtProbabilityThreshold.Name = "txtProbabilityThreshold";
+            this.txtProbabilityThreshold.Size = new System.Drawing.Size(44, 20);
+            this.txtProbabilityThreshold.TabIndex = 87;
+            this.txtProbabilityThreshold.Text = "50";
+            // 
             // groupBox10
             // 
             this.groupBox10.Controls.Add(this.txtPwrValue);
@@ -196,12 +233,13 @@
             this.groupBox10.Controls.Add(this.rbLogeValue);
             this.groupBox10.Controls.Add(this.rbLog10Value);
             this.groupBox10.Controls.Add(this.rbValue);
-            this.groupBox10.Location = new System.Drawing.Point(63, 87);
+            this.groupBox10.Controls.Add(this.btnXYPlot);
+            this.groupBox10.Location = new System.Drawing.Point(6, 87);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(155, 100);
+            this.groupBox10.Size = new System.Drawing.Size(209, 100);
             this.groupBox10.TabIndex = 86;
             this.groupBox10.TabStop = false;
-            this.groupBox10.Text = "Threshold Transform";
+            this.groupBox10.Text = "Threshold entry is transformed:";
             // 
             // txtPwrValue
             // 
@@ -258,7 +296,7 @@
             // 
             // btnXYPlot
             // 
-            this.btnXYPlot.Location = new System.Drawing.Point(5, 114);
+            this.btnXYPlot.Location = new System.Drawing.Point(155, 14);
             this.btnXYPlot.Name = "btnXYPlot";
             this.btnXYPlot.Size = new System.Drawing.Size(48, 23);
             this.btnXYPlot.TabIndex = 83;
@@ -270,7 +308,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(70, 68);
+            this.label10.Location = new System.Drawing.Point(77, 68);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(148, 13);
             this.label10.TabIndex = 82;
@@ -278,9 +316,9 @@
             // 
             // tbThresholdReg
             // 
-            this.tbThresholdReg.Location = new System.Drawing.Point(31, 65);
+            this.tbThresholdReg.Location = new System.Drawing.Point(27, 65);
             this.tbThresholdReg.Name = "tbThresholdReg";
-            this.tbThresholdReg.Size = new System.Drawing.Size(33, 20);
+            this.tbThresholdReg.Size = new System.Drawing.Size(44, 20);
             this.tbThresholdReg.TabIndex = 82;
             this.tbThresholdReg.Text = "235";
             this.tbThresholdReg.TextChanged += new System.EventHandler(this.tbThresholdReg_TextChanged);
@@ -289,7 +327,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.ForeColor = System.Drawing.Color.Blue;
-            this.label11.Location = new System.Drawing.Point(70, 46);
+            this.label11.Location = new System.Drawing.Point(77, 46);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(145, 13);
             this.label11.TabIndex = 81;
@@ -297,9 +335,9 @@
             // 
             // tbThresholdDec
             // 
-            this.tbThresholdDec.Location = new System.Drawing.Point(31, 43);
+            this.tbThresholdDec.Location = new System.Drawing.Point(27, 43);
             this.tbThresholdDec.Name = "tbThresholdDec";
-            this.tbThresholdDec.Size = new System.Drawing.Size(33, 20);
+            this.tbThresholdDec.Size = new System.Drawing.Size(44, 20);
             this.tbThresholdDec.TabIndex = 13;
             this.tbThresholdDec.Text = "235";
             this.tbThresholdDec.TextChanged += new System.EventHandler(this.tbThresholdDec_TextChanged);
@@ -310,7 +348,7 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.zedGraphControl1.EditButtons = System.Windows.Forms.MouseButtons.Left;
-            this.zedGraphControl1.Location = new System.Drawing.Point(235, 9);
+            this.zedGraphControl1.Location = new System.Drawing.Point(238, 9);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.PanModifierKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.None)));
             this.zedGraphControl1.ScrollGrace = 0D;
@@ -320,46 +358,8 @@
             this.zedGraphControl1.ScrollMinX = 0D;
             this.zedGraphControl1.ScrollMinY = 0D;
             this.zedGraphControl1.ScrollMinY2 = 0D;
-            this.zedGraphControl1.Size = new System.Drawing.Size(437, 342);
+            this.zedGraphControl1.Size = new System.Drawing.Size(434, 342);
             this.zedGraphControl1.TabIndex = 10;
-            // 
-            // lblProb
-            // 
-            this.lblProb.AutoSize = true;
-            this.lblProb.ForeColor = System.Drawing.Color.Blue;
-            this.lblProb.Location = new System.Drawing.Point(70, 23);
-            this.lblProb.Name = "lblProb";
-            this.lblProb.Size = new System.Drawing.Size(105, 13);
-            this.lblProb.TabIndex = 88;
-            this.lblProb.Text = "Probability Threshold";
-            // 
-            // txtProbabilityThreshold
-            // 
-            this.txtProbabilityThreshold.Location = new System.Drawing.Point(31, 20);
-            this.txtProbabilityThreshold.Name = "txtProbabilityThreshold";
-            this.txtProbabilityThreshold.Size = new System.Drawing.Size(33, 20);
-            this.txtProbabilityThreshold.TabIndex = 87;
-            this.txtProbabilityThreshold.Text = "50";
-            // 
-            // rbRaw
-            // 
-            this.rbRaw.AutoSize = true;
-            this.rbRaw.Checked = true;
-            this.rbRaw.Location = new System.Drawing.Point(11, 46);
-            this.rbRaw.Name = "rbRaw";
-            this.rbRaw.Size = new System.Drawing.Size(14, 13);
-            this.rbRaw.TabIndex = 89;
-            this.rbRaw.TabStop = true;
-            this.rbRaw.UseVisualStyleBackColor = true;
-            // 
-            // rbProb
-            // 
-            this.rbProb.AutoSize = true;
-            this.rbProb.Location = new System.Drawing.Point(11, 23);
-            this.rbProb.Name = "rbProb";
-            this.rbProb.Size = new System.Drawing.Size(14, 13);
-            this.rbProb.TabIndex = 90;
-            this.rbProb.UseVisualStyleBackColor = true;
             // 
             // AnnotatedScatterPlot
             // 

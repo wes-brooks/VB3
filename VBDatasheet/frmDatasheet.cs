@@ -138,6 +138,7 @@ namespace VBDatasheet
             dsControl1.SelectedColIndex = 1;
             dsControl1.ResponseVarColIndex = 1;
             dsControl1.ResponseVarColName = dsControl1.DT.Columns[1].Caption;
+            dsControl1.ResponseVarColNameAsImported = dsControl1.DT.Columns[1].Caption;
             
             //initial info for the list
             FileInfo fi = new FileInfo(import.getFileImportedName);

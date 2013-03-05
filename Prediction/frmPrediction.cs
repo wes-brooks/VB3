@@ -231,10 +231,18 @@ namespace Prediction
             txtRegStd.Text = Convert.ToDouble(dictModel["RegulatoryThreshold"]).ToString();
             txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
             txtProbabilityThreshold.Text = Convert.ToDouble(dictModel["ProbabilityThreshold"]).ToString();
-            strEnddatURL = dictModel["EnddatURL"].ToString();
-            strEnddatTimezone = dictModel["EnddatTimezone"].ToString();
-            strEnddatTimestamp = dictModel["EnddatTimestamp"].ToString();
-            bUseTimestamp = (bool)dictModel["UseEnddatTimestamp"];
+
+            if (dictModel.ContainsKey("EnddatUrl")) { strEnddatURL = dictModel["EnddatURL"].ToString(); }
+            else { strEnddatURL = ""; }
+
+            if (dictModel.ContainsKey("EnddatTimezone")) { strEnddatTimezone = dictModel["EnddatTimezone"].ToString(); }
+            else { strEnddatTimezone = ""; }
+
+            if (dictModel.ContainsKey("EnddatTimestamp")) { strEnddatTimestamp = dictModel["EnddatTimestamp"].ToString(); }
+            else { strEnddatTimestamp = ""; }
+
+            if (dictModel.ContainsKey("UseEnddatTimestamp")) { bUseTimestamp = (bool)dictModel["UseEnddatTimestamp"]; }
+            else { bUseTimestamp = false; }
 
             if ((bool)dictModel["UseRawPredictions"]) { rbRaw.Checked = true; }
             else { rbProbability.Checked = true; }
@@ -603,7 +611,7 @@ namespace Prediction
                 if (dictModel != null)
                 {
                     Dictionary<string, object> dictPackedDatasheet = (Dictionary<string, object>)dictPackedState["PackedDatasheetState"];
-                    strOutputVariable = dictPackedDatasheet["DepVarColName"].ToString();
+                    strOutputVariable = dictPackedDatasheet["DepVarColNameAsImported"].ToString();
 
                     //datatables serialized as xml string to maintain extendedProperty values
                     string strXmlDataTable = (string)dictPackedDatasheet["XmlDataTable"];

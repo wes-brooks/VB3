@@ -46,9 +46,9 @@ namespace IPyModeling
 
         //complete and visible flags
         public Boolean boolComplete = false;
-        public Boolean boolVisible;
-        public Boolean boolRunning;
-        public Boolean boolVirgin;
+        public Boolean boolVisible = false;
+        public Boolean boolRunning = false;
+        public Boolean boolVirgin = false;
         public Boolean boolChanged = false;
 
         private Stack<string> UndoKeys;
@@ -68,22 +68,28 @@ namespace IPyModeling
 
         public void Hide()
         {
-            if (boolVisible) { boolChanged = true; }
-            boolVisible = false;
-            
-            App.HeaderControl.RemoveAll();
-            ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            if (boolVisible)
+            {
+                boolChanged = true;
+                boolVisible = false;
+
+                App.HeaderControl.RemoveAll();
+                ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            }
         }
 
 
         public void Show()
         {
-            if (!boolVisible) { boolChanged = true; }
-            boolVisible = true;
-            
-            AddRibbon("Show");
-            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);            
+            if (!boolVisible)
+            {
+                boolChanged = true;
+                boolVisible = true;
+
+                AddRibbon("Show");
+                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                App.HeaderControl.SelectRoot(strPanelKey);
+            }
         }
 
 
@@ -133,6 +139,10 @@ namespace IPyModeling
             innerIronPythonControl.ModelingCanceledEvent += new EventHandler(ModelingCanceled);
 
             boolVirgin = true;
+            boolComplete = false;
+            boolVisible = true;
+            boolRunning = false;
+            boolChanged = false;
 
             base.Activate();
             Hide();
@@ -316,18 +326,6 @@ namespace IPyModeling
                     Hide();
                     return;
                 }
-                /*else if (boolVirgin)
-                {
-                    if (dictPluginState != null)
-                    {
-                        if (dictPluginState.Count > 3)
-                        {
-                            innerIronPythonControl.SetData(e.PackedPluginState);
-                            boolChanged = true;
-                            //Show();
-                        }
-                    }
-                }*/
                 else
                 {
                     if (!(bool)e.PackedPluginState["Clean"])
@@ -346,7 +344,7 @@ namespace IPyModeling
         {
             try
             {
-                string strActiveTabName  =innerIronPythonControl.ModelingTabControl.SelectedTab.Name.ToString();
+                string strActiveTabName = innerIronPythonControl.ModelingTabControl.SelectedTab.Name.ToString();
 
                 if (strActiveTabName == "DatasheetTab")
                 {
@@ -451,14 +449,14 @@ namespace IPyModeling
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
 
-                //Show();
-                MakeActive();
-
-                innerIronPythonControl.UnpackState(dictPlugin);
+                if ((bool)dictPlugin["Visible"]) { Show(); }
+                else { Hide(); }
+                //MakeActive();               
 
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolVirgin = (bool)dictPlugin["Virgin"];
+                innerIronPythonControl.UnpackState(dictPlugin);
 
                 //if (!boolVisible)
                 //    Hide();
@@ -520,16 +518,18 @@ namespace IPyModeling
                     //Show();
                     //MakeActive();
 
-                    innerIronPythonControl.UnpackState(dictPlugin);
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
 
                     boolComplete = (bool)dictPlugin["Complete"];
                     boolVisible = (bool)dictPlugin["Visible"];
                     boolVirgin = (bool)dictPlugin["Virgin"];
+                    innerIronPythonControl.UnpackState(dictPlugin);
 
-                    if (!boolVisible)
+                    /*if (!boolVisible)
                         Hide();
                     else
-                        Show();
+                        Show();*/
                 }
             }
             catch
@@ -554,16 +554,18 @@ namespace IPyModeling
                     //Show();
                     //MakeActive();
 
-                    innerIronPythonControl.UnpackState(dictPlugin);
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
 
                     boolComplete = (bool)dictPlugin["Complete"];
                     boolVisible = (bool)dictPlugin["Visible"];
                     boolVirgin = (bool)dictPlugin["Virgin"];
+                    innerIronPythonControl.UnpackState(dictPlugin);
 
-                    if (!boolVisible)
+                    /*if (!boolVisible)
                         Hide();
                     else
-                        Show(); 
+                        Show();*/
                 }
             }
             catch
