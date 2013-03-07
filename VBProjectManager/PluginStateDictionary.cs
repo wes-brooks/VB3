@@ -29,7 +29,7 @@ namespace VBProjectManager
 
             while (ie.MoveNext())
             {
-                yield return new KeyValuePair<string, IDictionary<string, object>>(ie.Current.Key, Utilities.StringToState(ie.Current.Value));
+                yield return new KeyValuePair<string, IDictionary<string, object>>(ie.Current.Key, PersistentStackUtilities.StringToState(ie.Current.Value));
             }
         }
 
@@ -40,7 +40,7 @@ namespace VBProjectManager
 
             while (ie.MoveNext())
             {
-                yield return new KeyValuePair<string, IDictionary<string, object>>(ie.Current.Key, Utilities.StringToState(ie.Current.Value));
+                yield return new KeyValuePair<string, IDictionary<string, object>>(ie.Current.Key, PersistentStackUtilities.StringToState(ie.Current.Value));
             }
         }
 
@@ -54,7 +54,7 @@ namespace VBProjectManager
 
                 foreach (string v in listValues)
                 {
-                    listOut.Add(Utilities.StringToState(v));
+                    listOut.Add(PersistentStackUtilities.StringToState(v));
                 }
 
                 return listOut;
@@ -64,20 +64,20 @@ namespace VBProjectManager
 
         public IDictionary<string, object> this[string key]
         {
-            get { return Utilities.StringToState(dictBackend[key]); }
-            set { dictBackend[key] = Utilities.StateToString(value); }
+            get { return PersistentStackUtilities.StringToState(dictBackend[key]); }
+            set { dictBackend[key] = PersistentStackUtilities.StateToString(value); }
         }
 
 
         public void Add(string key, IDictionary<string, object> value)
         {
-            dictBackend.Add(key, Utilities.StateToString(value));
+            dictBackend.Add(key, PersistentStackUtilities.StateToString(value));
         }
 
 
         public void Add(KeyValuePair<string, IDictionary<string, object>> kvp)
         {
-            dictBackend.Add(kvp.Key, Utilities.StateToString(kvp.Value));
+            dictBackend.Add(kvp.Key, PersistentStackUtilities.StateToString(kvp.Value));
         }
 
 
@@ -87,7 +87,7 @@ namespace VBProjectManager
             bool result = dictBackend.TryGetValue(key, out strState);
             try
             {
-                value = Utilities.StringToState(strState);
+                value = PersistentStackUtilities.StringToState(strState);
             }
             catch
             {

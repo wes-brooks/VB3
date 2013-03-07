@@ -44,7 +44,7 @@ namespace VBProjectManager
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
             signaller.RaiseSaveRequest(dictPluginStates);
 
-            string strProjectStateJson = Utilities.StatesToString(dictPluginStates);
+            string strProjectStateJson = PersistentStackUtilities.StatesToString(dictPluginStates);
             File.WriteAllText(strPathName, strProjectStateJson);
 
             logger.LogEvent(String.Format("Project File Name: {0}", strProjectName), Globals.messageIntent.UserOnly, Globals.targetSStrip.StatusStrip1);
@@ -82,7 +82,7 @@ namespace VBProjectManager
             streamreader.Close();
             jsonreader.Close();
 
-            IDictionary<string, IDictionary<string, object>> dictPluginStates = Utilities.StringToStates(strProjectStateJson);
+            IDictionary<string, IDictionary<string, object>> dictPluginStates = PersistentStackUtilities.StringToStates(strProjectStateJson);
 
             //raise unpack event, sending packed plugins dictionary
             signaller.UnpackProjectState(dictPluginStates);
@@ -137,7 +137,7 @@ namespace VBProjectManager
             {
                 IDictionary<string, object> dictPackedState = PackState();
 
-                string strKey = Utilities.RandomString(10);
+                string strKey = PersistentStackUtilities.RandomString(10);
                 args.Store.Add(strKey, dictPackedState);
                 UndoKeys.Push(strKey);
                 RedoKeys.Clear();
@@ -154,7 +154,7 @@ namespace VBProjectManager
                 catch
                 {
                     IDictionary<string, object> dictPackedState = PackState();
-                    string strKey = Utilities.RandomString(10);
+                    string strKey = PersistentStackUtilities.RandomString(10);
                     args.Store.Add(strKey, dictPackedState);
                     UndoKeys.Push(strKey);
                     RedoKeys.Clear();

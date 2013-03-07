@@ -397,7 +397,7 @@ namespace Prediction
                 dictPackedState.Add("Complete", boolComplete);
                 dictPackedState.Add("Visible", boolVisible);
 
-                string strKey = Utilities.RandomString(10);
+                string strKey = PersistentStackUtilities.RandomString(10);
                 args.Store.Add(strKey, dictPackedState);
                 UndoKeys.Push(strKey);
                 RedoKeys.Clear();

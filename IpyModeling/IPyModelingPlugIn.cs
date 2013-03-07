@@ -483,7 +483,7 @@ namespace IPyModeling
                     packedState.Add("Visible", boolVisible);
                     packedState.Add("Virgin", boolVirgin);
 
-                        string strKey = Utilities.RandomString(10);
+                        string strKey = PersistentStackUtilities.RandomString(10);
                         args.Store.Add(strKey, packedState);
                         UndoKeys.Push(strKey);
                         RedoKeys.Clear();
