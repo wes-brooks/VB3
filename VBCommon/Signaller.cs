@@ -106,7 +106,6 @@ namespace VBCommon
         }
 
 
-        [System.ComponentModel.Composition.Export("Signalling.PushToUndoStack")]
         public void TriggerUndoStack()
         {
             if (TriggerUndoStackEvent != null)
