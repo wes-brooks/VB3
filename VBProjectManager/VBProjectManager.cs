@@ -98,6 +98,24 @@ namespace VBProjectManager
             App.HeaderControl.Add(btnSaveAs);
             n++;
 
+            //Add a Save button to the application ("File") menu.
+            var btnSavePredOnly = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save (prediction only)", Save_PredictionOnly);
+            btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnSave.LargeImage = Resources.Save16x16;
+            btnSave.ToolTipText = "Save the current project state.";
+            btnSave.SortOrder = n;
+            App.HeaderControl.Add(btnSave);
+            n++;
+
+            //Add a Save button to the application ("File") menu.
+            var btnSaveAsPredOnly = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As (prediction only)", SaveAs_PredictionOnly);
+            btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnSave.LargeImage = Resources.Save16x16;
+            btnSave.ToolTipText = "Save the current project state.";
+            btnSave.SortOrder = n;
+            App.HeaderControl.Add(btnSave);
+            n++;
+
             //Add an item to the application ("File") menu.
             var btnAbout = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "About", AboutVirtualBeach);
             btnAbout.GroupCaption = HeaderControl.ApplicationMenuKey;

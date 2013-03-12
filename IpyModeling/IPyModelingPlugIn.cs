@@ -448,13 +448,21 @@ namespace IPyModeling
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
+                bool boolPredictionOnly = e.PredictionOnly;
 
-                if ((bool)dictPlugin["Visible"]) { Show(); }
-                else { Hide(); }
-                //MakeActive();               
+                if (!boolPredictionOnly)
+                {
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
+                    boolVisible = (bool)dictPlugin["Visible"];
+                }
+                else
+                {
+                    Hide();
+                    boolVisible = false;
+                }
 
                 boolComplete = (bool)dictPlugin["Complete"];
-                boolVisible = (bool)dictPlugin["Visible"];
                 boolVirgin = (bool)dictPlugin["Virgin"];
                 innerIronPythonControl.UnpackState(dictPlugin);
 

@@ -20,11 +20,18 @@ namespace VBProjectManager
     {
         public void Save(object sender, EventArgs e)
         {
+            bool bPredictionOnly = false;
+            if (sender.ToString() == "PredictionOnly")
+                bPredictionOnly = true;
+
             string fullName = string.Empty;
             if (ProjectPathName == null)
             {
                 //set up location for saved project to be stored
-                string strFilterstring = @"VB3 Project Files|*.vbpx|All Files|*.*";
+                string strFilterstring;
+                if (bPredictionOnly) { strFilterstring = @"VB3 Model Files|*.vbmx|All Files|*.*"; }
+                else { strFilterstring = @"VB3 Project Files|*.vbpx|All Files|*.*"; }
+
                 SaveFileDialog saveFile = new SaveFileDialog();
                 saveFile.Title = "Enter a file name to save your project information in.";
                 saveFile.Filter = strFilterstring;
@@ -59,12 +66,25 @@ namespace VBProjectManager
         }
 
 
+        public void Save_PredictionOnly(object sender, EventArgs e)
+        {
+            Save("PredictionOnly", e);
+        }
+
+
+        public void SaveAs_PredictionOnly(object sender, EventArgs e)
+        {
+            ProjectPathName = null;
+            Save("PredictionOnly", e);
+        }
+        
+
         public void Open(object sender, EventArgs e)
         {
             //open project
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.InitialDirectory = VBProjectsPath;
-            openFile.Filter = @"VB3 Project Files|*.vbpx|All Files|*.*";
+            openFile.Filter = @"VB3 Project Files|*.vbpx|VB3 Model Files|*.vbmx|All Files|*.*";
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;
             string strFileName = string.Empty;
@@ -73,7 +93,13 @@ namespace VBProjectManager
             if (openFile.ShowDialog() == DialogResult.OK)
                 strFileName = openFile.FileName;
             else return;
-            strPathName = strFileName; 
+            strPathName = strFileName;
+            
+            //If the file name ends in .vbmx then open this model for prediction only.
+            bool bPredictionOnly;
+            if (String.Equals(strFileName.Split('.').Last(), "vbmx", comparisonType: StringComparison.InvariantCultureIgnoreCase))
+                { bPredictionOnly = true; }
+            else { bPredictionOnly = false; }
             
             //Load a project file from disk and then send it out to be unpacked.           
             StreamReader streamreader = new StreamReader(strFileName);
@@ -85,7 +111,7 @@ namespace VBProjectManager
             IDictionary<string, IDictionary<string, object>> dictPluginStates = PersistentStackUtilities.StringToStates(strProjectStateJson);
 
             //raise unpack event, sending packed plugins dictionary
-            signaller.UnpackProjectState(dictPluginStates);
+            signaller.UnpackProjectState(dictPluginStates, bPredictionOnly);
 
             //Make the top plugin active
             if (dictPluginStates[this.strPluginKey]["TopPlugin"] != null)

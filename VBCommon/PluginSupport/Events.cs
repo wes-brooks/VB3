@@ -85,16 +85,22 @@ namespace VBCommon.PluginSupport
     public class SerializationEventArgs : EventArgs
     {
         private IDictionary<string, IDictionary<string, object>> packedStates;
+        private bool boolPredictionOnly;
 
-        public SerializationEventArgs(IDictionary<string, IDictionary<string, object>> dictSerializable)
+        public SerializationEventArgs(IDictionary<string, IDictionary<string, object>> dictSerializable, bool PredictionOnly=false)
         {
             this.packedStates = dictSerializable;
-
+            this.boolPredictionOnly = PredictionOnly;
         }
 
         public IDictionary<string, IDictionary<string, object>> PackedPluginStates
         {
             get { return packedStates; }
+        }
+        
+        public bool PredictionOnly
+        {
+            get { return boolPredictionOnly; }
         }
     }
 

@@ -76,7 +76,7 @@ namespace VBCommon
 
 
         //Tell the plugins to unpack themselves from the saved state
-        public void UnpackProjectState(IDictionary<string, IDictionary<string, object>> dictPackedStates)
+        public void UnpackProjectState(IDictionary<string, IDictionary<string, object>> dictPackedStates, bool PredictionOnly)
         {
             if (ProjectOpened != null) //Has some method been told to handle this event?
             {

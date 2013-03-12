@@ -317,7 +317,8 @@ namespace VBDatasheet
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-
+                
+                                
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolClean = (bool)dictPlugin["Clean"];

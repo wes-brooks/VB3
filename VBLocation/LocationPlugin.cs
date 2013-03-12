@@ -301,8 +301,11 @@ namespace VBLocation
         {
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
+                IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
+                bool boolPredictionOnly = e.PredictionOnly;
+
                 //Unpack the state of this plugin.
-                cLocation.UnpackState(e.PackedPluginStates[strPanelKey]);
+                cLocation.UnpackState(dictPlugin);
             }
             else
             {
