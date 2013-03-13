@@ -482,6 +482,7 @@ namespace VBDatasheet
             bool bSuccess = _frmDatasheet.btnImportData_Click(sender, e);
             if (bSuccess)
             {
+                boolClean = false;
                 btnValidate.Enabled = true;
                 btnComputeAO.Enabled = false;
                 btnManipulate.Enabled = false;

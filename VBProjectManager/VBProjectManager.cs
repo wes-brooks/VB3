@@ -100,20 +100,20 @@ namespace VBProjectManager
 
             //Add a Save button to the application ("File") menu.
             var btnSavePredOnly = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save (prediction only)", Save_PredictionOnly);
-            btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnSave.LargeImage = Resources.Save16x16;
-            btnSave.ToolTipText = "Save the current project state.";
-            btnSave.SortOrder = n;
-            App.HeaderControl.Add(btnSave);
+            btnSavePredOnly.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnSavePredOnly.LargeImage = Resources.Save16x16;
+            btnSavePredOnly.ToolTipText = "Save the current model state.";
+            btnSavePredOnly.SortOrder = n;
+            App.HeaderControl.Add(btnSavePredOnly);
             n++;
 
             //Add a Save button to the application ("File") menu.
             var btnSaveAsPredOnly = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As (prediction only)", SaveAs_PredictionOnly);
-            btnSave.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnSave.LargeImage = Resources.Save16x16;
-            btnSave.ToolTipText = "Save the current project state.";
-            btnSave.SortOrder = n;
-            App.HeaderControl.Add(btnSave);
+            btnSaveAsPredOnly.GroupCaption = HeaderControl.ApplicationMenuKey;
+            btnSaveAsPredOnly.LargeImage = Resources.SaveAs16x16;
+            btnSaveAsPredOnly.ToolTipText = "Save the current model state.";
+            btnSaveAsPredOnly.SortOrder = n;
+            App.HeaderControl.Add(btnSaveAsPredOnly);
             n++;
 
             //Add an item to the application ("File") menu.
