@@ -448,9 +448,8 @@ namespace IPyModeling
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-                bool boolPredictionOnly = e.PredictionOnly;
 
-                if (!boolPredictionOnly)
+                if (!e.PredictionOnly)
                 {
                     if ((bool)dictPlugin["Visible"]) { Show(); }
                     else { Hide(); }

@@ -302,14 +302,26 @@ namespace VBLocation
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-                bool boolPredictionOnly = e.PredictionOnly;
+
+                if (!e.PredictionOnly)
+                {
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
+                    boolVisible = (bool)dictPlugin["Visible"];
+                }
+                else
+                {
+                    Hide();
+                    boolVisible = false;
+                }
 
                 //Unpack the state of this plugin.
+                boolComplete = (bool)dictPlugin["Complete"];
                 cLocation.UnpackState(dictPlugin);
             }
             else
             {
-                //Set this plugin to an empty state.
+                Activate();
             }
         }
 

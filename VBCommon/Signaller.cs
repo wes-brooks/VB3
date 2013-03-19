@@ -80,7 +80,7 @@ namespace VBCommon
         {
             if (ProjectOpened != null) //Has some method been told to handle this event?
             {
-                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates);
+                SerializationEventArgs e = new SerializationEventArgs(dictPackedStates, PredictionOnly);
                 ProjectOpened(this, e);
             }
         }

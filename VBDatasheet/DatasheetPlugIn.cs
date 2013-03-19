@@ -317,25 +317,34 @@ namespace VBDatasheet
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-                
-                                
+
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolClean = (bool)dictPlugin["Clean"];
                 boolFirstPass = (bool)dictPlugin["FirstPass"];
 
-                if (boolVisible)
-                {
-                    this.Show();
-
-                    if (boolComplete)
+                if (!e.PredictionOnly)
+                {   
+                    if (boolVisible)
                     {
-                        btnComputeAO.Enabled = true;
-                        btnGoToModeling.Enabled = true;
-                        btnManipulate.Enabled = true;
-                        btnTransform.Enabled = true;
+                        this.Show();
+
+                        if (boolComplete)
+                        {
+                            btnComputeAO.Enabled = true;
+                            btnGoToModeling.Enabled = true;
+                            btnManipulate.Enabled = true;
+                            btnTransform.Enabled = true;
+                        }
                     }
+                    else { Hide(); }
                 }
+                else
+                {
+                    Hide();
+                    boolVisible = false;
+                }
+
                 _frmDatasheet.UnpackState(dictPlugin);
             }
             else

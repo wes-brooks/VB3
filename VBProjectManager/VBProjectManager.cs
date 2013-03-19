@@ -93,7 +93,7 @@ namespace VBProjectManager
             var btnSaveAs = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As", SaveAs);
             btnSaveAs.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSaveAs.LargeImage = Resources.SaveAs16x16;
-            btnSaveAs.ToolTipText = "test hide panel";
+            btnSaveAs.ToolTipText = "Save the current project state.";
             btnSaveAs.SortOrder = n;
             App.HeaderControl.Add(btnSaveAs);
             n++;
