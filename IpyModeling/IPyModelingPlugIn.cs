@@ -93,27 +93,6 @@ namespace IPyModeling
         }
 
 
-        /*public void ActivePluginChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
-        {
-            if (e.ActivePanelKey == strPanelKey)
-            {                
-                App.DockManager.SelectPanel(strPanelKey);
-                App.HeaderControl.SelectRoot(strPanelKey);
-            }
-            else
-            {
-                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-                {
-                    if (x is IPlugin)
-                    {
-                        if (((IPlugin)x).PanelKey == e.ActivePanelKey && ((IPlugin)x).PluginType <= VBCommon.Globals.PluginType.Datasheet)
-                            Hide();
-                    }
-                }
-            }
-        }*/
-
-
         public void MakeActive()
         {            
             App.HeaderControl.SelectRoot(strPanelKey); 

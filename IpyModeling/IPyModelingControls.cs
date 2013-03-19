@@ -109,10 +109,6 @@ namespace IPyModeling
             ipyInterface.ProgressEvent.Handle(mped);
 
             //Create the delegate that will raise the event that requests model data
-            //this.VariableSelectionTab.Enter += new EventHandler(DataTabEnter);
-            //this.TabPageEntered
-            //this.DataRequested += new EventHandler<ModelingCallback>(this.ProvideData);    
-            //ResetIPyProject += new EventHandler(this.ResetProject);
             ModelingTabControl.TabPages[2].Paint += new PaintEventHandler(ModelTabEntered);
             ModelingTabControl.TabPages[3].Paint += new PaintEventHandler(DiagnosticTabEntered);
             this.dsControl1.NotifiableChangeEvent += new EventHandler(this.UpdateData);
@@ -856,9 +852,6 @@ namespace IPyModeling
             tblData.Columns.Remove(tblData.Columns[0].Caption);
 
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
-            //dynamic validation_results = ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod);
-            //ModelingComplete(validation_results);
-
             ModelValidationCompleteDelegate callbackDelegate = new ModelValidationCompleteDelegate(ModelingComplete);
             ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod, callback: callbackDelegate);
 

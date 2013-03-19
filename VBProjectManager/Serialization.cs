@@ -84,7 +84,7 @@ namespace VBProjectManager
             //open project
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.InitialDirectory = VBProjectsPath;
-            openFile.Filter = @"VB3 Project Files|*.vbpx|VB3 Model Files|*.vbmx|All Files|*.*";
+            openFile.Filter = @"All VB3 Files|*.vbmx;*.vbpx|VB3 Project Files|*.vbpx|VB3 Model Files|*.vbmx|All Files|*.*";
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;
             string strFileName = string.Empty;

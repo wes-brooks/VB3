@@ -76,7 +76,6 @@ namespace VBCommon.IO
                     }
                 }
 
-                double cellVal;
                 DataRow dr = null;
                 line = sr.ReadLine();
                 while (line != null && line.Length > 0)

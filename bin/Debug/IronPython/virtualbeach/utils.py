@@ -175,7 +175,7 @@ def DotNetToArray(data):
     import System
     import System.Data
     import DotNetExtensions
-
+    
     #Determine whether we got a DataTable or a DataView
     if isinstance(data, System.Data.DataTable): data_view = data.AsDataView()
     elif isinstance(data, System.Data.DataView): data_view = data
@@ -191,8 +191,7 @@ def DotNetToArray(data):
     #Now copy the NaN-free rows of the DataView into an array:
     raw_table = [list(data_view[i]) for i in range(len(data_view)) if flags[i]]
     data_array = [array.array('d', row) for row in raw_table]
-    #data_array = np.array(data_array, dtype=float, ndmin=2)
-
+    
     return [headers, data_array]
     
     

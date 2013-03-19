@@ -89,18 +89,6 @@ namespace VBLocation
             btnNull.GroupCaption = grpManipulate;
             btnNull.Enabled = false;
             App.HeaderControl.Add(btnNull);
-
-            //var validateBtn = new SimpleActionItem("Validate", btnValidate_Click) { RootKey = kVBLocation, ToolTipText = "Validate Data", LargeImage = Properties.Resources.validate };
-            //App.HeaderControl.Add(validateBtn);
-
-            //var computeBtn = new SimpleActionItem("Compute", btnCompute_Click) { RootKey = kVBLocation, ToolTipText = "Compute" };
-            //App.HeaderControl.Add(computeBtn);
-
-            //var manipulateBtn = new SimpleActionItem("Manipulate", btnManipulate_Click) { RootKey = kVBLocation, ToolTipText = "Manipulate", LargeImage = Properties.Resources.manipulate };
-            //App.HeaderControl.Add(manipulateBtn);
-
-            //var transformBtn = new SimpleActionItem("Transform", btnTransform_Click) { RootKey = kVBLocation, ToolTipText = "Transform", LargeImage = Properties.Resources.transform };
-            //App.HeaderControl.Add(transformBtn);
         }
 
 
@@ -259,22 +247,7 @@ namespace VBLocation
             {
                 //Unpack the state of this plugin.
                 cLocation.UnpackState(new Dictionary<string, object>());
-            }
-            else
-            {
-                //This handles an undo:
-                try
-                {
-                    if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
-                    {
-                        if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
-                        {
-                            //Unpack the undo dictionary here
-                        }
-                    }
-                }
-                catch { }
-            }            
+            }         
         }
 
 

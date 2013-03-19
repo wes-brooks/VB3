@@ -139,6 +139,19 @@ namespace VBCommon.Controls
             }
             else
             {
+                //Make sure that the imported data are doubles (and not strings)
+                DataTable dtCloned = _dt.Clone();
+                for (int i = 1; i < _dt.Columns.Count; i++)
+                {
+                    dtCloned.Columns[i].DataType = typeof(Double);
+                }                                
+                
+                foreach (DataRow row in _dt.Rows) 
+                {
+                    dtCloned.ImportRow(row);
+                }
+                _dt = dtCloned;
+
                 lblStatus.Text = "No anomalous data values found.";
                 btnReturn.Enabled = true;  //can return if user selects
                 boolStatus = true;

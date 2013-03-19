@@ -233,17 +233,6 @@ namespace Prediction
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            /*else
-            {
-                foreach (DotSpatial.Extensions.IExtension x in App.Extensions)
-                {
-                    if (x is IPlugin)
-                    {
-                        if (((IPlugin)x).PanelKey == e.ActivePanelKey && ((IPlugin)x).PluginType <= VBCommon.Globals.PluginType.Datasheet)
-                            Hide();
-                    }
-                }
-            }*/
         }
 
 
@@ -338,7 +327,8 @@ namespace Prediction
                 _frmPred.ClearDataGridViews(e.PackedPluginState["Method"].ToString());
                 boolComplete = false;
                 boolChanged = true;
-            }           
+            }
+            
         }
 
 

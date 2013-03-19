@@ -117,8 +117,6 @@ class Model(object):
         try: container = args['extract_from']
         except KeyError: container = self.model
         
-        print "Extracting " + model_part
-        
         #use R's coef function to extract the model coefficients
         if model_part == 'coef':
             part = list(r.Call(function='coef', object=self.model, ncomp=self.ncomp, intercept=True).AsVector())
@@ -198,17 +196,13 @@ class Model(object):
     def CrossValidation(self, cv_method=0, **args):
         '''Select ncomp by the requested CV method'''
         validation = self.model['validation'].AsDataFrame()
-        print "in"
         
         #method 0: select the fewest components with PRESS within 1 stdev of the least PRESS (by the bootstrap)
         if cv_method == 0: #Use the bootstrap to find the standard deviation of the MSEP
             #Get the leave-one-out CV error from R:
             columns = min(self.num_predictors, self.ncomp_max)
-            #cv = np.array( validation['pred'].AsVector() )
             cv = array.array('d', validation['pred'].AsVector())
             rows = len(cv) / columns
-            #cv.shape = (columns, rows)
-            #cv = cv.transpose()
             cc = []
             for k in range(int(columns)):
                 b = k * rows
@@ -220,7 +214,6 @@ class Model(object):
             PRESS = [sum([(cv[i][j]-self.actual[j])**2 for j in range(rows)]) for i in range(int(columns))]
             #ncomp = np.argmin(PRESS)
             ncomp = [i for i in range(len(PRESS)) if PRESS[i]==min(PRESS)][0]
-            print ncomp
             
             #cv_squared_error = (cv[:,ncomp]-self.array_actual)**2
             cv_squared_error = [(cv[ncomp][j]-self.actual[j])**2 for j in range(int(rows))]
@@ -235,7 +228,6 @@ class Model(object):
                 PRESS_bootstrap = list()
                 
                 for j in range(100):
-                    #PRESS_bootstrap.append( sum([cv_squared_error[_int(_random()*cv.shape[0])] for i in sample_space]) )
                     PRESS_bootstrap.append( sum([cv_squared_error[_int(_random()*rows)] for i in sample_space]) )
                     
                 PRESS_stdev.append( utils.std(PRESS_bootstrap) )
@@ -243,10 +235,8 @@ class Model(object):
             med_stdev = utils.median(PRESS_stdev)
             
             #Maximum allowable PRESS is the minimum plus one standard deviation
-            #good_ncomp = mlab.find( PRESS < min(PRESS) + med_stdev )
             good_ncomp = [i for i in range(len(PRESS)) if PRESS[i] < min(PRESS) + med_stdev]
             self.ncomp = int( min(good_ncomp)+1 )
-            print "out"
             
         #method 1: select the fewest components w/ PRESS less than the minimum plus a 4% of the range
         if cv_method==1:
@@ -259,7 +249,6 @@ class Model(object):
             
             #Maximum allowable PRESS is the minimum plus a fraction of the range.
             max_CV_error = min(PRESS) + PRESS_range/25
-            #good_ncomp = mlab.find(PRESS < max_CV_error)
             good_ncomp = [i for i in range(len(PRESS)) if PRESS[i] < max_CV_error]
     
             #choose the most parsimonious model that satisfies that criterion
@@ -291,8 +280,7 @@ class Model(object):
         columns = min(self.num_predictors, self.ncomp_max)
         fitted = array.array('d', self.model['fitted.values'].AsVector())
         rows = len(fitted) / columns
-        #fitted_values.shape = (columns, rows)
-        #fitted_values = fitted_values.transpose()[:,0]
+        
         ff = []
         for k in range(columns):
             b = k * rows
@@ -302,8 +290,6 @@ class Model(object):
         
         #Recover the actual counts by adding the residuals to the fitted counts.
         residuals = array.array('d', self.model['residuals'].AsVector())
-        #residuals.shape = (columns, rows)
-        #residuals = residuals.transpose()[:,0]
         rr = []
         for k in range(columns):
             b = k * rows
@@ -325,8 +311,7 @@ class Model(object):
         columns = min(self.num_predictors, self.ncomp_max)
         fitted = array.array('d', self.model['fitted.values'].AsVector())
         rows = len(fitted) / columns
-        #fitted.shape = (columns, rows)
-        #fitted = fitted.transpose()[:,self.ncomp-1]
+        
         ff = []
         for k in range(columns):
             b = k * rows
@@ -348,7 +333,6 @@ class Model(object):
 
         #Now get the model coefficients from R.
         coefficients = array.array('d', self.Extract('coef'))
-        #coefficients = coefficients.flatten()
         
         #Get the standard deviations (from the data_dictionary) and package the influence in a dictionary.
         raw_influence = list()
@@ -356,7 +340,7 @@ class Model(object):
         for i in range( len(self.names) ):
             standard_deviation = utils.std( self.data_dictionary[self.names[i]] )
             raw_influence.append( float(abs(standard_deviation * coefficients[i+1])) )
- 
+        
         self.influence = dict( zip(self.names, [float(x/sum(raw_influence)) for x in raw_influence]) )
         return self.influence
             

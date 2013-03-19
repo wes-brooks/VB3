@@ -94,7 +94,7 @@ namespace VBCommon.Metadata
                 //filter out disabled rows
                 DataTable dtCopy = dt.Copy();
                 Dictionary<string, bool> rstatus = dtri.DTRowInfo;
-                for (int i = 0; i < dt.Rows.Count; i++)
+                for (int i = dt.Rows.Count-1; i >= 0; i--)
                 {
                     if (!rstatus[dt.Rows[i][0].ToString()])
                         dtCopy.Rows[i].Delete();
