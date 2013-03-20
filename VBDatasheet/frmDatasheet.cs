@@ -125,7 +125,12 @@ namespace VBDatasheet
                     dsControl1.DT.Columns[c].ExtendedProperties[VBCommon.Globals.DATETIMESTAMP] = true;
                     dsControl1.dgv.Columns[c].ReadOnly = true; //cannot edit this
                 }
-                if (c == 1) dsControl1.DT.Columns[c].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
+                if (c == 1)
+                {
+                    dsControl1.DT.Columns[c].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
+                    dsControl1.DT.Columns[c].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.Transforms.DependentVariableTransforms.none.ToString();
+                }
+                
                 dsControl1.dgv.Columns[c].SortMode = DataGridViewColumnSortMode.NotSortable;
                 dsControl1.dgv.Columns[c].DefaultCellStyle.ForeColor = Color.Black;
             }
