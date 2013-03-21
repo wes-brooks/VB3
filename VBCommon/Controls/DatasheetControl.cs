@@ -522,7 +522,7 @@ namespace VBCommon.Controls
                     //set properties of new rv
                     strResponseVarColName = newcolname;
                     intResponseVarColIndex = dtCopy.Columns.IndexOf(strResponseVarColName);
-                    dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLETRANSFORM] = true;
+                    dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLETRANSFORM] = false;
                     dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
 
                     //set properties of old one
@@ -1018,6 +1018,7 @@ namespace VBCommon.Controls
 
                 //maintain attributes
                 dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
+                dt.Columns[intSelectedColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM] = VBCommon.Transforms.DependentVariableTransforms.none.ToString();
                 dt.Columns[intResponseVarColIndex].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = false;
 
                 //filter transformed cols
@@ -1415,6 +1416,8 @@ namespace VBCommon.Controls
                 {
                     this.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
                 }
+                //seems like a logical place to put this - need to notify the mlr variableselection control that we've got available variables for the list
+                NotifyContainer();
             }
         }
 
