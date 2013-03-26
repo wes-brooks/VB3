@@ -406,95 +406,6 @@ namespace IPyModeling
         }
 
 
-        //Handle a request from an IronPython-based modeling tab to begin the modeling process.
-        /*private void ProvideData(object sender, ModelingCallback CallbackObject)
-        {
-            Cursor.Current = Cursors.WaitCursor;
-            DataTable modelDataTable;
-           
-            modelDataTable = CreateModelDataTable();
-            CallbackObject.MakeModel(modelDataTable);
-        }*/
-
-
-        //control ribbon active buttons depending on which tab
-        /*protected void DataTabEnter(object sender, EventArgs args)
-        {
-            if (((TabPage)sender).Text == "Data Manipulation")
-            {
-                if (ManipulateDataTab != null)
-                {
-                    EventArgs e = new EventArgs();
-                    ManipulateDataTab(this, e);
-                }
-            }
-            if (((TabPage)sender).Text == "Variable Selection")
-            {
-                if (VariableTab != null)
-                {
-                    EventArgs e = new EventArgs();
-                    VariableTab(this, e);
-                }
-            }
-        }*/
-
-
-        /*//Raise a request for access to the model data - should be raised when the Model tab is entered.
-        protected void RequestModelData(object sender, EventArgs args)
-        {
-            //only have run button enabled when on modeling tab
-            if (((TabPage)sender).Text == "Model")
-            {
-                if (ModelTab != null)
-                {
-                    EventArgs e = new EventArgs();
-                    ModelTab(this, e);
-                }
-            }
-            if (boolVirgin == true)
-            {
-                SetModelData(CreateModelDataTable());
-            } 
-        }*/
-
-
-        /*//Raise a MessageEvent (passes a message to the container, which should be logged)
-        protected virtual void Log(string message, LogMessageEvent.Intents intent, LogMessageEvent.Targets target)
-        {
-            if (LogMessageSent != null)
-            {
-                LogMessageEvent e = new LogMessageEvent(message, intent, target);
-                LogMessageSent(this, e);
-            }
-        }
-
-
-        //This method alerts the container that we need data. The container should then use the Set property of sender.data
-        protected void StartModeling()
-        {
-            VBLogger.GetLogger().LogEvent("60", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-            Cursor.Current = Cursors.WaitCursor;
-                        
-            if (DataRequested != null)
-            {
-                ModelingCallback e = new ModelingCallback(MakeModel);
-                DataRequested(this, e);
-            }
-            VBLogger.GetLogger().LogEvent("70", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
-        }
-
-
-        //Raise a MessageEvent (passes a message to the container, which should be logged)
-        protected virtual void TellManager(string message)
-        {
-            if (MessageSent != null)
-            {
-                MessageEvent e = new MessageEvent(message);
-                MessageSent(this, e);
-            }
-        }*/
-
-
         //Enable or disable controls, then raise an event to do the same up the chain in the containing Form.
         protected void ChangeControlStatus(bool enable)
         {
@@ -1049,21 +960,6 @@ namespace IPyModeling
             lvValidation.Items.Clear();
             lvValidation.Items.Add(lvi);
         }
-
-
-        /*protected double UntransformThreshold(double value)
-        {
-            if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.none)
-                return value;
-            else if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.Log10)
-                return Math.Pow(10, value);
-            else if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.Ln)
-                return Math.Exp(value);
-            else if ((VBCommon.Transforms.DependentVariableTransforms)this.DependentVariableTransform["Type"] == VBCommon.Transforms.DependentVariableTransforms.Power)
-                return Math.Pow(value, 1 / (double)this.DependentVariableTransform["Exponent"]);
-            else
-                return value;
-        }*/
                
         
         //Pack State for Serializing
@@ -1154,11 +1050,11 @@ namespace IPyModeling
             //this.Show();
             if (dictProjectState.Count <= 3) return; //if only plugin props are here
 
-            this.boolComplete = (bool)dictProjectState["Complete"];
-            this.listPredictors = (List<ListItem>)dictProjectState["Predictors"];
-
             //unpack the model's datasheet
             this.SetData(dictProjectState);
+
+            this.boolComplete = (bool)dictProjectState["Complete"];
+            this.listPredictors = (List<ListItem>)dictProjectState["Predictors"];
                        
             //Make the modeling tab active during unpacking so we can draw the graph.
             //tabControl1.SelectedIndex = 2;

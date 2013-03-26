@@ -294,9 +294,6 @@ namespace IPyModeling
         //event listener for plugin broadcasting changes
         private void BroadcastStateListener(object sender, VBCommon.PluginSupport.BroadcastEventArgs e)
         {            
-            //if (!(bool)((IPlugin)sender).Complete)
-            //    return;
-
             //if datasheet updated itself, set data with changes
             if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {
@@ -440,14 +437,9 @@ namespace IPyModeling
                     boolVisible = false;
                 }
 
+                innerIronPythonControl.UnpackState(dictPlugin);
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolVirgin = (bool)dictPlugin["Virgin"];
-                innerIronPythonControl.UnpackState(dictPlugin);
-
-                //if (!boolVisible)
-                //    Hide();
-                //else
-                //    Show();        
             }
             else
             {

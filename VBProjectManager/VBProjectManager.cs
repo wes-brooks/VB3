@@ -36,9 +36,6 @@ namespace VBProjectManager
         private Boolean boolVisible = false;
         private Boolean boolChanged = false;
 
-        //private Stack<string> UndoStack;
-        //private Stack<string> RedoStack;
-
         private SimpleActionItem btnUndo;
         private SimpleActionItem btnRedo;
 
@@ -99,15 +96,6 @@ namespace VBProjectManager
             n++;
 
             //Add a Save button to the application ("File") menu.
-            var btnSavePredOnly = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save (prediction only)", Save_PredictionOnly);
-            btnSavePredOnly.GroupCaption = HeaderControl.ApplicationMenuKey;
-            btnSavePredOnly.LargeImage = Resources.Save16x16;
-            btnSavePredOnly.ToolTipText = "Save the current model state.";
-            btnSavePredOnly.SortOrder = n;
-            App.HeaderControl.Add(btnSavePredOnly);
-            n++;
-
-            //Add a Save button to the application ("File") menu.
             var btnSaveAsPredOnly = new SimpleActionItem(HeaderControl.ApplicationMenuKey, "Save As (prediction only)", SaveAs_PredictionOnly);
             btnSaveAsPredOnly.GroupCaption = HeaderControl.ApplicationMenuKey;
             btnSaveAsPredOnly.LargeImage = Resources.SaveAs16x16;
@@ -159,15 +147,6 @@ namespace VBProjectManager
 
             //Hook up the event handler that fires when the user clicks on a new plugin.
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
-
-            /*//if PType is smallest (datasheet/map), set as activated when open
-            int pos = lstAllPluginTypes.IndexOf(lstAllPluginTypes.Min());
-            DotSpatial.Extensions.IExtension extension = App.Extensions.ElementAt(pos);
-            IPlugin ex = (IPlugin)extension;
-            if (ex != null)
-                ex.MakeActive();
-                               
-            base.Activate();*/
         }
 
 
@@ -295,29 +274,13 @@ namespace VBProjectManager
 
         //pop off last stack for undo
         public void UndoMenuItem_Click(object sender, EventArgs e)
-        {
-            //if (UndoStack.Count > 1)
-            //{
-                //string strCurrentStateKey = UndoStack.Pop().ToString();
-                //string strLastStateKey = UndoStack.Peek().ToString();
-
-                //string strCurrentStateJson = UndoRedoBackend[strCurrentStateKey];
-                //string strLastStateJson = UndoRedoBackend[strLastStateKey];
-
-                //IDictionary<string, IDictionary<string, object>> dictCurrentState = Utilities.StringToStates(strCurrentStateJson);
-                //IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
-
-                //raise unpack event, sending packed plugins dictionary
-                //RedoStack.Push(strCurrentStateKey);
-                //signaller.UnpackProjectState(dictLastState, Undo: true, Store: UndoRedoDict);
-                
+        {                
                 signaller.SignalUndo(Store: UndoRedoDict);
 
                 if (RedoKeys.Count > 0)
                     btnRedo.Enabled = true;                
                 if (UndoKeys.Count == 1)
                     btnUndo.Enabled = false;
-            //}
         }
 
 
@@ -325,14 +288,8 @@ namespace VBProjectManager
         {
             if (RedoKeys.Count > 0)
             {
-                //string strLastStateKey = RedoStack.Pop().ToString();
-                //string strLastStateJson = UndoRedoBackend[strLastStateKey];
-                //IDictionary<string, IDictionary<string, object>> dictLastState = Utilities.StringToStates(strLastStateJson);
-
                 //raise unpack event, sending packed plugins dictionary
-                //UndoStack.Push(strLastStateKey);
                 signaller.SignalRedo(Store: UndoRedoDict);
-
                 
                 if (RedoKeys.Count > 0)
                     btnRedo.Enabled = true;
@@ -351,13 +308,6 @@ namespace VBProjectManager
             //Dictionary to store each plugin's state for saving
             IDictionary<string, IDictionary<string, object>> dictPluginStates = new Dictionary<string, IDictionary<string, object>>();
             signaller.UndoStack(Store: UndoRedoDict);
-
-            //PersistentDictionary-based undo and redo:
-            //string strProjectStateJson = Utilities.StatesToString(dictPluginStates);
-            //string strKey = Utilities.RandomString(10);
-            //UndoRedoBackend.Add(key: strKey, value: strProjectStateJson);
-            //UndoStack.Push(strKey);        
-            //RedoStack.Clear();
 
             //Manage the state of the undo/redo buttons.
             btnUndo.Enabled = true;

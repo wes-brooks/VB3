@@ -391,12 +391,30 @@ namespace Prediction
         {
             //Disconnect the selection-changed handlers for this process
             this.lbAvailableModels.SelectedIndexChanged -= new System.EventHandler(this.lbAvailableModels_SelectedIndexChanged);            
-
+            
             //If there is already a model from this plugin in the listBox, then remove it.
             if (listModels.Contains(Method))
             {
                 //Remove the Method from the lists
                 listModels.Remove(Method);
+                
+                if (lbAvailableModels.SelectedItem != null)
+                {
+                    if (lbAvailableModels.SelectedItem.ToString() == Method && ReplacePredictionElements)
+                    {
+                        ClearDataGridViews(Method);
+                        txtModel.Clear();
+                        txtPower.Text = "1";
+                        txtRegStd.Text = "235";
+                        txtProbabilityThreshold.Text = "50";
+                        txtDecCrit.Text = "235";
+                        strEnddatURL = "";
+                        rbNone.Select();
+                        rbRaw.Select();
+                        strMethod = null;
+                        lbAvailableModels.SelectedIndex = -1;
+                    }
+                }
                 lbAvailableModels.Items.Remove(Method);
             }
 

@@ -318,18 +318,13 @@ namespace VBDatasheet
             {
                 IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
 
-                boolVisible = (bool)dictPlugin["Visible"];
-                boolComplete = (bool)dictPlugin["Complete"];
-                boolClean = (bool)dictPlugin["Clean"];
-                boolFirstPass = (bool)dictPlugin["FirstPass"];
-
                 if (!e.PredictionOnly)
-                {   
-                    if (boolVisible)
+                {
+                    if ((bool)dictPlugin["Visible"])
                     {
                         this.Show();
 
-                        if (boolComplete)
+                        if ((bool)dictPlugin["Complete"])
                         {
                             btnComputeAO.Enabled = true;
                             btnGoToModeling.Enabled = true;
@@ -339,13 +334,13 @@ namespace VBDatasheet
                     }
                     else { Hide(); }
                 }
-                else
-                {
-                    Hide();
-                    boolVisible = false;
-                }
+                else { Hide(); }
 
                 _frmDatasheet.UnpackState(dictPlugin);
+                boolVisible = (bool)dictPlugin["Visible"];
+                boolComplete = (bool)dictPlugin["Complete"];
+                boolClean = (bool)dictPlugin["Clean"];
+                boolFirstPass = (bool)dictPlugin["FirstPass"];
             }
             else
             {

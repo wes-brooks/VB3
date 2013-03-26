@@ -35,6 +35,8 @@ namespace VBCommon
         public delegate void BroadcastEventHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event BroadcastEventHandler<BroadcastEventArgs> BroadcastState;
 
+        private bool bEnableBroadcast = true;
+
 
         public Signaller() {}
 
@@ -42,7 +44,7 @@ namespace VBCommon
         //tell plugins to pack their states into a dictionary to pass to other plugins
         public void RaiseBroadcastRequest(object sender, IDictionary<string, object> dictPackedPlugin)
         {
-            if (BroadcastState != null) //has some method been told to handle this event?
+            if (BroadcastState != null && bEnableBroadcast) //has some method been told to handle this event?
             {
                 string strSenderKey = "";
                 try
@@ -52,14 +54,19 @@ namespace VBCommon
                 catch { }
                 finally
                 {
+                    bEnableBroadcast = false;
+
                     if (!dictPackedPlugin.ContainsKey("Sender"))
                     {
                         dictPackedPlugin.Add("Sender", strSenderKey);
                     }
                     BroadcastEventArgs e = new BroadcastEventArgs(sender, dictPackedPlugin);
                     BroadcastState(sender, e);
-                    
+
+                    bEnableBroadcast = true;
                 }
+
+                
             }
         }
 
@@ -80,8 +87,12 @@ namespace VBCommon
         {
             if (ProjectOpened != null) //Has some method been told to handle this event?
             {
+                bEnableBroadcast = false;
+
                 SerializationEventArgs e = new SerializationEventArgs(dictPackedStates, PredictionOnly);
                 ProjectOpened(this, e);
+                
+                bEnableBroadcast = true;
             }
         }
 
@@ -90,8 +101,12 @@ namespace VBCommon
         {
             if (UndoEvent != null) //Has some method been told to handle this event?
             {
+                bEnableBroadcast = false;
+
                 UndoRedoEventArgs e = new UndoRedoEventArgs(Store);
                 UndoEvent(this, e);
+
+                bEnableBroadcast = true;
             }
         }
 
@@ -100,15 +115,19 @@ namespace VBCommon
         {
             if (RedoEvent != null) //Has some method been told to handle this event?
             {
+                bEnableBroadcast = false;
+
                 UndoRedoEventArgs e = new UndoRedoEventArgs(Store);
                 RedoEvent(this, e);
+
+                bEnableBroadcast = true;
             }
         }
 
 
         public void TriggerUndoStack()
         {
-            if (TriggerUndoStackEvent != null)
+            if (TriggerUndoStackEvent != null && bEnableBroadcast)
             {
                 EventArgs e = new EventArgs();
                 TriggerUndoStackEvent(this, e);

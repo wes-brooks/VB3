@@ -256,7 +256,7 @@ namespace VBLocation
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = cLocation.PackState();
 
-            boolComplete = (bool)dictPackedState["Complete"];
+            //boolComplete = (bool)dictPackedState["Complete"];
             dictPackedState.Add("Visible", boolVisible);
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
@@ -266,7 +266,10 @@ namespace VBLocation
 
         private void ProjectSavedListener(object sender, SerializationEventArgs e)
         {
-            e.PackedPluginStates.Add(strPanelKey, cLocation.PackState());
+            IDictionary<string, object> packedState = cLocation.PackState();
+            //packedState.Add("Complete", boolComplete);
+            packedState.Add("Visible", boolVisible);
+            e.PackedPluginStates.Add(strPanelKey, packedState);
         }
 
 

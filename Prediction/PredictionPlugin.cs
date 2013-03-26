@@ -328,7 +328,22 @@ namespace Prediction
                 boolComplete = false;
                 boolChanged = true;
             }
-            
+            else if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
+            {
+                if (!(bool)((IPlugin)sender).Complete)
+                {
+                    Hide();
+                    return;
+                }
+                else
+                {
+                    if (!(bool)e.PackedPluginState["Clean"])
+                    {
+                        Activate();
+                    }
+                    Hide();
+                }
+            }                
         }
 
 

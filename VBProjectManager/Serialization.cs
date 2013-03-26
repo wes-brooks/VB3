@@ -66,12 +66,6 @@ namespace VBProjectManager
         }
 
 
-        public void Save_PredictionOnly(object sender, EventArgs e)
-        {
-            Save("PredictionOnly", e);
-        }
-
-
         public void SaveAs_PredictionOnly(object sender, EventArgs e)
         {
             ProjectPathName = null;
