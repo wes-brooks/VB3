@@ -1,0 +1,10 @@
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\bin\debug\GALib.dll
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\bin\debug\GALib.pdb
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\GALib\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\GALib\obj\x86\Debug\GALib.dll
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\GALib\obj\x86\Debug\GALib.pdb
+C:\svn\svn\trunk\VB3\bin\debug\Plugins\VBMLR\GALib.dll
+C:\svn\svn\trunk\VB3\bin\debug\Plugins\VBMLR\GALib.pdb
+C:\svn\svn\trunk\VB3\MLR\GALib\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\svn\svn\trunk\VB3\MLR\GALib\obj\x86\Debug\GALib.dll
+C:\svn\svn\trunk\VB3\MLR\GALib\obj\x86\Debug\GALib.pdb

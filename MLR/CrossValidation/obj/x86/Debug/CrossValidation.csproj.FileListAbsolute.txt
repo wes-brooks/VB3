@@ -1,0 +1,8 @@
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\CrossValidation.frmCrossValidation.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\CrossValidation.frmCrossValidation.resources
+C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.write.1.tlog

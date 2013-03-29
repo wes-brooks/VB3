@@ -1,0 +1,6 @@
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\MLRCore\obj\Debug\ResolveAssemblyReference.cache
+C:\svn\svn\trunk\VB3\MLR\MLRCore\bin\Debug\MLRCore.dll
+C:\svn\svn\trunk\VB3\MLR\MLRCore\bin\Debug\MLRCore.pdb
+C:\svn\svn\trunk\VB3\MLR\MLRCore\obj\Debug\ResolveAssemblyReference.cache
+C:\svn\svn\trunk\VB3\MLR\MLRCore\obj\Debug\MLRCore.dll
+C:\svn\svn\trunk\VB3\MLR\MLRCore\obj\Debug\MLRCore.pdb

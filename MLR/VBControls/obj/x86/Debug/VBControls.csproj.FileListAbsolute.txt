@@ -1,0 +1,14 @@
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBControls\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.MLRPlots.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmBadCellsRpt.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmMissingValues.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmVariableSpecification.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBControls\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBControls\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\svn\svn\trunk\VB3\MLR\VBControls\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\svn\svn\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.MLRPlots.resources
+C:\svn\svn\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmBadCellsRpt.resources
+C:\svn\svn\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmMissingValues.resources
+C:\svn\svn\trunk\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmVariableSpecification.resources
+C:\svn\svn\trunk\VB3\MLR\VBControls\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\svn\svn\trunk\VB3\MLR\VBControls\obj\x86\Debug\GenerateResource.write.1.tlog

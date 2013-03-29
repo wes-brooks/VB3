@@ -1,0 +1,5 @@
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\MLRPlugin\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\MLRPlugin\obj\Debug\MLRPlugin.ctlMLRPlugin.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\MLRPlugin\obj\Debug\MLRPlugin.Properties.Resources.resources
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\MLRPlugin\obj\Debug\GenerateResource.read.1.tlog
+C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\MLRPlugin\obj\Debug\GenerateResource.write.1.tlog
