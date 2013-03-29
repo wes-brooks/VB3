@@ -109,7 +109,7 @@
       <Name>VBCommon</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\VBDockManager\VBDockManagerEPA.csproj">
+    <ProjectReference Include="..\..\VBDockManager\VBDockManager.csproj">
       <Project>{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}</Project>
       <Name>VBDockManagerEPA</Name>
       <Private>False</Private>
