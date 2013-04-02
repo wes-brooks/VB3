@@ -135,16 +135,6 @@
       <Project>{7D8D0BAB-69AE-4FBF-B8B7-E2C9EE75F62D}</Project>
       <Name>LogUtilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VBControls\VBControls.csproj">
-      <Project>{9F2D6730-6FD3-4A3F-98FC-C5898FCFA12E}</Project>
-      <Name>VBControls</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\VBStatistics\VBStatistics\VBStatistics.csproj">
-      <Project>{76237650-4E1E-40B0-89FC-98BF7599CBAF}</Project>
-      <Name>VBStatistics</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\VBTOOLS\VBTOOLS\VBTools.csproj">
       <Project>{3F5ED9FC-B22D-4133-981D-897DDD15D823}</Project>
       <Name>VBTools</Name>

@@ -48,7 +48,7 @@ namespace IPyModeling
         public Boolean boolComplete = false;
         public Boolean boolVisible = false;
         public Boolean boolRunning = false;
-        public Boolean boolVirgin = false;
+        public Boolean boolVirgin = true;
         public Boolean boolChanged = false;
 
         private Stack<string> UndoKeys;
@@ -70,12 +70,12 @@ namespace IPyModeling
         {
             if (boolVisible)
             {
-                boolChanged = true;
-                boolVisible = false;
+                boolChanged = true;                
 
                 App.HeaderControl.RemoveAll();
-                ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+                App.DockManager.HidePanel(strPanelKey);
             }
+            boolVisible = false;
         }
 
 
@@ -83,13 +83,13 @@ namespace IPyModeling
         {
             if (!boolVisible)
             {
-                boolChanged = true;
-                boolVisible = true;
+                boolChanged = true;                
 
                 AddRibbon("Show");
-                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
+            boolVisible = true;
         }
 
 
@@ -97,7 +97,7 @@ namespace IPyModeling
         {            
             App.HeaderControl.SelectRoot(strPanelKey); 
             App.DockManager.SelectPanel(strPanelKey);
-            boolVisible = true;       
+            //boolVisible = true;       
         }
 
 
@@ -138,18 +138,13 @@ namespace IPyModeling
         }
 
 
-        //add a datasheet plugin root item
+        //add a plugin root item
         public void AddRibbon(string sender)
         {
             rootHeaderItem = new RootItem(strPanelKey, strPanelCaption);
             rootHeaderItem.SortOrder = (short)pluginType;
             App.HeaderControl.Add(rootHeaderItem);
-            
-            //tell ProjMngr if this is being Shown
-            if (sender == "Show")
-            {
-                App.HeaderControl.SelectRoot(strPanelKey); 
-            }
+            App.HeaderControl.SelectRoot(strPanelKey); 
             
             //add sub-ribbon
             string grpManipulate = "Manipulate Data";
@@ -214,8 +209,6 @@ namespace IPyModeling
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            //if ((e.ActivePanelKey.ToString() == "DataSheetPanel" || e.ActivePanelKey.ToString() == "kVBLocation") && boolVisible)
-            //    Hide();
         }
 
 
@@ -307,6 +300,7 @@ namespace IPyModeling
                     if (!(bool)e.PackedPluginState["Clean"])
                     {
                         boolComplete = false;
+                        boolVirgin = false;
                         innerIronPythonControl.SetData(e.PackedPluginState);
                         boolChanged = true;
                     }
@@ -381,6 +375,7 @@ namespace IPyModeling
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
             signaller.TriggerUndoStack();
+            MakeActive();
         }
 
 
@@ -493,9 +488,6 @@ namespace IPyModeling
                 {
                     IDictionary<string, object> dictPlugin = args.Store[strPastKey];
 
-                    //Show();
-                    //MakeActive();
-
                     if ((bool)dictPlugin["Visible"]) { Show(); }
                     else { Hide(); }
 
@@ -503,11 +495,6 @@ namespace IPyModeling
                     boolVisible = (bool)dictPlugin["Visible"];
                     boolVirgin = (bool)dictPlugin["Virgin"];
                     innerIronPythonControl.UnpackState(dictPlugin);
-
-                    /*if (!boolVisible)
-                        Hide();
-                    else
-                        Show();*/
                 }
             }
             catch
@@ -529,9 +516,6 @@ namespace IPyModeling
                 {
                     IDictionary<string, object> dictPlugin = args.Store[strNextKey];
 
-                    //Show();
-                    //MakeActive();
-
                     if ((bool)dictPlugin["Visible"]) { Show(); }
                     else { Hide(); }
 
@@ -539,11 +523,6 @@ namespace IPyModeling
                     boolVisible = (bool)dictPlugin["Visible"];
                     boolVirgin = (bool)dictPlugin["Virgin"];
                     innerIronPythonControl.UnpackState(dictPlugin);
-
-                    /*if (!boolVisible)
-                        Hide();
-                    else
-                        Show();*/
                 }
             }
             catch

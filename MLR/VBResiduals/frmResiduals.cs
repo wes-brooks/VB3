@@ -10,7 +10,9 @@ using WeifenLuo.WinFormsUI.Docking;
 using VBTools;
 using VBControls;
 using ZedGraph;
-using VBStatistics;
+//using VBStatistics;
+using VBCommon.Statistics;
+using VBProjectManager;
 using Microsoft.VisualBasic;
 
 namespace VBResiduals
@@ -20,7 +22,7 @@ namespace VBResiduals
         private const double cutoff = 0.65d;
         private const double cookscutoff = 0.05d;
 
-        private VBProjectManager _projMgr = null;
+        //private VBProjectManager _projMgr = null;
         private double[] _dffits = null;
         private double[] _cooks = null;
         private double _dffitsThreshold = cutoff;

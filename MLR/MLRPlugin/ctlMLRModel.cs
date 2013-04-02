@@ -24,28 +24,23 @@ namespace MLRPlugin
             MLRControl = this;
 
             dsControl1.NotifiableChangeEvent +=new EventHandler(dsControl1_NotifiableChangeEvent);
-            ctlVariableSelection1.SelectionChanged += new EventHandler(ctlVariableSelection1_SelectionChanged);
-            ctlVariableSelection1.UpdateVariableList  += new EventHandler(ctlVariableSelection1_UpdateVariableList);
+            ctlVariableSelection1.VariablesChanged += new EventHandler(ctlVariableSelection1_UpdateVariableList);
             frmModel1.ClearList += new EventHandler(frmModel1_ClearList);
-            frmModel1.Add2List += new frmModel.MyEventHandler(frmModel1_Add2List);
-
-
+            frmModel1.AddToList += new frmModel.MyEventHandler(frmModel1_AddToList);
         }
+
 
         private void frmModel1_ClearList(object sender, EventArgs e)
         {
             ctlVariableSelection1.ClearAll();
         }
 
-        private void frmModel1_Add2List(frmModel.MyEventArg e)
+
+        private void frmModel1_AddToList(frmModel.MyEventArg e)
         {
-            ctlVariableSelection1.Add2List(e.ModelVars);
+            ctlVariableSelection1.AddToList(e.ModelVars);
         }
 
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
 
         //Handle changes in the local datasheet control
         private void dsControl1_NotifiableChangeEvent(object source, EventArgs e)
@@ -59,6 +54,7 @@ namespace MLRPlugin
             frmModel1.SelectedVariables = lstSelectedVariables;
         }
 
+
         //Handle changes in the variable selection control
         private void ctlVariableSelection1_SelectionChanged(object sender, EventArgs e)
         {
@@ -71,16 +67,19 @@ namespace MLRPlugin
             frmModel1.SelectedVariables = lstSelectedVariables;
         }
 
+
         private void ctlVariableSelection1_UpdateVariableList(object sender, EventArgs e)
         {
             List<string> lstSelectedVariables = ctlVariableSelection1.SelectedVariables.ToList();
             frmModel1.SelectedVariables = lstSelectedVariables;
         }
 
+
         public GALibForm.frmModel ModelForm
         {
             get { return this.frmModel1; }
         }
+
 
         public DatasheetControl LocalDatasheet
         {
@@ -133,11 +132,9 @@ namespace MLRPlugin
 
             pluginState.Add("Method", "MLR");
 
-
-
             return pluginState;
-
         }
+
 
         public void UnpackProjectState(IDictionary<string, object> dictProjectState)
         {
@@ -174,10 +171,8 @@ namespace MLRPlugin
             {
                 ModelForm.UnpackProjectState(dictProjectState["Model"] as IDictionary<string, object>);
             }
-
-
+            
             this.Show();
-
         }
     }
 }

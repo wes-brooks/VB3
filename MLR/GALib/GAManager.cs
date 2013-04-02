@@ -89,7 +89,7 @@ namespace GALib
             {                
                 if (population.PopulationSize < population.MaximumPopulationSize)
                 {
-                    for (int j=0;j< (population.MaximumPopulationSize - population.PopulationSize); j++)
+                    for (int j=0; j<(population.MaximumPopulationSize - population.PopulationSize); j++)
                     {
                         IIndividual indiv = cloner.Clone();
                         indiv.Initialize();
@@ -98,48 +98,30 @@ namespace GALib
                     }
                 }
 
-                //population.Sort();
-
                 population.ReplaceLeastFit(elite);
-
-                //population.Sort();
-
                 population.Evolve();
-
-                //population.Cull();
-
                 population.Evaluate();
-
                 population.Cull();
-
                 population.Sort();
 
                 lstCache = population.GetTopUniqueIndividuals(_cacheSize);
-
                 int numElements = Math.Min(lstCache.Count, _numElite);
                 elite = Util.CloneRange(lstCache,0, numElements);
 
                 _cache.Add(lstCache);
-
                 _cache.Sort();
 
                 double percentComplete = i * 100 / _numberGenerations;
-
-                //GAProgress(percentComplete, _cache.GetTopUniqueIndividuals(1)[0].Fitness);
                 GAProgress(percentComplete, _cache.MaximumFitness);
-
                 Console.WriteLine("Min: " + _cache.MinimumFitness + "  Max: " + _cache.MaximumFitness);
 
                 if (Cancel)
                     break;
-
             }
+
             _cache.Sort();
             GAComplete(this);
-            return;
-            
+            return;            
         }
-
-
     }
 }

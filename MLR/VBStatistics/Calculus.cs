@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 //using System.Linq;
 using System.Text;
-using Extreme.Mathematics;
-using Extreme.Mathematics.Curves;
-using Extreme.Mathematics.Calculus;
-using Extreme.Mathematics.Algorithms;
+//using Extreme.Mathematics;
+//using Extreme.Mathematics.Curves;
+//using Extreme.Mathematics.Calculus;
+//using Extreme.Mathematics.Algorithms;
 using System.Data.Common;
 
 namespace VBStatistics

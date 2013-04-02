@@ -55,7 +55,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\bin\debug\Plugins\VBMLR\</OutputPath>
+    <OutputPath>..\..\bin\debug\Binaries\VBMLR\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -88,7 +88,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Combinatorics">
-      <HintPath>..\..\Externals\Combinatorics\bin\x86\Debug\Combinatorics.dll</HintPath>
+      <HintPath>..\..\Externals\Combinatorics\Combinatorics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json">
@@ -198,12 +198,6 @@
     <ProjectReference Include="..\VBControls\VBControls.csproj">
       <Project>{9F2D6730-6FD3-4A3F-98FC-C5898FCFA12E}</Project>
       <Name>VBControls</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\VBStatistics\VBStatistics.csproj">
-      <Project>{76237650-4E1E-40B0-89FC-98BF7599CBAF}</Project>
-      <Name>VBStatistics</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +218,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath)  $(SolutionDir)\bin\Debug\Plugins\$(TargetFileName)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

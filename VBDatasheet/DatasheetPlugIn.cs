@@ -155,12 +155,7 @@ namespace VBDatasheet
             rootDatasheetTab = new RootItem(strPanelKey, strPanelCaption);
             rootDatasheetTab.SortOrder = (short)pluginType;
             App.HeaderControl.Add(rootDatasheetTab);
-
-            //tell ProjMngr if this is being Shown
-            if (sender == "Show")
-            {
-                App.HeaderControl.SelectRoot(strPanelKey);
-            }
+            App.HeaderControl.SelectRoot(strPanelKey);
 
             //add sub-ribbons
             const string tGroupCaption = "Add";
@@ -250,24 +245,6 @@ namespace VBDatasheet
                 _frmDatasheet.SetLocation(e.PackedPluginState);
                 boolChanged = true;
             }
-
-            /*//This handles an undo:
-            try
-            {
-                if (((IPlugin)sender).PluginType == VBCommon.Globals.PluginType.ProjectManager)
-                {
-                    if (e.PackedPluginState["Sender"].ToString() == strPanelKey)
-                    {
-                        boolVisible = (bool)e.PackedPluginState["Visible"];
-                        boolComplete = (bool)e.PackedPluginState["Complete"];
-                        boolClean = (bool)e.PackedPluginState["Clean"];
-                        boolFirstPass = (bool)e.PackedPluginState["FirstPass"];
-
-                        _frmDatasheet.UnpackState(e.PackedPluginState);
-                    }
-                }
-            }
-            catch { }*/
         }
 
 
@@ -296,6 +273,7 @@ namespace VBDatasheet
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
             signaller.TriggerUndoStack();
+            MakeActive();
         }
 
 

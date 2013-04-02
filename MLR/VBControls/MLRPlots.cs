@@ -6,8 +6,8 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using VBStatistics;
 using VBCommon;
+using VBCommon.Statistics;
 using VBCommon.Transforms;
 using ZedGraph;
 
@@ -726,7 +726,7 @@ namespace VBControls
                 string[] line = new string[7];
                 line[0] = prob.ToString();
 
-                VBStatistics.ModelErrorCounts mec = new VBStatistics.ModelErrorCounts();
+                ModelErrorCounts mec = new ModelErrorCounts();
                 mec.getCounts(prob, _mandateThreshold, _prob, _obs);
 
                 line[1] = mec.FNCount.ToString();
@@ -874,7 +874,7 @@ namespace VBControls
             else gp.Title.Text = "FitValue Probability Exceedance vs Observations";
             gp.XAxis.Type = AxisType.Linear;
 
-            VBStatistics.ModelErrorCounts mec = new VBStatistics.ModelErrorCounts();
+            ModelErrorCounts mec = new ModelErrorCounts();
             mec.getCounts(_probabilityThreshold, _mandateThreshold, pexceed, obs);
 
             tbFN.Text = mec.FNCount.ToString();
@@ -964,7 +964,7 @@ namespace VBControls
             else gp.Title.Text = "Fitted vs Observed";
             gp.XAxis.Type = AxisType.Linear;
 
-            VBStatistics.ModelErrorCounts mec = new VBStatistics.ModelErrorCounts();
+            ModelErrorCounts mec = new ModelErrorCounts();
             mec.getCounts(_decisionThreshold, _mandateThreshold, pred, obs);
 
             tbFN.Text = mec.FNCount.ToString();

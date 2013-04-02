@@ -54,16 +54,9 @@ namespace VBLocation
         public void Hide()
         {
             App.HeaderControl.RemoveAll();
-            ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+            App.DockManager.HidePanel(strPanelKey);
             boolVisible = false;
         }
-
-
-        /*//undo was hit, send the packed state to be unpacked
-        public void UndoLastChange(Dictionary<string, object> packedState)
-        {
-           
-        }*/
 
 
         //add a datasheet plugin root item
@@ -79,7 +72,6 @@ namespace VBLocation
                 //make this the selected root
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-
 
             //section for working with data
             const string grpManipulate = "Waste time and space";
@@ -119,7 +111,7 @@ namespace VBLocation
         public void Show()
         {            
             AddRibbon("Show");
-            ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+            App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
             boolVisible = true;
         }

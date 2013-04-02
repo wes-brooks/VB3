@@ -78,8 +78,7 @@ namespace MLRPlugin
             
             mlrModelForm = cMlr.ModelForm;
             mlrModelForm.ModelChanged += new frmModel.ModelChangedEventHandler(ModelChanged);
-
-
+            
             AddPanel();
             AddRibbon("Activate");
 
@@ -136,13 +135,11 @@ namespace MLRPlugin
             if (boolVisible)
             {
                 boolChanged = true;
-                //set visible flag to false
-                boolVisible = false;
-                //hide pluginTab
+                
                 App.HeaderControl.RemoveAll();
-                //hide plugin panel
-                ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+                App.DockManager.HidePanel(strPanelKey);
             }
+            boolVisible = false;
         }
 
 
@@ -152,21 +149,18 @@ namespace MLRPlugin
             if (!boolVisible)
             {
                 boolChanged = true;
-                //set visible flag to true
-                boolVisible = true;
-                //show the tab
+                
                 AddRibbon("Show");
-                //show the panel
-                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
+            boolVisible = true;
         }
 
 
         //make this plugin the active one
         public void MakeActive()
         {
-            boolVisible = true;
             App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
         }
@@ -177,38 +171,9 @@ namespace MLRPlugin
             rootHeaderItem = new RootItem(strPanelKey, strPanelCaption);
             rootHeaderItem.SortOrder = (short)pluginType;
             App.HeaderControl.Add(rootHeaderItem);
-
-            //tell ProjMngr if this is being Shown
-            if (sender == "Show")
-            {
-                //make this the selected root
-                App.HeaderControl.SelectRoot(strPanelKey);
-            }
-
+            App.HeaderControl.SelectRoot(strPanelKey);
 
             //add sub-ribbon
-            string grpManipulate = "Manipulate Data";
-
-            //btnComputeAO = new SimpleActionItem(strPanelKey, "Compute A O", innerIronPythonControl.btnComputeAO_Click);
-            //btnComputeAO.LargeImage = Properties.Resources.EPAComputeAO;
-            //btnComputeAO.GroupCaption = grpManipulate;
-            //btnComputeAO.Enabled = true;
-            //App.HeaderControl.Add(btnComputeAO);
-
-            //btnManipulate = new SimpleActionItem(strPanelKey, "Manipulate", innerIronPythonControl.btnManipulate_Click);
-            //btnManipulate.LargeImage = Properties.Resources.EPAmanipulate;
-            //btnManipulate.GroupCaption = grpManipulate;
-            //btnManipulate.Enabled = true;
-            //App.HeaderControl.Add(btnManipulate);
-
-            //btnTransform = new SimpleActionItem(strPanelKey, "Transform", innerIronPythonControl.btnTransform_Click);
-            //btnTransform.LargeImage = Properties.Resources.EPAtransform;
-            //btnTransform.GroupCaption = grpManipulate;
-            //btnTransform.Enabled = true;
-            //App.HeaderControl.Add(btnTransform);
-
-
-
             string rGroupCaption = "Model";
 
             btnRun = new SimpleActionItem(strPanelKey, "Run", btnRun_Click);
@@ -276,6 +241,7 @@ namespace MLRPlugin
             dictPackedState.Add("Visible", boolVisible);
             signaller.RaiseBroadcastRequest(this, dictPackedState);
             signaller.TriggerUndoStack();
+            MakeActive();
         }
 
         public bool Complete
@@ -326,27 +292,6 @@ namespace MLRPlugin
                     this.Hide();
                     return;
                 }
-                /*else if (InitialEntry)
-                {
-                    if (dictPluginState != null)
-                    {
-                        if (dictPluginState.Count > 3)
-                        {
-                            cMlr.UnpackProjectState(e.PackedPluginState);
-                            Show();
-                        }
-                    }
-                }
-                else
-                {
-                    //if changes were made or it is initial pass, set the data
-                    boolInitialEntry = false;
-                    //this tells projectManager that the modeling isn't complete, so don't show prediction when unhidden
-                    if ((bool)e.PackedPluginState["Clean"])
-                        boolComplete = false;
-
-                    cMlr.UnpackProjectState(e.PackedPluginState);
-                }*/
                 else
                 {
                     if (!(bool)e.PackedPluginState["Clean"])
@@ -383,7 +328,7 @@ namespace MLRPlugin
                 //repopulate plugin Complete flags from saved project
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolInitialEntry = false; //opening projects have been entered before
-                //check to see if there already is a PLS model open, if so, close it before opening a saved project
+                //check to see if there already is a model open, if so, close it before opening a saved project
                 if ((Visible) && (Complete))
                     Hide();
 

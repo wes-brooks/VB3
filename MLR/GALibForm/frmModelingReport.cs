@@ -14,7 +14,7 @@ using MultipleLinearRegression;
 using GALib;
 using VBCommon;
 using System.IO;
-using VBStatistics;
+using VBCommon.Statistics;
 
 
 namespace GALibForm

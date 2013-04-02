@@ -7,6 +7,7 @@ using System.Text;
 //using Extreme.Mathematics.Calculus;
 //using Extreme.Mathematics.Algorithms;
 using System.Data.Common;
+using MathNet;
 
 namespace VBCommon.Statistics
 {
@@ -33,40 +34,38 @@ namespace VBCommon.Statistics
             _upperbound = upper;
         }
 
-        //private static double Integrand(double x)
-        //{
-        //    //dummy ... fit a curve to data?.... seems wrong.
-        //    //dont think a lookup will work either: integrator needs to interpolate
-        //    //need to return a value for all x, not just my data points
-        //    return x;
-        //}
+        private static double Integrand(double x)
+        {
+            //dummy ... fit a curve to data?.... seems wrong.
+            //dont think a lookup will work either: integrator needs to interpolate
+            //need to return a value for all x, not just my data points
+            return x;
+        }
 
-        //public double Integrate()
-        //{
-        //    //double x;
-        //    RealFunction f = new RealFunction(Integrand);
-        //    AdaptiveIntegrator integrator = new AdaptiveIntegrator(f, 0, 1);
-        //    integrator.RelativeTolerance = 0.00001d;
-        //    integrator.ConvergenceCriterion = ConvergenceCriterion.WithinRelativeTolerance;
-        //    double result = integrator.Integrate();
-        //    return result;
-        //}
+        public double Integrate()
+        {
+            //double x;
+            //RealFunction f = new RealFunction(Integrand);
+            //AdaptiveIntegrator integrator = new AdaptiveIntegrator(f, 0, 1);
+            //integrator.RelativeTolerance = 0.00001d;
+            //integrator.ConvergenceCriterion = ConvergenceCriterion.WithinRelativeTolerance;
+            //integrator.Integrate();
+            double result = MathNet.Numerics.Integration.Integrate.OnClosedInterval(Integrand, 0, 1, 0.00001d);
+            return result;
+        }
 
 
         //commented out because extreme.statics not working
-        //public double PieceWiseConstantCurveIntegrate()
-        //{
-        //    PiecewiseConstantCurve curve = new PiecewiseConstantCurve(_X, _Y);
-        //    return curve.Integral(_lowerbound, _upperbound);
+        public double PieceWiseConstantCurveIntegrate()
+        {
+            var curve = MathNet.Numerics.Interpolation.Interpolate.Common(_X, _Y);
+            return curve.Integrate(_upperbound) - curve.Integrate(_lowerbound); //(_lowerbound, _upperbound);
+        }
 
-        //}
-
-        //public double PieceWiseLinearCurveIntegrate()
-        //{
-        //    PiecewiseLinearCurve curve = new PiecewiseLinearCurve(_X, _Y);
-        //    return curve.Integral(_lowerbound, _upperbound);
-        //}
-
-
+        public double PieceWiseLinearCurveIntegrate()
+        {
+            var curve = MathNet.Numerics.Interpolation.Interpolate.LinearBetweenPoints(_X, _Y);
+            return curve.Integrate(_upperbound) - curve.Integrate(_lowerbound); //(_lowerbound, _upperbound);
+        }
     }
 }

@@ -60,13 +60,12 @@ namespace VBCommon
                     {
                         dictPackedPlugin.Add("Sender", strSenderKey);
                     }
+
                     BroadcastEventArgs e = new BroadcastEventArgs(sender, dictPackedPlugin);
                     BroadcastState(sender, e);
 
                     bEnableBroadcast = true;
-                }
-
-                
+                }                
             }
         }
 

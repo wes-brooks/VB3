@@ -1,2 +1,9 @@
 C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\svn\svn\trunk\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\VB3\bin\debug\Plugins\VBMLR\MultipleLinearRegression.dll
+C:\VB3\bin\debug\Plugins\VBMLR\MultipleLinearRegression.pdb
+C:\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\MultipleLinearRegression.dll
+C:\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\MultipleLinearRegression.pdb
+C:\VB3\bin\debug\Binaries\VBMLR\MultipleLinearRegression.dll
+C:\VB3\bin\debug\Binaries\VBMLR\MultipleLinearRegression.pdb

@@ -150,14 +150,17 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\VBCommon\VBCommon.csproj">
+      <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
+      <Name>VBCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\VBProjectManager\VBProjectManager.csproj">
+      <Project>{56A96878-2E76-41B4-858A-6AAB61F99CE8}</Project>
+      <Name>VBProjectManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VBControls\VBControls.csproj">
       <Project>{9F2D6730-6FD3-4A3F-98FC-C5898FCFA12E}</Project>
       <Name>VBControls</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\VBStatistics\VBStatistics.csproj">
-      <Project>{76237650-4E1E-40B0-89FC-98BF7599CBAF}</Project>
-      <Name>VBStatistics</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

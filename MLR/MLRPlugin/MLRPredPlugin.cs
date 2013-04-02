@@ -75,7 +75,7 @@ namespace MLRPlugin
                 DataRow mlrModelVarVals = Support.getMLRxVals(dr, _mlrPluginControl.ModelForm.ModelInfo.Model);
                  
                 //do the matrix math... (mlrModelVar/Vals == x, dtModelVars == X...)
-                double probEx = VBStatistics.Statistics.PExceed(mlrModelVarVals, dtModelVars, pred, tdc, rmse, bFlag);
+                double probEx = VBCommon.Statistics.Statistics.PExceed(mlrModelVarVals, dtModelVars, pred, tdc, rmse, bFlag);
                 _lstProbEx.Add(probEx);
 
                 //reset the matrix control flag so (X`*X)inv isn't computed again

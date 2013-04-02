@@ -2,3 +2,5 @@ C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBStatistics\obj\x86\Debug\ResolveAssemb
 C:\Users\wrbrooks\svn\vb3\trunk\VB3\MLR\VBStatistics\obj\x86\Debug\VBStatistics.dll.licenses
 C:\svn\svn\trunk\VB3\MLR\VBStatistics\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\svn\svn\trunk\VB3\MLR\VBStatistics\obj\x86\Debug\VBStatistics.dll.licenses
+C:\VB3\MLR\VBStatistics\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\VB3\MLR\VBStatistics\obj\x86\Debug\VBStatistics.dll.licenses

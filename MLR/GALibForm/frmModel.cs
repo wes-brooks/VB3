@@ -40,7 +40,7 @@ namespace GALibForm
         public List<string> _lstSelectedVariables = null;
 
         public event EventHandler ClearList;
-        public event MyEventHandler Add2List;
+        public event MyEventHandler AddToList;
         public delegate void MyEventHandler(MyEventArg args);
 
         public System.Windows.Forms.Label lblAvailVars = null;
@@ -291,15 +291,9 @@ namespace GALibForm
             mlrPlots1.LISTVIEW.Items.Clear();
             //mlrPredObs1.zedGraphControl1.GraphPane.CurveList.Clear();
             //mlrPredObs1.zedGraphControl1.Refresh();
-            //listBox2.Items.Clear();
-
-
+            //listBox2.Items.Clear();            
         }
 
-        //private void NewModelSelectedListener(VBProjectManager.ModelingNewModelSelected(TabStates tabstates)
-        //{
-           
-        //}
         /// <summary>
         /// Fires when the app opens a project file
         /// </summary>
@@ -382,7 +376,6 @@ namespace GALibForm
             txtMaxVars.Text = recVar.ToString();
 
             this.Show();
-
         }
 
 
@@ -392,13 +385,13 @@ namespace GALibForm
             return ProjectSave();
         }
 
+
         /// <summary>
         /// Fires when the app saves a project file
         /// </summary>
         /// <param name="projMgr"></param>
         private Dictionary<string, object> ProjectSave()
-        {           
-
+        {
             //Not really much to save if no models were generated
             if ((_list == null) || (_list.Count < 1))
                 return null;
@@ -421,8 +414,6 @@ namespace GALibForm
             //Add the variable-coefficient model
             mlrPackState.Add("MLRModel", new Dictionary<string, double>(mlrIndiv.Model));               
             _modelingInfo = new MLRModelingInfo();
-
-            
 
             //_modelingInfo.DependentVariable = _dataMgr.ModelDataTable.Columns[1].ColumnName;
             _modelingInfo.DependentVariable = _dataMgr.ModelDependentVariable;
@@ -491,9 +482,7 @@ namespace GALibForm
             //    lstIndependentVars.Add((ListItem)lbIndVariables.Items[i]);
                 //modelingInfo.IndependentVariables.Add((ListItem)lbIndVariables.Items[i]);
             mlrPackState.Add("IndependentVariables", _lstSelectedVariables);
-
-
-
+            
             //Save the chromosomes
             List<List<short>> chromosomes = new List<List<short>>();
             //modelingInfo.Chromosomes = new List<List<short>>();
@@ -537,8 +526,8 @@ namespace GALibForm
             //string modelString = MLRCore.Support.BuildModelExpression(mlrIndiv.Model, _modelingInfo.DependentVariable, "g4");
             //mlrPackState.Add("ModelString", modelString);
             //mlrPackState.Add("Transform", _modelingInfo.DependentVariableTransform.ToString());
-	    double dblRegulatoryThresholdTextbox, dblDecisionThresholdTextbox;
-	    if (double.TryParse(tbDecThreshHoriz.Text, out dblDecisionThresholdTextbox) == false)
+	        double dblRegulatoryThresholdTextbox, dblDecisionThresholdTextbox;
+	        if (double.TryParse(tbDecThreshHoriz.Text, out dblDecisionThresholdTextbox) == false)
                 dblDecisionThresholdTextbox = 235;
             if (double.TryParse(tbRegThreshVert.Text, out dblRegulatoryThresholdTextbox) == false)
                 dblRegulatoryThresholdTextbox = 235;	    
@@ -547,10 +536,8 @@ namespace GALibForm
             mlrPackState.Add("DecisionThreshold", dblDecisionThresholdTextbox);
             //mlrPackState.Add("Method", "MLR");
             //mlrPackState.Add("Model", dictModelState);
-
-
+            
             return mlrPackState;
-
         }
 
         //Reconstruct the saved modeling state
@@ -586,8 +573,7 @@ namespace GALibForm
                     model = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, double>>(strJson);
                 }                
             }
-
-
+            
             //List<ListItem> lstAvailVars = null;
             //if (dictProjectState.ContainsKey("AvailableVariables"))
             //{
@@ -671,11 +657,8 @@ namespace GALibForm
             InitProgressGraph();
 
             listBox1.SelectedIndex = mi.SelectedModel;
-            
-           
-
-           
         }
+
 
         //This function creates a datatable with only subset of selected IVs included in it.
         //Can't remeber the motivation for this.  Performance?
@@ -699,16 +682,13 @@ namespace GALibForm
             return dt;
         }
 
+
         private bool VerifyGAModelParams()
         {
-
-
             //_numVars = lbIndVariables.Items.Count;
             _numVars = _lstSelectedVariables.Count;
             //int numRecommendedVars = _numObs / 3;
             int numRecommendedVars = _numObs / 5;
-
-
 
             if (chkSeed.Checked)
             {
@@ -722,24 +702,22 @@ namespace GALibForm
             }
 
             _totVar = _numVars;
-
             return true;
-
         }
+
 
         private bool VerifyManualModelParams()
         {
-            //Dont think we need this check
             return true;
         }
 
+
         private bool verifyGlobalModelingParams()
         {
-            _numVars = _lstSelectedVariables.Count;            
-            
+            _numVars = _lstSelectedVariables.Count;                       
             int numRecommendedVars = _numObs / 5;
-
             _userSpecifiedNumVars = Convert.ToInt32(txtMaxVars.Text);
+
             if (_userSpecifiedNumVars > numRecommendedVars)
             {
                 string msg;
@@ -750,7 +728,6 @@ namespace GALibForm
                 MessageBox.Show(msg);
                 //txtMaxVars.Focus();                
                 return false;
-
             }
             if (_userSpecifiedNumVars > _numVars)
             {
@@ -760,7 +737,6 @@ namespace GALibForm
                 //txtMaxVars.Text = _numVars.ToString();
                 //txtMaxVars.Focus();
                 return false;
-
             }
 
             //if (_userSpecifiedNumVars < 2)
@@ -784,8 +760,7 @@ namespace GALibForm
                 return false;
             }
             else
-            {
-                
+            {                
                 mlrPlots1.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
                 mlrPlots1.DependentVarXFrm = _depVarTransform;
                 mlrPlots1.PowerTransformExponent = _depVarPowerTransformExponent;
@@ -933,10 +908,7 @@ namespace GALibForm
             }
 
             return true;
-
         }
-
-
 
 
         public void SetDataTable(DataTable dt)
@@ -944,11 +916,11 @@ namespace GALibForm
             _dtFull = dt;
         }
 
+
         //private void SetData(DataTable dt)
         //public void SetData(DataTable dt)
         public void SetData()
-        {   
-         
+        {            
             //_dtFull = dt;
             _dtFull = MLRDataManager.GetDataManager().ModelDataTable.Copy();
 
@@ -1064,9 +1036,6 @@ namespace GALibForm
            //modelingInfo.DependentVariableTransform = transform;
            //modelingInfo.DecisionThreshold = Convert.ToDouble(tbDecThreshHoriz.Text);
            //modelingInfo.MandatedThreshold = Convert.ToDouble(tbRegThreshVert.Text);
-            
-            
-
         }
 
         private double getTransformPower(string pwrTransform)
@@ -1085,7 +1054,6 @@ namespace GALibForm
                 return double.NaN;
 
             return power;
-
         }
 
 
@@ -1095,7 +1063,7 @@ namespace GALibForm
             long numModels = 0;
 
             for (int i = 1; i <= maxIndVars; i++)
-                numModels += VBStatistics.Utility.Choose(totalVars, i);
+                numModels += VBCommon.Statistics.Utility.Choose(totalVars, i);
 
             return numModels;
         }
@@ -1144,7 +1112,6 @@ namespace GALibForm
             UpdateFitnessListBox();
 
             return;
-
         }
 
 
@@ -1236,9 +1203,7 @@ namespace GALibForm
                 RandomNumbers.SetRandomSeed();
 
             _maxVIF = Convert.ToInt32(txtMaxVIF.Text);
-
-
-
+            
             List<IIndividual> initPop = new List<IIndividual>(popSize);
             for (int i = 0; i < popSize; i++)
             {
@@ -1247,7 +1212,6 @@ namespace GALibForm
             }
 
             Population population = new Population(initPop);
-
             population.CrossoverMethod = new MLROnePointCrossover(crossoverRate);
 
             if (fitnessCriteria == FitnessCriteria.Akaike)
@@ -1339,10 +1303,8 @@ namespace GALibForm
             GAManager ga = new GAManager();
             _runThread = new Thread(_gaManager.Run);
             _runThread.Start();
-            //list = ga.Run(population);
-
-
         }
+
 
         private void btnRun_Click(object sender, EventArgs e)
         {
@@ -1827,15 +1789,12 @@ namespace GALibForm
                 _state = _mlrState.clean;
             }
 
-            //modelchanged();
-
             listView1.Items.Clear();
             listView2.Items.Clear();
 
             int idx = listBox1.SelectedIndex;
             MLRIndividual ind = (MLRIndividual)_list[idx];
-
-
+            
             _selectedModelIndex = idx;
 
             //tell the main form to enable the model save/saveas menu selection buttons
@@ -1971,12 +1930,6 @@ namespace GALibForm
                 lvi = new ListViewItem(item);
                 listView2.Items.Add(lvi);
 
-                //item = new string[2];
-                //item[0] = "Specificity";
-                //item[1] = String.Format("{0:F4}", ind.Specificity);
-                //lvi = new ListViewItem(item);
-                //listView2.Items.Add(lvi);
-
                 item = new string[2];
                 item[0] = "Accuracy";
                 item[1] = String.Format("{0:F4}", ind.Accuracy);
@@ -2053,7 +2006,7 @@ namespace GALibForm
                 DataRow dr = dtModelVarVals.Rows[i];
 
                 //do the matrix math... (dr == x, dtModelVarVals == X...)
-                double probEx = VBStatistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, ind.DecisionThreshold, ind.RMSE, bFlag);
+                double probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, ind.DecisionThreshold, ind.RMSE, bFlag);
                 lstProbEx.Add(probEx);
 
                 //reset the matrix control flag so (X`*X)inv isn't computed again
@@ -2089,7 +2042,7 @@ namespace GALibForm
                 DataRow dr = dtModelVarVals.Rows[i];
 
                 //do the matrix math... (dr == x, dtModelVarVals == X...)
-                double probEx = VBStatistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, _decisionThreshold, ind.RMSE, bFlag);
+                double probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, _decisionThreshold, ind.RMSE, bFlag);
                 lstProbEx.Add(probEx);
 
                 //reset the matrix control flag so (X`*X)inv isn't computed again
@@ -2528,7 +2481,7 @@ namespace GALibForm
             myE.ModelVars = modelVars;
             
 
-            if (Add2List != null) Add2List(myE);
+            if (AddToList != null) AddToList(myE);
             return;
 
 

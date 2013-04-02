@@ -43,7 +43,7 @@ namespace Prediction
         
         //complete and visible flags
         public Boolean boolComplete = false;
-        public Boolean boolVisible = false;
+        public Boolean boolVisible = true;
         public Boolean boolChanged = false;
 
         //this plugin was clicked
@@ -73,11 +73,11 @@ namespace Prediction
             if (boolVisible)
             {
                 boolChanged = true;
-                boolVisible = false;
 
                 App.HeaderControl.RemoveAll();
-                ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+                App.DockManager.HidePanel(strPanelKey);
             }
+            boolVisible = false;
         }
 
 
@@ -86,12 +86,12 @@ namespace Prediction
             if (!boolVisible)
             {
                 boolChanged = true;
-                boolVisible = true;
 
                 AddRibbon("Show");
-                ((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+                App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
+            boolVisible = true;
         }
 
 
@@ -105,23 +105,24 @@ namespace Prediction
         //initial activation
         public override void Activate()
         {
-            UndoKeys = new Stack<string>();
-            RedoKeys = new Stack<string>();
-
             _frmPred = new frmPrediction();
 
+            UndoKeys = new Stack<string>();
+            RedoKeys = new Stack<string>();
+            
+            AddPanel();
+            AddRibbon("Activate");
+            
+            //when panel is selected activate seriesview and ribbon tab
+            App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
+            App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
             _frmPred.ButtonStatusEvent += new EventHandler<ButtonStatusEventArgs>(_frmPred_ButtonStatusEvent);
             _frmPred.ControlChangeEvent += new EventHandler(ControlChangeEventHandler);
             _frmPred.RequestModelPluginList += new EventHandler(PassModelPluginList);
             _frmPred.NotifiableChangeEvent += new EventHandler(NotifiableChangeHandler);
             
-            AddPanel();
-            AddRibbon("Activate");
             boolVisible = true;
-
-            //when panel is selected activate seriesview and ribbon tab
-            App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
-            App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
+            boolComplete = false;
 
             base.Activate();
             Hide();
@@ -129,7 +130,7 @@ namespace Prediction
 
 
         //a root item (plugin) has been selected
-        private void HeaderControl_RootItemSelected(object sender, RootItemEventArgs e)
+        void HeaderControl_RootItemSelected(object sender, RootItemEventArgs e)
         {
             if (e.SelectedRootKey == strPanelKey)
             {
@@ -144,12 +145,7 @@ namespace Prediction
             rootIPyPredictionTab = new RootItem(strPanelKey, strPanelCaption);
             rootIPyPredictionTab.SortOrder = (short)pluginType;
             App.HeaderControl.Add(rootIPyPredictionTab);
-
-            //tell ProjMngr if this is being Shown
-            if (sender == "Show")
-            {
-                App.HeaderControl.SelectRoot(strPanelKey);
-            }
+            App.HeaderControl.SelectRoot(strPanelKey);
 
             //add sub-ribbons
             const string rGroupCaption = "Predict";
@@ -226,7 +222,7 @@ namespace Prediction
 
 
         //event handler when a plugin is selected from tabs
-        private void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
+        void DockManager_ActivePanelChanged(object sender, DotSpatial.Controls.Docking.DockablePanelEventArgs e)
         {
             if (e.ActivePanelKey == strPanelKey)
             {
@@ -284,8 +280,7 @@ namespace Prediction
             signaller.RedoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Redo);
             signaller.UndoStackEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(PushToStack);
             
-            this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
-            
+            this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);            
         }
 
 
@@ -313,7 +308,7 @@ namespace Prediction
             if (((IPlugin)sender).PluginType == Globals.PluginType.Modeling)
             {
                 if ((bool)e.PackedPluginState["Complete"])
-                {
+                {                    
                     _frmPred.AddModel(e.PackedPluginState["Method"].ToString());
                     Show();
                 }
@@ -330,6 +325,7 @@ namespace Prediction
             }
             else if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {
+                Hide(); /*
                 if (!(bool)((IPlugin)sender).Complete)
                 {
                     Hide();
@@ -342,7 +338,7 @@ namespace Prediction
                         Activate();
                     }
                     Hide();
-                }
+                }*/
             }                
         }
 
@@ -487,11 +483,6 @@ namespace Prediction
                 btnMakePred.Enabled = true;
                 Broadcast();
             }
-            /*else
-            {
-                btnIVDataVal.Enabled = false;
-                btnMakePred.Enabled = false;
-            }*/
         }
 
 

@@ -11,18 +11,14 @@ namespace VBCommon.Controls
 {
     public partial class VariableSelection : UserControl
     {
-        public event EventHandler SelectionChanged;
+        public event EventHandler VariablesChanged;
 
-        //public ListBox AvailableVariables = null;
-        //public ListBox IndependentVariables = null;
 
         public VariableSelection()
         {
             InitializeComponent();
-
-            //AvailableVariables = lbAvailableVariables;
-            //IndependentVariables = lbIndVariables;
         }
+
 
         /// <summary>
         /// Set the data for variable selection
@@ -52,9 +48,9 @@ namespace VBCommon.Controls
             for (int i=0;i<fieldList.Count;i++)
                 lbAvailableVariables.Items.Add(new ListItem(fieldList[i], i.ToString()));
             
-            lblDepVarName.Text = dt.Columns[1].ColumnName;
-            
+            lblDepVarName.Text = dt.Columns[1].ColumnName;            
         }
+
 
         public void ClearAll()
         {
@@ -86,28 +82,24 @@ namespace VBCommon.Controls
                     lbAvailableVariables.Items.Insert(j, li);
 
             }
-
-
-            //SetCombinations();
-
+            
             lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
-            //if (SelectionChanged != null)
-            //    SelectionChanged(this, null);
+            if (VariablesChanged != null)
+                VariablesChanged(this, null);
         }
 
-        public void Add2List(List<string> varlist)
+
+        public void AddToList(List<string> varlist)
         {
             List<ListItem> items = new List<ListItem>();
 
-            //int selectedIndices = lbAvailableVariables.SelectedIndices.Count;
             for (int i = 0; i < lbAvailableVariables.Items.Count; i++)
             {
                 ListItem li = (ListItem)lbAvailableVariables.Items[i];
                 if (varlist.Contains<string>(li.DisplayItem))
                 {
-                    //ListItem li1 = (ListItem)lbAvailableVariables.Items[i];
                     items.Add(li);
                 }
             }
@@ -118,15 +110,13 @@ namespace VBCommon.Controls
                 lbIndVariables.Items.Add(li);
             }
 
-
-            //SetCombinations();
-
             lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
-            if (SelectionChanged != null)
-                SelectionChanged(this, null);
+            if (VariablesChanged != null)
+                VariablesChanged(this, null);
         }
+
 
         private void btnAddInputVariable_Click(object sender, EventArgs e)
         {
@@ -145,21 +135,13 @@ namespace VBCommon.Controls
                 lbIndVariables.Items.Add(li);
             }
 
-
-            //SetCombinations();
-
             lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
-            if (SelectionChanged != null)
-                SelectionChanged(this, e);
-            //_IndepVarCount = lbIndVariables.Items.Count;
-
-            //_state = _mlrState.dirty;
-            //listBox1.Items.Clear();
-            //initControls();
-        
+            if (VariablesChanged != null)
+                VariablesChanged(this, e);  
         }
+
 
         private void btnRemoveInputVariable_Click(object sender, EventArgs e)
         {
@@ -189,22 +171,15 @@ namespace VBCommon.Controls
                 }
                 if (foundIdx == false)
                     lbAvailableVariables.Items.Insert(j, li);
-
             }
-
-
-            //SetCombinations();
-
+            
             lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
 
-            if (SelectionChanged != null)
-                SelectionChanged(this, e);
-
-            //_state = _mlrState.dirty;
-            //listBox1.Items.Clear();
-            //initControls();
+            if (VariablesChanged != null)
+                VariablesChanged(this, e);
         }
+
 
         public List<string> SelectedVariables
         {
@@ -219,6 +194,7 @@ namespace VBCommon.Controls
                 return list;
             }
         }
+
 
         private void groupBox1_Resize(object sender, EventArgs e)
         {
@@ -241,5 +217,43 @@ namespace VBCommon.Controls
         }
 
 
+        public Dictionary<string, List<ListItem>> PackState()
+        {
+            Dictionary<string, List<ListItem>> dctState = new Dictionary<string, List<ListItem>>();
+            List<ListItem> listAvail = new List<ListItem>();
+            List<ListItem> listInd = new List<ListItem>(); ;
+
+            for (int i = 0; i < lbAvailableVariables.Items.Count; i++)
+                listAvail.Add(lbAvailableVariables.Items[i] as ListItem);
+
+            for (int i = 0; i < lbIndVariables.Items.Count; i++)
+                listInd.Add(lbIndVariables.Items[i] as ListItem);
+
+            dctState.Add("AvailableVariables", listAvail);
+            dctState.Add("IndependentVariables", listInd);
+
+            return dctState;
+        }
+
+
+        public void UnpackState(Dictionary<string, List<ListItem>> state)
+        {
+            List<ListItem> list = null;
+            if (state.Keys.Contains("AvailableVariables"))
+            {
+                list = state["AvailableVariables"];
+                for (int i = 0; i < list.Count; i++)
+                    lbAvailableVariables.Items.Add(list[i]);
+            }
+
+            list = null;
+
+            if (state.Keys.Contains("IndependentVariables"))
+            {
+                list = state["IndependentVariables"];
+                for (int i = 0; i < list.Count; i++)
+                    lbIndVariables.Items.Add(list[i]);
+            }
+        }
     }
 }

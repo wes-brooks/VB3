@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using Accord.Statistics;
+using Accord.Statistics.Models.Regression.Linear;
 using Accord.Math;
 using Accord.Math.Decompositions;
 //using Extreme.Statistics;
@@ -14,7 +15,7 @@ namespace VBCommon.Statistics
 {
     public class MultipleRegression
     {
-        private MultipleRegression _model;
+        private MultipleLinearRegression _model;
 
         //private VariableCollection _data = null;
         private DataTable _dataTable = null;
@@ -200,8 +201,6 @@ namespace VBCommon.Statistics
             get { return _WSresidNormStatVal; }
         }
 
-
-
         //public Dictionary<string, double> VIFs
         //{
         //    get { return _VIF; }
@@ -214,54 +213,52 @@ namespace VBCommon.Statistics
 
         public void Compute()
         {
-            // Next, create a VariableCollection from the data table:
-            
-
             // Now create the regression model. Parameters are the name 
             // of the dependent variable, a string array containing 
             // the names of the independent variables, and the VariableCollection
             // containing all variables.
-            //LinearRegressionModel model = new LinearRegressionModel(_dataTable, _dependentVar, _independentVars);
-            double[][] input = new double[arrInputData.Length][]; // {arrInputData};
-            double[,] input2 = new double[arrInputData.Length, arrInputData[0].Length+1]; // {arrInputData};
+            double[][] input = new double[arrInputData.Length][];
+            double[][] input2 = new double[arrInputData.Length][];
+            double[,] inputMat = new double[arrInputData.Length, arrInputData[0].Length+1];
             for(int i=0; i<arrInputData.Length; i++)
             {
-                input[i] = arrInputData[i];
+                List<double> datarow = new List<double> {1};
+                datarow.AddRange(arrInputData[i].ToList());
+                input[i] = datarow.ToArray();
+                input2[i] = arrInputData[i];
 
-                input2[i, 0] = 1;
+                inputMat[i, 0] = 1;
                 for (int j = 1; j <= arrInputData[0].Length; j++)
                 {
-                    input2[i,j] = arrInputData[i][j - 1];
+                    inputMat[i,j] = arrInputData[i][j - 1];
                 }
             }
 
-            string[] inputNames = _independentVars;
+            //Make sure the intercept appears first in the list of results:
+            List<string> inputNames = new List<string>();
+            inputNames.Add("(Intercept)");
+            foreach (string varname in _independentVars)
+            {
+                inputNames.Add(varname);
+            }
 
-            Accord.Statistics.Analysis.MultipleLinearRegressionAnalysis M2 = new Accord.Statistics.Analysis.MultipleLinearRegressionAnalysis(inputs: input, outputs: arrOutputData, inputNames: inputNames, outputName: strOutputName, intercept: true);
-            M2.Compute();
+            Accord.Statistics.Analysis.MultipleLinearRegressionAnalysis M2 = new Accord.Statistics.Analysis.MultipleLinearRegressionAnalysis(inputs: input, outputs: arrOutputData, inputNames: inputNames.ToArray(), outputName: strOutputName, intercept: false);
+            _model = new MultipleLinearRegression(inputs:arrInputData[0].Length, intercept:true);
 
-            /*
-            //LogisticRegressionModel model = new LogisticRegressionModel(_dataTable, _dependentVar, _independentVars);            
-
-            // We can set model options now, such as whether to include a constant:
-            _model.NoIntercept = false;
-            */
             // The Compute method performs the actual regression analysis.
-            //_model.Compute();            
+            M2.Compute();
+            _model.Regress(inputs: input2, outputs: arrOutputData);
+                        
             _adjR2 = M2.RSquareAdjusted;
             _R2 = M2.RSquared;
             _RMSE = Math.Sqrt(M2.Table[M2.Table.Count - 2].MeanSquares);
             
-            //_AIC = model.GetAkaikeInformationCriterion();
-            //_BIC = model.GetBayesianInformationCriterion();            
-
-            
-            //Calculate the Corrected AIC
+            //Calculate the selection criteria
             double sse = M2.Table[M2.Table.Count-2].SumOfSquares;            
             int n = Convert.ToInt32(M2.Results.Length);
             double p = M2.CoefficientValues.Length;
-            double[,] H = input2.Multiply((input2.Transpose().Multiply(input2)).Inverse().Multiply(input2.Transpose()));
-
+            double[,] H = inputMat.Multiply((inputMat.Transpose().Multiply(inputMat)).Inverse().Multiply(inputMat.Transpose()));
+            
             double[] SquaredResiduals = new double[M2.Results.Length];
             double[] Residuals = new double[M2.Results.Length];
             double[] Leverage = new double[M2.Results.Length];
@@ -286,11 +283,9 @@ namespace VBCommon.Statistics
             }
 
             _AIC = n * Math.Log(sse / n) + (2 * p) + n + 2;
-            //_AICC = 1 + (Math.Log(sse / n)) + (2)*(p + 1)/ (n - p - 1);
             _AICC = _AIC + (2 * (p + 1) * (p + 2)) / (n - p - 2);
             _BIC = n * (Math.Log(sse / n)) + (p * Math.Log(n));
-
-            
+                        
             _Press = 0.0;
             double leverage = 0.0;
             for (int i = 0; i < M2.Results.Length; i++)
@@ -298,7 +293,6 @@ namespace VBCommon.Statistics
                 leverage = Math.Min(Leverage[i], 0.99);                
                 _Press += Math.Pow((Residuals[i]) / (1 - leverage),2);
             }
-
             
             _parameters = createParametersDataTable();
             DataRow dr = null;
@@ -313,8 +307,7 @@ namespace VBCommon.Statistics
                 dr["StandardizedCoefficient"] = getStandardCoeff(param.Name, param.Value);
                 _parameters.Rows.Add(dr);
             }
-
-            
+                        
             _predictedValues = M2.Results;            
             _observedValues = M2.Outputs;            
             _studentizedResiduals = ExternallyStudentizedResiduals;
@@ -327,8 +320,7 @@ namespace VBCommon.Statistics
                 standardizedResid[i] = (Residuals[i] - Residuals.Mean()) / Residuals.StandardDeviation();
             }
             Array.Sort(standardizedResid);
-
-
+            
             double AD_stat = 0;
             for (int i = 0; i < M2.Results.Length; i++)
             {
@@ -352,12 +344,12 @@ namespace VBCommon.Statistics
             {
                 for(int j=0; j<_independentVars.Length; j++)
                 {
-                    centered[i, j] = input2[i,j + 1];
+                    centered[i, j] = inputMat[i,j + 1];
                 }
             }
 
 
-            double[,] matrix = input2.Transpose().Multiply(input2);
+            double[,] matrix = inputMat.Transpose().Multiply(inputMat);
 
             //Extreme.Mathematics.LinearAlgebra.SymmetricMatrix matrix = _model.GetCorrelationMatrix();
             //Extreme.Mathematics.LinearAlgebra.SymmetricMatrix corrMatrix = new SymmetricMatrix(matrix.ColumnCount -1);
@@ -385,38 +377,40 @@ namespace VBCommon.Statistics
                 _VIF.Add(_independentVars[i].ToString(), vifs.GetValue(i));
 
             _maxVIF = VIFVector.AbsoluteMax();
-            _maxVIFParameter = _independentVars[VIFVector.AbsoluteMaxIndex()];           */      
-      
-
+            _maxVIFParameter = _independentVars[VIFVector.AbsoluteMaxIndex()];           */ 
         }
+
 
         private double getStandardCoeff(string paramName, double coeff)
         {
             //throw new NotImplementedException();
             if (paramName == "(Intercept)") return double.NaN;
-            //double[] nv = new double[] (_dataTable.Columns[_dependentVar]);
-            //double stdevY = nv.StandardDeviation;
-            //nv = new NumericalVariable(_dataTable.Columns[paramName]);
-            //double stdevX = nv.StandardDeviation;
-            //return coeff * stdevX / stdevY;
-            return (0);
+            double[] nv = _dataTable.Columns[_dependentVar].ToArray();
+            double stdevY = nv.StandardDeviation();
+
+            nv = _dataTable.Columns[paramName].ToArray();
+            double stdevX = nv.StandardDeviation();
+            return coeff * stdevX / stdevY;
         }
 
-        //public double Predict(DataRow independentValues)
-        //{
-        //    double[] indVals = new double[_independentVars.Length];
-        //    for (int i = 0; i < _independentVars.Length; i++)
-        //    {
-        //        indVals[i] = Convert.ToDouble(independentValues[_independentVars[i]]);
-        //    }
 
-        //    return Predict(indVals);
-        //}
+        public double Predict(DataRow independentValues)
+        {
+            double[] indVals = new double[_independentVars.Length];
+            for (int i = 0; i < _independentVars.Length; i++)
+            {
+                indVals[i] = Convert.ToDouble(independentValues[_independentVars[i]]);
+            }
 
-        //public double Predict(double[] independentValues)
-        //{
-        //    return _model.Predict(independentValues);
-        //}
+            return Predict(indVals);
+        }
+
+
+        public double Predict(double[] independentValues)
+        {
+            return _model.Compute(independentValues);
+        }
+
 
         private DataTable createParametersDataTable()
         {
@@ -431,11 +425,11 @@ namespace VBCommon.Statistics
             return dt;
         }
 
+
         public Dictionary<string, double> Model
         {
             get
             {
-
                 Dictionary<string, double> parameters = new Dictionary<string, double>();
                 for (int i = 0; i < _parameters.Rows.Count; i++)
                 {
@@ -444,7 +438,6 @@ namespace VBCommon.Statistics
 
                 return parameters;
             }
-        }
-        
+        }        
     }
 }
