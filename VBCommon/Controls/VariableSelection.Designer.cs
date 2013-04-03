@@ -131,8 +131,7 @@
             // 
             // lbIndVariables
             // 
-            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbIndVariables.FormattingEnabled = true;
             this.lbIndVariables.HorizontalScrollbar = true;
@@ -154,6 +153,8 @@
             // 
             // lbAvailableVariables
             // 
+            this.lbAvailableVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lbAvailableVariables.FormattingEnabled = true;
             this.lbAvailableVariables.HorizontalScrollbar = true;
             this.lbAvailableVariables.Location = new System.Drawing.Point(25, 50);

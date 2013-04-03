@@ -31,6 +31,7 @@ namespace IPyModeling
         public delegate void ModelProgressEventDelegate(string message, double progress);
         public delegate void ModelValidationCompleteDelegate(dynamic result);
         protected bool bAnticipatingModel = false;
+        protected bool bAllowUpdateData = true;
 
         //Class member definitions:
         //Events:
@@ -502,6 +503,9 @@ namespace IPyModeling
         //Set column header names in Variable Selection listbox
         public void UpdateData(object source, EventArgs e)
         {
+            if (!bAllowUpdateData)
+                return;
+
             boolClean = false;
             boolComplete = false;
             boolVirgin = false;
@@ -914,16 +918,7 @@ namespace IPyModeling
 
         protected void AnnotateChart()
         {
-            Cursor.Current = Cursors.WaitCursor;
-
-            /*//if cancel was clicked, get out of here
-            if (stopRun)
-            {
-                NotifyPropChanged(boolRunning);
-                return;
-            }*/
-
-            //tabControl1.SelectTab(2);           
+            Cursor.Current = Cursors.WaitCursor;        
             
             //Set the threshold with the given specificity.
             double dblSpecificity = this.listCandidateSpecificity[this.intThresholdIndex];
@@ -1047,18 +1042,15 @@ namespace IPyModeling
         //Reconstruct the saved modeling state - without the IronPython Model
         public void UnpackState(IDictionary<string, object> dictProjectState)
         {
-            //this.Show();
             if (dictProjectState.Count <= 3) return; //if only plugin props are here
 
             //unpack the model's datasheet
+            listPredictors = (List<ListItem>)dictProjectState["Predictors"];
+            bAllowUpdateData = false;
             this.SetData(dictProjectState);
+            bAllowUpdateData = true;
 
-            this.boolComplete = (bool)dictProjectState["Complete"];
-            this.listPredictors = (List<ListItem>)dictProjectState["Predictors"];
-                       
-            //Make the modeling tab active during unpacking so we can draw the graph.
-            //tabControl1.SelectedIndex = 2;
-
+            boolComplete = (bool)dictProjectState["Complete"];
             if (boolComplete)
             {
                 //Unpack the lists that go into making the validation chart.
@@ -1083,7 +1075,6 @@ namespace IPyModeling
                 PopulateResults(this.ipyModel);
 
                 //Unpack the contents of the threshold and exponent text boxes
-                //Dictionary<string, object> dictTransform = (Dictionary<string, object>)dictProjectState["Transform"];
                 xfrmImported = (DependentVariableTransforms)dictProjectState["xfrmImported"];
                 xfrmThreshold = (DependentVariableTransforms)dictProjectState["xfrmThreshold"];
                 dblImportedPowerTransformExponent = Convert.ToDouble(dictProjectState["ImportedPowerTransformExponent"]);

@@ -277,9 +277,9 @@ namespace VBCommon.Statistics
             _cooks = new double[M2.Results.Length];
             for (int i=0; i<M2.Results.Length; i++)
             {
-                ExternallyStudentizedResiduals[i] = (SSR - SquaredResiduals[i])/(n-p-1);
-                _dffits[i] = ExternallyStudentizedResiduals[i] * Math.Sqrt(H[i, i] * (1 - H[i, i]));
-                _cooks[i] = SquaredResiduals[i] / (p * M2.Table[M2.Table.Count - 2].MeanSquares) * H[i, i] / (1 - H[i, i]);
+                ExternallyStudentizedResiduals[i] = Residuals[i] / Math.Sqrt((SSR - SquaredResiduals[i]) / (n - p - 1) * (1 - H[i, i]));
+                _dffits[i] = ExternallyStudentizedResiduals[i] * Math.Sqrt(H[i, i] / (1 - H[i, i]));
+                _cooks[i] = SquaredResiduals[i] / (p * M2.Table[M2.Table.Count - 2].MeanSquares) * H[i, i] / Math.Pow((1 - H[i, i]), 2);
             }
 
             _AIC = n * Math.Log(sse / n) + (2 * p) + n + 2;
@@ -320,24 +320,17 @@ namespace VBCommon.Statistics
                 standardizedResid[i] = (Residuals[i] - Residuals.Mean()) / Residuals.StandardDeviation();
             }
             Array.Sort(standardizedResid);
-            
+
+            //Anderson-Darling normality test for residuals:
             double AD_stat = 0;
             for (int i = 0; i < M2.Results.Length; i++)
             {
                 AD_stat += (2 * i + 1) * (Math.Log(distribution.DistributionFunction(standardizedResid[i])) + Math.Log(1-distribution.DistributionFunction(standardizedResid[n-1-i])));
             }
 
-            AD_stat = -Convert.ToDouble(n) - AD_stat / Convert.ToDouble(n);
-
-            //AndersonDarlingTest adtest = new AndersonDarlingTest((NumericalVariable)vecResiduals);
-           
-            
-            //Extreme.Statistics.Tests.OneSampleTest ADtest = _model.GetNormalityOfResidualsTest(TestOfNormality.AndersonDarling);
-            //Extreme.Statistics.Tests.OneSampleTest WStest = _model.GetNormalityOfResidualsTest(TestOfNormality.ShapiroWilk);
-            //_ADresidPvalue = ADtest.PValue;
+            AD_stat = -Convert.ToDouble(n) - AD_stat / Convert.ToDouble(n);                        
             _ADresidNormStatVal = AD_stat;
-            //_WSresidPvalue = WStest.PValue;
-            //_WSresidNormStatVal = WStest.Statistic;
+            _ADresidPvalue = 1 - adinf(AD_stat);
 
             double[,] centered = new double[arrInputData.Length, _independentVars.Length];
             for (int i=0; i<M2.Results.Length; i++)
@@ -348,24 +341,7 @@ namespace VBCommon.Statistics
                 }
             }
 
-
-            double[,] matrix = inputMat.Transpose().Multiply(inputMat);
-
-            //Extreme.Mathematics.LinearAlgebra.SymmetricMatrix matrix = _model.GetCorrelationMatrix();
-            //Extreme.Mathematics.LinearAlgebra.SymmetricMatrix corrMatrix = new SymmetricMatrix(matrix.ColumnCount -1);
-
-            //Extreme Opt returns a Correlation matrix that contains an extra row and column
-            //Looks like these are related to the intercept
-            //We are carving out the std correlation matrix
-            //for (int row=1;row < matrix.ColumnCount; row++)
-            //{
-            //    for (int col=1;col < matrix.ColumnCount; col++)
-            //    {
-            //        corrMatrix[row-1,col-1] = matrix[row,col];
-            //    }
-            //}           
-            
-            double[,] corrMatrix = matrix;
+            double[,] corrMatrix = inputMat.Transpose().Multiply(inputMat);              
             double[,] InvCorrMatrix = corrMatrix.Inverse();
             
             /*Extreme.Mathematics.Matrix InvCorrMatrix = corrMatrix.GetInverse();
@@ -378,6 +354,16 @@ namespace VBCommon.Statistics
 
             _maxVIF = VIFVector.AbsoluteMax();
             _maxVIFParameter = _independentVars[VIFVector.AbsoluteMaxIndex()];           */ 
+        }
+
+
+        private double adinf(double z)
+        {
+            /* Short, practical version of full ADinf(z), z>0.   */
+            if (z < 2)
+                return Math.Exp(-1.2337141/z) / Math.Sqrt(z)*(2.00012+(.247105-(.0649821-(.0347962-(.011672-.00168691*z)*z)*z)*z)*z);
+            else
+                return Math.Exp(-Math.Exp(1.0776-(2.30695-(.43424-(.082433-(.008056 -.0003146*z)*z)*z)*z)*z));
         }
 
 

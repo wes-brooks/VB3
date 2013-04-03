@@ -100,10 +100,12 @@
             // 
             // ctlVariableSelection1
             // 
-            this.ctlVariableSelection1.Location = new System.Drawing.Point(19, 16);
+            this.ctlVariableSelection1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.ctlVariableSelection1.Location = new System.Drawing.Point(3, 6);
             this.ctlVariableSelection1.MinimumSize = new System.Drawing.Size(500, 0);
             this.ctlVariableSelection1.Name = "ctlVariableSelection1";
-            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 412);
+            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 17);
             this.ctlVariableSelection1.TabIndex = 0;
             // 
             // tpModel

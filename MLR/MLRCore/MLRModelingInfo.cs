@@ -23,8 +23,9 @@ namespace MLRCore
         List<VBCommon.ListItem> _independentVariables = null;
 
         private VBCommon.Transforms.DependentVariableTransforms _thresholdTransform;
-	private VBCommon.Transforms.DependentVariableTransforms _importedTransform;
-        private double _powerTransformExp = double.NaN;
+	    private VBCommon.Transforms.DependentVariableTransforms _importedTransform;
+        private double _thresholdPowerTransformExponent = 1;
+        private double _depVarTransformExponent = 1;
         private string _dependendVariable = "";
 
         List<List<short>> _chromosomes = null;
@@ -35,7 +36,6 @@ namespace MLRCore
         private double _maxVIF = Double.NaN;
         private double _decisionThreshold = Double.NaN;
         private double _mandateThreshold = Double.NaN;
-
         private double _AIC = Double.NaN;
         private double _AICC = Double.NaN;
         private double _Press = Double.NaN;
@@ -46,23 +46,14 @@ namespace MLRCore
         private double _specificity = Double.NaN;
         private double _sensitivity = Double.NaN;
         private double _accuracy = Double.NaN;
-
         private double _VIF = Double.NaN;
-
         private int _bestFitModelIndexSelected = -1;
-
-        private double _depVarTransformExponent = 1;
-
 
         //residual rebuild variables
         private Dictionary<string, double> _selectedRebuild = null;
         private int _selectedRebuildIndex = -1;
 
-
-        public MLRModelingInfo()
-        {
-
-        }
+        public MLRModelingInfo() { }
 
         //statistics
         [JsonProperty]
@@ -205,12 +196,22 @@ namespace MLRCore
             set { _independentVariables = value; }
         }
 
+
         [JsonProperty]
         public VBCommon.Transforms.DependentVariableTransforms ThresholdTransform
         {
             get { return _thresholdTransform; }
             set { _thresholdTransform = value; }
         }
+
+
+        [JsonProperty]
+        public double ThresholdPowerTransformExponent
+        {
+            get { return _thresholdPowerTransformExponent; }
+            set { _thresholdPowerTransformExponent = value; }
+        }
+
 
         [JsonProperty]
         public VBCommon.Transforms.DependentVariableTransforms DependentVariableTransform
@@ -220,17 +221,10 @@ namespace MLRCore
         }
 
         [JsonProperty]
-        public double DependentVariableTransformExponent
+        public double DependentVariablePowerTransformExponent
         {
             get { return _depVarTransformExponent; }
             set { _depVarTransformExponent = value; }
-        }
-
-        [JsonProperty]
-        public double PowerTransformExponent
-        {
-            get { return _powerTransformExp; }
-            set { _powerTransformExp = value; }
         }
 
         [JsonProperty]

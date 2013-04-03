@@ -25,11 +25,13 @@ namespace VBLocation
         private const string strPanelCaption = "Location";
         private Globals.PluginType pluginType = VBCommon.Globals.PluginType.Map;
         private RootItem locationTab;
-        private SimpleActionItem btnNull;
+        private SimpleActionItem btnFindDataSources;
+        private SimpleActionItem btnClearDataSources;
 
         //complete and visible flags
         public Boolean boolComplete;
-        public Boolean boolVisible = true;
+        public Boolean boolVisible;
+        private Boolean boolChanged = false;
 
         //this plugin was clicked
         private string strTopPlugin = string.Empty;
@@ -37,6 +39,9 @@ namespace VBLocation
         //raise a message
         public delegate void MessageHandler<TArgs>(object sender, TArgs args) where TArgs : EventArgs;
         public event MessageHandler<MessageArgs> MessageSent;
+	
+        private Stack<string> UndoKeys;
+        private Stack<string> RedoKeys;
 
 
         public override void Deactivate()
@@ -53,10 +58,21 @@ namespace VBLocation
         //hide this plugin
         public void Hide()
         {
-            App.HeaderControl.RemoveAll();
-            App.DockManager.HidePanel(strPanelKey);
-            boolVisible = false;
+            if (boolVisible)
+            {
+                boolChanged = true;
+                App.HeaderControl.RemoveAll();
+                ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+                boolVisible = false;
+            }
         }
+
+
+        /*//undo was hit, send the packed state to be unpacked
+        public void UndoLastChange(Dictionary<string, object> packedState)
+        {
+           
+        }*/
 
 
         //add a datasheet plugin root item
@@ -73,19 +89,42 @@ namespace VBLocation
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
 
-            //section for working with data
-            const string grpManipulate = "Waste time and space";
 
-            btnNull = new SimpleActionItem(strPanelKey, "Do nothing!", btnNull_Click);
-            btnNull.LargeImage = Properties.Resources.USGS;
-            btnNull.GroupCaption = grpManipulate;
-            btnNull.Enabled = false;
-            App.HeaderControl.Add(btnNull);
+            //section for working with data
+            const string grpManipulate = "Data";
+
+            btnFindDataSources = new SimpleActionItem(strPanelKey, "Show Stations", ShowStations_Click);
+            btnFindDataSources.LargeImage = Properties.Resources.USGS;
+            btnFindDataSources.GroupCaption = grpManipulate;
+            btnFindDataSources.Enabled = true;
+            App.HeaderControl.Add(btnFindDataSources);
+
+            btnClearDataSources = new SimpleActionItem(strPanelKey, "Clear Stations", ClearStations_Click);
+            btnClearDataSources.LargeImage = Properties.Resources.clear;
+            btnClearDataSources.GroupCaption = grpManipulate;
+            btnClearDataSources.Enabled = true;
+            App.HeaderControl.Add(btnClearDataSources);
+
+
+            //var validateBtn = new SimpleActionItem("Validate", btnValidate_Click) { RootKey = kVBLocation, ToolTipText = "Validate Data", LargeImage = Properties.Resources.validate };
+            //App.HeaderControl.Add(validateBtn);
+
+            //var computeBtn = new SimpleActionItem("Compute", btnCompute_Click) { RootKey = kVBLocation, ToolTipText = "Compute" };
+            //App.HeaderControl.Add(computeBtn);
+
+            //var manipulateBtn = new SimpleActionItem("Manipulate", btnManipulate_Click) { RootKey = kVBLocation, ToolTipText = "Manipulate", LargeImage = Properties.Resources.manipulate };
+            //App.HeaderControl.Add(manipulateBtn);
+
+            //var transformBtn = new SimpleActionItem("Transform", btnTransform_Click) { RootKey = kVBLocation, ToolTipText = "Transform", LargeImage = Properties.Resources.transform };
+            //App.HeaderControl.Add(transformBtn);
         }
 
 
         public override void Activate()
         {
+            UndoKeys = new Stack<string>();
+            RedoKeys = new Stack<string>();
+        
             cLocation = new frmLocation();
             cLocation.LocationFormEvent += new EventHandler(LocationEventHandler);
 
@@ -96,7 +135,11 @@ namespace VBLocation
             App.DockManager.ActivePanelChanged += new EventHandler<DotSpatial.Controls.Docking.DockablePanelEventArgs>(DockManager_ActivePanelChanged);
             App.HeaderControl.RootItemSelected += new EventHandler<RootItemEventArgs>(HeaderControl_RootItemSelected);
             
+	        boolChanged = false;
             base.Activate(); 
+	    
+	        boolVisible = true;
+	        Show();
         }
 
 
@@ -110,10 +153,14 @@ namespace VBLocation
 
         public void Show()
         {            
-            AddRibbon("Show");
-            App.DockManager.SelectPanel(strPanelKey);
-            App.HeaderControl.SelectRoot(strPanelKey);
-            boolVisible = true;
+		if (!boolVisible)
+		{
+			boolChanged = true;
+			AddRibbon("Show");
+			((VBDockManager.VBDockManager)App.DockManager).SelectPanel(strPanelKey);
+			App.HeaderControl.SelectRoot(strPanelKey);
+			boolVisible = true;
+		}
         }
 
 
@@ -187,7 +234,9 @@ namespace VBLocation
             signaller.BroadcastState += new VBCommon.Signaller.BroadcastEventHandler<VBCommon.PluginSupport.BroadcastEventArgs>(BroadcastStateListener);
             signaller.ProjectSaved += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectSavedListener);
             signaller.ProjectOpened += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.SerializationEventArgs>(ProjectOpenedListener);
-
+            signaller.UndoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Undo);
+            signaller.RedoEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(Redo);
+            signaller.UndoStackEvent += new VBCommon.Signaller.SerializationEventHandler<VBCommon.PluginSupport.UndoRedoEventArgs>(PushToStack);
             this.MessageSent += new MessageHandler<VBCommon.PluginSupport.MessageArgs>(signaller.HandleMessage);
         }
 
@@ -198,9 +247,14 @@ namespace VBLocation
         }
 
 
-        private void btnNull_Click(object sender, EventArgs e)
+        private void ShowStations_Click(object sender, EventArgs e)
         {
-            //cLocation.btnImport_Click(sender, e);
+            cLocation.btnShowDataSources_Click(sender, e);
+        }
+
+        private void ClearStations_Click(object sender, EventArgs e)
+        {
+            cLocation.btnClearStations_Click(sender, e);
         }
 
 
@@ -239,16 +293,17 @@ namespace VBLocation
             {
                 //Unpack the state of this plugin.
                 cLocation.UnpackState(new Dictionary<string, object>());
-            }         
+            }          
         }
 
 
         public void Broadcast()
         {
+	    boolChanged = true;
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = cLocation.PackState();
 
-            //boolComplete = (bool)dictPackedState["Complete"];
+            boolComplete = (bool)dictPackedState["Complete"];
             dictPackedState.Add("Visible", boolVisible);
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
@@ -258,10 +313,7 @@ namespace VBLocation
 
         private void ProjectSavedListener(object sender, SerializationEventArgs e)
         {
-            IDictionary<string, object> packedState = cLocation.PackState();
-            //packedState.Add("Complete", boolComplete);
-            packedState.Add("Visible", boolVisible);
-            e.PackedPluginStates.Add(strPanelKey, packedState);
+            e.PackedPluginStates.Add(strPanelKey, cLocation.PackState());
         }
 
 
@@ -269,30 +321,109 @@ namespace VBLocation
         {
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
-                IDictionary<string, object> dictPlugin = e.PackedPluginStates[strPanelKey];
-
-                if (!e.PredictionOnly)
-                {
-                    if ((bool)dictPlugin["Visible"]) { Show(); }
-                    else { Hide(); }
-                    boolVisible = (bool)dictPlugin["Visible"];
-                }
-                else
-                {
-                    Hide();
-                    boolVisible = false;
-                }
-
                 //Unpack the state of this plugin.
-                boolComplete = (bool)dictPlugin["Complete"];
-                cLocation.UnpackState(dictPlugin);
+                cLocation.UnpackState(e.PackedPluginStates[strPanelKey]);
             }
             else
+            {
+                //Set this plugin to an empty state.
+            }
+			
+			if (!e.PredictionOnly)
+			{
+                Show();
+			}
+			else
+			{
+				Hide();
+			}
+        }
+
+	
+        private void PushToStack(object sender, UndoRedoEventArgs args)
+        {
+            if (boolChanged)
+            {
+                //go pack state, add complete and visible, and add to dictionary of plugins
+                IDictionary<string, object> packedState = cLocation.PackState();
+
+                if (packedState != null)
+                {                    
+                    packedState.Add("Visible", boolVisible);
+
+                        string strKey = PersistentStackUtilities.RandomString(10);
+                        args.Store.Add(strKey, packedState);
+                        UndoKeys.Push(strKey);
+                        RedoKeys.Clear();
+                        boolChanged = false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    string strKey = UndoKeys.Peek();
+                    UndoKeys.Push(strKey);
+                    RedoKeys.Clear();
+                }
+                catch { }
+            }            
+        }
+
+
+        private void Undo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Pop();
+                string strPastKey = UndoKeys.Peek();
+                RedoKeys.Push(strCurrentKey);
+
+                if (strCurrentKey != strPastKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strPastKey];
+
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
+
+                    boolComplete = (bool)dictPlugin["Complete"];
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    cLocation.UnpackState(dictPlugin);
+                }
+            }
+            catch
             {
                 Activate();
             }
         }
 
+
+        private void Redo(object sender, UndoRedoEventArgs args)
+        {
+            try
+            {
+                string strCurrentKey = UndoKeys.Peek();
+                string strNextKey = RedoKeys.Pop();
+                UndoKeys.Push(strNextKey);
+
+                if (strCurrentKey != strNextKey)
+                {
+                    IDictionary<string, object> dictPlugin = args.Store[strNextKey];
+
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
+
+                    boolComplete = (bool)dictPlugin["Complete"];
+                    boolVisible = (bool)dictPlugin["Visible"];
+                    cLocation.UnpackState(dictPlugin);
+                }
+            }
+            catch
+            {
+                Activate();
+            }
+        }
+	
 
         private void SendMessage(string message)
         {

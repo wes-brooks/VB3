@@ -95,7 +95,7 @@ namespace VBCommon.Statistics
 
                 //load up vector with prediction variable values and get in matrix form and transpose
                 double[] xv = x;
-                double[,] xm = xv.ToMatrix();
+                double[,] xm = xv.ToMatrix().Transpose();
                 double[,] xmT = xv.Transpose();
 
 
@@ -113,7 +113,7 @@ namespace VBCommon.Statistics
 
             catch (Exception e)
             {
-                Console.WriteLine("Prediction P(Excced) calculation error via Statistics class: " + e.Message.ToString());
+                Console.WriteLine("Prediction P(Exceed) calculation error via Statistics class: " + e.Message.ToString());
                 return double.NaN;
             }
         }

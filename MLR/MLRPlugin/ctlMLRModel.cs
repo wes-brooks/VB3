@@ -16,6 +16,7 @@ namespace MLRPlugin
     public partial class ctlMLRModel : UserControl
     {
         public static ctlMLRModel MLRControl = null;
+        private bool bAllowNotifiableDataEvent = true;
 
         public ctlMLRModel()
         {
@@ -27,6 +28,13 @@ namespace MLRPlugin
             ctlVariableSelection1.VariablesChanged += new EventHandler(ctlVariableSelection1_UpdateVariableList);
             frmModel1.ClearList += new EventHandler(frmModel1_ClearList);
             frmModel1.AddToList += new frmModel.MyEventHandler(frmModel1_AddToList);
+        }
+
+
+        public bool AllowNotifiableDataEvent
+        {
+            get { return bAllowNotifiableDataEvent; }
+            set { bAllowNotifiableDataEvent = value; }
         }
 
 
@@ -45,6 +53,9 @@ namespace MLRPlugin
         //Handle changes in the local datasheet control
         private void dsControl1_NotifiableChangeEvent(object source, EventArgs e)
         {
+            if (!bAllowNotifiableDataEvent)
+                return;
+
             ctlVariableSelection1.SetData(dsControl1.DT.Copy());
             List<string> lstSelectedVariables = ctlVariableSelection1.SelectedVariables.ToList();
             MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
@@ -109,25 +120,24 @@ namespace MLRPlugin
 
             pluginState.Add("PackedDatasheetState", dsControl1.PackState());
             pluginState.Add("VarSelectionState", ctlVariableSelection1.PackState());
-            //pluginState.Add("MLRModelState", ModelForm.PackProjectState()); 
-            pluginState.Add("Model", ModelForm.PackProjectState());
+            pluginState.Add("ActiveTab", tabControl1.SelectedIndex);
+            pluginState.Add("Model", frmModel1.PackProjectState());
 
-            if (ModelForm.ModelInfo != null)
+            if (frmModel1.ModelInfo != null)
             {
                 Dictionary<string, object> dictTransform = new Dictionary<string, object>();
                 //dictTransform.Add("Type", ModelForm.ModelInfo.ThresholdTransform);
-                dictTransform.Add("Type", ModelForm.ModelInfo.DependentVariableTransform);
-                dictTransform.Add("Exponent", ModelForm.ModelInfo.PowerTransformExponent);
+                dictTransform.Add("Type", frmModel1.ModelInfo.DependentVariableTransform);
+                dictTransform.Add("Exponent", frmModel1.ModelInfo.DependentVariablePowerTransformExponent);
                 pluginState.Add("Transform", dictTransform);
 
-                pluginState.Add("Predictors", ModelForm.ModelInfo.IndependentVariables.ToList());
+                pluginState.Add("Predictors", frmModel1.ModelInfo.IndependentVariables.ToList());
 
-                pluginState.Add("xfrmThreshold", ModelForm.ModelInfo.DependentVariableTransform);
-                //pluginState.Add("xfrmThreshold", VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM);
-                pluginState.Add("ThresholdPowerTransformExponent", ModelForm.ModelInfo.PowerTransformExponent);
+                pluginState.Add("xfrmThreshold", frmModel1.ModelInfo.ThresholdTransform);
+                pluginState.Add("ThresholdPowerTransformExponent", frmModel1.ModelInfo.ThresholdPowerTransformExponent);
 
-                pluginState.Add("xfrmImported", ModelForm.ModelInfo.DependentVariableTransform);
-                pluginState.Add("ImportedPowerTransformExponent", ModelForm.ModelInfo.PowerTransformExponent);
+                pluginState.Add("xfrmImported", frmModel1.ModelInfo.DependentVariableTransform);
+                pluginState.Add("ImportedPowerTransformExponent", frmModel1.ModelInfo.DependentVariablePowerTransformExponent);
             }
 
             pluginState.Add("Method", "MLR");
@@ -144,32 +154,22 @@ namespace MLRPlugin
 
             if (dictProjectState.ContainsKey("PackedDatasheetState"))            
                 dsControl1.UnpackState(dictProjectState["PackedDatasheetState"] as IDictionary<string, object>);
-
-
+            
             if (dictProjectState.ContainsKey("VarSelectionState"))
             {
                 ctlVariableSelection1.UnpackState(dictProjectState["VarSelectionState"] as Dictionary<string, List<ListItem>>);
                 frmModel1.SelectedVariables = ctlVariableSelection1.SelectedVariables.ToList();
             }
-            //else
-            //{
-            //    ctlVariableSelection1_SelectionChanged();
-            //}
+
             MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
             _dataMgr.ModelDataTable = dsControl1.DT.Copy();
-            //ctlVariableSelection1.SetData(dsControl1.DT.Copy());
+
             frmModel1.InitControls();
             frmModel1.SetData();
-            //ModelForm.SetDataTable(dsControl1.DT.Copy());
-            //ModelForm.SetData(dsControl1.DT.Copy());
-
-            //if (dictProjectState.ContainsKey("MLRModelState"))
-            //{
-            //    ModelForm.UnpackProjectState(dictProjectState["MLRModelState"] as IDictionary<string, object>);
-            //}
+            
             if (dictProjectState.ContainsKey("Model"))
             {
-                ModelForm.UnpackProjectState(dictProjectState["Model"] as IDictionary<string, object>);
+                frmModel1.UnpackProjectState(dictProjectState["Model"] as IDictionary<string, object>);
             }
             
             this.Show();

@@ -55,13 +55,6 @@ namespace VBCommon.Statistics
         }
 
 
-        //commented out because extreme.statics not working
-        public double PieceWiseConstantCurveIntegrate()
-        {
-            var curve = MathNet.Numerics.Interpolation.Interpolate.Common(_X, _Y);
-            return curve.Integrate(_upperbound) - curve.Integrate(_lowerbound); //(_lowerbound, _upperbound);
-        }
-
         public double PieceWiseLinearCurveIntegrate()
         {
             var curve = MathNet.Numerics.Interpolation.Interpolate.LinearBetweenPoints(_X, _Y);

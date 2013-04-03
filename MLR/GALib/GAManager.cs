@@ -10,8 +10,6 @@ namespace GALib
         public delegate void GAProgressHandler(double generation, double max);
         public delegate void GACompleteHandler(GAManager gaManager);
 
-        //private double _mutationRate = 0.01;
-        //private double _crossoverRate = 0.70;
         private int _numberGenerations = -1;
         private int maxPopSize = -1;
         private Cache _cache = null;
@@ -68,9 +66,7 @@ namespace GALib
                 return;
 
             population = _population;
-
             _numElite = 2;
-
             maxPopSize = population.PopulationSize;
 
             _cache = new Cache(_cacheSize);
@@ -81,10 +77,8 @@ namespace GALib
 
             List<IIndividual> elite = null;
             List<IIndividual> lstCache = null;
-
             IIndividual cloner = population.GetTopIndividuals(1)[0];
-
-
+            
             for (int i = 0; i < _numberGenerations; i++)
             {                
                 if (population.PopulationSize < population.MaximumPopulationSize)

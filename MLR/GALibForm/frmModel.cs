@@ -70,36 +70,23 @@ namespace GALibForm
         private ExhaustiveSearchManager _esManager = null;
         private Thread _runThread = null;
 
-        //Number of independent variables in the dataset
-        private int _numVars;
-        //Number of observations in the dataset
-        int _numObs;
-        //Maximum number of variables (including interaction terms) allowed in model
-        int _maxIndVars;
-        //Total number of variables (including interaction terms) available to model
-        int _totVar;
-        //
+        private int _numVars;        //Number of independent variables in the dataset
+        int _numObs;        //Number of observations in the dataset
+        int _maxIndVars;        //Maximum number of variables (including interaction terms) allowed in model
+        int _totVar;        //Total number of variables (including interaction terms) available to model
         int _userSpecifiedNumVars;
-        //int _IndepVarCount = 0;
-
-        //Maximum VIF allowed for model to be valid
-        int _maxVIF;
-
-        //Seed for random number generator
-        int _seed;
+        int _maxVIF;        //Maximum VIF allowed for model to be valid        
+        int _seed;        //Seed for random number generator
 
         //Threshold value used for sensitiviy, specificity, accuracy
         double _decisionThreshold;
         double _mandateThreshold;
 
-        //For reporting/plotting of optional eval criteria
-        public static bool ThresholdChecked;
+        public static bool ThresholdChecked;        //For reporting/plotting of optional eval criteria
 
-        //for ROC curve plotting
-        private int[] _ndxs;
 
+        private int[] _ndxs;        //for ROC curve plotting
         private List<double[]> _XYPlotdata;
-
         private int _selectedModelIndex = -1;
 
         Dictionary<string, List<object>> _tableVals = null; 
@@ -118,7 +105,6 @@ namespace GALibForm
         private const double cutoff = 0.65d;
         private const double cookscutoff = 0.05d;
 
-        //private VBProjectManager _projMgr = null;
         private double[] _dffits = null;
         private double[] _cooks = null;
         private double _dffitsThreshold = cutoff;
@@ -127,7 +113,6 @@ namespace GALibForm
         private double[] _predictions = null;
         private double[] _standardResiduals = null;
         private double[] _observations = null;
-        //private double[] _standardResiduals = new double[]{1};
 
         private VBCommon.Statistics.MultipleRegression _model = null;
 
@@ -149,18 +134,12 @@ namespace GALibForm
 
         private bool _gobtnState = true;
 
-        private Dictionary<string, double> _selectedModel = null;
-        //private bool _newModelSelected = true;
+        //private Dictionary<string, double> _selectedModel = null;
         private int _maxIterations = 0;
 
         private Dictionary<int, string> _residualInfo = null;
 
-        //private bool _projectOpened = false;
-
         private int _selectedRebuild = -1;
-
-        //private enum _residState { clean, dirty };
-        //private _residState _state = _residState.clean;
 
         private bool _continue = true;
         #endregion
@@ -170,11 +149,14 @@ namespace GALibForm
             set { _depVarTransform = value; }
             get { return _depVarTransform; }
         }
+
+
         public double DepVarTransExp
         {
             set { _depVarPowerTransformExponent = value; }
             get { return _depVarPowerTransformExponent; }
         }
+
 
         public MLRModelingInfo ModelInfo { get { return _modelingInfo; } }
 
@@ -182,56 +164,13 @@ namespace GALibForm
         {
             InitializeComponent();
             _dataMgr = MLRDataManager.GetDataManager();
-            //_projMgr.ProjectOpened += new VBProjectManager.ProjectOpenedHandler(ProjectOpenedListener);
-            //_projMgr.ProjectSaved += new VBProjectManager.ProjectSavedHandler(ProjectSavedListener);
-            //set a default model evaluation criterion - currently AIC is index = 0
             cbCriteria.SelectedIndex = 0;
         }
 
         private void frmModel_Load(object sender, EventArgs e)
         {
-            //_list = new List<IIndividual>();
-            ////_projMgr = VBProjectManager.GetProjectManager();
-            //_projMgr.CorrelationDataTableUpdate += new VBProjectManager.CorrelationDataTableUpdateHandler(CorrelateDataTableUpdateListener);
-            //_projMgr.ModelDataTableUpdate += new VBProjectManager.ModelDataTableUpdateHandler(ModelDataTableUpdateListener);
-            ////_projMgr.ModelingModelSelected += new VBProjectManager.ModelingNewModelSelected(_projMgr_ModelingModelSelected); 
-            ////_projMgr.ProjectOpened += new VBProjectManager.ProjectOpenedHandler(ProjectOpenedListener);
-            ////_projMgr.ProjectSaved += new VBProjectManager.ProjectSavedHandler(ProjectSavedListener);
-            //SetData(_projMgr.CorrelationDataTable);
-            //InitProgressGraph();
-            //InitResultsGraph();
-            ////InitResultsGraph2();
-            //tabControl2.TabPages[0].Hide();
-            ////lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
-            //lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
-
-
-            //btnViewRptChangeStatus(false);
         }
 
-        //public VariableSelection VariableSelectionCtl
-        //{
-        //    get { return _ctlVarSelection; }
-
-        //    set
-        //    {
-        //        _ctlVarSelection = value;
-        //        lbAvailableVariables = _ctlVarSelection.AvailableVariables;
-        //        lbIndVariables = _ctlVarSelection.IndependentVariables;
-        //        _ctlVarSelection.SelectionChanged += new EventHandler(_ctlVarSelection_SelectionChanged);
-        //    }
-        //}
-
-        //private void _ctlVarSelection_SelectionChanged(object sender, EventArgs e)
-        //{
-        //    lbAvailableVariables = _ctlVarSelection.AvailableVariables;
-        //    lbIndVariables = _ctlVarSelection.IndependentVariables;
-        //    _state = _mlrState.dirty;
-        //    InitControls();
-        //    SetCombinations();
-            
-            
-        //}
 
         public List<string> SelectedVariables
         {
@@ -244,29 +183,6 @@ namespace GALibForm
             }
         }
 
-        /// <summary>
-        /// Initialize the entire modeling form with new data
-        /// </summary>
-        /// <param name="dt"></param>
-        //public void InitializeForm(DataTable dt)
-        //{
-            //_list = new List<IIndividual>();
-            //_listRebuilds = new List<MultipleRegression>();
-            //_projMgr = VBProjectManager.GetProjectManager();
-            //_projMgr.CorrelationDataTableUpdate += new VBProjectManager.CorrelationDataTableUpdateHandler(CorrelateDataTableUpdateListener);
-            //_projMgr.ModelDataTableUpdate += new VBProjectManager.ModelDataTableUpdateHandler(ModelDataTableUpdateListener);
-            //_projMgr.ModelingModelSelected += new VBProjectManager.ModelingNewModelSelected(_projMgr_ModelingModelSelected); 
-            //_projMgr.ProjectOpened += new VBProjectManager.ProjectOpenedHandler(ProjectOpenedListener);
-            //_projMgr.ProjectSaved += new VBProjectManager.ProjectSavedHandler(ProjectSavedListener);
-            //SetData(dt);
-            //SetData();
-            //InitProgressGraph();
-            //InitResultsGraph();
-            //InitResultsGraph2();
-            //tabControl2.TabPages[0].Hide();
-            //lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
-            //lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
-        //}
 
         public void InitControls()
         {
@@ -294,7 +210,7 @@ namespace GALibForm
             //listBox2.Items.Clear();            
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Fires when the app opens a project file
         /// </summary>
         /// <param name="projMgr"></param>
@@ -309,20 +225,14 @@ namespace GALibForm
             Globals.ProjectType pmType = _dataMgr._projectType;
             if (pmType == Globals.ProjectType.COMPLETE) return;
 
-            //Console.WriteLine("\n*** Modeling: project opened.***\n");
-
             //Save dependent variable transform
             if (modelingInfo.ThresholdTransform == VBCommon.Transforms.DependentVariableTransforms.none)
-                //mlrPredObs1.Transform = Globals.DependentVariableTransforms.none;
                 mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
             else if (modelingInfo.ThresholdTransform == DependentVariableTransforms.Log10)
-                //mlrPredObs1.Transform = Globals.DependentVariableTransforms.Log10;
                 mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
             else if (modelingInfo.ThresholdTransform == DependentVariableTransforms.Ln)
-                //mlrPredObs1.Transform = Globals.DependentVariableTransforms.Ln;
                 mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
             else if (modelingInfo.ThresholdTransform == DependentVariableTransforms.Power)
-                //mlrPredObs1.Transform = Globals.DependentVariableTransforms.Power;
                 mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
                 
 
@@ -376,7 +286,7 @@ namespace GALibForm
             txtMaxVars.Text = recVar.ToString();
 
             this.Show();
-        }
+        }*/
 
 
         //Pack State for Serializing
@@ -404,8 +314,7 @@ namespace GALibForm
             if (_selectedModelIndex < 0)
                 return null;
 
-            Dictionary<string, object> mlrPackState = new Dictionary<string, object>();
-            
+            Dictionary<string, object> mlrPackState = new Dictionary<string, object>();            
             MLRIndividual mlrIndiv = _list[_selectedModelIndex] as MLRIndividual;
 
             if (mlrIndiv == null)
@@ -414,11 +323,9 @@ namespace GALibForm
             //Add the variable-coefficient model
             mlrPackState.Add("MLRModel", new Dictionary<string, double>(mlrIndiv.Model));               
             _modelingInfo = new MLRModelingInfo();
-
-            //_modelingInfo.DependentVariable = _dataMgr.ModelDataTable.Columns[1].ColumnName;
             _modelingInfo.DependentVariable = _dataMgr.ModelDependentVariable;
-            //Save dependent variable transform
 
+            //Save dependent variable transform
             _modelingInfo.Model = new Dictionary<string,double>();
             _modelingInfo.IndependentVariables = new List<ListItem>();
             foreach (KeyValuePair<string, double> pair in mlrIndiv.Model)
@@ -439,21 +346,19 @@ namespace GALibForm
 
                     foreach (KeyValuePair<string, double> pair in _listRebuilds[_selectedRebuildIndex].Model)
                     {
-
                         _modelingInfo.IndependentVariables.Add(new ListItem(pair.Key, pair.Key));
                         _modelingInfo.Model.Add(pair.Key, pair.Value);
                         _modelingInfo.SelectedRebuild.Add(pair.Key, pair.Value);
                     }
+
                     _modelingInfo.SelectedModel = _selectedModelIndex;
                     _modelingInfo.SelectedRebuildIndex = _selectedRebuildIndex;
                 }
             }
-            //*****************************************************
 
-            //_modelingInfo.DependentVariable = _dataMgr.ModelDataTable.Columns[1].ColumnName;
             //Save dependent variable transform
-            _modelingInfo.DependentVariableTransform = _depVarTransform;
-            _modelingInfo.DependentVariableTransformExponent = _depVarPowerTransformExponent;
+            /*_modelingInfo.DependentVariableTransform = _depVarTransform;
+            _modelingInfo.DependentVariablePowerTransformExponent = _depVarPowerTransformExponent;
 
             if (rbValMET.Checked)
                _modelingInfo.ThresholdTransform = DependentVariableTransforms.none;
@@ -464,8 +369,8 @@ namespace GALibForm
             else if (rbPwrValMET.Checked)
             {
                _modelingInfo.ThresholdTransform = DependentVariableTransforms.Power;
-               _modelingInfo.PowerTransformExponent = Convert.ToDouble(txtPwrValMET.Text);
-            }
+               _modelingInfo.ThresholdPowerTransformExponent = Convert.ToDouble(txtPwrValMET.Text);
+            }*/
 
             //List<ListItem> lstAvailVars = new List<ListItem>();
             //Save available and independent variables
@@ -485,12 +390,10 @@ namespace GALibForm
             
             //Save the chromosomes
             List<List<short>> chromosomes = new List<List<short>>();
-            //modelingInfo.Chromosomes = new List<List<short>>();
             for (int i = 0; i < _list.Count; i++)
             {
                 List<short> lst = new List<short>(_list[i].Chromosome);
                 chromosomes.Add(lst);
-                //modelingInfo.Chromosomes.Add(_list[i].Chromosome);
             }
 
             mlrPackState.Add("MLRIndividualChromosomes", chromosomes);
@@ -555,11 +458,11 @@ namespace GALibForm
                 if (jsonObj.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
                 {
                     string strJson = jsonObj.ToString();
-                    mi = Newtonsoft.Json.JsonConvert.DeserializeObject<MLRModelingInfo >(strJson);                    
+                    mi = Newtonsoft.Json.JsonConvert.DeserializeObject<MLRModelingInfo>(strJson);                    
                 }
             }
 
-            //What else can we do?
+            
             if (mi == null)
                 return;
 
@@ -573,27 +476,6 @@ namespace GALibForm
                     model = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, double>>(strJson);
                 }                
             }
-            
-            //List<ListItem> lstAvailVars = null;
-            //if (dictProjectState.ContainsKey("AvailableVariables"))
-            //{
-            //    jsonObj = dictProjectState["AvailableVariables"] as object;
-            //    if (jsonObj.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
-            //    {
-            //        string strJson = jsonObj.ToString();
-            //        lstAvailVars = Newtonsoft.Json.JsonConvert.DeserializeObject< List<ListItem>>(strJson);
-            //    }                       
-            //}
-            //List<ListItem> lstIndependentVars = null;
-            //if (dictProjectState.ContainsKey("IndependentVariables"))
-            //{
-            //    jsonObj = dictProjectState["IndependentVariables"] as object;
-            //    if (jsonObj.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
-            //    {
-            //        string strJson = jsonObj.ToString();
-            //        lstIndependentVars = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Item>>(strJson);
-            //    }  
-            //}
 
             List<List<short>> chromosomes = null;
             if (dictProjectState.ContainsKey("MLRIndividualChromosomes"))
@@ -619,22 +501,15 @@ namespace GALibForm
                     break;
                 case DependentVariableTransforms.Power:
                     rbPwrValMET.Checked = true;
-                    txtPwrValMET.Text = mi.PowerTransformExponent.ToString();
+                    txtPwrValMET.Text = mi.ThresholdPowerTransformExponent.ToString();
                     break;
             }
 
-            //if (lstAvailVars != null)
-            //    lbAvailableVariables.Items.AddRange(lstAvailVars.ToArray());
-
-            //if (lstIndependentVars != null)
-            //    lbIndVariables.Items.AddRange(lstIndependentVars.ToArray());
-
             listBox1.SelectedIndex = -1;
             _list = new List<IIndividual>();
-            //MLRIndividual mlrIndiv = new MLRIndividual(mi.NumGenes, mi.MaxGeneValue, (FitnessCriteria)mi.FitnessCriteria, mi.MaxVIF, mi.DecisionThreshold, mi.MandatedThreshold);
+
             for (int i = 0; i < chromosomes.Count; i++)
             {
-                //MLRIndividual indiv = new MLRIndividual(mlrIndiv);
                 MLRIndividual indiv = new MLRIndividual(chromosomes[i].Count, mi.MaxGeneValue, (FitnessCriteria)mi.FitnessCriteria, mi.MaxVIF, mi.DecisionThreshold, mi.MandatedThreshold);
                 indiv.Chromosome = new List<short>(chromosomes[i]);
                 indiv.Evaluate();
@@ -648,7 +523,6 @@ namespace GALibForm
             lblNumObs.Text = "Number of Observations: " + _numObs.ToString();
 
             int maxVar = _numObs / 5;            
-           // int recVar = Math.Min(((_numObs / 10) + 1), (lbIndVariables.Items.Count));
             int recVar = Math.Min(((_numObs / 10) + 1), (_lstSelectedVariables.Count));
             lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
             txtMaxVars.Text = recVar.ToString();
@@ -721,8 +595,6 @@ namespace GALibForm
             if (_userSpecifiedNumVars > numRecommendedVars)
             {
                 string msg;
-                //msg = "Models require at least three times as many" + Environment.NewLine;
-                // msg += "observations as there are independent variables." + Environment.NewLine;
                 msg = "The maximum number of variables in model for this dataset (" + _numObs.ToString() + " observations)" + Environment.NewLine;
                 msg += " is " + numRecommendedVars.ToString() + ".";
                 MessageBox.Show(msg);
@@ -739,10 +611,8 @@ namespace GALibForm
                 return false;
             }
 
-            //if (_userSpecifiedNumVars < 2)
             if (_userSpecifiedNumVars < 1)
             {
-                //MessageBox.Show("Maximum number of variables must be an integer value > 0.");
                 MessageBox.Show("Maximum number of variables must be an integer value > 1.");
                 return false;
             }
@@ -775,16 +645,7 @@ namespace GALibForm
                     _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Log10);
                     mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
                     mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    //if (_depVarTransform == DependentVariableTransforms.Power)
-                    //    _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform,_powerTransform);
                     
-                    //mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    //if (_depVarTransform != DependentVariableTransforms.Log10)
-                    //{
-                    //    _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Log10);
-                    //    _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform);
-                    //    mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    //}
                 }
                 else if (rbLogeValMET.Checked)
                 {
@@ -792,12 +653,6 @@ namespace GALibForm
                     _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Ln);
                      mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
                      mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
-                    //if (_depVarTransform != DependentVariableTransforms.Ln)
-                    //{
-                    //    _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Ln);
-                    //    _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform);
-                    //    mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
-                    //}
                 }
                 else if (rbPwrValMET.Checked)
                 {
@@ -816,28 +671,13 @@ namespace GALibForm
 
                     mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
                     mlrPlots2.PowerExponent = pwr;
-                    //double power = Convert.ToDouble(txtPwrValMET.Text);
-                    //_decisionThreshold = Math.Pow(_decisionThreshold, power);                    
-                    
-
-                    //if (_depVarTransform != DependentVariableTransforms.Power)
-                    //{
-                    //    _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Power,_powerTransform);
-                    //    _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform, _powerTransform);
-                    //    mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
-                    //    mlrPlots1.PowerExponent = _powerTransform;
-                    //}
                 }
                 else
                 {
                     _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.none);
                     _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.none);
                     mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
-                    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
-                    //if (_depVarTransform != DependentVariableTransforms.none)
-                       // _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.none);
-
-                    //mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;                   
+                    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.none;              
                 }
 
                 if (_depVarTransform == DependentVariableTransforms.Power)
@@ -866,40 +706,6 @@ namespace GALibForm
                 } 
             }
 
-            //if (double.TryParse(tbRegThreshVert.Text, out _mandateThreshold) == false)
-            //{
-            //    string msg = @"Regulatory standard must be a numeric value.";
-            //    MessageBox.Show(msg);
-            //    return false;
-            //}
-            //else  
-            //{               
-            //    if (rbLog10ValMET.Checked)
-            //    {
-            //        _mandateThreshold = Math.Log10(_mandateThreshold);                    
-            //    }
-            //    else if (rbLogeValMET.Checked)
-            //    {
-            //        _mandateThreshold = Math.Log(_mandateThreshold);                    
-            //    }
-            //    else if (rbPwrValMET.Checked)
-            //    {
-            //        double power = Convert.ToDouble(txtPwrValMET.Text);
-            //        _mandateThreshold = Math.Pow(_mandateThreshold, power);                   
-            //    }
-            //    else 
-            //    { 
-                    
-            //    }
-            //    if (_mandateThreshold < 0 || _mandateThreshold.Equals(double.NaN))
-            //    {
-            //        string msg = @"Regulatory standard must be a numeric value greater than 0.";
-            //        MessageBox.Show(msg);
-            //        return false;
-            //    }
-
-            //}
-
             if (Int32.TryParse(txtMaxVIF.Text, out _maxVIF) == false)
             {
                 string msg = "Maximum Variance Inflation Factor (VIF) must be a valid integer";
@@ -917,14 +723,9 @@ namespace GALibForm
         }
 
 
-        //private void SetData(DataTable dt)
-        //public void SetData(DataTable dt)
         public void SetData()
         {            
-            //_dtFull = dt;
             _dtFull = MLRDataManager.GetDataManager().ModelDataTable.Copy();
-
-            //_depVarTransform = (DependentVariableTransforms) _dtFull.Columns[1].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM]; 
 
             string exp = _dtFull.Columns[MLRDataManager.GetDataManager().ModelDependentVariable].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM].ToString();
             string[] components = exp.Split(",".ToCharArray());
@@ -933,6 +734,13 @@ namespace GALibForm
 
             if (_depVarTransform == DependentVariableTransforms.Power)
                 _depVarPowerTransformExponent = Convert.ToDouble(components[1]);
+
+            //Make sure that the scatterplots know how the dependent variable is transformed.
+            mlrPlots1.DependentVarXFrm = _depVarTransform;
+            mlrPlots1.PowerTransformExponent = _depVarPowerTransformExponent;
+
+            mlrPlots2.DependentVarXFrm = _depVarTransform;
+            mlrPlots2.PowerTransformExponent = _depVarPowerTransformExponent;
 
             if (_dtFull == null)
                 return;
@@ -947,96 +755,8 @@ namespace GALibForm
             lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
 
             mlrPlots1.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
-
-            //if (rbValMET.Checked)
-            //    _depVarTransform = DependentVariableTransforms.none;
-            //else if (rbLog10ValMET.Checked)
-            //    _depVarTransform = DependentVariableTransforms.Log10;
-            //else if (rbLogeValMET.Checked)
-            //    _depVarTransform = DependentVariableTransforms.Ln;
-            //else if (rbPwrValMET.Checked)
-            //{
-            //    _depVarTransform = DependentVariableTransforms.Power;
-            //    _powerTransform = Convert.ToDouble(txtPwrValMET.Text);
-            //}
-
-            //List<string> fieldList = new List<string>();
-            //
-            //First column is datetime or id, second is dependent variable
-            //Filter the columns based on extended properties
-            //for (int i = 2; i < _dtFull.Columns.Count; i++)
-            //{
-            //    if (_dtFull.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
-            //    {
-            //        if (_dtFull.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
-            //            fieldList.Add(_dtFull.Columns[i].ColumnName);
-            //    }
-            //    else
-            //        fieldList.Add(_dtFull.Columns[i].ColumnName);
-            //}
-
-
-           
-
-
-            //lbAvailableVariables.Items.Clear();
-            //lbIndVariables.Items.Clear();
-            //listBox1.Items.Clear();
-
-            //for (int i = 0; i < fieldList.Count; i++)
-            //{
-            //    ListItem li = new ListItem(fieldList[i], i.ToString());
-            //    lbAvailableVariables.Items.Add(li);
-            //}
-
-            //lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
-            //lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
-
-            //string respVarTransform;
-            //VBCommon.Transforms.DependentVariableTransforms transform = VBCommon.Transforms.DependentVariableTransforms.none;
-            
-            //The second column should always contain the dependent variable.
-            //if (_dtFull.Columns[1].ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM))
-            //{
-            //    respVarTransform = _dtFull.Columns[1].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM].ToString();
-
-            //    if (String.Compare(respVarTransform, Globals.DependentVariableTransforms.Log10.ToString(), 0) == 0)
-            //    {
-            //        rbLog10ValMET.Checked = true;
-            //        transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-            //    }
-            //    else if (String.Compare(respVarTransform, VBCommon.Transforms.DependentVariableTransforms.Ln.ToString(), 0) == 0)
-            //    {
-            //        rbLogeValMET.Checked = true;
-            //        transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
-            //    }
-            //    else if (respVarTransform.Contains(VBCommon.Transforms.DependentVariableTransforms.Power.ToString()))
-            //    {
-            //        rbPwrValMET.Checked = true;
-            //        double power = getTransformPower(respVarTransform);
-            //        txtPwrValMET.Text = power.ToString();
-            //        transform = VBCommon.Transforms.DependentVariableTransforms.Power;                    
-            //        mlrPlots1.PowerExponent = power;
-            //    }
-            //    else //(String.Compare(respVarTransform, Globals.DependentVariableTransforms.none.ToString(), 0) == 0)
-            //    {
-            //        rbValMET.Checked = true;
-            //        transform = VBCommon.Transforms.DependentVariableTransforms.none;
-            //    }
-            //}
-            //else
-            //{
-            //    rbValMET.Checked = true;
-            //    transform = VBCommon.Transforms.DependentVariableTransforms.none;
-            //}
-
-
-            //mlrPlots1.Transform = transform;
-           // if (_projMgr.ModelingInfo == null)modelingInfo = new MLRModelingInfo();
-           //modelingInfo.DependentVariableTransform = transform;
-           //modelingInfo.DecisionThreshold = Convert.ToDouble(tbDecThreshHoriz.Text);
-           //modelingInfo.MandatedThreshold = Convert.ToDouble(tbRegThreshVert.Text);
         }
+
 
         private double getTransformPower(string pwrTransform)
         {
@@ -1208,7 +928,6 @@ namespace GALibForm
             for (int i = 0; i < popSize; i++)
             {
                 initPop.Add(new MLRIndividual(_maxIndVars, _totVar, fitnessCriteria, _maxVIF, _decisionThreshold, _mandateThreshold));
-                //initPop.Add(new MLRIndividual(_maxIndVars, _totVar, fitnessCriteria, _maxVIF));
             }
 
             Population population = new Population(initPop);
@@ -1284,16 +1003,11 @@ namespace GALibForm
                 accuracySelector.Comparer = population.Comparer;
                 population.Selector = accuracySelector;
             }
-
-
+            
             population.ChromosomeComparer = new CompareChromosomes();
-
             population.Initialize();
-
             population.Mutator = new MLRMutator(mutationRate, _totVar);
 
-
-            //GALib.GAManager ga = new GALib.GAManager();
             _gaManager = new GALib.GAManager();
             _gaManager.Init(population);
             _gaManager.NumberOfGenerations = numGen;
@@ -1320,7 +1034,7 @@ namespace GALibForm
             _state = _mlrState.dirty;
             _pmi = -1;
 
-            DataTable modelDataTable = null;
+            //DataTable modelDataTable = null;
             if (btnRun.Text == "Run")
             {
 
@@ -1371,12 +1085,11 @@ namespace GALibForm
             }
 
             Application.DoEvents();
-
         }
+
 
         private void InitResultsGraph()
         {
-
             GraphPane myPane = zedGraphControl2.GraphPane;
             if (myPane.CurveList.Count > 0)
                 myPane.CurveList.RemoveRange(0, myPane.CurveList.Count);
@@ -1394,20 +1107,14 @@ namespace GALibForm
             // Color is blue, and there will be no symbols
 
             LineItem curve = myPane.AddCurve("YObs", list, Color.Black, SymbolType.Square);
-            curve.Line.IsVisible = true;
-            // Hide the symbol outline
-            curve.Symbol.Border.IsVisible = true;
-            // Fill the symbol interior with color
-            //curve.Symbol.Fill = new Fill(Color.Firebrick);
-
-
+            curve.Line.IsVisible = true; // Hide the symbol outline            
+            curve.Symbol.Border.IsVisible = true; // Fill the symbol interior with color
+            
             LineItem curve2 = myPane.AddCurve("YPred", list2, Color.Red, SymbolType.Triangle);
             curve2.Line.IsVisible = true;
 
             LineItem curve3 = myPane.AddCurve("Threshold", list3, Color.Blue, SymbolType.None);
-            curve3.Line.IsVisible = true;
-
-            
+            curve3.Line.IsVisible = true;                       
             
             // Just manually control the X axis range so it scrolls continuously
             // instead of discrete step-sized jumps
@@ -1422,45 +1129,6 @@ namespace GALibForm
             zedGraphControl2.Refresh();
         }
 
-        //private void InitResultsGraph2()
-        //{
-        //    _XYPlotdata = new List<double[]>();
-
-        //    GraphPane myPane = zedGraphControl3.GraphPane;
-        //    if (myPane.CurveList.Count > 0)
-        //        myPane.CurveList.RemoveRange(0, myPane.CurveList.Count - 1);
-
-        //    myPane.Title.Text = "Results";
-        //    myPane.XAxis.Title.Text = "Observed";
-        //    myPane.YAxis.Title.Text = "Predicted";
-
-        //    myPane.XAxis.MajorGrid.IsVisible = true;
-        //    myPane.XAxis.MajorGrid.Color = Color.Gray;
-
-        //    myPane.YAxis.MajorGrid.IsVisible = true;
-        //    myPane.YAxis.MajorGrid.Color = Color.Gray;
-
-        //    PointPairList list = new PointPairList();
-
-        //    LineItem curve = myPane.AddCurve("Y", list, Color.Red, SymbolType.Circle);
-        //    curve.Line.IsVisible = false;
-        //    // Hide the symbol outline
-        //    curve.Symbol.Border.IsVisible = true;
-        //    // Fill the symbol interior with color
-        //    curve.Symbol.Fill = new Fill(Color.Firebrick);
-
-        //    //Vertical and horizontal threshold lines
-        //    PointPairList list2 = new PointPairList();
-        //    LineItem curve2 = myPane.AddCurve("Decision Threshold", list2, Color.Blue, SymbolType.None);
-        //    curve2.Line.IsVisible = false;
-
-        //    PointPairList list3 = new PointPairList();
-        //    LineItem curve3 = myPane.AddCurve("Regulatory Threshold", list3, Color.Green, SymbolType.None);
-        //    curve3.Line.IsVisible = false;
-
-        //    // Scale the axes
-        //    zedGraphControl3.AxisChange();
-        //}
 
         private void ResetGraphs()
         {
@@ -1480,12 +1148,6 @@ namespace GALibForm
             listBox1.Items.Clear();
             listView1.Items.Clear();
             listView2.Items.Clear();
-            //txtAdjustedR2.Text = "";
-            //txtAIC.Text = "";
-            //txtBIC.Text = "";
-            //txtR2.Text = "";
-            //txtAICC.Text = "";
-            //txtPress.Text = "";
 
             //init residual stuff
             listBox2.Items.Clear();
@@ -1493,13 +1155,12 @@ namespace GALibForm
             zgcResidualsPlot.GraphPane.CurveList.Clear();
             zgcResidvFitted.GraphPane.CurveList.Clear();
             mlrPlots2.ZGC.GraphPane.CurveList.Clear();
-            mlrPlots2.LISTVIEW.Items.Clear();
-            
+            mlrPlots2.LISTVIEW.Items.Clear();            
         }
+
 
         private void InitProgressGraph()
         {
-
             GraphPane myPane = zedGraphControl1.GraphPane;
 
             if (tabControlModelGeneration.SelectedTab.Name == "tabGA")
@@ -1517,10 +1178,7 @@ namespace GALibForm
                 myPane.XAxis.Title.Text = "Percent Completed";
                 myPane.YAxis.Title.Text = "Fitness";
             }
-
-
-
-
+            
             // Save 1200 points.  At 50 ms sample rate, this is one minute
             // The RollingPointPairList is an efficient storage class that always
             // keeps a rolling set of point data without needing to shift any data values
@@ -1530,11 +1188,6 @@ namespace GALibForm
             // Initially, a curve is added with no data points (list is empty)
             // Color is blue, and there will be no symbols
             LineItem curve = myPane.AddCurve("Fitness", list, Color.Blue, SymbolType.None);
-
-            // Sample at 50ms intervals
-            //timer1.Interval = 50;
-            //timer1.Enabled = true;
-            //timer1.Start();
 
             // Just manually control the X axis range so it scrolls continuously
             // instead of discrete step-sized jumps
@@ -1547,34 +1200,6 @@ namespace GALibForm
             zedGraphControl1.AxisChange();
             zedGraphControl1.Refresh();
         }
-
-
-
-        // Set the size and location of the ZedGraphControl
-        //private void SetSize()
-        //{
-        //    // Control is always 10 pixels inset from the client rectangle of the form
-        //    Rectangle formRect = this.ClientRectangle;
-        //    formRect.Inflate(-10, -10);
-
-        //    if (zedGraphControl1.Size != formRect.Size)
-        //    {
-        //        zedGraphControl1.Location = formRect.Location;
-        //        zedGraphControl1.Size = formRect.Size;
-        //    }
-
-        //    if (zedGraphControl2.Size != formRect.Size)
-        //    {
-        //        zedGraphControl2.Location = formRect.Location;
-        //        zedGraphControl2.Size = formRect.Size;
-        //    }
-
-        //    if (zedGraphControl3.Size != formRect.Size)
-        //    {
-        //        zedGraphControl3.Location = formRect.Location;
-        //        zedGraphControl3.Size = formRect.Size;
-        //    }
-        //}
 
 
         private void RunComplete(List<IIndividual> updateList)
@@ -1597,9 +1222,9 @@ namespace GALibForm
             string item = "";
             int lastm;
             if (_list.Count > 10) lastm = 10;
+
             else lastm = _list.Count;
             for (int i = 0; i < lastm; i++)
-            //for (int i = 0; i < list.Count; i++)
             {
                 item = String.Format("{0:F4}", _list[i].Fitness);
                 listBox1.Invoke((MethodInvoker)delegate
@@ -1614,15 +1239,15 @@ namespace GALibForm
             });
 
             _dataMgr.ModelRunning = false;
-
             changeControlStatus(true);
-
-
         }
+
+
         private void GAComplete(GAManager gaManager)
         {
             RunComplete(gaManager.Results);
         }
+
 
         private void RunUpdate(double generation, double max)
         {
@@ -1639,6 +1264,7 @@ namespace GALibForm
 
             // Get the PointPairList
             IPointListEdit list = curve.Points as IPointListEdit;
+
             // If this is null, it means the reference at curve.Points does not
             // support IPointListEdit, so we won't be able to modify it
             if (list == null)
@@ -1671,17 +1297,14 @@ namespace GALibForm
             {
                 zedGraphControl1.Refresh();
             });
-            //zedGraphControl1.Refresh();
-            //Refresh();
-
-            //tabControl2.Refresh();
-            //Application.DoEvents();
         }
+
 
         private void GAUpdate(double generation, double max)
         {
             RunUpdate(generation, max);
         }
+
 
         private void UpdateResults(List<double[]> data)
         {
@@ -1727,30 +1350,12 @@ namespace GALibForm
             LineItem curve3 = zedGraphControl2.GraphPane.CurveList[2] as LineItem;
             if (curve3 != null)
             {
-                //if (chkThreshold.Checked)
-                // {
-                // Get the PointPairList
                 IPointListEdit list3 = curve3.Points as IPointListEdit;
                 list3.Clear();
                 list3.Add(0, _decisionThreshold);
                 list3.Add(data.Count, _decisionThreshold);
 
                 curve3.Line.IsVisible = true;
-                //}
-                // else
-                //{
-                //    curve3.Line.IsVisible = false; 
-                //}
-            }
-
-
-            // Keep the X scale at a rolling 30 second interval, with one
-            // major step between the max X value and the end of the axis
-            Scale xScale = zedGraphControl2.GraphPane.XAxis.Scale;
-            if (data[data.Count - 1][0] > xScale.Max - xScale.MajorStep)
-            {
-                //xScale.Max = data[data.Count - 1][0] + xScale.MajorStep;
-                //xScale.Min = xScale.Max - 30.0;
             }
 
             //mikec - get rid of the line at y=0...?
@@ -2484,8 +2089,6 @@ namespace GALibForm
             if (AddToList != null) AddToList(myE);
             return;
 
-
-
             //if (lbAvailableVariables.SelectedItems.Count > 0)
                 //btnAddInputVariable_Click(this, new EventArgs());
 
@@ -2509,8 +2112,8 @@ namespace GALibForm
 
             //lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
             //lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
-
         }
+
 
         //private void lblDepVars_TextChanged(object sender, EventArgs e)
         private void SelectedVariablesChanged()
@@ -2524,16 +2127,16 @@ namespace GALibForm
                     ", Max: " + maxVar.ToString();
 
                 txtMaxVars.Text = recVar.ToString();
-
         }
+
 
         private void btnCrossValidation_Click(object sender, EventArgs e)
         {
             frmCrossValidation crossValForm = new frmCrossValidation(_list, _numObs);
             //crossValForm.ShowDialog(this);
             crossValForm.ShowDialog();
-
         }
+
 
         private void frmModel_HelpRequested(object sender, HelpEventArgs hlpevent)
         {
@@ -2548,6 +2151,7 @@ namespace GALibForm
                 MessageBoxButtons.OK);
             }
         }
+
 
         #region roc prototype;
 
@@ -2567,12 +2171,10 @@ namespace GALibForm
             PointPair pp = new PointPair();
             double[] measurement = model.ObservedValues;
             double[] est = model.PredictedValues;
-            //int truePos = 0;
-            //int trueNeg = 0;
+
             int falsePos = 0;
             int falseNeg = 0;
-            //double pred = double.NaN;
-            //double obs = double.NaN;
+
             double specificity = double.NaN;
             double sensitivity = double.NaN;
             double accuracy = double.NaN;
@@ -2580,30 +2182,12 @@ namespace GALibForm
             ModelErrorCounts mec = new ModelErrorCounts();
             mec.getCounts(decisionThreshold, _mandateThreshold, est, measurement);
 
-            //for (int i = 0; i < est.Length; i++)
-            //{
-            //    pred = est[i];
-            //    obs = measurement[i];
-            //    if ((pred > decisionThreshold) && (obs > _mandateThreshold))
-            //        truePos++;
-            //    else if ((pred > decisionThreshold) && (obs < _mandateThreshold))
-            //        falsePos++;
-            //    else if ((pred < decisionThreshold) && (obs > _mandateThreshold))
-            //        falseNeg++;
-            //    else if ((pred < decisionThreshold) && (obs < _mandateThreshold))
-            //        trueNeg++;
-            //}
-
-            //sensitivity = (double)truePos / (double)(truePos + falseNeg);
-            //specificity = (double)trueNeg / (double)(trueNeg + falsePos);
-
             sensitivity = mec.Sensitivity;
             specificity = mec.Specificity;
             falsePos = mec.FPCount;
             falseNeg = mec.FNCount;
             accuracy = mec.Accuracy;
-
-
+            
             if (!sensitivity.Equals(double.NaN) && !specificity.Equals(double.NaN))
             {
                 pp.X = (1.0d - specificity);
@@ -2615,7 +2199,6 @@ namespace GALibForm
             rocPars = rocpars;
 
             return pp;
-
         }
 
         /// <summary>
@@ -2629,7 +2212,7 @@ namespace GALibForm
         /// <returns>null if number of pts lt 10, otherwise a pointpair list fro plotting</returns>
         private PointPairList ROCpoints(MLRIndividual model, out List<object> rocTableVals)
         {
-            const int interations = 50;
+            const int steps = 50;
 
             //vary the decision threshold by increments
             //calculate the ROC point for the decision threshold increment
@@ -2642,7 +2225,7 @@ namespace GALibForm
 
             double maxPred = model.PredictedValues.Max();
             double minPred = model.PredictedValues.Min();
-            double inc = (maxPred - minPred) / (double)interations;
+            double inc = (maxPred - minPred) / (double)steps;
             double threshold = minPred;
 
             while (threshold < maxPred)
@@ -2654,8 +2237,6 @@ namespace GALibForm
                     ppl.Add(pp);
                     rocTableVal.Add(rocParameters.ROCPars);
                 }
-
-
             }
 
             rocTableVals = rocTableVal;
@@ -2674,6 +2255,7 @@ namespace GALibForm
                 return null;
             }
         }
+
 
         /// <summary>
         /// method aggregates a pointpair list Y values by X values, in effect removing duplicate X values
@@ -2723,11 +2305,9 @@ namespace GALibForm
                 }
 
             }
-
-            //var xes = x.Distinct<double>();
-
             return ppl2;
         }
+
 
         /// <summary>
         /// generate roc plot data for all models in the best-fit models list and makes the plots.
@@ -2807,7 +2387,7 @@ namespace GALibForm
                             //like the wrong approach entirely - requires curve fitting/definition and all
                             //we have are data points for VERY similar curves)
                             Calculus calc = new Calculus(X, Y, lowerbound, upperbound);
-                            double auc = calc.PieceWiseConstantCurveIntegrate();
+                            double auc = calc.PieceWiseLinearCurveIntegrate();
 
                             //maybe piecewise linear curve is better?
                             calc = new Calculus(X, Y, lowerbound, upperbound);
@@ -3085,21 +2665,39 @@ namespace GALibForm
             if (eh != null) eh(this, e);
         }
 
+
         private void rbPwrValMET_CheckedChanged(object sender, EventArgs e)
         {
             if (rbPwrValMET.Checked)
+            {
                 txtPwrValMET.Enabled = true;
+                _modelingInfo.ThresholdTransform = DependentVariableTransforms.Power;
+            }
             else
                 txtPwrValMET.Enabled = false;
         }
 
-        //private void rbPwrValue_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    if (rbPwrValue.Checked)
-        //        txtPwrValue.Enabled = true;
-        //    else
-        //        txtPwrValue.Enabled = false;
-        //}
+
+        private void rbValMET_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbValMET.Checked)
+                _modelingInfo.ThresholdTransform = DependentVariableTransforms.none;
+        }
+
+
+        private void rbLog10ValMET_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbLog10ValMET.Checked)
+                _modelingInfo.ThresholdTransform = DependentVariableTransforms.Log10;
+        }
+
+
+        private void rbLogeValMET_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbLogeValMET.Checked)
+                _modelingInfo.ThresholdTransform = DependentVariableTransforms.Ln;
+        }
+
 
         private void txtPwr_Leave(object sender, EventArgs e)
         {
@@ -3111,6 +2709,8 @@ namespace GALibForm
                 MessageBox.Show("Invalid number.");
                 txtBox.Focus();
             }
+            else
+                _modelingInfo.ThresholdPowerTransformExponent = Convert.ToDouble(txtPwrValMET.Text);
         }
 
         private void txtPopSize_Validated(object sender, EventArgs e)
@@ -3218,34 +2818,20 @@ namespace GALibForm
 
         private void showResiduals(MLRIndividual selectedModel)
         {
-            //_state = _residState.clean;
-
             Dictionary<string, double> modeldic = _dataMgr.Model;
 
-            //determine if a new model has been selected, do nothing if not
-            //if (modeldic.Keys.Count > 0)
-            //{
-            //    if (!newModelSelected(modeldic)) return;
-            //}
-
             if (_dataMgr.ModelDataTable == null) return;
-
-
-
+            
             _residualInfo = new Dictionary<int, string>();
             _modelBuildTables = new DataSet();
-
             DataTable modeldt = _dataMgr.ModelDataTable;
-
             _gobtnState = true;
-
 
             //cutoff rebuilds when half data records eliminated
             _maxIterations = modeldt.Rows.Count / 2;
 
             if (modeldt != null)
             {
-
                 MultipleRegression model = computeModel(modeldt);
                 _listRebuilds.Add(model);
 
@@ -3260,40 +2846,25 @@ namespace GALibForm
 
                     DataTable dffits = getDFFITSTable(model, modeldt, true);
                     DataTable cooks = getCooksDistanceTable(model, modeldt, true);
-                    updateModelList(model, "original", modeldt, "model");
-
-                    //create rediduals plots
-                    //createResidPlot("DFFITS", dffits);
-                    //createResidPlot("CooksDistance", cooks);
-
-                    //predictions vs standardized residuals plot
-                    createResidvFittedPlot(model);
-
-
+                    updateModelList(model, "original", modeldt, "model");                    
+                    createResidvFittedPlot(model);  //predictions vs standardized residuals plot
+                    
                     double dffitsThreshold = Convert.ToDouble((2.0d * Math.Sqrt(((double)(CreateResidualModelDataTable()).Columns.Count - 2) / (double)model.PredictedValues.Length)).ToString());
                     double cooksThreshold = 4.0d / (double)model.PredictedValues.Length;
 
                     setLabels(true, dffitsThreshold, cooksThreshold);
-
                 }
             }
         }
 
+
         private MultipleRegression computeModel(DataTable dt)
         {
-
-            //if (_dataMgr.ModelIndependentVariables == null) return null;
             if (_dataMgr.ModelFieldList == null) return null;
-
-            //given a datatable, build a model
+            
             MultipleRegression model = null;
-
-            //string[] idvars = _dataMgr.ModelIndependentVariables.ToArray();
-            //string[] idvars = _dataMgr.ModelFieldList.ToArray();
             string[] idvars = CreateResidualModelList().ToArray();
-
             string dvar = _dataMgr.ModelDependentVariable;
-            //string dvar = dt.Columns[1].Caption;
 
             if (dt != null)
             {
@@ -3308,7 +2879,6 @@ namespace GALibForm
 
         private DataTable CreateResidualModelDataTable()
         {
-            //DataTable dtCorr = _dataMgr.CorrelationDataTable;
             DataTable dtCorr = _dataMgr.ModelDataTable;
             DataView dvCorr = dtCorr.DefaultView;
 
@@ -3317,20 +2887,14 @@ namespace GALibForm
             list.Add(dtCorr.Columns[0].ColumnName);
             list.Add(_dataMgr.ModelDependentVariable);
 
-            //int numVars = lbIndVariables.Items.Count;
-            //for (int i = 0; i < numVars; i++)
-            //    list.Add(lbIndVariables.Items[i].ToString());
-            //list = _projMgr.ModelingInfo.IndependentVariables;
-
             foreach (KeyValuePair<string, double> kvp in _dataMgr.Model)
                 if (kvp.Key != "(Intercept)") list.Add(kvp.Key);
-
-
-
+                        
             DataTable dtModel = dvCorr.ToTable("ModelData", false, list.ToArray());
 
             return dtModel;
         }
+
 
         private List <string> CreateResidualModelList()
         {
@@ -3342,6 +2906,7 @@ namespace GALibForm
             return list;
         }
 
+
         private void setLabels(bool init, double dffitsThreshold, double cooksThreshold)
         {
             if (rbDFFITS.Checked)
@@ -3350,7 +2915,6 @@ namespace GALibForm
                 lblAutoThreshold.Text = "Stop when all DFFITS values less than " + dffitsThreshold.ToString("f4");
                 rbAutoIterativeThreshold.Text = "iterative threshold using 2*SQR(p/n) = " + dffitsThreshold.ToString("f4");
                 if (init) tboxAutoConstantThresholdValue.Text = (0.9 * dffitsThreshold).ToString("f4");
-                //else tboxAutoConstantThresholdValue.Text = dffitsThreshold.ToString("f4");
             }
             else if (rbCooks.Checked)
             {
@@ -3358,7 +2922,6 @@ namespace GALibForm
                 lblAutoThreshold.Text = "Stop when all Cooks values less than " + cooksThreshold.ToString("f4");
                 rbAutoIterativeThreshold.Text = "iterative threshold using 4.0/n = " + cooksThreshold.ToString("f4");
                 if (init) tboxAutoConstantThresholdValue.Text = (0.9 * cooksThreshold).ToString("f4");
-                //else tboxAutoConstantThresholdValue.Text = cooksThreshold.ToString("f4");
             }
 
             if (rbAutoIterativeThreshold.Checked)
@@ -3372,80 +2935,8 @@ namespace GALibForm
                 _dffitsThreshold = Convert.ToDouble(tboxAutoConstantThresholdValue.Text);
                 _cooksThreshold = Convert.ToDouble(tboxAutoConstantThresholdValue.Text);
             }
-
         }
 
-        /// <summary>
-        /// Get a table of mlr variables/values winnowed from the modeling table
-        /// </summary>
-        /// <returns></returns>
-        //private DataTable CreateResidualModelDataTable()
-        //{
-        //    //DataTable dtCorr = _dataMgr.CorrelationDataTable;
-        //    DataTable dtCorr = null;
-        //    DataView dvCorr = dtCorr.DefaultView;
-
-        //    List<string> list = new List<string>();
-
-        //    //list.Add(dtCorr.Columns[0].ColumnName);
-        //    //list.Add(dtCorr.Columns[1].ColumnName);
-
-        //    //int numVars = lbIndVariables.Items.Count;
-        //    //for (int i = 0; i < numVars; i++)
-        //    //    list.Add(lbIndVariables.Items[i].ToString());
-        //    //list = _projMgr.ModelingInfo.IndependentVariables;
-
-        //    foreach (KeyValuePair<string, double> kvp in _dataMgr.ModelingInfo.Model)
-        //        if (kvp.Key != "(Intercept)") list.Add(kvp.Key);
-
-
-
-        //    DataTable dtModel = dvCorr.ToTable("ModelData", false, list.ToArray());
-
-        //    return dtModel;
-        //}
-
-        //private bool newModelSelected(Dictionary<string, double> modeldic)
-        //{
-        //    //_state = _residState.dirty;
-        //    _state = _residState.clean;
-
-        //    if (_selectedModel == null)
-        //    {
-        //        _selectedModel = modeldic;
-        //        _state = _residState.dirty;
-        //        return true;
-        //    }
-
-        //    if (_projectOpened)
-        //    {
-        //        _projectOpened = false;
-        //        return true;
-        //    }
-
-        //    if (_selectedModel.Keys.Count == modeldic.Keys.Count)
-        //    {
-        //        foreach (KeyValuePair<string, double> kv in modeldic)
-        //        {
-        //            if (!_selectedModel.ContainsKey(kv.Key))
-        //            {
-        //                _selectedModel = modeldic;
-        //                _state = _residState.dirty;
-        //                return true;
-        //            }
-
-        //        }
-        //        _state = _residState.clean;
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        _selectedModel = modeldic;
-        //        _state = _residState.dirty;
-        //        return true; ;
-        //    }
-
-        //}
 
         private DataTable getDFFITSTable(MultipleRegression model, DataTable dt, bool prepare)
         {
@@ -3499,6 +2990,7 @@ namespace GALibForm
             return dtDFFITS;
         }
 
+
         private DataTable getCooksDistanceTable(MultipleRegression model, DataTable dt, bool prepare)
         {
             _cooks = model.Cooks;
@@ -3506,15 +2998,8 @@ namespace GALibForm
             DataTable dtCooks = getResidualsTable("CooksDist", _cooks, dt);
             DataView view = dtCooks.DefaultView;
             view.Sort = "CooksDist Desc";
-            //dgvCooks.DataSource = view;
             dgvResid.DataSource = view;
-
-            //int n = model.PredictedValues.Length; // number of observations
-            //int p = dt.Columns.Count - 2; // number of variables
-            //VBStatistics.FDistribution fstat = new FDistribution(.05, p, n-p);
-            //double cutoff = fstat.FStat;
-
-
+            
             if (prepare)
             {
 
@@ -3549,6 +3034,7 @@ namespace GALibForm
             return dtCooks;
         }
 
+
         private DataTable getResidualsTable(string residName, double[] residuals, DataTable dtModel)
         {
             DataTable dt = new DataTable();
@@ -3568,6 +3054,7 @@ namespace GALibForm
 
             return dt;
         }
+
 
         private void btnGoDFFITSRebuild_Click(object sender, EventArgs e)
         {
@@ -3589,7 +3076,6 @@ namespace GALibForm
             opdt.AcceptChanges();
 
             //track removed records here...
-            //_recsRemoved.Add(_dffitsRecno2Remove);
             _recsRemoved.Add(getRecordRemoved(_dffitsDateTime2Remove));
             _residValueRemoved.Add(_dffitsResidValue2Remove);
             _residTypeRemoved.Add("DFFITS");
@@ -3622,12 +3108,10 @@ namespace GALibForm
                 _continue = false;
                 return; // false;
             }
-            //_recsRemoved.Add(_cooksRecno2Remove);
             opdt.Rows[_cooksRecno2Remove].Delete();
             opdt.AcceptChanges();
 
             //track removed records here...
-            //_recsRemoved.Add(_cooksRecno2Remove);
             _recsRemoved.Add(getRecordRemoved(_cooksDataTime2Remove));
             _residValueRemoved.Add(_cooksResidValue2Remove);
             _residTypeRemoved.Add("COOKS");
@@ -3646,8 +3130,8 @@ namespace GALibForm
             createResidPlot("CooksDistance", cooks);
             createResidvFittedPlot(_model);
             _continue = true;
-
         }
+
 
         private int getRecordRemoved(string datetimestamp)
         {
@@ -3662,6 +3146,7 @@ namespace GALibForm
             }
             return -1;
         }
+
 
         private void btnGoDFFITSAuto_Click(object sender, EventArgs e)
         {
@@ -3683,7 +3168,6 @@ namespace GALibForm
                 DataTable dt = _modelBuildTables.Tables[_currentModelTableName];
                 if (dt.Rows.Count < _maxIterations) break;
             }
-
         }
 
         private void btnGoCooksAuto_Click(object sender, EventArgs e)
@@ -3705,9 +3189,9 @@ namespace GALibForm
 
                 DataTable dt = _modelBuildTables.Tables[_currentModelTableName];
                 if (dt.Rows.Count < _maxIterations) break;
-
             }
         }
+
 
         private void updateModelList(MultipleRegression model, string name, DataTable dt, string residType)
         {
@@ -3743,14 +3227,8 @@ namespace GALibForm
 
             //update the model stats UI lists
             updateListViews(model, listitem.ToString());
-            //textBox3.Text = _dffitsThreshold.ToString("f4");
-
-            ////and check if we can still rebuild models with remaining data... this need work...
-            //if (newDT.Rows.Count < 3) _gobtnState = false;
-            //btnGoDFFITSRebuild.Enabled = _gobtnState;
-            //btnGoDFFITSAuto.Enabled = _gobtnState;
-
         }
+
 
         private void updateListViews(MultipleRegression model, string tabname)
         {
@@ -3822,11 +3300,7 @@ namespace GALibForm
             lvi = new ListViewItem(item);
             listView2.Items.Add(lvi);
 
-
-            //MLRPredObs mlrobs = new MLRPredObs();
-
             ModelErrorCounts mec = new ModelErrorCounts();
-            //mec.getCounts(mlrPredObs1.ThresholdHoriz, mlrPredObs1.ThresholdVert, model.PredictedValues, model.ObservedValues);
             mec.getCounts(mlrPlots1.ThresholdHoriz, mlrPlots1.ThresholdVert, model.PredictedValues, model.ObservedValues);
 
             item = new string[2];
@@ -3836,19 +3310,15 @@ namespace GALibForm
             listView2.Items.Add(lvi);
 
             item = new string[2];
-            //item[0] = "Decision Criterion"; 
             item[0] = "Transformed DC";
             item[1] = string.Format("{0:F4}", mlrPlots1.ThresholdHoriz);
-            //item[1] = string.Format("{0:F4}", _dataMgr.ModelingInfo.DecisionThreshold);
 
             lvi = new ListViewItem(item);
             listView2.Items.Add(lvi);
 
             item = new string[2];
-            //item[0] = "Regulatory Standard";
             item[0] = "Transformed RS";
             item[1] = string.Format("{0:F4}", mlrPlots1.ThresholdVert);
-            //item[1] = string.Format("{0:F4}", _dataMgr.ModelingInfo.MandatedThreshold);
             lvi = new ListViewItem(item);
             listView2.Items.Add(lvi);
 
@@ -3876,12 +3346,6 @@ namespace GALibForm
             lvi = new ListViewItem(item);
             listView2.Items.Add(lvi);
 
-            //item = new string[2];
-            //item[0] = "Specificity";
-            //item[1] = String.Format("{0:F4}", mec.Specificity);
-            //lvi = new ListViewItem(item);
-            //listView2.Items.Add(lvi);
-
             item = new string[2];
             item[0] = "Accuracy";
             item[1] = String.Format("{0:F4}", mec.Accuracy);
@@ -3902,6 +3366,7 @@ namespace GALibForm
             listView2.Items.Add(lvi);
         }
 
+
         private string formatNumber(double number)
         {
             string fmtstring = string.Empty;
@@ -3911,6 +3376,7 @@ namespace GALibForm
             else fmtstring = "{0:f4}";
             return string.Format(fmtstring, number);
         }
+
 
         private void createResidPlot(string plotname, DataTable residuals)
         {
@@ -3964,6 +3430,7 @@ namespace GALibForm
             zgcCtrl.Refresh();
         }
 
+
         /// <summary>
         /// create the residuals vs fitted plot and the fitted vs obs plot (via mlrplotcontrol)
         /// </summary>
@@ -3982,12 +3449,6 @@ namespace GALibForm
             _standardResiduals = model.StudentizedResiduals;
             _observations = model.ObservedValues;
 
-
-            //AndersonDarlingNormality adtest = new AndersonDarlingNormality();
-            //adtest.getADstat(_standardResiduals);
-            //double adstat1 = adtest.ADStat;
-            //double adstat1pval = adtest.ADStatPval;
-
             //get different values of adstat with direct call (above)
             //...from this below which uses the adtestofnormality directly in the linearmodel object... (see statistics.multipleregression.compute)
             //won't match numbers passing residuals or standardized residuals to the test above - revisit this when possible
@@ -3996,8 +3457,6 @@ namespace GALibForm
 
             lblADStat.Text = "A.D. Normality Statistic = " + adstat1.ToString("f4");
             lblADPVal.Text = "A.D. Statistic P-value = " + adstat1pval.ToString("f4");
-            //label8.Text = "W.S. Normality Statistic = " + model.WSResidNormStatVal.ToString("f4");
-            //label9.Text = "W.S. Statistic P-value = " + model.WSResidPvalue.ToString("f4");
 
             GraphPane gpResidPlot = addPlotResid(_predictions, _standardResiduals);
             List<double[]> data = new List<double[]>();
@@ -4011,58 +3470,11 @@ namespace GALibForm
             }
 
             double dec, man;
-            
 
-            //if (_dataMgr.ModelingInfo.DependentVariableTransform == VBCommon.Globals.DependentVariableTransforms.Log10)
-            //if (_modelingInfo.ThresholdTransform == VBCommon.Transforms.DependentVariableTransforms.Log10)
-            //{
-            //    dec = Math.Pow(10, _modelingInfo.DecisionThreshold);
-            //    man = Math.Pow(10, _modelingInfo.MandatedThreshold);
-            //    //mlrPredObs1.SetThresholds(dec, man);
-            //    mlrPlots2.SetThresholds(dec, man);
-            //    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-            //}
-            ////else if (_dataMgr.ModelingInfo.DependentVariableTransform == VBCommon.Globals.DependentVariableTransforms.Ln)
-            //else if (_modelingInfo.ThresholdTransform == VBCommon.Transforms.DependentVariableTransforms.Ln)
-            //{
-            //    dec = Math.Pow(Math.E, _modelingInfo.DecisionThreshold);
-            //    man = Math.Pow(Math.E, _modelingInfo.MandatedThreshold);
-            //    //mlrPredObs1.SetThresholds(dec, man);
-            //    mlrPlots2.SetThresholds(dec, man);
-            //    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
-            //}
-            ////else if (_dataMgr.ModelingInfo.DependentVariableTransform == VBCommon.Globals.DependentVariableTransforms.Power)
-            //else if (_modelingInfo.ThresholdTransform == VBCommon.Transforms.DependentVariableTransforms.Power)
-            //{
-            //    double power = _modelingInfo.PowerTransformExponent;
-            //    dec = Math.Sign(_modelingInfo.DecisionThreshold) * Math.Pow(Math.Abs(_modelingInfo.DecisionThreshold), (1.0 / power));
-            //    man = Math.Sign(_modelingInfo.MandatedThreshold) * Math.Pow(Math.Abs(_modelingInfo.MandatedThreshold), (1.0 / power));
-
-            //    //mlrPredObs1.SetThresholds(dec, man);
-            //    mlrPlots2.SetThresholds(dec, man);
-            //    mlrPlots2.PowerExponent = power;
-            //    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
-
-            //}
-
-            //mlrPredObs1.UpdateResults(data);
-            //ModelFitExceedances();
             ModelRebuildFitExceedances();
             mlrPlots2.UpdateResults(data, model.RMSE, MLRPlots.Exceedance.model);
-            //GraphPane gpXYPlot = addPlotXY(_predictions, _observations);
 
             master.Add(gpResidPlot);
-            //master.Add(gpXYPlot); 
-
-            //GraphPane pane = zgc2.GraphPane;
-            //pane.Title.Text = "Predictions vs Studentized Residuals";
-            //if (pane.CurveList.Count > 0) pane.CurveList.Clear();
-            //LineItem curve = pane.AddCurve(null, _predictions, _standardResiduals, Color.Blue, SymbolType.Circle);
-            //pane.XAxis.Title.Text = "Predictions";
-            //pane.YAxis.Title.Text = "Studentized Residuals";
-            //curve.Line.IsVisible = false;
-            //zgc2.AxisChange();
-            //zgc2.Refresh();
 
             using (Graphics g = this.CreateGraphics())
             { master.SetLayout(g, PaneLayout.SquareColPreferred); }
@@ -4071,17 +3483,17 @@ namespace GALibForm
             zgcResidvFitted.AxisChange();
             master.AxisChange();
             zgcResidvFitted.Refresh();
-
         }
+
 
         private GraphPane addPlotResid(double[] _predictions, double[] _standardResiduals)
         {
             GraphPane pane = new GraphPane();
-            //pane.Title.Text = "Predictions vs Studentized Residuals";
+
             pane.Title.Text = "Studentized Residuals vs Fitted";
             if (pane.CurveList.Count > 0) pane.CurveList.Clear();
             LineItem curve = pane.AddCurve(null, _predictions, _standardResiduals, Color.Blue, SymbolType.Circle);
-            //pane.XAxis.Title.Text = "Predictions";
+
             pane.XAxis.Title.Text = "Fitted";
             pane.YAxis.Title.Text = "Studentized Residuals";
             curve.Line.IsVisible = false;
@@ -4090,6 +3502,7 @@ namespace GALibForm
 
             return pane;
         }
+
 
         private PointPairList getPPList(DataTable dt, bool xdate)
         {
@@ -4118,11 +3531,9 @@ namespace GALibForm
                     plist.Add(x, y, tag);
                 }
             }
-
             return plist;
-
-
         }
+
 
         private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -4143,32 +3554,21 @@ namespace GALibForm
 
                 if (rbDFFITS.Checked)
                 {
-                    //DataTable dffits = getDFFITSTable(model, dt, false);
-                    //createResidPlot("DFFITS", dffits);
                     showResid("DFFITS");
                 }
                 else if (rbCooks.Checked)
                 {
-                    //DataTable cooks = getCooksDistanceTable(model, dt, false);
-                    //createResidPlot("CooksDistance", cooks);
                     showResid("Cooks");
                 }
 
-                //createResidPlot("DFFITS", dffits);
-                //createResidPlot("CooksDistance", cooks);
-
                 createResidvFittedPlot(model);
 
-                //SaveModel(dt, model);
                 _selectedRebuildIndex = _selectedRebuild;
-
                 ProjectSave();
-
                 ModelChanged();
-
-                //_state = _residState.dirty;
             }
         }
+
 
         private void SaveModel(DataTable dt, MultipleRegression model)
         {
@@ -4189,27 +3589,14 @@ namespace GALibForm
             //m.ModelDic = parameters;
             //m.ModelDT = dt;
             //m.RegressionDataTable = dt;
-
         }
 
-        //private void frmResiduals_HelpRequested(object sender, HelpEventArgs hlpevent)
-        //{
-        //    string apppath = Application.StartupPath.ToString();
-        //    VBCSHelp help = new VBCSHelp(apppath, sender);
-        //    if (!help.Status)
-        //    {
-        //        MessageBox.Show(
-        //        "User documentation is found in the Documentation folder where you installed Virtual Beach"
-        //        + "\nIf your web browser is PDF-enabled, open the User Guide with your browser.",
-        //        "Neither Adobe Acrobat nor Adobe Reader found.",
-        //        MessageBoxButtons.OK);
-        //    }
-        //}
 
         private void tboxAutoConstantThresholdValue_Validated(object sender, EventArgs e)
         {
             errorProvider1.SetError(tboxAutoConstantThresholdValue, "");
         }
+
 
         private void tboxAutoConstantThresholdValue_Validating(object sender, CancelEventArgs e)
         {
@@ -4238,39 +3625,9 @@ namespace GALibForm
             {
                 _dffitsThreshold = newcutoff;
             }
-
         }
 
-        //private void tbcookcutoff_Validated(object sender, EventArgs e)
-        //{
-        //    errorProvider1.SetError(tbcookcutoff, "");
-        //}
-
-        //private void tbcookcutoff_Validating(object sender, CancelEventArgs e)
-        //{
-        //    double newcutoff = double.NaN;
-        //    string teststring = tbcookcutoff.Text;
-        //    if (!double.TryParse(teststring, out newcutoff))
-        //    {
-        //        e.Cancel = true;
-        //        tbcookcutoff.Select(0, tbcookcutoff.Text.Length);
-        //        this.errorProvider1.SetError(tbcookcutoff, "Text must convert to a number.");
-        //        return;
-        //    }
-        //    else if (newcutoff >= 4 * _cooksThreshold)
-        //    {
-        //        e.Cancel = true;
-        //        tbcookcutoff.Select(0, tbcookcutoff.Text.Length);
-        //        this.errorProvider1.SetError(tbcookcutoff, "Value must be less than " + (4 * _cooksThreshold).ToString("f4"));
-        //        //MessageBox.Show("Value must be less than 3", "Invalid entry", MessageBoxButtons.OK);
-        //        return;
-        //    }
-        //    else
-        //    {
-        //        _cooksThreshold = newcutoff;
-        //    }
-        //}
-
+        
         /// <summary>
         /// starts the residual process all over
         /// </summary>
@@ -4278,8 +3635,6 @@ namespace GALibForm
         /// <param name="e"></param>
         private void btnClear_Click(object sender, EventArgs e)
         {
-            //_residualInfo = new Dictionary<int, string>();
-
             DataTable modeldt = _dataMgr.ModelDataTable;
 
             MultipleRegression model = computeModel(modeldt);
@@ -4294,12 +3649,8 @@ namespace GALibForm
             _residTypeRemoved = new List<string>();
 
             listBox2.Items.Clear();
-            //for (int i = listBox1.Items.Count - 1; i > 0;  i--)
-            //    listBox1.Items.RemoveAt(i);
 
             _modelBuildTables.Tables.Clear();
-            //for (int i = _modelBuildTables.Tables.Count - 1; i > 0; i--)
-            //    _modelBuildTables.Tables.RemoveAt(i);
             _residualInfo = new Dictionary<int, string>();
 
             DataTable dffits = getDFFITSTable(model, modeldt, true);
@@ -4318,6 +3669,7 @@ namespace GALibForm
             _continue = true;
         }
 
+
         private void btnGoIterative_Click(object sender, EventArgs e)
         {
             if (rbDFFITS.Checked)
@@ -4329,6 +3681,7 @@ namespace GALibForm
                 btnGoCooksIterative_Click(btnGoIterative, null);
             }
         }
+
 
         private void btnGoAuto_Click(object sender, EventArgs e)
         {
@@ -4342,8 +3695,8 @@ namespace GALibForm
                 //btnGoCooksIterative_Click(btnGoIterative, null);
                 btnGoCooksAuto_Click(btnGoAuto, null);
             }
-
         }
+
 
         private void rbTable_CheckedChanged(object sender, EventArgs e)
         {
@@ -4360,6 +3713,7 @@ namespace GALibForm
             }
         }
 
+
         private void rbPlot_CheckedChanged(object sender, EventArgs e)
         {
             if (rbPlot.Checked)
@@ -4375,14 +3729,15 @@ namespace GALibForm
             }
         }
 
+
         private void rbDFFITS_CheckedChanged(object sender, EventArgs e)
         {
             if (rbDFFITS.Checked)
             {
                 showResid("DFFITS");
             }
-
         }
+
 
         private void rbCooks_CheckedChanged(object sender, EventArgs e)
         {
@@ -4390,13 +3745,13 @@ namespace GALibForm
             {
                 showResid("Cooks");
             }
-
         }
+
 
         private void showResid(string residType)
         {
             if (listBox2.Items.Count <= 0) return;
-            //string lastrebuild = _modelBuildTables.Tables[_modelBuildTables.Tables.Count - 1].TableName;
+
             string modelname = listBox2.SelectedItem.ToString();
             DataTable modeldt = _modelBuildTables.Tables[modelname];
             MultipleRegression model = computeModel(modeldt);
@@ -4428,6 +3783,7 @@ namespace GALibForm
             }
         }
 
+
         private void tabControl3_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tabControl3.SelectedTab.Name == "tabDFFITSCooks")
@@ -4439,6 +3795,7 @@ namespace GALibForm
                 gboxCtrls.Visible = false;
             }
         }
+
 
         private void btnViewDataTable_Click(object sender, EventArgs e)
         {
@@ -4462,11 +3819,6 @@ namespace GALibForm
                 set { modelVars = value; }
                 get { return modelVars; }
             }
-
-
-
-
-
         }
     }
 }

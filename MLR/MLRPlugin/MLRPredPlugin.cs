@@ -45,13 +45,9 @@ namespace MLRPlugin
             _lstProbEx = new List<double>();
 
             //get the threshold synced with measurements and dependent variable transform
-            //double udc = VBCommon.Transforms.Apply.UntransformThreshold(DecisionThreshold, _mlrPluginControl.ModelForm.DepVarTrans, ThresholdPowerExponent);
-            //double tdc = VBCommon.Transforms.Apply.TransformThreshold(udc, ThresholdTransform, _mlrPluginControl.ModelForm.ModelInfo.PowerTransformExponent);
             double udc = VBCommon.Transforms.Apply.UntransformThreshold(DecisionThreshold, ThresholdTransform, ThresholdPowerExponent);
             double tdc = VBCommon.Transforms.Apply.TransformThreshold(udc, _mlrPluginControl.ModelForm.DepVarTrans, ThresholdPowerExponent);
-            //double tdc = VBCommon.Transforms.Apply.TransformThreshold(udc, _mlrPluginControl.ModelForm.ModelInfo.DependentVariableTransform, _mlrPluginControl.ModelForm.ModelInfo.PowerTransformExponent);
-            //double tdc = VBCommon.Transforms.Apply.TransformThreshold(udc, _mlrPluginControl.ModelForm.DepVarTrans, _mlrPluginControl.ModelForm.DepVarTransExp);
-
+            
             //get a table of model variables/values (big X)
             DataTable dtModelVars = Support.getModelDatatable();
 

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using GALib;
-//using VBStatistics;
 using VBCommon.Statistics;
 using MLRCore;
 
@@ -27,7 +26,6 @@ namespace MultipleLinearRegression
 
     public class MLRIndividual : IIndividual
     {
-
         private double _fitness = 0.0;
         private int _numGenes;
         private int _maxGeneValue = 0;
@@ -48,7 +46,6 @@ namespace MultipleLinearRegression
         private double _specificity = Double.NaN;
         private double _sensitivity = Double.NaN;
         private double _accuracy = Double.NaN;
-
         private double _VIF = Double.NaN;
         private double _maxVIF = Double.NaN;
         private double _decisionThreshold = Double.NaN;
@@ -107,8 +104,8 @@ namespace MultipleLinearRegression
             _decisionThreshold = decisionThreshold;
             _mandateThreshold = mandateThreshold;
             Init();
-
         }
+
 
         public MLRIndividual(int numGenes, int maxGeneValue, FitnessCriteria fitnessCriteria, int maxVIF, double threshold)
         {
@@ -119,8 +116,8 @@ namespace MultipleLinearRegression
             _decisionThreshold = threshold;
             _mandateThreshold = threshold;
             Init();
-
         }
+
 
         public MLRIndividual(int numGenes, int maxGeneValue, FitnessCriteria fitnessCriteria, int maxVIF)
         {
@@ -129,8 +126,8 @@ namespace MultipleLinearRegression
             _fitnessCriteria = fitnessCriteria;
             _maxVIF = maxVIF;
             Init();
-
         }
+
 
         public MLRIndividual(int numGenes, int maxGeneValue, FitnessCriteria fitnessCriteria)
         {
@@ -139,6 +136,7 @@ namespace MultipleLinearRegression
             _fitnessCriteria = fitnessCriteria;
             Init();
         }
+
 
         public MLRIndividual(MLRIndividual individual)
         {
@@ -224,13 +222,12 @@ namespace MultipleLinearRegression
             return individual;
         }
 
+
         public double Fitness
         {
             get { return _fitness; }
             set {_fitness = value; }
         }
-
-
 
 
         /// <summary>
@@ -269,6 +266,7 @@ namespace MultipleLinearRegression
             }
         }
 
+
         public string Genotype
         {
             get
@@ -285,15 +283,13 @@ namespace MultipleLinearRegression
                 }
 
                 string retVal = sb.ToString();
-                //retVal = retVal.TrimEnd("_".ToCharArray());
                 return retVal;
             }   
         }
 
-        public void Evaluate()
-        {            
-            //Init();
 
+        public void Evaluate()
+        {
             _cantCompute = false;
             try
             {
@@ -330,12 +326,14 @@ namespace MultipleLinearRegression
                 {
                     if (_predictedValues.Length != _observedValues.Length)
                         throw new Exception("The number of predicted and observed values are not equal.");
+
                     double pred;
                     double obs;
                     double truePos = 0;
                     double falsePos = 0;
                     double trueNeg = 0;
                     double falseNeg = 0;
+
                     for (int i = 0; i < _predictedValues.Length; i++)
                     {
                         pred = _predictedValues[i];
@@ -353,9 +351,7 @@ namespace MultipleLinearRegression
                     _sensitivity = truePos / (truePos + falseNeg);
                     _specificity = trueNeg / (trueNeg + falsePos);
                     _accuracy = (truePos + trueNeg) / (truePos + trueNeg + falsePos + falseNeg);
-
                 }
-
 
                 if (_fitnessCriteria == FitnessCriteria.AdjustedR2)
                     _fitness = mlr.AdjustedR2;

@@ -325,9 +325,11 @@ namespace MLRPlugin
             if (e.PackedPluginStates.ContainsKey(strPanelKey))
             {
                 dictPlugin = e.PackedPluginStates[strPanelKey];
+
                 //repopulate plugin Complete flags from saved project
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolInitialEntry = false; //opening projects have been entered before
+
                 //check to see if there already is a model open, if so, close it before opening a saved project
                 if ((Visible) && (Complete))
                     Hide();
@@ -336,7 +338,10 @@ namespace MLRPlugin
                 if ((bool)dictPlugin["Visible"] && !e.PredictionOnly)
                     Show();
 
+                //Disable the notifiabledataevent during the unpacking or it'll overwrite the saved variable selection.
+                cMlr.AllowNotifiableDataEvent = false;
                 cMlr.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
+                cMlr.AllowNotifiableDataEvent = true;
             }
             else
             {

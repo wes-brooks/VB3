@@ -171,9 +171,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\VBCommon\VBCommon.csproj">
-      <Project>{A76BCA73-81A9-4F56-88A9-F16A018973B4}</Project>
+      <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
       <Name>VBCommon</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\CrossValidation\CrossValidation.csproj">
       <Project>{A9B51300-27DC-4187-BF92-E73C0059F8A1}</Project>

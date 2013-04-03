@@ -60,6 +60,7 @@ namespace VBLocation
         public event EventHandler LocationFormEvent;
         public bool boolComplete = false;
 
+        ToolTip _tooltipTrackBar = new ToolTip();
         //private LocationPlugin _plugin = null;
 
         
@@ -71,6 +72,7 @@ namespace VBLocation
             //_plugin = plugin;
             InitMap();
             showDefaultMap();
+            _tooltipTrackBar.SetToolTip(trackBar1, trackBar1.Value.ToString());
         }
 
 
@@ -526,13 +528,14 @@ namespace VBLocation
 
         // zoom
         private void trackBar1_ValueChanged(object sender, EventArgs e)
-        {
+        {            
+            _tooltipTrackBar.SetToolTip(trackBar1, trackBar1.Value.ToString());
             MainMap.Zoom = trackBar1.Value;
 
-            if (trackBar1.Value >= 15)
-                btnShowDataSources.Enabled = true;
-            else
-                btnShowDataSources.Enabled = false;
+            //if (trackBar1.Value >= 15)
+            //    btnShowDataSources.Enabled = true;
+            //else
+            //    btnShowDataSources.Enabled = false;
         }
 
 
@@ -1240,10 +1243,17 @@ namespace VBLocation
         }
 
 
-        private void btnShowDataSources_Click(object sender, EventArgs e)
+        public void btnShowDataSources_Click(object sender, EventArgs e)
         {
             Cursor current = Cursor.Current;
             Cursor.Current = Cursors.WaitCursor;
+
+            if (trackBar1.Value < 13)
+            {
+                MessageBox.Show("Please zoom in to level >= 15 on the map in order to limit the amount of data to retrieve.");
+                return;
+            }
+
 
             stations.Markers.Clear();
 
@@ -1263,6 +1273,7 @@ namespace VBLocation
                 VBD4EM.D4EMData d4emData = new VBD4EM.D4EMData(minX, minY, maxX, maxY, "gcjjaDgainKJnfefJK");
                 //List<VBD4EM.StationInfo> nwisList = null;
                 //List<VBD4EM.StationInfo> ncdcList = null;
+                //List<VBD4EM.DomainObjects.StationInfo> list = null;
                 List<VBD4EM.StationInfo> list = null;
 
                 VBMarker stationMarker = null;
@@ -1295,6 +1306,7 @@ namespace VBLocation
                         System.Drawing.Size size = stationMarker.Size;
                         stationMarker.TooltipMode = MarkerTooltipMode.OnMouseOver;
                         stationMarker.ToolTipText = "Station ID: " + list[i].ID + Environment.NewLine + "Station Name: " + list[i].Name;
+                        stationMarker.ToolTipOffset = new System.Drawing.Point(7, 7);
                         stations.Markers.Add(stationMarker);
                     }
                 }
@@ -1328,12 +1340,14 @@ namespace VBLocation
             {
                 MessageBox.Show(ex.Message);
             }
-
-            Cursor.Current = current;
+            finally
+            {
+                Cursor.Current = current;
+            }
         }
 
         
-        private void btnClearStations_Click(object sender, EventArgs e)
+        public void btnClearStations_Click(object sender, EventArgs e)
         {
             stations.Markers.Clear();
         }

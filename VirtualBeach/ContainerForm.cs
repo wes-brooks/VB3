@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using VBProjectManager;
 using VBCommon;
+using System.Threading;
 
 
 namespace VirtualBeach
@@ -19,23 +20,37 @@ namespace VirtualBeach
         [Export("Shell", typeof(ContainerControl))]
         private static ContainerControl Shell;
 
+        frmVBSplashScreen _splshForm = null;
+
         /// <summary>
         /// Initializes a new instance of the MainForm class.
         /// </summary>
         public ContainerForm()
         {
             InitializeComponent();
-            
+
+            var splashForm = new frmVBSplashScreen(false, 0);
+            splashForm.Show(this);
+
+            Thread splashthread = new Thread(new ThreadStart(LoadSplashScreen));
+            splashthread.IsBackground = true;
+            splashthread.Start();
+
             //The AppManager is a piece of DotSpatial that we'll use only here and there.
             appManager = new AppManager();
-            
+
+            splashForm.Close();
+            splashForm = null;
+
             //Set the main application window to be the "Shell" 
             Shell = this;
             this.statusBar.Dock = DockStyle.Bottom;
-            appManager.LoadExtensions();            
+            appManager.LoadExtensions();
             this.FormClosed += new FormClosedEventHandler(Dispose);
 
-            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));        
+            CloseSplashScreen();
+
+            VBLogger.GetLogger().AddHandler(new VBLogger.MessageLoggedEventHandler(this.WriteMessage));           
         }
 
         public AppManager appManager { get; set; }
@@ -75,6 +90,26 @@ namespace VirtualBeach
                     break;
                 default:
                     break;
+            }
+        }
+
+
+        private void LoadSplashScreen()
+        {
+            _splshForm = new frmVBSplashScreen(false, 0);
+            _splshForm.ShowDialog();
+        }
+
+
+        private void CloseSplashScreen()
+        {
+            if (_splshForm != null)
+            {
+                _splshForm.Invoke(new MethodInvoker(delegate
+                {
+                    _splshForm.Close();
+                    _splshForm.Dispose();
+                }));
             }
         }
     }

@@ -33,22 +33,30 @@ namespace VBCommon.Controls
             lbIndVariables.Items.Clear();
 
             List<string> fieldList = new List<string>();
-            //Remember, first column is Date or ID and second is the response variable.
-            for (int i = 2; i < dt.Columns.Count; i++)
+            for (int i = 1; i < dt.Columns.Count; i++)
             {
-                if (dt.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
+                bool bDependentVariableColumn = false;
+
+                if (dt.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVAR))
+                {
+                    if (dt.Columns[i].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR].ToString() == "True")
+                    {
+                        bDependentVariableColumn = true;
+                        lblDepVarName.Text = dt.Columns[i].ColumnName;
+                    }
+                }
+
+                if (!bDependentVariableColumn && dt.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
                 {
                     if (dt.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
                         fieldList.Add(dt.Columns[i].ColumnName);
                 }
-                else
+                else if (!bDependentVariableColumn)
                     fieldList.Add(dt.Columns[i].ColumnName);
             }
 
             for (int i=0;i<fieldList.Count;i++)
-                lbAvailableVariables.Items.Add(new ListItem(fieldList[i], i.ToString()));
-            
-            lblDepVarName.Text = dt.Columns[1].ColumnName;            
+                lbAvailableVariables.Items.Add(new ListItem(fieldList[i], i.ToString()));        
         }
 
 

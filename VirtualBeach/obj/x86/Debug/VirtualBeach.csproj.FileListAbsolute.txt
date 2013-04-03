@@ -109,3 +109,4 @@ C:\VB3\bin\Debug\ContainerForm.cs
 C:\VB3\bin\Debug\ContainerForm.Designer.cs
 C:\VB3\bin\Debug\VirtualBeach.exe
 C:\VB3\bin\Debug\VirtualBeach.pdb
+C:\VB3\VirtualBeach\obj\x86\Debug\VirtualBeach.frmVBSplashScreen.resources

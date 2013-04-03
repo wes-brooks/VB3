@@ -32,14 +32,10 @@ namespace MLRCore
         private string _dependentVariable = "";
         
         private Dictionary<string, double> _model = null;
-        //private List<string> _modelIndepentVariables = null;
-
         private bool _modelRunning = false;       
                        
-        private MLRDataManager()
-        {            
+        private MLRDataManager() { }
 
-        }
 
         /// <summary>
         /// Returns global instance of the VBProjectManager
@@ -73,14 +69,7 @@ namespace MLRCore
             set
             {
                 _modelData = value;
-
                 _modelFieldList = new List<string>();
-
-                /*for (int i = 2; i < _modelData.Columns.Count; i++)
-                    _modelFieldList.Add(_modelData.Columns[i].ColumnName);
-
-                _dependentVariable = _modelData.Columns[1].ColumnName;*/
-
 
                 List<string> lstFieldList = new List<string>();
                 for (int i = 1; i < _modelData.Columns.Count; i++)
@@ -116,9 +105,7 @@ namespace MLRCore
         {
             get { return _modelFieldList; }
         }
-
-
-
+        
 
         /// <summary>
         /// Given an array of indices, return the corresponding field names from the model data table. 
@@ -140,7 +127,6 @@ namespace MLRCore
                     sumGenes += variableIdxArray[i];
                     geneVal = variableIdxArray[i];
                     field = ModelFieldList[geneVal - 1];
-                    //field = fieldList[geneVal];
                     names.Add(field);
                 }
             }
@@ -177,8 +163,6 @@ namespace MLRCore
         {
             set { _residualAnalysisInfo = value; }
             get { return _residualAnalysisInfo; }
-        }
-        
+        }        
     }
-
 }
