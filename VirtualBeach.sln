@@ -23,8 +23,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPyGBMControl", "IPyGBMCont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPyPLSControl", "IPyPLSControl\IPyPLSControl.csproj", "{14F53376-3ADE-4FA4-9026-392DE3360177}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Installer", "Installer\Installer.vdproj", "{1B4F22B7-D7C4-47A8-B900-36A0F240EFF8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MLR", "MLR", "{D429AE83-9EB8-44E2-9868-809BB15324C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation", "MLR\CrossValidation\CrossValidation.csproj", "{A9B51300-27DC-4187-BF92-E73C0059F8A1}"
@@ -40,6 +38,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleLinearRegression", "MLR\MultipleLinearRegression\MultipleLinearRegression.csproj", "{2E95E0AC-AB0A-42CF-8DCC-A2FA19ECD32A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBControls", "MLR\VBControls\VBControls.csproj", "{9F2D6730-6FD3-4A3F-98FC-C5898FCFA12E}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Installer", "Installer\Installer.vdproj", "{580C493A-1F26-4BA2-BD79-466E2CBB44FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -167,12 +167,6 @@ Global
 		{14F53376-3ADE-4FA4-9026-392DE3360177}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{14F53376-3ADE-4FA4-9026-392DE3360177}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{14F53376-3ADE-4FA4-9026-392DE3360177}.Release|x86.ActiveCfg = Release|Any CPU
-		{1B4F22B7-D7C4-47A8-B900-36A0F240EFF8}.Debug|Any CPU.ActiveCfg = Debug
-		{1B4F22B7-D7C4-47A8-B900-36A0F240EFF8}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{1B4F22B7-D7C4-47A8-B900-36A0F240EFF8}.Debug|x86.ActiveCfg = Debug
-		{1B4F22B7-D7C4-47A8-B900-36A0F240EFF8}.Release|Any CPU.ActiveCfg = Release
-		{1B4F22B7-D7C4-47A8-B900-36A0F240EFF8}.Release|Mixed Platforms.ActiveCfg = Release
-		{1B4F22B7-D7C4-47A8-B900-36A0F240EFF8}.Release|x86.ActiveCfg = Release
 		{A9B51300-27DC-4187-BF92-E73C0059F8A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9B51300-27DC-4187-BF92-E73C0059F8A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9B51300-27DC-4187-BF92-E73C0059F8A1}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
@@ -257,6 +251,12 @@ Global
 		{9F2D6730-6FD3-4A3F-98FC-C5898FCFA12E}.Release|Mixed Platforms.Build.0 = Release|x86
 		{9F2D6730-6FD3-4A3F-98FC-C5898FCFA12E}.Release|x86.ActiveCfg = Release|x86
 		{9F2D6730-6FD3-4A3F-98FC-C5898FCFA12E}.Release|x86.Build.0 = Release|x86
+		{580C493A-1F26-4BA2-BD79-466E2CBB44FD}.Debug|Any CPU.ActiveCfg = Debug
+		{580C493A-1F26-4BA2-BD79-466E2CBB44FD}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{580C493A-1F26-4BA2-BD79-466E2CBB44FD}.Debug|x86.ActiveCfg = Debug
+		{580C493A-1F26-4BA2-BD79-466E2CBB44FD}.Release|Any CPU.ActiveCfg = Release
+		{580C493A-1F26-4BA2-BD79-466E2CBB44FD}.Release|Mixed Platforms.ActiveCfg = Release
+		{580C493A-1F26-4BA2-BD79-466E2CBB44FD}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
