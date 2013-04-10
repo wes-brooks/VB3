@@ -150,16 +150,16 @@ namespace Prediction
             //add sub-ribbons
             const string rGroupCaption = "Predict";
             
-            btnImportIV = new SimpleActionItem(strPanelKey, "Import Data", btnImportIV_Click);
+            btnImportIV = new SimpleActionItem(strPanelKey, "Import IV Data", btnImportIV_Click);
             btnImportIV.LargeImage = Properties.Resources.ImportIV;
             btnImportIV.GroupCaption = rGroupCaption;
-            btnImportIV.Enabled = true;
+            btnImportIV.Enabled = false;
             App.HeaderControl.Add(btnImportIV);
 
-            btnImportOB = new SimpleActionItem(strPanelKey, "Import Lab Measurements", btnImportOB_Click);
+            btnImportOB = new SimpleActionItem(strPanelKey, "Import Observations", btnImportOB_Click);
             btnImportOB.LargeImage = Properties.Resources.ImportOB;
             btnImportOB.GroupCaption = rGroupCaption;
-            btnImportOB.Enabled = true;
+            btnImportOB.Enabled = false;
             App.HeaderControl.Add(btnImportOB);
             
             btnIVDataVal = new SimpleActionItem(strPanelKey, "Data Validation", btnIVDataVal_Click);
@@ -180,19 +180,19 @@ namespace Prediction
             btnPlot = new SimpleActionItem(strPanelKey, "Plot", btnPlot_Ck);
             btnPlot.LargeImage = Properties.Resources.Plot;
             btnPlot.GroupCaption = sGroupCaption;
-            btnPlot.Enabled = true;
+            btnPlot.Enabled = false;
             App.HeaderControl.Add(btnPlot);
 
             btnClear = new SimpleActionItem(strPanelKey, "Clear", btnClear_Click);
             btnClear.LargeImage = Properties.Resources.Clear;
             btnClear.GroupCaption = sGroupCaption;
-            btnClear.Enabled = true;
+            btnClear.Enabled = false;
             App.HeaderControl.Add(btnClear);
 
             btnExportCSV = new SimpleActionItem(strPanelKey, "Export As CSV", btnExportTable_Ck);
             btnExportCSV.LargeImage = Properties.Resources.ExportAsCSV;
             btnExportCSV.GroupCaption = sGroupCaption;
-            btnExportCSV.Enabled = true;
+            btnExportCSV.Enabled = false;
             App.HeaderControl.Add(btnExportCSV);
 
             //EnDDAT
@@ -201,7 +201,7 @@ namespace Prediction
             btnSetEnddatURL = new SimpleActionItem(strPanelKey, "Set EnDDaT Data Source", btnSetEnddatURL_Click);
             btnSetEnddatURL.LargeImage = Properties.Resources.URL;
             btnSetEnddatURL.GroupCaption = strEnddatCaption;
-            btnSetEnddatURL.Enabled = true;
+            btnSetEnddatURL.Enabled = false;
             App.HeaderControl.Add(btnSetEnddatURL);
 
             btnImportFromEnddat = new SimpleActionItem(strPanelKey, "Import From EnDDaT", btnImportFromEnddat_Click);
@@ -325,20 +325,7 @@ namespace Prediction
             }
             else if (((IPlugin)sender).PluginType == Globals.PluginType.Datasheet)
             {
-                Hide(); /*
-                if (!(bool)((IPlugin)sender).Complete)
-                {
-                    Hide();
-                    return;
-                }
-                else
-                {
-                    if (!(bool)e.PackedPluginState["Clean"])
-                    {
-                        Activate();
-                    }
-                    Hide();
-                }*/
+                Hide();
             }                
         }
 
@@ -481,6 +468,7 @@ namespace Prediction
             {
                 btnIVDataVal.Enabled = true;
                 btnMakePred.Enabled = true;
+                btnExportCSV.Enabled = true;
                 Broadcast();
             }
         }
@@ -510,6 +498,7 @@ namespace Prediction
             {
                 btnIVDataVal.Enabled = true;
                 btnMakePred.Enabled = true;
+                btnExportCSV.Enabled = true;
                 Broadcast();
             }
         }
@@ -518,9 +507,14 @@ namespace Prediction
         //import ob data, sends to form click event
         void btnImportOB_Click(object sender, EventArgs e)
         {
-            _frmPred.btnImportObs_Click(sender, e);
-            Broadcast();
+            bool validated = _frmPred.btnImportObs_Click(sender, e);
+            if (validated)
+            {
+                btnExportCSV.Enabled = true;
+                Broadcast();
+            }
         }
+
 
         void ControlChangeEventHandler(object sender, EventArgs e)
         {
@@ -546,10 +540,14 @@ namespace Prediction
         void btnMakePrediction_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
-            _frmPred.btnMakePredictions_Click(sender, e);
-           boolComplete = true;
-           Broadcast();
-           Cursor.Current = Cursors.Default;
+            bool validate = _frmPred.btnMakePredictions_Click(sender, e);
+            if (validate)
+            {
+                btnPlot.Enabled = true;
+                boolComplete = true;
+                Broadcast();
+            }
+            Cursor.Current = Cursors.Default;
         }
 
 
@@ -567,10 +565,19 @@ namespace Prediction
             if (dgr == DialogResult.OK)
             {
                 _frmPred.btnClear_Click(sender, e);
+
+                btnImportIV.Enabled = false;
+                btnImportOB.Enabled = false;
                 btnIVDataVal.Enabled = false;
                 btnMakePred.Enabled = false;
-                btnImportFromEnddat.Enabled = false;
 
+                btnExportCSV.Enabled = false;
+                btnClear.Enabled = false;
+                btnPlot.Enabled = false;
+
+                btnSetEnddatURL.Enabled = false;
+                btnImportFromEnddat.Enabled = false;
+                
                 Broadcast();
             }
         }
@@ -587,14 +594,30 @@ namespace Prediction
         {
             if (args.Set == false)
             {
-                args.ButtonStatus.Add("PredictionButtonEnabled", btnMakePred.Enabled);
+                args.ButtonStatus.Add("ImportIVsEnabled", btnImportIV.Enabled);
+                args.ButtonStatus.Add("ImportObsEnabled", btnImportOB.Enabled);
                 args.ButtonStatus.Add("ValidationButtonEnabled", btnIVDataVal.Enabled);
+                args.ButtonStatus.Add("PredictionButtonEnabled", btnMakePred.Enabled);
+
+                args.ButtonStatus.Add("PlotButtonEnabled", btnPlot.Enabled);
+                args.ButtonStatus.Add("ClearButtonEnabled", btnClear.Enabled);
+                args.ButtonStatus.Add("ExportButtonEnabled", btnExportCSV.Enabled);
+                
+                args.ButtonStatus.Add("SetEnddatURLButtonEnabled", btnSetEnddatURL.Enabled);
                 args.ButtonStatus.Add("EnddatImportButtonEnabled", btnImportFromEnddat.Enabled);
             }
             else
             {
+                if (args.ButtonStatus.ContainsKey("ImportIVsEnabled")) { btnImportIV.Enabled = args.ButtonStatus["ImportIVsEnabled"]; }
+                if (args.ButtonStatus.ContainsKey("ImportObsEnabled")) { btnImportOB.Enabled = args.ButtonStatus["ImportObsEnabled"]; }
                 if (args.ButtonStatus.ContainsKey("ValidationButtonEnabled")) { btnIVDataVal.Enabled = args.ButtonStatus["ValidationButtonEnabled"]; }
                 if (args.ButtonStatus.ContainsKey("PredictionButtonEnabled")) { btnMakePred.Enabled = args.ButtonStatus["PredictionButtonEnabled"]; }
+
+                if (args.ButtonStatus.ContainsKey("PlotButtonEnabled")) { btnPlot.Enabled = args.ButtonStatus["PlotButtonEnabled"]; }
+                if (args.ButtonStatus.ContainsKey("ClearButtonEnabled")) { btnClear.Enabled = args.ButtonStatus["ClearButtonEnabled"]; }
+                if (args.ButtonStatus.ContainsKey("ExportButtonEnabled")) { btnExportCSV.Enabled = args.ButtonStatus["ExportButtonEnabled"]; }
+
+                if (args.ButtonStatus.ContainsKey("SetEnddatURLButtonEnabled")) { btnSetEnddatURL.Enabled = args.ButtonStatus["SetEnddatURLButtonEnabled"]; }
                 if (args.ButtonStatus.ContainsKey("EnddatImportButtonEnabled")) { btnImportFromEnddat.Enabled = args.ButtonStatus["EnddatImportButtonEnabled"]; }
             }
         }

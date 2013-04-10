@@ -299,7 +299,7 @@ namespace VBLocation
 
         public void Broadcast()
         {
-	    boolChanged = true;
+	        boolChanged = true;
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = cLocation.PackState();
 
@@ -393,7 +393,7 @@ namespace VBLocation
             }
             catch
             {
-                Activate();
+                //Activate();
             }
         }
 
@@ -420,7 +420,7 @@ namespace VBLocation
             }
             catch
             {
-                Activate();
+                //Activate();
             }
         }
 	

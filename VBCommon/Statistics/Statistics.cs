@@ -154,75 +154,77 @@ namespace VBCommon.Statistics
         }
 
 
-        //public static DataTable getPearsonCorrCoeffs(DataTable data)
-        //{
-        //    DataTable dtCoeff = new DataTable();
-        //    dtCoeff.Columns.Add("Variable1");
-        //    dtCoeff.Columns.Add("Variable2");
-        //    dtCoeff.Columns.Add("PearsonCorrelation", Type.GetType("System.Decimal"));
+        public static DataTable getPearsonCorrCoeffs(DataTable data)
+        {
+            DataTable dtCoeff = new DataTable();
+            dtCoeff.Columns.Add("Variable1");
+            dtCoeff.Columns.Add("Variable2");
+            dtCoeff.Columns.Add("PearsonCorrelation", Type.GetType("System.Decimal"));
 
-        //    if ((data == null) || (data.Rows.Count == 0) || (data.Columns.Count < 3))
-        //    {
-        //        return dtCoeff; 
-        //    }
-        //    Hashtable htVarValues = new Hashtable();
-        //    double[] arColumn;
+            if ((data == null) || (data.Rows.Count == 0) || (data.Columns.Count < 3))
+            {
+                return dtCoeff; 
+            }
+            Hashtable htVarValues = new Hashtable();
+            double[] arColumn;
 
-        //    for (int intColumnIndex = 2; intColumnIndex < data.Columns.Count; intColumnIndex++)
-        //    {
-        //        arColumn = new double[data.Rows.Count];
-        //        int count = 0;
-        //        foreach (DataRow dr in data.Rows)
-        //        {
-        //            arColumn.SetValue(Convert.ToDouble(dr[intColumnIndex].ToString()), count);
-        //            count++;
-        //        }
-        //        htVarValues.Add(intColumnIndex, arColumn);
-        //    }
-        //    string strCoeff = "";
-        //    int intLength = 0;
-        //    for (int intFirstColumnIndex = 2; intFirstColumnIndex < (data.Columns.Count - 1); intFirstColumnIndex++)
-        //    {
-        //        double[] var1Values = (double[])htVarValues[intFirstColumnIndex];
-        //        for (int intSecondColumnIndex = (intFirstColumnIndex + 1); intSecondColumnIndex < data.Columns.Count; intSecondColumnIndex++)
-        //        {
-        //            double[] var2Values = (double[])htVarValues[intSecondColumnIndex];
-        //            double coeff = Stats.Correlation(var1Values, var2Values);
-        //            coeff = Math.Abs(coeff);
-        //            if (coeff < 0.001)
-        //            {
-        //                coeff = 0;
-        //            }
-        //            strCoeff = coeff.ToString();
-        //            intLength = strCoeff.Length;
-        //            if (intLength > 8)
-        //            {
-        //                intLength = 8;
-        //            }
-        //            strCoeff = strCoeff.Substring(0, intLength);
-        //            coeff = Convert.ToDouble(strCoeff);
-        //            DataRow dr = dtCoeff.NewRow();
-        //            dr["Variable1"] = data.Columns[intFirstColumnIndex].ColumnName;
-        //            dr["Variable2"] = data.Columns[intSecondColumnIndex].ColumnName;
-        //            dr["PearsonCorrelation"] = coeff;
-        //            dtCoeff.Rows.Add(dr);
-        //        }
-        //    }
-        //    dtCoeff = sortTable(dtCoeff, "PearsonCorrelation", "DESC");
-        //    return dtCoeff;
-    //    }
-    //    public static DataTable sortTable(DataTable dtUnsorted, string sortColumn, string sortDirection)
-    //    {
-    //        string sortFormat = "{0} {1}";
-    //        dtUnsorted.DefaultView.Sort = string.Format(sortFormat, sortColumn, sortDirection);
-    //        return dtUnsorted.DefaultView.Table;
-    //    }
+            for (int intColumnIndex = 2; intColumnIndex < data.Columns.Count; intColumnIndex++)
+            {
+                arColumn = new double[data.Rows.Count];
+                int count = 0;
+                foreach (DataRow dr in data.Rows)
+                {
+                    arColumn.SetValue(Convert.ToDouble(dr[intColumnIndex].ToString()), count);
+                    count++;
+                }
+                htVarValues.Add(intColumnIndex, arColumn);
+            }
+            string strCoeff = "";
+            int intLength = 0;
+            for (int intFirstColumnIndex = 2; intFirstColumnIndex < (data.Columns.Count - 1); intFirstColumnIndex++)
+            {
+                double[] var1Values = (double[])htVarValues[intFirstColumnIndex];
+                for (int intSecondColumnIndex = (intFirstColumnIndex + 1); intSecondColumnIndex < data.Columns.Count; intSecondColumnIndex++)
+                {
+                    double[] var2Values = (double[])htVarValues[intSecondColumnIndex];
+                    double coeff = Correlation(var1Values, var2Values);
+                    coeff = Math.Abs(coeff);
+                    if (coeff < 0.001)
+                    {
+                        coeff = 0;
+                    }
+                    strCoeff = coeff.ToString();
+                    intLength = strCoeff.Length;
+                    if (intLength > 8)
+                    {
+                        intLength = 8;
+                    }
+                    strCoeff = strCoeff.Substring(0, intLength);
+                    coeff = Convert.ToDouble(strCoeff);
+                    DataRow dr = dtCoeff.NewRow();
+                    dr["Variable1"] = data.Columns[intFirstColumnIndex].ColumnName;
+                    dr["Variable2"] = data.Columns[intSecondColumnIndex].ColumnName;
+                    dr["PearsonCorrelation"] = coeff;
+                    dtCoeff.Rows.Add(dr);
+                }
+            }
+            dtCoeff = sortTable(dtCoeff, "PearsonCorrelation", "DESC");
+            return dtCoeff;
+        }
 
-        //public static double Correlation(double[] deparray, double[] vararray)
-        //{
-        //    double correlation = Stats.Correlation(deparray, vararray);
-        //    return correlation;
-        //}
+
+        public static DataTable sortTable(DataTable dtUnsorted, string sortColumn, string sortDirection)
+        {
+            string sortFormat = "{0} {1}";
+            dtUnsorted.DefaultView.Sort = string.Format(sortFormat, sortColumn, sortDirection);
+            return dtUnsorted.DefaultView.Table;
+        }
+
+        public static double Correlation(double[] deparray, double[] vararray)
+        {
+            double correlation = deparray.Covariance(vararray) / (deparray.StandardDeviation() * vararray.StandardDeviation());
+            return correlation;
+        }
 
         
 

@@ -470,6 +470,7 @@ namespace VBDatasheet
                 btnManipulate.Enabled = false;
                 btnTransform.Enabled = false;
                 btnGoToModeling.Enabled = false;
+                Broadcast();
             }
         }
 
@@ -483,6 +484,7 @@ namespace VBDatasheet
                 btnManipulate.Enabled = true;
                 btnTransform.Enabled = true;
                 btnGoToModeling.Enabled = true;
+                Broadcast();
             }
             else
             {

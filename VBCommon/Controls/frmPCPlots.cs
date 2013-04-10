@@ -51,7 +51,6 @@ namespace VBCommon.Controls
         {
             InitializeComponent();
 
-
             this.WindowState = FormWindowState.Maximized;
 
             this.Text = "Variable " + varName + " and its Transforms";
@@ -67,6 +66,7 @@ namespace VBCommon.Controls
 
             renderPlots();
         }
+
 
         /// <summary>
         /// method extracts data for plotting the timeseries plot for the named variable and its transforms
@@ -104,7 +104,6 @@ namespace VBCommon.Controls
             _pValueDict = new Dictionary<string, double>();
             foreach (KeyValuePair<string, double[]> kv in _plotData)
             {
-                //GraphPane gp = addPlotTS(kv.Value, tags, kv.Key);
                 GraphPane gp = addPlotXY(depvals, kv.Value, tags, kv.Key);
                 master.Add(gp);
             }
@@ -121,6 +120,7 @@ namespace VBCommon.Controls
 
             showListInfo();
         }
+
 
         /// <summary>
         /// lists Anderson-Darling stats and Pearson Correlation score for each variable and its transform
@@ -172,10 +172,9 @@ namespace VBCommon.Controls
             }
             //should probably figure some way to signify best and/or selected stats in table here...
             //List<double> lad = lvAD.SubItems.Cast<double>().ToList<double>();
-            //List<double> lpc = lvPC.SubItems.Cast<double>().ToList<double>();
-            
-            
+            //List<double> lpc = lvPC.SubItems.Cast<double>().ToList<double>();                      
         }
+
 
         /// <summary>
         /// calculate the Anderson-Darling normality statistic for the datatable column of data
@@ -191,6 +190,7 @@ namespace VBCommon.Controls
             if (!adtest.ADStat.Equals(double.NaN)) retval = adtest.ADStat;
             return retval;
         }
+
 
         /// <summary>
         /// extracts the previously calculated Pearson Correlation Coefficient statistic of the datatable column
@@ -212,6 +212,7 @@ namespace VBCommon.Controls
             return retval;
         }
 
+
         private string getPVal(string key)
         {
             string retval = string.Empty;
@@ -224,9 +225,9 @@ namespace VBCommon.Controls
                     retval = string.Format(fmtstring, pval);
                 }
             }
-
             return retval;
         }
+
 
         /// <summary>
         /// extract data from a datatable column into a typed array of values
@@ -273,8 +274,8 @@ namespace VBCommon.Controls
                 default:
                     return null;
             }
-
         }
+
 
         /// <summary>
         /// generate a zedgraph timeseries plot graphpane
@@ -323,6 +324,7 @@ namespace VBCommon.Controls
             return gp;
         }
 
+
         /// <summary>
         /// generate a zedgraph frequency plot graphpane
         /// </summary>
@@ -350,9 +352,8 @@ namespace VBCommon.Controls
             gp.Title.Text = title;
 
             return gp;
-
-
         }
+
 
         /// <summary>
         /// generate an xy-plot zedgraph graphpane
@@ -407,6 +408,7 @@ namespace VBCommon.Controls
             return gp;
         }
 
+
         private string formatNumberString(double number, int argnum)
         {
             string fmtstring = string.Empty;
@@ -429,6 +431,7 @@ namespace VBCommon.Controls
             //return string.Format(fmtstring, number);
             return fmtstring;
         }
+
 
         /// <summary>
         /// determine if the x-axis variable (of the ts-plot) is a date
@@ -457,6 +460,7 @@ namespace VBCommon.Controls
             return isDate;
         }
 
+
         /// <summary>
         /// combobox selection of plot type maintneance
         /// </summary>
@@ -468,6 +472,7 @@ namespace VBCommon.Controls
             redoPlots(cbSelectPlot.SelectedItem.ToString());
         }
 
+
         /// <summary>
         /// another plot type was selected, generate the plot for the variable and its transforms
         /// and pass them to the zg master control for display
@@ -475,8 +480,6 @@ namespace VBCommon.Controls
         /// <param name="p"></param>
         private void redoPlots(string p)
         {
-            //throw new NotImplementedException();
-
             MasterPane master = zgc1.MasterPane;
             master.PaneList.Clear();
 
@@ -511,8 +514,6 @@ namespace VBCommon.Controls
                     }
                     //showListInfo();
                     break;
-
-
             }
 
             using (Graphics g = this.CreateGraphics())
@@ -522,8 +523,8 @@ namespace VBCommon.Controls
             zgc1.AxisChange();
             master.AxisChange();
             zgc1.Refresh();
-
         }
+
 
         private void frmPCPlots_HelpRequested(object sender, HelpEventArgs hlpevent)
         {
@@ -538,8 +539,5 @@ namespace VBCommon.Controls
                 MessageBoxButtons.OK);
             }*/
         }
-
     }
-
-
 }

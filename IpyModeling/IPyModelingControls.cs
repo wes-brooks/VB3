@@ -48,7 +48,7 @@ namespace IPyModeling
         
         //Delegates to get data from Virtual Beach
         public delegate void RequestData(object sender, EventArgs args);
-        public RequestData TabPageEntered;
+        //public RequestData TabPageEntered;
         public event EventHandler IronPythonInterfaceRequested;
         protected DataTable tblModelData;
         

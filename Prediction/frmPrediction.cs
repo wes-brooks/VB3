@@ -252,8 +252,16 @@ namespace Prediction
                 if (ButtonStatusEvent != null)
                 {
                     IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
-                    dictButtonStates["PredictionButtonEnabled"] = (bool)dictPackedState["PredictionButtonEnabled"];
+                    dictButtonStates["ImportIVsEnabled"] = (bool)dictPackedState["ImportIVsEnabled"];
+                    dictButtonStates["ImportObsEnabled"] = (bool)dictPackedState["ImportObsEnabled"];
                     dictButtonStates["ValidationButtonEnabled"] = (bool)dictPackedState["ValidationButtonEnabled"];
+                    dictButtonStates["PredictionButtonEnabled"] = (bool)dictPackedState["PredictionButtonEnabled"];
+
+                    dictButtonStates["PlotButtonEnabled"] = (bool)dictPackedState["PlotButtonEnabled"];
+                    dictButtonStates["ClearButtonEnabled"] = (bool)dictPackedState["ClearButtonEnabled"];
+                    dictButtonStates["ExportButtonEnabled"] = (bool)dictPackedState["ExportButtonEnabled"];
+
+                    dictButtonStates["SetEnddatURLButtonEnabled"] = (bool)dictPackedState["SetEnddatURLButtonEnabled"];
                     dictButtonStates["EnddatImportButtonEnabled"] = (bool)dictPackedState["EnddatImportButtonEnabled"];
 
                     ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
@@ -362,9 +370,8 @@ namespace Prediction
                 ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates);
                 ButtonStatusEvent(this, args);
 
-                dictPluginState.Add("PredictionButtonEnabled", dictButtonStates["PredictionButtonEnabled"]);
-                dictPluginState.Add("ValidationButtonEnabled", dictButtonStates["ValidationButtonEnabled"]);
-                dictPluginState.Add("EnddatImportButtonEnabled", dictButtonStates["EnddatImportButtonEnabled"]);
+                foreach (KeyValuePair<string, bool> kvp in dictButtonStates)
+                    dictPluginState.Add(kvp.Key, kvp.Value);
             }
 
             //pack values
@@ -450,6 +457,22 @@ namespace Prediction
                 rbNone.Select();
                 rbRaw.Select();
                 strMethod = null;
+
+                //Deactivate all the ribbon buttons
+                if (ButtonStatusEvent != null)
+                {
+                    string[] strButtonStateKeys = {"ImportIVsEnabled", "ImportObsEnabled", "ValidationButtonEnabled",
+                                                                  "PredictionButtonEnabled", "PlotButtonEnabled", "ClearButtonEnabled",
+                                                                  "ExportButtonEnabled", "SetEnddatURLButtonEnabled",
+                                                                  "EnddatImportButtonEnabled" };
+                    IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                    foreach (string key in strButtonStateKeys)
+                        dictButtonStates[key] = false;
+
+                    ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
+                    ButtonStatusEvent(this, args);
+                }
+
                 return;
             }
 
@@ -515,9 +538,8 @@ namespace Prediction
                     ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates);
                     ButtonStatusEvent(this, args);
 
-                    ((IDictionary<string, object>)dictPredictionElements[strMethod])["PredictionButtonEnabled"] = dictButtonStates["PredictionButtonEnabled"];
-                    ((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"] = dictButtonStates["ValidationButtonEnabled"];
-                    ((IDictionary<string, object>)dictPredictionElements[strMethod])["EnddatImportButtonEnabled"] = dictButtonStates["EnddatImportButtonEnabled"];
+                    foreach (KeyValuePair<string, bool> kvp in dictButtonStates)
+                        ((IDictionary<string, object>)dictPredictionElements[strMethod])[kvp.Key] = kvp.Value;
                 }
             }
 
@@ -720,8 +742,16 @@ namespace Prediction
                         if (ButtonStatusEvent != null)
                         {
                             IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
-                            dictButtonStates["PredictionButtonEnabled"] = false;
+                            dictButtonStates["ImportIVsEnabled"] = true;
+                            dictButtonStates["ImportObsEnabled"] = true;
                             dictButtonStates["ValidationButtonEnabled"] = false;
+                            dictButtonStates["PredictionButtonEnabled"] = false;
+
+                            dictButtonStates["PlotButtonEnabled"] = false;
+                            dictButtonStates["ClearButtonEnabled"] = true;
+                            dictButtonStates["ExportButtonEnabled"] = false;
+                            
+                            dictButtonStates["SetEnddatURLButtonEnabled"] = true;
                             dictButtonStates["EnddatImportButtonEnabled"] = false;
 
                             ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
@@ -766,10 +796,13 @@ namespace Prediction
                         {
                             if (ButtonStatusEvent != null)
                             {
+                                string[] strButtonStateKeys = {"ImportIVsEnabled", "ImportObsEnabled", "ValidationButtonEnabled",
+                                                                  "PredictionButtonEnabled", "PlotButtonEnabled", "ClearButtonEnabled",
+                                                                  "ExportButtonEnabled", "SetEnddatURLButtonEnabled",
+                                                                  "EnddatImportButtonEnabled" };
                                 IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
-                                dictButtonStates["PredictionButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["PredictionButtonEnabled"];
-                                dictButtonStates["ValidationButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["ValidationButtonEnabled"];
-                                dictButtonStates["EnddatImportButtonEnabled"] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])["EnddatImportButtonEnabled"];
+                                foreach (string key in strButtonStateKeys)
+                                    dictButtonStates[key] = (bool)((IDictionary<string, object>)dictPredictionElements[strMethod])[key];
 
                                 ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
                                 ButtonStatusEvent(this, args);
@@ -1272,7 +1305,7 @@ namespace Prediction
         
 
         //Import OB datatable
-        public void btnImportObs_Click(object sender, EventArgs e)
+        public bool btnImportObs_Click(object sender, EventArgs e)
         {
             bool boolNewMapping = false;
 
@@ -1293,7 +1326,7 @@ namespace Prediction
             if (dictMainEffects == null)
             {
                 MessageBox.Show("You must first pick a model from the Available Models");
-                return;
+                return false;
             }
 
             DataTable dt;
@@ -1311,7 +1344,7 @@ namespace Prediction
 
             
             if (dt == null)
-                return;
+                return false;
 
             dgvObs.DataSource = dt;
 
@@ -1332,21 +1365,23 @@ namespace Prediction
                     ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Remove("ObsVariableMapping");
                 ((IDictionary<string, object>)(dictPredictionElements[strMethod])).Add("ObsVariableMapping", ObsMap.PackState());
             }
+
+            return true;
         }
 
 
         //make predictions based on imported ob and iv datatables
-        public void btnMakePredictions_Click(object sender, EventArgs e)
+        public bool btnMakePredictions_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
             VBLogger.GetLogger().LogEvent("0", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             
             dtVariables = (DataTable)dgvVariables.DataSource;
             if (dtVariables == null)
-                return;
+                return false;
 
             if (dtVariables.Rows.Count < 1)
-                return;
+                return false;
 
             dgvVariables.EndEdit();
             dtVariables.AcceptChanges();
@@ -1363,7 +1398,7 @@ namespace Prediction
             if (lstBadCells.Count > 0)
             {
                 MessageBox.Show("There are errors in the data. Run data validation to find and correct them.");
-                return;
+                return false;
             }
 
             VBLogger.GetLogger().LogEvent("20", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
@@ -1413,7 +1448,7 @@ namespace Prediction
             Cursor.Current = Cursors.WaitCursor;
 
              if (dtStats == null)
-                 return;
+                 return false;
 
             dgvStats.DataSource = dtStats;
             foreach (DataGridViewColumn dvgCol in dgvStats.Columns)
@@ -1426,7 +1461,8 @@ namespace Prediction
             dtStats = (DataTable)dgvStats.DataSource;
             SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
 
-            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);            
+            VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
+            return true;
         }
 
 

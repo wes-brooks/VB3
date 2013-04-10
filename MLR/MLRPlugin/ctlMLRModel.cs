@@ -126,7 +126,6 @@ namespace MLRPlugin
             if (frmModel1.ModelInfo != null)
             {
                 Dictionary<string, object> dictTransform = new Dictionary<string, object>();
-                //dictTransform.Add("Type", ModelForm.ModelInfo.ThresholdTransform);
                 dictTransform.Add("Type", frmModel1.ModelInfo.DependentVariableTransform);
                 dictTransform.Add("Exponent", frmModel1.ModelInfo.DependentVariablePowerTransformExponent);
                 pluginState.Add("Transform", dictTransform);
@@ -168,10 +167,11 @@ namespace MLRPlugin
             frmModel1.SetData();
             
             if (dictProjectState.ContainsKey("Model"))
-            {
                 frmModel1.UnpackProjectState(dictProjectState["Model"] as IDictionary<string, object>);
-            }
-            
+
+            if (dictProjectState.ContainsKey("ActiveTab"))
+                tabControl1.SelectedIndex = (int)(dictProjectState["ActiveTab"]); //model
+    
             this.Show();
         }
     }

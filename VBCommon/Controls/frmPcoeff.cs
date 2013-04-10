@@ -58,6 +58,7 @@ namespace VBCommon.Controls
 
         private DataTable _dtCopy = null;
 
+
         /// <summary>
         /// accessor that returns the table containg the best variables
         /// </summary>
@@ -66,6 +67,7 @@ namespace VBCommon.Controls
             get { return _dtCopy; }
         }
        
+
         /// <summary>
         /// constructor needs the correlation coefficient scores calculated elsewhere and their
         /// associated information, column index, column name, transformname, etc...
@@ -88,6 +90,7 @@ namespace VBCommon.Controls
             _plotsMenu.MenuItems.Add("View Plots", new EventHandler(viewPlotsEH));
         }
 
+
         /// <summary>
         /// method builds a table of variables, their transforms
         /// and their pearson scores for UI display in the grid
@@ -96,7 +99,6 @@ namespace VBCommon.Controls
         /// <param name="e"></param>
         private void frmPcoeff_Load(object sender, EventArgs e)
         {
-
             Cursor.Current = Cursors.WaitCursor;
 
             lbDepVar.Text = _depvarname;
@@ -185,6 +187,7 @@ namespace VBCommon.Controls
             Cursor.Current = Cursors.Default;
         }
 
+
         /// <summary>
         /// method provides UI clues for the selected variable/transform
         /// </summary>
@@ -203,6 +206,7 @@ namespace VBCommon.Controls
                 dgv.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.Red;
             }
         }
+
 
         /// <summary>
         /// we're done, return but set table  by removing readonly rows and set column 
@@ -272,9 +276,9 @@ namespace VBCommon.Controls
 
             }
             _dtCopy.AcceptChanges();
-            this.DialogResult = DialogResult.OK;
-            
+            this.DialogResult = DialogResult.OK;            
         }
+
 
         /// <summary>
         /// handler responds to grid header mouse clicks, if left click users want to select this
@@ -312,8 +316,8 @@ namespace VBCommon.Controls
                 break; // go do something else
             }
             //there's probably a smarter way to do this with lists of groups or indices....
-
         }
+
 
         /// <summary>
         /// handler responds to mouse clicks; if right click, invoke the plot menu show handler
@@ -325,6 +329,7 @@ namespace VBCommon.Controls
             if (e.Button == MouseButtons.Left) return;
             showPlotContexMenu((DataGridView)sender, e);
         }
+
 
         /// <summary>
         /// grid context menu for plots clicked, show the plot form
@@ -340,6 +345,7 @@ namespace VBCommon.Controls
             //otherwise show the menu
             _plotsMenu.Show(dgv, new Point(e.X, e.Y));
         }
+
 
         /// <summary>
         /// viewplots menu item clicked handler - show the plot form
@@ -357,11 +363,13 @@ namespace VBCommon.Controls
             frmPlots.ShowDialog();
         }
 
+
         private void btnThresholdSelect_Click(object sender, EventArgs e)
         {
             double threshold = 1.0d + (Convert.ToDouble(numericUpDown1.Value) / 100.0d);
             makeVarGrid(threshold);
         }
+
 
         private void makeVarGrid(double threshold)
         {
@@ -380,7 +388,6 @@ namespace VBCommon.Controls
 
             for (int r = 0; r < dataGridView1.Rows.Count; r++)
             {
-
                 //string message = dataGridView1.Rows[r].Cells[1].Value.ToString();
                 //VBLogger.getLogger().logEvent(message, VBLogger.messageIntent.UserOnly,
                 //    VBLogger.targetSStrip.StatusStrip2);
@@ -400,8 +407,7 @@ namespace VBCommon.Controls
                     continue;
                 }
                 //find the row within transform group that has max Pcoeff
-                if (Math.Abs(maxpc) * testval <
-                        Math.Abs(Convert.ToDouble(dataGridView1.Rows[r].Cells[2].Value)))
+                if (Math.Abs(maxpc) * testval < Math.Abs(Convert.ToDouble(dataGridView1.Rows[r].Cells[2].Value)))
                 {
                     //if threshold set (>1) then we've found value > max*threshold
                     //reset testval to see if any are bigger than this value
@@ -431,6 +437,7 @@ namespace VBCommon.Controls
             Cursor.Current = Cursors.Default;
         }
 
+
         private void resetGrid()
         {
             string message = string.Empty;
@@ -457,16 +464,19 @@ namespace VBCommon.Controls
                         VBLogger.targetSStrip.ProgressBar);*/
         }
 
+
         private void btnAuto_Click(object sender, EventArgs e)
         {
             makeVarGrid(1.0d);
         }
+
 
         public DataGridView DGV
         {
             set { _dgv = value; }
             get { return _dgv; }
         }
+
 
         private void frmPcoeff_HelpRequested(object sender, HelpEventArgs hlpevent)
         {
@@ -481,23 +491,23 @@ namespace VBCommon.Controls
             }*/
         }
 
+
         #region region - print methods
         private void btnPrint_Click(object sender, EventArgs e)
         {
-
             if (SetupThePrinting())
                 MyPrintDocument.Print();
-
         }
 
+
         // The PrintPage action for the PrintDocument control
-        private void MyPrintDocument_PrintPage(object sender,
-            System.Drawing.Printing.PrintPageEventArgs e)
+        private void MyPrintDocument_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
         {
             bool more = MyDataGridViewPrinter.DrawDataGridView(e.Graphics);
             if (more == true)
                 e.HasMorePages = true;
         }
+
 
         // The printing setup function
         private bool SetupThePrinting()
@@ -539,6 +549,7 @@ namespace VBCommon.Controls
             }
         }
         #endregion
+
 
         private void btnCancel_Click(object sender, EventArgs e)
         {

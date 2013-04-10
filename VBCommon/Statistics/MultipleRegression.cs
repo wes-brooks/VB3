@@ -100,19 +100,26 @@ namespace VBCommon.Statistics
 
         public MultipleRegression(double[] OutputData, double[] InputData, string OutputName = "", string InputName = "")
         {
+            //Set up the DataTable with two columns:
+            _dataTable = new DataTable();
+            _dataTable.Columns.Add(OutputName, typeof(double));
+            _dataTable.Columns.Add(InputName, typeof(double));
+
             arrOutputData = OutputData;
             arrInputData = new double[InputData.Length][];
             for (int i = 0; i < InputData.Length; i++)
             {
                 arrInputData[i] = new double[] { InputData[i] };
+                _dataTable.LoadDataRow(new object[] { OutputData[i], InputData[i] }, true);
             }
 
             strOutputName = OutputName;
             strInputName = InputName;
 
             _independentVars = new string[1] { InputName };
+            strOutputName = _dependentVar = OutputName;
 
-            //_model = new MultipleRegression(
+            //_model = new MultipleRegression(new DataTable(), OutputName, _independentVars);
         }
 
 

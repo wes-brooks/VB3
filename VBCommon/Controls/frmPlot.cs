@@ -332,8 +332,8 @@ namespace VBCommon.Controls
             //might be a smarter way to add tags to points but I can't find it.
             for (int i = 0; i < response.Length; i++)
             {
-                //tag = "(" + iv[i].ToString("n2") + " , " + response[i].ToString("n2") + ") " + tags[i];
-                tag = tags[i];
+                tag = "(" + iv[i].ToString("n2") + " , " + response[i].ToString("n2") + ") " + tags[i];
+                //tag = tags[i];
                 ppl.Add(iv[i], response[i], tag);
             }
 
@@ -342,28 +342,22 @@ namespace VBCommon.Controls
             if (_dt.Rows.Count > 6)
             {
                 //mc wants a regression line and some new stats on the plot
-                //double pcoeff = Statistics.Correlation(response, iv); <--
-                //double pval = Statistics.Pvalue4Correlation(pcoeff, _dt.Rows.Count);  <--
+                double pcoeff = Statistics.Statistics.Correlation(response, iv);
+                double pval = Statistics.Statistics.Pvalue4Correlation(pcoeff, _dt.Rows.Count);
 
                 string[] ivname = new string[] { _dt.Columns[intSelectedcol].Caption };
                 VBCommon.Statistics.MultipleRegression mlr = new MultipleRegression(response, iv, _dt.Columns[intResponsevarcol].Caption, ivname[0]);
-                //VBCommon.Statistics.MultipleRegression mlr = new MultipleRegression(_dt, _dt.Columns[intResponsevarcol].Caption, ivname);
                 mlr.Compute();
 
                 PointPairList ppl2 = new PointPairList(iv, mlr.PredictedValues);
-                //string fmtstring = formatNumberString(pval);  <--
-                string fmtstring = "test1"; //added
-                fmtstring = "r = {0:f4}, P-Value = " + fmtstring;
-                //string annot = string.Format(fmtstring, pcoeff, pval);  <--
-                string annot = "test"; //added
-                //string annot = string.Format("r = {0:f4}, p-value = {1:e4}", pcoeff, pval);
+                string fmtstring = formatNumberString(pval);
+                fmtstring = "r={0:f4}, P-Value=" + fmtstring;
+                string annot = string.Format("r={0:f4}, p-value={1:e4}", pcoeff, pval);
                 LineItem curve2 = gp.AddCurve(annot, ppl2, Color.Red);
                 curve2.Symbol.IsVisible = false;
                 curve2.Line.IsVisible = true;
             }
-            //end new stuff
 
-            //GraphPane gp = new GraphPane();
             LineItem curve = gp.AddCurve(_dt.Columns[intSelectedcol].ColumnName, ppl, Color.Black);
             curve.Line.IsVisible = false;
             gp.XAxis.Title.Text = _dt.Columns[intSelectedcol].ColumnName;
@@ -371,7 +365,6 @@ namespace VBCommon.Controls
 
             gp.Tag = "XYPlot";
             gp.Title.Text = "Scatter Plot";
-
 
             return gp;
         }
@@ -443,6 +436,7 @@ namespace VBCommon.Controls
             double iqr = 1.5 * (hivalue - lovalue);
             double upperLimit = hivalue + iqr;
             double lowerLimit = lovalue - iqr;
+
             //The wiskers must end on an actual data point
             double wiskerlo = ValueNearestButGreater(ivtemp, lowerLimit);
             double wiskerhi = ValueNearestButLess(ivtemp, upperLimit);

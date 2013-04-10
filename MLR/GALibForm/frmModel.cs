@@ -81,6 +81,8 @@ namespace GALibForm
         //Threshold value used for sensitiviy, specificity, accuracy
         double _decisionThreshold;
         double _mandateThreshold;
+        DependentVariableTransforms xfrmThreshold = DependentVariableTransforms.none;
+        double dblThresholdPowerTransformExponent = 1;
 
         public static bool ThresholdChecked;        //For reporting/plotting of optional eval criteria
 
@@ -160,12 +162,14 @@ namespace GALibForm
 
         public MLRModelingInfo ModelInfo { get { return _modelingInfo; } }
 
+
         public frmModel()
         {
             InitializeComponent();
             _dataMgr = MLRDataManager.GetDataManager();
             cbCriteria.SelectedIndex = 0;
         }
+
 
         private void frmModel_Load(object sender, EventArgs e)
         {
@@ -210,84 +214,6 @@ namespace GALibForm
             //listBox2.Items.Clear();            
         }
 
-        /*/// <summary>
-        /// Fires when the app opens a project file
-        /// </summary>
-        /// <param name="projMgr"></param>
-        private void ProjectOpen(MLRModelingInfo modelingInfo)
-        {
-            //If either of these are null, then no project to open
-            if (modelingInfo == null)
-                return;
-
-            if (modelingInfo.AvailableVariables == null) return;
-
-            Globals.ProjectType pmType = _dataMgr._projectType;
-            if (pmType == Globals.ProjectType.COMPLETE) return;
-
-            //Save dependent variable transform
-            if (modelingInfo.ThresholdTransform == VBCommon.Transforms.DependentVariableTransforms.none)
-                mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
-            else if (modelingInfo.ThresholdTransform == DependentVariableTransforms.Log10)
-                mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-            else if (modelingInfo.ThresholdTransform == DependentVariableTransforms.Ln)
-                mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
-            else if (modelingInfo.ThresholdTransform == DependentVariableTransforms.Power)
-                mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
-                
-
-            //These variable selection list boxes have been moved to the variable selection control
-            //Load available and independent variables
-            //lbAvailableVariables.Items.Clear();
-            //for (int i = 0; i <modelingInfo.AvailableVariables.Count; i++)
-            //    lbAvailableVariables.Items.Add(modelingInfo.AvailableVariables[i]);
-
-            //lbIndVariables.Items.Clear();
-            //for (int i = 0; i <modelingInfo.IndependentVariables.Count; i++)
-            //    lbIndVariables.Items.Add(modelingInfo.IndependentVariables[i]);
-
-            //lblAvailVars.Text = lbAvailableVariables.Items.Count.ToString();
-            //lblDepVars.Text = lbIndVariables.Items.Count.ToString();
-
-            //Save the chromosomes
-            if (_list != null)
-                _list.Clear();
-            else _list = new List<IIndividual>();
-
-            _dataMgr.ModelDataTable = CreateModelDataTable();
-
-            MLRIndividual indiv = null;
-            MLRModelingInfo modInfo = null;
-            if (modelingInfo.Chromosomes != null)
-            {
-                for (int i = 0; i <modelingInfo.Chromosomes.Count; i++)
-                {
-                    modInfo =modelingInfo;
-                    int numGenes =modelingInfo.Chromosomes[i].Count;
-                    indiv = new MLRIndividual(numGenes, modInfo.MaxGeneValue, (FitnessCriteria)modInfo.FitnessCriteria, modInfo.MaxVIF, modInfo.DecisionThreshold, modInfo.MandatedThreshold);
-                    indiv.Chromosome =modelingInfo.Chromosomes[i];
-                    indiv.Evaluate();
-                    _list.Add((IIndividual)indiv);
-                }
-
-                UpdateFitnessListBox();
-                if (modelingInfo.SelectedModel > -1 && indiv.Parameters != null)
-                    listBox1.SelectedIndex =modelingInfo.SelectedModel;
-            }
-
-            _numObs = _dtFull.Rows.Count;
-            lblNumObs.Text = "Number of Observations: " + _numObs.ToString();
-
-            int maxVar = _numObs / 5;
-            
-            //int recVar = Math.Min(((_numObs / 10) + 1), (lbIndVariables.Items.Count));
-            int recVar = Math.Min(((_numObs / 10) + 1), (_lstSelectedVariables.Count));
-            lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
-            txtMaxVars.Text = recVar.ToString();
-
-            this.Show();
-        }*/
-
 
         //Pack State for Serializing
         public IDictionary<string, object> PackProjectState()
@@ -324,6 +250,8 @@ namespace GALibForm
             mlrPackState.Add("MLRModel", new Dictionary<string, double>(mlrIndiv.Model));               
             _modelingInfo = new MLRModelingInfo();
             _modelingInfo.DependentVariable = _dataMgr.ModelDependentVariable;
+            _modelingInfo.ThresholdTransform = xfrmThreshold;
+            _modelingInfo.ThresholdPowerTransformExponent = dblThresholdPowerTransformExponent;
 
             //Save dependent variable transform
             _modelingInfo.Model = new Dictionary<string,double>();
@@ -356,36 +284,6 @@ namespace GALibForm
                 }
             }
 
-            //Save dependent variable transform
-            /*_modelingInfo.DependentVariableTransform = _depVarTransform;
-            _modelingInfo.DependentVariablePowerTransformExponent = _depVarPowerTransformExponent;
-
-            if (rbValMET.Checked)
-               _modelingInfo.ThresholdTransform = DependentVariableTransforms.none;
-            else if (rbLog10ValMET.Checked)
-               _modelingInfo.ThresholdTransform = DependentVariableTransforms.Log10;
-            else if (rbLogeValMET.Checked)
-               _modelingInfo.ThresholdTransform = DependentVariableTransforms.Ln;
-            else if (rbPwrValMET.Checked)
-            {
-               _modelingInfo.ThresholdTransform = DependentVariableTransforms.Power;
-               _modelingInfo.ThresholdPowerTransformExponent = Convert.ToDouble(txtPwrValMET.Text);
-            }*/
-
-            //List<ListItem> lstAvailVars = new List<ListItem>();
-            //Save available and independent variables
-            //modelingInfo.AvailableVariables = new List<ListItem>();
-            //for (int i = 0; i < lbAvailableVariables.Items.Count; i++)
-            //    lstAvailVars.Add((ListItem)lbAvailableVariables.Items[i]);
-                //modelingInfo.AvailableVariables.Add((ListItem)lbAvailableVariables.Items[i]);
-            //mlrPackState.Add("AvailableVariables", lstAvailVars);
-
-
-            //List<ListItem> lstIndependentVars = new List<ListItem>();
-           // modelingInfo.IndependentVariables = new List<ListItem>();
-            //for (int i = 0; i < lbIndVariables.Items.Count; i++)
-            //    lstIndependentVars.Add((ListItem)lbIndVariables.Items[i]);
-                //modelingInfo.IndependentVariables.Add((ListItem)lbIndVariables.Items[i]);
             mlrPackState.Add("IndependentVariables", _lstSelectedVariables);
             
             //Save the chromosomes
@@ -435,13 +333,21 @@ namespace GALibForm
             if (double.TryParse(tbRegThreshVert.Text, out dblRegulatoryThresholdTextbox) == false)
                 dblRegulatoryThresholdTextbox = 235;	    
 	    
+            //Pack up the textboxes that control modeling
             mlrPackState.Add("RegulatoryThreshold", dblRegulatoryThresholdTextbox);
             mlrPackState.Add("DecisionThreshold", dblDecisionThresholdTextbox);
-            //mlrPackState.Add("Method", "MLR");
-            //mlrPackState.Add("Model", dictModelState);
+            mlrPackState.Add("MaxVars", txtMaxVars.Text);
+            mlrPackState.Add("MaxVIF", txtMaxVIF.Text);
+            mlrPackState.Add("PseudorandomSeed", txtSeed.Text);
+            mlrPackState.Add("PopulationSize", txtPopSize.Text);
+            mlrPackState.Add("NumGenerations", txtNumGen.Text);
+            mlrPackState.Add("MutationRate", txtMutRate.Text);
+            mlrPackState.Add("CrossoverRate", txtCrossoverRate.Text);
+            mlrPackState.Add("SelectionCriterion", cbCriteria.SelectedItem.ToString());        
             
             return mlrPackState;
         }
+
 
         //Reconstruct the saved modeling state
         public void UnpackProjectState(IDictionary<string, object> dictProjectState)
@@ -449,6 +355,36 @@ namespace GALibForm
             //Nothing to do here
             if (dictProjectState == null || dictProjectState.Keys.Count < 1)
                 return;
+
+            if (dictProjectState.ContainsKey("DecisionThreshold"))
+                tbDecThreshHoriz.Text = dictProjectState["DecisionThreshold"].ToString();
+
+            if (dictProjectState.ContainsKey("RegulatoryThreshold"))
+                 tbRegThreshVert.Text = dictProjectState["RegulatoryThreshold"].ToString();
+
+            if (dictProjectState.ContainsKey("MaxVars"))
+                txtMaxVars.Text = dictProjectState["MaxVars"].ToString();
+
+            if (dictProjectState.ContainsKey("MaxVIF"))
+                txtMaxVIF.Text = dictProjectState["MaxVIF"].ToString();
+
+            if (dictProjectState.ContainsKey("PseudorandomSeed"))
+                txtSeed.Text = dictProjectState["PseudorandomSeed"].ToString();
+
+            if (dictProjectState.ContainsKey("PopulationSize"))
+                txtPopSize.Text = dictProjectState["PopulationSize"].ToString();
+
+            if (dictProjectState.ContainsKey("NumGenerations"))
+                txtNumGen.Text = dictProjectState["NumGenerations"].ToString();
+
+            if (dictProjectState.ContainsKey("MutationRate"))
+                txtMutRate.Text = dictProjectState["MutationRate"].ToString();
+
+            if (dictProjectState.ContainsKey("CrossoverRate"))
+                txtCrossoverRate.Text = dictProjectState["CrossoverRate"].ToString();
+
+            if (dictProjectState.ContainsKey("SelectionCriterion"))
+                cbCriteria.SelectedItem = dictProjectState["SelectionCriterion"].ToString();
 
             MLRModelingInfo mi = null;
             object jsonObj = null;
@@ -461,7 +397,6 @@ namespace GALibForm
                     mi = Newtonsoft.Json.JsonConvert.DeserializeObject<MLRModelingInfo>(strJson);                    
                 }
             }
-
             
             if (mi == null)
                 return;
@@ -504,7 +439,7 @@ namespace GALibForm
                     txtPwrValMET.Text = mi.ThresholdPowerTransformExponent.ToString();
                     break;
             }
-
+            
             listBox1.SelectedIndex = -1;
             _list = new List<IIndividual>();
 
@@ -525,7 +460,7 @@ namespace GALibForm
             int maxVar = _numObs / 5;            
             int recVar = Math.Min(((_numObs / 10) + 1), (_lstSelectedVariables.Count));
             lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
-            txtMaxVars.Text = recVar.ToString();
+            //txtMaxVars.Text = recVar.ToString();
 
             InitResultsGraph();
             InitProgressGraph();
@@ -572,7 +507,6 @@ namespace GALibForm
                     MessageBox.Show(msg);
                     return false;
                 }
-
             }
 
             _totVar = _numVars;
@@ -644,8 +578,7 @@ namespace GALibForm
                     _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Log10);
                     _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Log10);
                     mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    
+                    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;                    
                 }
                 else if (rbLogeValMET.Checked)
                 {
@@ -775,8 +708,7 @@ namespace GALibForm
 
             return power;
         }
-
-
+        
 
         private long CalcNumModels(long maxIndVars, long totalVars)
         {
@@ -835,36 +767,6 @@ namespace GALibForm
         }
 
 
-        //private void RunStepwise()
-        //{
-        //    ResetGraphs();
-        //    ResetOutputFields();
-
-        //    _proj.ModelRunning = true;
-
-        //    FitnessCriteria fitnessCrit = GetFitnessCriteria();
-        //    int numVars = lbIndVariables.Items.Count;
-
-        //    StepwiseSearchManager swSearchMgr = null;
-
-        //    swSearchMgr = new StepwiseSearchManager(numVars, fitnessCrit,_maxVIF,_decisionThreshold, _mandateThreshold);
-        //    //swSearchMgr = new StepwiseSearchManager(numVars, fitnessCrit, _maxVIF);
-
-        //    //if (forwardstepwise )
-        //    swSearchMgr.RunForwardStepwise();
-        //    //else
-        //    //swSearchMgr.RunBackwardStepwise();
-
-        //    list.Clear();
-        //    list.AddRange(swSearchMgr.Results);
-
-        //    _proj.ModelRunning = false;
-
-        //    UpdateFitnessListBox();
-        //}
-
-
-
         private FitnessCriteria GetFitnessCriteria()
         {
             FitnessCriteria fitnessCriteria = FitnessCriteria.Akaike;
@@ -896,6 +798,7 @@ namespace GALibForm
 
             return fitnessCriteria;
         }
+
 
         private void RunGA()
         {
@@ -1067,7 +970,6 @@ namespace GALibForm
                     //if (ForwardStepwise
                     //RunStepwise();
                 }
-
             }
             else if (btnRun.Text == "Cancel")
             {
@@ -1083,7 +985,6 @@ namespace GALibForm
                 Application.DoEvents();
                 return;
             }
-
             Application.DoEvents();
         }
 
@@ -1122,8 +1023,7 @@ namespace GALibForm
             myPane.XAxis.Scale.Max = 60;
             myPane.XAxis.Scale.MinorStep = 1;
             myPane.XAxis.Scale.MajorStep = 5;
-
-            
+                        
             // Scale the axes
             zedGraphControl2.AxisChange();
             zedGraphControl2.Refresh();
@@ -1139,9 +1039,9 @@ namespace GALibForm
 
             //zedGraphControl2.GraphPane.CurveList.Clear();
             mlrPlots1.ZGC.GraphPane.CurveList.Clear();
-            mlrPlots1.LISTVIEW.Items.Clear();
-            
+            mlrPlots1.LISTVIEW.Items.Clear();            
         }
+
 
         private void ResetOutputFields()
         {
@@ -1586,7 +1486,6 @@ namespace GALibForm
         }
 
 
-
         private void ModelFitExceedances()
         {
             //MLRPredPlugin has similar code for prediction exceedances
@@ -1623,6 +1522,7 @@ namespace GALibForm
             //mlrPlots2.Exceedances = lstProbEx.ToArray<double>();
         }
 
+
         private void ModelRebuildFitExceedances()
         {
             //DataTable dtMData = _dataMgr.ModelDataTable;
@@ -1657,9 +1557,7 @@ namespace GALibForm
             //now set to exceedances for plotting here...
             //mlrPlots1.Exceedances = lstProbEx.ToArray<double>();
             mlrPlots2.Exceedances = lstProbEx.ToArray<double>();
-
         }
-
 
 
         private void btnAddInputVariable_Click(object sender, EventArgs e)
@@ -1735,17 +1633,17 @@ namespace GALibForm
         }
 
         
-
-
         private void ESComplete(ExhaustiveSearchManager esManager)
         {
             RunComplete(esManager.Results);
         }
 
+        
         private void ESUpdate(double progress, double max)
         {
             RunUpdate(progress, max);
         }
+
 
         private void SearchExhaustiveModelList()
         {
@@ -1763,8 +1661,8 @@ namespace GALibForm
             _runThread.Start();
 
             return;
-
         }
+
 
         private void UpdateFitnessListBox()
         {
@@ -1911,27 +1809,6 @@ namespace GALibForm
 
         private void changeControlStatus(bool enable)
         {           
-
-            //lbAvailableVariables.Invoke((MethodInvoker)delegate
-            //{
-            //    lbAvailableVariables.Enabled = enable;
-            //});
-
-            //lbIndVariables.Invoke((MethodInvoker)delegate
-            //{
-            //    lbIndVariables.Enabled = enable;
-            //});
-
-            //btnAddInputVariable.Invoke((MethodInvoker)delegate
-            //{
-            //    btnAddInputVariable.Enabled = enable;
-            //});
-
-            //btnRemoveInputVariable.Invoke((MethodInvoker)delegate
-            //{
-            //    btnRemoveInputVariable.Enabled = enable;
-            //});
-
             groupBox4.Invoke((MethodInvoker)delegate
             {
                 groupBox4.Enabled = enable;
@@ -2671,7 +2548,7 @@ namespace GALibForm
             if (rbPwrValMET.Checked)
             {
                 txtPwrValMET.Enabled = true;
-                _modelingInfo.ThresholdTransform = DependentVariableTransforms.Power;
+                xfrmThreshold = DependentVariableTransforms.Power;
             }
             else
                 txtPwrValMET.Enabled = false;
@@ -2681,21 +2558,21 @@ namespace GALibForm
         private void rbValMET_CheckedChanged(object sender, EventArgs e)
         {
             if (rbValMET.Checked)
-                _modelingInfo.ThresholdTransform = DependentVariableTransforms.none;
+                xfrmThreshold = DependentVariableTransforms.none;
         }
 
 
         private void rbLog10ValMET_CheckedChanged(object sender, EventArgs e)
         {
             if (rbLog10ValMET.Checked)
-                _modelingInfo.ThresholdTransform = DependentVariableTransforms.Log10;
+                xfrmThreshold = DependentVariableTransforms.Log10;
         }
 
 
         private void rbLogeValMET_CheckedChanged(object sender, EventArgs e)
         {
             if (rbLogeValMET.Checked)
-                _modelingInfo.ThresholdTransform = DependentVariableTransforms.Ln;
+                xfrmThreshold = DependentVariableTransforms.Ln;
         }
 
 
@@ -2710,6 +2587,7 @@ namespace GALibForm
                 txtBox.Focus();
             }
             else
+                dblThresholdPowerTransformExponent = Convert.ToDouble(txtPwrValMET.Text);
                 _modelingInfo.ThresholdPowerTransformExponent = Convert.ToDouble(txtPwrValMET.Text);
         }
 
@@ -3570,7 +3448,7 @@ namespace GALibForm
         }
 
 
-        private void SaveModel(DataTable dt, MultipleRegression model)
+        /*private void SaveModel(DataTable dt, MultipleRegression model)
         {
             //throw new NotImplementedException();
             //update the serialized model string with the new model dictionary, model datatable
@@ -3589,7 +3467,7 @@ namespace GALibForm
             //m.ModelDic = parameters;
             //m.ModelDT = dt;
             //m.RegressionDataTable = dt;
-        }
+        }*/
 
 
         private void tboxAutoConstantThresholdValue_Validated(object sender, EventArgs e)
@@ -3803,9 +3681,8 @@ namespace GALibForm
              _residTypeRemoved, _modelBuildTables.Tables[0]);
             frmDT.Show();
         }
-
-
         #endregion
+
 
         public class MyEventArg:EventArgs
         {
