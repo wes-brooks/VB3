@@ -49,7 +49,7 @@ namespace Prediction
 
         
         //configure display for plot
-        public void ConfigureDisplay(double DecisionThreshold, double RegulatoryThreshold, double ProbabilityThreshold, string Transform, double Exponent)        
+        public void ConfigureDisplay(double DecisionThreshold, double RegulatoryThreshold, double ProbabilityThreshold, string Transform, double Exponent, bool EnableProbabilityThreshold = false)        
         {
             scatterPlot.SetThresholds(DecisionThreshold, RegulatoryThreshold, ProbabilityThreshold);
             scatterPlot.PowerExponent = Exponent;
@@ -57,11 +57,12 @@ namespace Prediction
             scatterPlot.Transform = Transform;
             scatterPlot.DisplayTransform = Transform;
             scatterPlot.DisplayTransformExponent = Exponent;
+            scatterPlot.ProbabilityThresholdEnabled = EnableProbabilityThreshold;
         }
 
 
         //configure display for plot
-        public void ConfigureDisplay(double DecisionThreshold, double RegulatoryThreshold, double ProbabilityThreshold, DependentVariableTransforms ObservationTransform, double ObservationExponent, DependentVariableTransforms PredictionTransform, double PredictionExponent, DependentVariableTransforms ThresholdTransform, double ThresholdExponent, bool RawPredictions=false)
+        public void ConfigureDisplay(double DecisionThreshold, double RegulatoryThreshold, double ProbabilityThreshold, DependentVariableTransforms ObservationTransform, double ObservationExponent, DependentVariableTransforms PredictionTransform, double PredictionExponent, DependentVariableTransforms ThresholdTransform, double ThresholdExponent, bool RawPredictions=false, bool EnableProbabilityThreshold=false)
         {
             scatterPlot.SetThresholds(DecisionThreshold, RegulatoryThreshold, ProbabilityThreshold);
             scatterPlot.PowerExponent = ThresholdExponent;            
@@ -77,6 +78,8 @@ namespace Prediction
             dblObsExponent = ObservationExponent;
             dblPredExponent = PredictionExponent;
             dblThreshExponent = ThresholdExponent;
+
+            scatterPlot.ProbabilityThresholdEnabled = !RawPredictions;
 
             scatterPlot.UpdateResults(GetObsPredData());
             scatterPlot.Refresh();

@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.scatterPlot = new VBCommon.Controls.AnnotatedScatterPlot(EnableProbabilityThreshold:true);
+            this.scatterPlot = new VBCommon.Controls.AnnotatedScatterPlot();
             this.btnClose = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
             this.SuspendLayout();

@@ -30,37 +30,39 @@ namespace VBCommon.Statistics
         /// <param name="modelRMSE">model RMSE value</param>
         /// <param name="newModel">passed bool indicates if recompute of X'X matrix is required (yes if another model selected)</param>
         /// <returns>double, probability of exceedance for fitted values</returns>
-        public static double PExceedFits(DataRow drVars, DataTable dtCorr, double prediction, double threshold, double modelRMSE, bool newModel)
+        public static double[] PExceedFits(DataTable dtCorr, double[] predictions, double threshold, double modelRMSE)
         {
             try
             {
-                double[] x = new double[drVars.ItemArray.Length + 1];
+                //Create the design matrix (augmented by the intercept column)
+                int p = dtCorr.Columns.Count + 1;
+                int n = dtCorr.Rows.Count;
+                double[][] X1 = new double[n][];
+                for (int i = 0; i < n; i++)
+                {
+                    DataRow row = dtCorr.Rows[i];
+                    double[] drow = ((IList<object>)row.ItemArray).Cast<double>().ToArray();
+                    double[] xrow = new double[p];
+                    xrow[0] = 1;
+                    for (int j = 1; j < p; j++)
+                    {
+                        xrow[j] = drow[j - 1];
+                    }
+                    X1[i] = xrow;
+                }
 
-                //skip the ID, only want the prediction variable values
-
-                for (int r = 0; r < drVars.ItemArray.Length; r++)
-                    x[r + 1] = (double)drVars.ItemArray[r];
-
-                x[0] = 1.0d;
-
-                //load up vector with prediction variable values and get in matrix form and transpose
-                double[] xv = x;
-                double[,] xm = xv.ToMatrix();
-                double[,] xmT = xm.Transpose();
-                if (_XpI == null || newModel) getModelMatrixProduct(dtCorr);
-
-                double[,] v = xmT.Multiply(_XpI);
-                double[,] vp = v.Multiply(xm);
-
-                //for fitted probability exceenances
-                double fittedSE = Math.Sqrt(vp[0, 0]) * modelRMSE;
-                return NormalDistribution.Standard.DistributionFunction((prediction-threshold)/fittedSE) * 100.0d;
+                List<int> indx = Enumerable.Range(0, n).ToList<int>();
+                double[,] X = X1.ToMatrix<double>();
+                double[,] H = X.Multiply((X.Transpose().Multiply(X)).Inverse().Multiply(X.Transpose()));
+                List<double> diag = H.Diagonal().ToList<double>();
+                List<double> std = diag.Select(y => modelRMSE * (1 + Math.Sqrt(y))).ToList<double>();
+                double[] prob = indx.Select(k => NormalDistribution.Standard.DistributionFunction((predictions[k] - threshold) / std[k]) * 100.0d).ToArray<double>();
+                return prob;
             }
-
             catch (Exception e)
             {
                 Console.WriteLine("Fitted P(Excced) calculation error via Statistics class: " + e.Message.ToString());
-                return double.NaN;
+                return Enumerable.Repeat(double.NaN, dtCorr.Rows.Count).ToArray<double>();
             }
         }
 
@@ -79,42 +81,72 @@ namespace VBCommon.Statistics
         /// <param name="modelRMSE">model RMSE value</param>
         /// <param name="newModel">passed bool indicates if recompute of X'X matrix is required (yes if another model selected)</param>
         /// <returns>double, probability of exceedance of prediction</returns>
-        public static double PExceed(DataRow drVars, DataTable dtCorr, double prediction, double threshold, double modelRMSE, bool newModel)
+        public static List<double> PExceed(DataTable dtModelData, double[] predictions, double threshold, double modelRMSE, DataTable dtPredData=null)
         {
             try
             {
-                double[] x = new double[drVars.ItemArray.Length];
+                //Create the design matrix (augmented by the intercept column)
+                int p = dtModelData.Columns.Count + 1;
+                int n = dtModelData.Rows.Count;
+                double[][] X1 = new double[n][];
+                double[,] X, P;
 
-                //skip the ID, only want the prediction variable values
-                x[0] = 1.0d;
-                for (int r = 1; r < drVars.ItemArray.Length; r++)
+                for (int i = 0; i < n; i++)
                 {
-                    //x[r - 1] = (double)drVars.ItemArray[r];
-                    x[r] = (double)drVars.ItemArray[r];
+                    DataRow row = dtModelData.Rows[i];
+                    double[] drow = ((IList<object>)row.ItemArray).Cast<double>().ToArray();
+                    double[] xrow = new double[p];
+                    xrow[0] = 1;
+                    for (int j = 1; j < p; j++)
+                    {
+                        xrow[j] = drow[j - 1];
+                    }
+                    X1[i] = xrow;
                 }
+                X = X1.ToMatrix<double>();
 
-                //load up vector with prediction variable values and get in matrix form and transpose
-                double[] xv = x;
-                double[,] xm = xv.ToMatrix().Transpose();
-                double[,] xmT = xv.Transpose();
+                //If we're predicting on different data than was used in model building, then get the prediction data in to the proper form:
+                if (dtPredData != null)
+                {
+                    if (dtPredData.Columns.Count != dtModelData.Columns.Count)
+                    {
+                        Exception err = new Exception(message: "The number of columns for the prediction data does not match the number of columns for the model data, as it must.");
+                        throw err;
+                    }
 
+                    n = dtPredData.Rows.Count;
+                    double[][] P1 = new double[n][];
+                    for (int i = 0; i < n; i++)
+                    {
+                        DataRow row = dtPredData.Rows[i];
+                        double[] drow = ((IList<object>)row.ItemArray).Cast<double>().ToArray();
+                        double[] xrow = new double[p];
+                        xrow[0] = 1;
+                        for (int j = 1; j < p; j++)
+                        {
+                            xrow[j] = drow[j - 1];
+                        }
+                        P1[i] = xrow;
+                    }
+                    P = P1.ToMatrix<double>();
+                }
+                else
+                {
+                    P = X;
+                }                
 
-                if (_XpI == null || newModel) getModelMatrixProduct(dtCorr);
-
-                double[,] v = xmT.Multiply(_XpI);
-                double[,]  vp = v.Multiply(xm);
-
-                //...and get the standard error of the prediction
-                double predictionSE = Math.Sqrt(1 + vp[0, 0]) * modelRMSE;
-
-                //...finally calculate the probability of exceedence for the prediction
-                return NormalDistribution.Standard.DistributionFunction((prediction-threshold)/ predictionSE) * 100.0d;
+                List<int> indx = Enumerable.Range(0, n).ToList<int>();                
+                double[,] H = P.Multiply((X.Transpose().Multiply(X)).Inverse().Multiply(P.Transpose()));
+                List<double> diag = H.Diagonal().ToList<double>();
+                List<double> std = diag.Select(y => modelRMSE * (1 + Math.Sqrt(y))).ToList<double>();
+                List<double> prob = indx.Select(k => NormalDistribution.Standard.DistributionFunction((predictions[k] - threshold) / std[k]) * 100.0d).ToList<double>();
+                return prob;
             }
 
             catch (Exception e)
             {
                 Console.WriteLine("Prediction P(Exceed) calculation error via Statistics class: " + e.Message.ToString());
-                return double.NaN;
+                return Enumerable.Repeat(double.NaN, dtModelData.Rows.Count).ToList<double>();
             }
         }
 
@@ -220,26 +252,19 @@ namespace VBCommon.Statistics
             return dtUnsorted.DefaultView.Table;
         }
 
+
         public static double Correlation(double[] deparray, double[] vararray)
         {
             double correlation = deparray.Covariance(vararray) / (deparray.StandardDeviation() * vararray.StandardDeviation());
             return correlation;
         }
 
-        
 
-        //public static object descriptiveStats(double[] data)
-        //{
-        //    NumericalVariable descstats = new NumericalVariable(data);
-        //    return (object) descstats;
-        //}
-
-        public static double PExceed(double prediction, double threshold, double se)
+        /*public static double PExceed(double prediction, double threshold, double se)
         {
             return NormalDistribution.Standard.DistributionFunction((prediction-threshold)/se) * 100.0d;
-        }
-
-
+        }*/
+        
 
         /// <summary>
         /// return a 2-tailed p-value for the t distribution of the pearson correlation score
@@ -265,9 +290,5 @@ namespace VBCommon.Statistics
 
             return Pval;
         }
-
-
-
-    }
-       
+    }       
 }

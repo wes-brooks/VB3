@@ -43,8 +43,8 @@
             this.rbProb = new System.Windows.Forms.RadioButton();
             this.rbRaw = new System.Windows.Forms.RadioButton();
             this.lblProb = new System.Windows.Forms.Label();
-            this.txtProbabilityThreshold = new System.Windows.Forms.TextBox();
-            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.tbProbabilityThreshold = new System.Windows.Forms.TextBox();
+            this.boxThresholdTransform = new System.Windows.Forms.GroupBox();
             this.txtPwrValue = new System.Windows.Forms.TextBox();
             this.rbPwrValue = new System.Windows.Forms.RadioButton();
             this.rbLogeValue = new System.Windows.Forms.RadioButton();
@@ -53,12 +53,12 @@
             this.btnXYPlot = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.tbThresholdReg = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
+            this.lblThresholdDec = new System.Windows.Forms.Label();
             this.tbThresholdDec = new System.Windows.Forms.TextBox();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox10.SuspendLayout();
+            this.boxThresholdTransform.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox3
@@ -175,11 +175,11 @@
             this.groupBox2.Controls.Add(this.rbProb);
             this.groupBox2.Controls.Add(this.rbRaw);
             this.groupBox2.Controls.Add(this.lblProb);
-            this.groupBox2.Controls.Add(this.txtProbabilityThreshold);
-            this.groupBox2.Controls.Add(this.groupBox10);
+            this.groupBox2.Controls.Add(this.tbProbabilityThreshold);
+            this.groupBox2.Controls.Add(this.boxThresholdTransform);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.tbThresholdReg);
-            this.groupBox2.Controls.Add(this.label11);
+            this.groupBox2.Controls.Add(this.lblThresholdDec);
             this.groupBox2.Controls.Add(this.tbThresholdDec);
             this.groupBox2.Location = new System.Drawing.Point(6, 9);
             this.groupBox2.Name = "groupBox2";
@@ -218,28 +218,29 @@
             this.lblProb.TabIndex = 88;
             this.lblProb.Text = "Probability Threshold";
             // 
-            // txtProbabilityThreshold
+            // tbProbabilityThreshold
             // 
-            this.txtProbabilityThreshold.Location = new System.Drawing.Point(27, 20);
-            this.txtProbabilityThreshold.Name = "txtProbabilityThreshold";
-            this.txtProbabilityThreshold.Size = new System.Drawing.Size(44, 20);
-            this.txtProbabilityThreshold.TabIndex = 87;
-            this.txtProbabilityThreshold.Text = "50";
+            this.tbProbabilityThreshold.Location = new System.Drawing.Point(27, 20);
+            this.tbProbabilityThreshold.Name = "tbProbabilityThreshold";
+            this.tbProbabilityThreshold.Size = new System.Drawing.Size(44, 20);
+            this.tbProbabilityThreshold.TabIndex = 87;
+            this.tbProbabilityThreshold.Text = "50";
+            this.tbProbabilityThreshold.TextChanged += new System.EventHandler(this.tbProbabilityThreshold_TextChanged);
             // 
-            // groupBox10
+            // boxThresholdTransform
             // 
-            this.groupBox10.Controls.Add(this.txtPwrValue);
-            this.groupBox10.Controls.Add(this.rbPwrValue);
-            this.groupBox10.Controls.Add(this.rbLogeValue);
-            this.groupBox10.Controls.Add(this.rbLog10Value);
-            this.groupBox10.Controls.Add(this.rbValue);
-            this.groupBox10.Controls.Add(this.btnXYPlot);
-            this.groupBox10.Location = new System.Drawing.Point(6, 87);
-            this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(209, 100);
-            this.groupBox10.TabIndex = 86;
-            this.groupBox10.TabStop = false;
-            this.groupBox10.Text = "Threshold entry is transformed:";
+            this.boxThresholdTransform.Controls.Add(this.txtPwrValue);
+            this.boxThresholdTransform.Controls.Add(this.rbPwrValue);
+            this.boxThresholdTransform.Controls.Add(this.rbLogeValue);
+            this.boxThresholdTransform.Controls.Add(this.rbLog10Value);
+            this.boxThresholdTransform.Controls.Add(this.rbValue);
+            this.boxThresholdTransform.Controls.Add(this.btnXYPlot);
+            this.boxThresholdTransform.Location = new System.Drawing.Point(6, 87);
+            this.boxThresholdTransform.Name = "boxThresholdTransform";
+            this.boxThresholdTransform.Size = new System.Drawing.Size(209, 100);
+            this.boxThresholdTransform.TabIndex = 86;
+            this.boxThresholdTransform.TabStop = false;
+            this.boxThresholdTransform.Text = "Threshold entry is transformed:";
             // 
             // txtPwrValue
             // 
@@ -323,15 +324,15 @@
             this.tbThresholdReg.Text = "235";
             this.tbThresholdReg.TextChanged += new System.EventHandler(this.tbThresholdReg_TextChanged);
             // 
-            // label11
+            // lblThresholdDec
             // 
-            this.label11.AutoSize = true;
-            this.label11.ForeColor = System.Drawing.Color.Blue;
-            this.label11.Location = new System.Drawing.Point(77, 46);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(145, 13);
-            this.label11.TabIndex = 81;
-            this.label11.Text = "Decision Criterion (Horizontal)";
+            this.lblThresholdDec.AutoSize = true;
+            this.lblThresholdDec.ForeColor = System.Drawing.Color.Blue;
+            this.lblThresholdDec.Location = new System.Drawing.Point(77, 46);
+            this.lblThresholdDec.Name = "lblThresholdDec";
+            this.lblThresholdDec.Size = new System.Drawing.Size(145, 13);
+            this.lblThresholdDec.TabIndex = 81;
+            this.lblThresholdDec.Text = "Decision Criterion (Horizontal)";
             // 
             // tbThresholdDec
             // 
@@ -344,9 +345,9 @@
             // 
             // zedGraphControl1
             // 
-            this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.zedGraphControl1.EditButtons = System.Windows.Forms.MouseButtons.Left;
             this.zedGraphControl1.Location = new System.Drawing.Point(238, 9);
             this.zedGraphControl1.Name = "zedGraphControl1";
@@ -374,8 +375,8 @@
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox10.ResumeLayout(false);
-            this.groupBox10.PerformLayout();
+            this.boxThresholdTransform.ResumeLayout(false);
+            this.boxThresholdTransform.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -394,7 +395,7 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.GroupBox groupBox10;
+        private System.Windows.Forms.GroupBox boxThresholdTransform;
         private System.Windows.Forms.TextBox txtPwrValue;
         private System.Windows.Forms.RadioButton rbPwrValue;
         private System.Windows.Forms.RadioButton rbLogeValue;
@@ -403,11 +404,11 @@
         private System.Windows.Forms.Button btnXYPlot;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox tbThresholdReg;
-        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label lblThresholdDec;
         private System.Windows.Forms.TextBox tbThresholdDec;
         public ZedGraph.ZedGraphControl zedGraphControl1;
         private System.Windows.Forms.Label lblProb;
-        private System.Windows.Forms.TextBox txtProbabilityThreshold;
+        private System.Windows.Forms.TextBox tbProbabilityThreshold;
         private System.Windows.Forms.RadioButton rbProb;
         private System.Windows.Forms.RadioButton rbRaw;
     }

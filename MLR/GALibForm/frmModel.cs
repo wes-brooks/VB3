@@ -1498,27 +1498,27 @@ namespace GALibForm
             int idx = listBox1.SelectedIndex;
             MLRIndividual ind = (MLRIndividual)_list[idx];
 
-            List<double> lstProbEx = new List<double>();
+            //List<double> lstProbEx = new List<double>();
             bool bFlag = true;
 
-            for (int i = 0; i < dtMData.Rows.Count; i++)
-            {
+            //for (int i = 0; i < dtMData.Rows.Count; i++)
+            //{
                 //prediction...
-                double pred = ind.PredictedValues[i];
+                //double pred = ind.PredictedValues[i];
 
                 //model variables and values... (little x)
-                DataRow dr = dtModelVarVals.Rows[i];
+                //DataRow dr = dtModelVarVals.Rows[i];
 
                 //do the matrix math... (dr == x, dtModelVarVals == X...)
-                double probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, ind.DecisionThreshold, ind.RMSE, bFlag);
-                lstProbEx.Add(probEx);
+                //double[] probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, ind.PredictedValues, ind.DecisionThreshold, ind.RMSE, bFlag);
 
                 //reset the matrix control flag so (X`*X)inv isn't computed again
-                bFlag = false;
-            }
+                //bFlag = false;
+            //}
 
             //now set to exceedances for plotting here...
-            mlrPlots1.Exceedances = lstProbEx.ToArray<double>();
+            //mlrPlots1.Exceedances = lstProbEx.ToArray<double>();
+            mlrPlots1.Exceedances = VBCommon.Statistics.Statistics.PExceedFits(dtModelVarVals, ind.PredictedValues, ind.DecisionThreshold, ind.RMSE);
             //mlrPlots2.Exceedances = lstProbEx.ToArray<double>();
         }
 
@@ -1547,8 +1547,8 @@ namespace GALibForm
                 DataRow dr = dtModelVarVals.Rows[i];
 
                 //do the matrix math... (dr == x, dtModelVarVals == X...)
-                double probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, _decisionThreshold, ind.RMSE, bFlag);
-                lstProbEx.Add(probEx);
+                //double probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, _decisionThreshold, ind.RMSE, bFlag);
+                //lstProbEx.Add(probEx);
 
                 //reset the matrix control flag so (X`*X)inv isn't computed again
                 bFlag = false;

@@ -499,7 +499,8 @@ namespace IPyModeling
             }
             catch
             {
-                Activate();
+                //Pass errors silently?
+                //Activate();
             }
         }
 
@@ -527,7 +528,8 @@ namespace IPyModeling
             }
             catch
             {
-                Activate();
+                //Pass errors silently?
+                //Activate();
             }
         }
 

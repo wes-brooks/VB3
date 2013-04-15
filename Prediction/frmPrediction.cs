@@ -1469,10 +1469,9 @@ namespace Prediction
         private DataTable BuildPredictionTable(DataTable tblRaw, string strModelExpression)
         {
             DataTable tblForPrediction = new DataTable();
-
-
-            string[] strExpressionChunks = strModelExpression.Split('+');
-            string[] strExpressions = new string[strExpressionChunks.Count()];
+            
+            string[] strExpressionChunks = strModelExpression.Split(new char[] {'+', '-'});
+            List<string> strExpressions = new List<string>();
 
             for (int k=0; k<strExpressionChunks.Count(); k++)
             {
@@ -1482,12 +1481,22 @@ namespace Prediction
                 if ((intIndx = strVariable.IndexOf('(')) != -1)
                     if ((intIndx = strVariable.IndexOf(')', intIndx)) != -1)
                         intIndx = 0;
-                strExpressions[k] = strVariable;
+
+                if ((intIndx = strVariable.IndexOf('*')) != -1)
+                    strVariable = strVariable.Substring(intIndx + 1);
+
+                //If the column name can be cast to a double, then it is the intercept and should be ignored.
+                double intercept;
+                bool castable = double.TryParse(strVariable, out intercept);
+                if (!castable)
+                {
+                    strExpressions.Add(strVariable);
+                }
             }
 
             //Do any transformations/manipulations of the raw data.
             ExpressionEvaluator ee = new ExpressionEvaluator();
-            tblForPrediction = ee.EvaluateTable(strExpressions, tblRaw);
+            tblForPrediction = ee.EvaluateTable(strExpressions.ToArray(), tblRaw);
             return tblForPrediction;
         }
 
