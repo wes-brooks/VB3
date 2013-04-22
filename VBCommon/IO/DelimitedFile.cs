@@ -93,7 +93,7 @@ namespace VBCommon.IO
             }
             catch (Exception ex)
             {
-                //Should rethrow exception
+                return null;
             }
 
             finally

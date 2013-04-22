@@ -37,6 +37,7 @@ namespace VBCommon.Controls
         private string strResponseVarColName = string.Empty;
         private string strResponseVarColNameAsImported = string.Empty;
         private string strSelectedColName = string.Empty;
+        private dynamic initialValue;
 
         private enum AddReplace { Add, Replace };
         private AddReplace addreplace;
@@ -172,42 +173,6 @@ namespace VBCommon.Controls
         }
 
 
-        /*//return Disabled columns
-        [JsonProperty]
-        public int DisabledCols
-        {
-            get { return this.intNdisabledcols; }
-            set { intNdisabledcols = value; }
-        }
-
-
-        //return Disabled Rows
-        [JsonProperty]
-        public int DisabledRows
-        {
-            get { return this.intNdisabledrows; }
-            set { intNdisabledrows = value; }
-        }
-
-
-        //return Hidden Columns
-        [JsonProperty]
-        public int HiddenCols
-        {
-            get { return this.intNhiddencols; }
-            set { intNhiddencols = value; }
-        }
-
-
-        //return Number of IVs
-        [JsonProperty]
-        public int NumberIVs
-        {
-            get { return this.intNivs; }
-            set { intNivs = value; }
-        }*/
-
-
         public double Orientation
         {
             get { return this.dblOrientation; }
@@ -248,9 +213,9 @@ namespace VBCommon.Controls
 
 
         // load the datasheet form, initialize then gridview's menu items/eventhandlers
-        public void datasheet_load(object sender, EventArgs e)      
+        /*public void datasheet_load(object sender, EventArgs e)      
         {
-            /*//menu items for response variable column
+            //menu items for response variable column
             cmforResponseVar.MenuItems.Add("Transform");
             cmforResponseVar.MenuItems[0].MenuItems.Add("Log10", new EventHandler(log10T));
             cmforResponseVar.MenuItems[0].MenuItems.Add("Ln", new EventHandler(lnT));
@@ -276,8 +241,8 @@ namespace VBCommon.Controls
             cmforRows.MenuItems.Add("Enable Row", new EventHandler(EnableRow));
             cmforRows.MenuItems.Add("Enable All Rows", new EventHandler(EnableAllRows));
 
-            SetTransformCheckmarks(Menu:3, Item:0);*/
-        }
+            SetTransformCheckmarks(Menu:3, Item:0);
+        }*/
 
 
         private void InitializeContextMenus()
@@ -1117,9 +1082,11 @@ namespace VBCommon.Controls
 
 
         public void dgv_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
+        {            
             dgv.EndEdit();
-            dt.Rows[e.RowIndex][e.ColumnIndex] = dgv[e.ColumnIndex, e.RowIndex].Value;
+
+            double dblValue = Convert.ToDouble(dgv[e.ColumnIndex, e.RowIndex].Value);
+            dt.Rows[e.RowIndex][e.ColumnIndex] = dblValue;
             dt.AcceptChanges();
             state = dtState.dirty;
             NotifyContainer();

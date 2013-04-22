@@ -35,6 +35,7 @@ namespace VBCommon.Controls
         private Dictionary<string, double[]> _plotData = null;
         private DataTable _corrResults = null;
         private Dictionary<string,double> _pValueDict = null;
+        private List<string> _varsToPlot = null;
 
         bool _init = true;
 
@@ -47,18 +48,19 @@ namespace VBCommon.Controls
         /// <param name="depVarName">response variable name</param>
         /// <param name="dt">table with plot data</param>
         /// <param name="corrResults">table with pearson scores</param>
-        public frmPCPlots(string varName, string depVarName, DataTable dt, DataTable corrResults)
+        public frmPCPlots(string mainVarName, List<string> varNames, string depVarName, DataTable dt, DataTable corrResults)
         {
             InitializeComponent();
 
             this.WindowState = FormWindowState.Maximized;
 
-            this.Text = "Variable " + varName + " and its Transforms";
+            this.Text = "Variable " + mainVarName + " and its Transforms";
 
             _dtCopy = dt.Copy();
-            _varName = varName;
+            _varName = mainVarName;
             _depVarName = depVarName;
             _corrResults = corrResults;
+            _varsToPlot = varNames;
 
             string[] plotTypes = new string[] { "Scatter Plots", "Time Series Plots", "Frequency Plots" };
             cbSelectPlot.DataSource = plotTypes;
@@ -85,7 +87,7 @@ namespace VBCommon.Controls
             _plotData.Add(_varName, values);
             foreach (DataColumn dc in _dtCopy.Columns)
             {
-                if (!dc.ColumnName.Contains(_varName)) continue;
+                if (!_varsToPlot.Contains(dc.ColumnName)) continue;
                 //otherwise we've got plotting data
                 colndx = _dtCopy.Columns.IndexOf(dc);
                 varname = dc.ColumnName.ToString();

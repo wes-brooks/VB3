@@ -83,25 +83,25 @@
             // 
             // panel2
             // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.panel2.Controls.Add(this.panelIVs);
             this.panel2.Location = new System.Drawing.Point(12, 211);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(967, 314);
+            this.panel2.Size = new System.Drawing.Size(967, 391);
             this.panel2.TabIndex = 1;
             // 
             // panelIVs
             // 
-            this.panelIVs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelIVs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelIVs.Controls.Add(this.splitContainer1);
             this.panelIVs.Location = new System.Drawing.Point(4, 3);
             this.panelIVs.Name = "panelIVs";
-            this.panelIVs.Size = new System.Drawing.Size(960, 308);
+            this.panelIVs.Size = new System.Drawing.Size(960, 385);
             this.panelIVs.TabIndex = 3;
             // 
             // splitContainer1
@@ -118,7 +118,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(960, 308);
+            this.splitContainer1.Size = new System.Drawing.Size(960, 385);
             this.splitContainer1.SplitterDistance = 538;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -145,14 +145,14 @@
             this.dgvVariables.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvVariables.Location = new System.Drawing.Point(0, 0);
             this.dgvVariables.Name = "dgvVariables";
-            this.dgvVariables.Size = new System.Drawing.Size(538, 308);
+            this.dgvVariables.Size = new System.Drawing.Size(538, 385);
             this.dgvVariables.TabIndex = 2;
             this.dgvVariables.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dgvVariables_CellPainting);
             this.dgvVariables.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_CellValueChanged);
             this.dgvVariables.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvVariables_DataError);
+            this.dgvVariables.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgvVariables_RowsAdded);
             this.dgvVariables.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dgvVariables_Scroll);
             this.dgvVariables.SelectionChanged += new System.EventHandler(this.dgvVariables_SelectionChanged);
-            this.dgvVariables.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgvVariables_RowsAdded);
             // 
             // splitContainer2
             // 
@@ -167,7 +167,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.dgvStats);
-            this.splitContainer2.Size = new System.Drawing.Size(418, 308);
+            this.splitContainer2.Size = new System.Drawing.Size(418, 385);
             this.splitContainer2.SplitterDistance = 139;
             this.splitContainer2.TabIndex = 0;
             this.splitContainer2.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer2_SplitterMoved);
@@ -194,7 +194,7 @@
             this.dgvObs.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvObs.Location = new System.Drawing.Point(0, 0);
             this.dgvObs.Name = "dgvObs";
-            this.dgvObs.Size = new System.Drawing.Size(139, 308);
+            this.dgvObs.Size = new System.Drawing.Size(139, 385);
             this.dgvObs.TabIndex = 3;
             this.dgvObs.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvObs_CellEndEdit);
             this.dgvObs.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvObs_DataError);
@@ -226,7 +226,7 @@
             this.dgvStats.Location = new System.Drawing.Point(0, 0);
             this.dgvStats.Name = "dgvStats";
             this.dgvStats.ReadOnly = true;
-            this.dgvStats.Size = new System.Drawing.Size(275, 308);
+            this.dgvStats.Size = new System.Drawing.Size(275, 385);
             this.dgvStats.TabIndex = 4;
             this.dgvStats.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dgvStats_Scroll);
             this.dgvStats.SelectionChanged += new System.EventHandler(this.dgvStats_SelectionChanged);
@@ -405,8 +405,8 @@
             // 
             // txtModel
             // 
-            this.txtModel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtModel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtModel.BackColor = System.Drawing.Color.White;
             this.txtModel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtModel.Location = new System.Drawing.Point(266, 9);
@@ -462,6 +462,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
+            this.AutoScrollMinSize = new System.Drawing.Size(600, 610);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnIVDataValidation);
@@ -471,7 +473,7 @@
             this.Controls.Add(this.panel2);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "frmPrediction";
-            this.Size = new System.Drawing.Size(991, 537);
+            this.Size = new System.Drawing.Size(991, 614);
             this.Load += new System.EventHandler(this.frmIPyPrediction_Load);
             this.panel2.ResumeLayout(false);
             this.panelIVs.ResumeLayout(false);

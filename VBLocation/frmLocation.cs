@@ -76,6 +76,12 @@ namespace VBLocation
         }
 
 
+        public TrackBar ZoomControl
+        {
+            get { return trackBar1; }
+        }
+
+
         public IDictionary<string, object> PackState()
         {
             //to hold packed state
@@ -239,6 +245,7 @@ namespace VBLocation
                 MainMap.MinZoom = trackBar1.Minimum;
                 MainMap.Zoom = MainMap.MinZoom + 3;
                 trackBar1.Value = MainMap.Zoom;
+                trackBar1.ValueChanged += new EventHandler(trackBar1_ValueChanged);
 
                 MainMap.MapType = MapType.YahooMap;
                 // get map type

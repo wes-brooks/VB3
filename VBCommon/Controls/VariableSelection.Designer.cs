@@ -84,6 +84,7 @@
             // 
             // btnRemoveInputVariable
             // 
+            this.btnRemoveInputVariable.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnRemoveInputVariable.Location = new System.Drawing.Point(235, 145);
             this.btnRemoveInputVariable.Name = "btnRemoveInputVariable";
             this.btnRemoveInputVariable.Size = new System.Drawing.Size(30, 20);
@@ -93,6 +94,7 @@
             // 
             // btnAddInputVariable
             // 
+            this.btnAddInputVariable.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnAddInputVariable.Location = new System.Drawing.Point(235, 119);
             this.btnAddInputVariable.Name = "btnAddInputVariable";
             this.btnAddInputVariable.Size = new System.Drawing.Size(30, 20);
@@ -102,6 +104,7 @@
             // 
             // lblDepVarName
             // 
+            this.lblDepVarName.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblDepVarName.AutoSize = true;
             this.lblDepVarName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblDepVarName.Location = new System.Drawing.Point(132, 13);
@@ -112,6 +115,7 @@
             // 
             // lblDepVariable
             // 
+            this.lblDepVariable.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblDepVariable.AutoSize = true;
             this.lblDepVariable.Location = new System.Drawing.Point(23, 12);
             this.lblDepVariable.Name = "lblDepVariable";
@@ -121,7 +125,7 @@
             // 
             // lblIndVars
             // 
-            this.lblIndVars.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblIndVars.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblIndVars.AutoSize = true;
             this.lblIndVars.Location = new System.Drawing.Point(264, 34);
             this.lblIndVars.Name = "lblIndVars";
@@ -131,8 +135,7 @@
             // 
             // lbIndVariables
             // 
-            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.lbIndVariables.FormattingEnabled = true;
             this.lbIndVariables.HorizontalScrollbar = true;
             this.lbIndVariables.Location = new System.Drawing.Point(275, 50);
@@ -144,6 +147,7 @@
             // 
             // lblAvailVars
             // 
+            this.lblAvailVars.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblAvailVars.AutoSize = true;
             this.lblAvailVars.Location = new System.Drawing.Point(23, 34);
             this.lblAvailVars.Name = "lblAvailVars";
@@ -153,8 +157,7 @@
             // 
             // lbAvailableVariables
             // 
-            this.lbAvailableVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbAvailableVariables.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.lbAvailableVariables.FormattingEnabled = true;
             this.lbAvailableVariables.HorizontalScrollbar = true;
             this.lbAvailableVariables.Location = new System.Drawing.Point(25, 50);

@@ -20,6 +20,7 @@ using System.Text;
 using System.Data;
 using System.Data.OleDb;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace VBCommon.IO
 {
@@ -29,9 +30,6 @@ namespace VBCommon.IO
     public class ExcelOleDb
     {
         public delegate void ProgressWork(float percentage);
-        private event ProgressWork Reading;
-        private event ProgressWork Writeing;
-
 
         private string _fileName = "";
         private bool _firstRowHeaders = true;        
@@ -123,10 +121,10 @@ namespace VBCommon.IO
         public DataTable Read(string worksheet, string criteria)
         {
             try
-            {                
+            {
                 if (_conn.State != ConnectionState.Open)
                 {
-                    _conn.Open();                    
+                    _conn.Open();
                 }
                 string cmdText = "Select * from [{0}]";
                 if (!string.IsNullOrEmpty(criteria))

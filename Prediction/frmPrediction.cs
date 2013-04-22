@@ -922,14 +922,14 @@ namespace Prediction
 
         private DataTable InitializeIVData()
         {
-            if (dictMainEffects != null)
+            if (strArrReferencedVars != null)
             {
                 //Create the datatable and initialize it with the ID column
                 DataTable dt = new DataTable();
                 dt.Columns.Add("ID", typeof(string));
 
                 //Add a column to the datatable for each predictor
-                foreach (string meKey in dictMainEffects.Keys)
+                foreach (string meKey in strArrReferencedVars)
                 {
                     if (String.Compare(meKey, "ID", true) != 0)
                         dt.Columns.Add(meKey, typeof(double));

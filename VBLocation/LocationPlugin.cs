@@ -68,13 +68,6 @@ namespace VBLocation
         }
 
 
-        /*//undo was hit, send the packed state to be unpacked
-        public void UndoLastChange(Dictionary<string, object> packedState)
-        {
-           
-        }*/
-
-
         //add a datasheet plugin root item
         public void AddRibbon(string sender)
         {
@@ -93,30 +86,17 @@ namespace VBLocation
             //section for working with data
             const string grpManipulate = "Data";
 
-            btnFindDataSources = new SimpleActionItem(strPanelKey, "Show Stations", ShowStations_Click);
-            btnFindDataSources.LargeImage = Properties.Resources.USGS;
+            btnFindDataSources = new SimpleActionItem(strPanelKey, "Zoom In", ZoomIn);
+            btnFindDataSources.LargeImage = Properties.Resources.Zoom_In_icon;
             btnFindDataSources.GroupCaption = grpManipulate;
             btnFindDataSources.Enabled = true;
             App.HeaderControl.Add(btnFindDataSources);
 
-            btnClearDataSources = new SimpleActionItem(strPanelKey, "Clear Stations", ClearStations_Click);
-            btnClearDataSources.LargeImage = Properties.Resources.clear;
+            btnClearDataSources = new SimpleActionItem(strPanelKey, "Zoom Out", ZoomOut);
+            btnClearDataSources.LargeImage = Properties.Resources.Zoom_Out_icon;
             btnClearDataSources.GroupCaption = grpManipulate;
             btnClearDataSources.Enabled = true;
             App.HeaderControl.Add(btnClearDataSources);
-
-
-            //var validateBtn = new SimpleActionItem("Validate", btnValidate_Click) { RootKey = kVBLocation, ToolTipText = "Validate Data", LargeImage = Properties.Resources.validate };
-            //App.HeaderControl.Add(validateBtn);
-
-            //var computeBtn = new SimpleActionItem("Compute", btnCompute_Click) { RootKey = kVBLocation, ToolTipText = "Compute" };
-            //App.HeaderControl.Add(computeBtn);
-
-            //var manipulateBtn = new SimpleActionItem("Manipulate", btnManipulate_Click) { RootKey = kVBLocation, ToolTipText = "Manipulate", LargeImage = Properties.Resources.manipulate };
-            //App.HeaderControl.Add(manipulateBtn);
-
-            //var transformBtn = new SimpleActionItem("Transform", btnTransform_Click) { RootKey = kVBLocation, ToolTipText = "Transform", LargeImage = Properties.Resources.transform };
-            //App.HeaderControl.Add(transformBtn);
         }
 
 
@@ -247,14 +227,16 @@ namespace VBLocation
         }
 
 
-        private void ShowStations_Click(object sender, EventArgs e)
+        private void ZoomIn(object sender, EventArgs e)
         {
-            cLocation.btnShowDataSources_Click(sender, e);
+            if (cLocation.ZoomControl.Value < cLocation.ZoomControl.Maximum)
+                cLocation.ZoomControl.Value += 1;
         }
 
-        private void ClearStations_Click(object sender, EventArgs e)
+        private void ZoomOut(object sender, EventArgs e)
         {
-            cLocation.btnClearStations_Click(sender, e);
+            if (cLocation.ZoomControl.Value > cLocation.ZoomControl.Minimum)
+                cLocation.ZoomControl.Value -= 1;
         }
 
 

@@ -50,7 +50,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(980, 457);
+            this.tabControl1.Size = new System.Drawing.Size(963, 610);
             this.tabControl1.TabIndex = 0;
             // 
             // tpData
@@ -59,7 +59,7 @@
             this.tpData.Location = new System.Drawing.Point(4, 22);
             this.tpData.Name = "tpData";
             this.tpData.Padding = new System.Windows.Forms.Padding(3);
-            this.tpData.Size = new System.Drawing.Size(972, 431);
+            this.tpData.Size = new System.Drawing.Size(955, 584);
             this.tpData.TabIndex = 0;
             this.tpData.Text = "Data Manipulation";
             this.tpData.UseVisualStyleBackColor = true;
@@ -82,7 +82,7 @@
             this.dsControl1.ResponseVarColNameAsImported = "";
             this.dsControl1.SelectColName = "";
             this.dsControl1.SelectedColIndex = -1;
-            this.dsControl1.Size = new System.Drawing.Size(966, 425);
+            this.dsControl1.Size = new System.Drawing.Size(949, 578);
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
             // 
@@ -94,7 +94,7 @@
             this.tpVarSelection.Location = new System.Drawing.Point(4, 22);
             this.tpVarSelection.Name = "tpVarSelection";
             this.tpVarSelection.Padding = new System.Windows.Forms.Padding(3);
-            this.tpVarSelection.Size = new System.Drawing.Size(972, 431);
+            this.tpVarSelection.Size = new System.Drawing.Size(955, 584);
             this.tpVarSelection.TabIndex = 3;
             this.tpVarSelection.Text = "Variable Selection";
             // 
@@ -105,7 +105,7 @@
             this.ctlVariableSelection1.Location = new System.Drawing.Point(3, 6);
             this.ctlVariableSelection1.MinimumSize = new System.Drawing.Size(500, 0);
             this.ctlVariableSelection1.Name = "ctlVariableSelection1";
-            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 17);
+            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 0);
             this.ctlVariableSelection1.TabIndex = 0;
             // 
             // tpModel
@@ -113,13 +113,15 @@
             this.tpModel.Controls.Add(this.frmModel1);
             this.tpModel.Location = new System.Drawing.Point(4, 22);
             this.tpModel.Name = "tpModel";
-            this.tpModel.Size = new System.Drawing.Size(972, 431);
+            this.tpModel.Size = new System.Drawing.Size(955, 584);
             this.tpModel.TabIndex = 2;
             this.tpModel.Text = "Model";
             this.tpModel.UseVisualStyleBackColor = true;
             // 
             // frmModel1
             // 
+            this.frmModel1.AutoScroll = true;
+            this.frmModel1.AutoScrollMinSize = new System.Drawing.Size(410, 610);
             this.frmModel1.DepVarTrans = VBCommon.Transforms.DependentVariableTransforms.none;
             this.frmModel1.DepVarTransExp = 1D;
             this.frmModel1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -127,16 +129,18 @@
             this.frmModel1.Location = new System.Drawing.Point(0, 0);
             this.frmModel1.Name = "frmModel1";
             this.frmModel1.SelectedVariables = null;
-            this.frmModel1.Size = new System.Drawing.Size(972, 431);
+            this.frmModel1.Size = new System.Drawing.Size(955, 584);
             this.frmModel1.TabIndex = 0;
             // 
             // ctlMLRModel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
+            this.AutoScrollMinSize = new System.Drawing.Size(600, 610);
             this.Controls.Add(this.tabControl1);
             this.Name = "ctlMLRModel";
-            this.Size = new System.Drawing.Size(980, 457);
+            this.Size = new System.Drawing.Size(963, 610);
             this.tabControl1.ResumeLayout(false);
             this.tpData.ResumeLayout(false);
             this.tpVarSelection.ResumeLayout(false);

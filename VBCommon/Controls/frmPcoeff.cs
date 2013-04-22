@@ -15,7 +15,6 @@ using Accord.Statistics;
 
 namespace VBCommon.Controls
 {
-
     /// <summary>
     /// Class displays and processes interacted and transformed variables the user imported.
     /// Processing includes calculating univariate correlation coefficients (Pearson coeff)
@@ -354,12 +353,22 @@ namespace VBCommon.Controls
         /// <param name="e"></param>
         private void viewPlotsEH(object o, EventArgs e)
         {
-            //show plots for the selected group of transforms in the grid
+            //show plots for the selected group of transforms in the grid rowlist
             if (_gridRowNdx < 0) return;
             string variable = dataGridView1[0, _gridRowNdx].Value.ToString();
+
+            //Get a list of the transformations that we're plotting
+            List<string> plotvarnames = new List<string>();
+            var rowlist = dataGridView1.Rows.Cast<DataGridViewRow>().Where(row => row.Cells[0].Value.ToString() == variable.ToString());
+            foreach (var item in rowlist)
+            {
+                plotvarnames.Add(dataGridView1[1, item.Index].Value.ToString());
+            }
+
             if (variable == "" || variable == null) return;
             //all info should be in dtCopy.....
-            frmPCPlots frmPlots = new frmPCPlots(variable, _depvarname, _dtCopy, (DataTable)dataGridView1.DataSource);
+            //frmPCPlots frmPlots = new frmPCPlots(variable, _depvarname, _dtCopy, (DataTable)dataGridView1.DataSource);
+            frmPCPlots frmPlots = new frmPCPlots(variable, plotvarnames, _depvarname, _dtCopy, (DataTable)dataGridView1.DataSource);
             frmPlots.ShowDialog();
         }
 

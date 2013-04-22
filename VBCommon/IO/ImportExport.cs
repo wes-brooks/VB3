@@ -8,9 +8,13 @@ using Microsoft.VisualBasic;
 using System.IO;
 using VBCommon.IO;
 using VBCommon.Controls;
+using System.Text.RegularExpressions;
 
 namespace VBCommon.IO
-{ 
+{
+    //This exception class is used to abort an import that includes improperly-formatted column names
+    public class InvalidColumnNameException : Exception { }
+
     public class ImportExport
     {
         //class for import/export from/to xls, xlsx or csv files - note that xlsx has not been tested
@@ -47,7 +51,7 @@ namespace VBCommon.IO
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.Forms.MessageBox.Show(String.Format("There was an error while trying to import the data. Is the spreadsheet also open in Excel? Error message: {0}", ex.Message));
+                    System.Windows.Forms.MessageBox.Show(String.Format("There was an error while trying to import the data. Is your spreadsheet improperly formatted? Is it already open in Excel? Error message: {0}", ex.Message));
                     _dt = null;
                 }
 
@@ -137,6 +141,43 @@ namespace VBCommon.IO
             else
             {
                 throw new Exception("Unknown file type: " + fileName);
+            }
+
+            //Check that column names are valid:
+            try
+            {
+                if (_dt.Columns.Cast<DataColumn>().Where(x => Regex.IsMatch(x.ColumnName, @"^[^a-zA-Z]")).Count() > 0)
+                {
+                    throw new InvalidColumnNameException();
+                }
+
+                //Count the distinct values in each column.
+                var results = _dt.Columns
+                .Cast<DataColumn>()
+                .Select(dc => new {
+                    Name = dc.ColumnName,
+                    Values = _dt.Rows
+                        .Cast<DataRow>()
+                        .Select(row => row[dc])
+                        .Distinct()
+                        .Count()})
+                .OrderBy(item => item.Values);//.ToList<int>();
+
+                //Remove any columns that have fewer than two distinct values.
+                foreach (var entry in results)
+                {
+                    if (entry.Values < 2)
+                    {
+                        System.Windows.Forms.MessageBox.Show("The column " + entry.Name + " contains no distinct values and will be removed from the data set.");
+                        _dt.Columns.Remove(entry.Name);
+                    }
+                }
+            }
+            catch (InvalidColumnNameException ex)
+            {
+                _dt = null;
+                System.Windows.Forms.MessageBox.Show("Invalid column name! Please make sure that all columns begin with a letter character.");
+                throw new Exception(ex.Message);
             }
             _importFileName = fileName;
         }

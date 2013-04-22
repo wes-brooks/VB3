@@ -180,6 +180,8 @@
     <Content Include="Resources\clear.png" />
     <Content Include="Resources\NOAA.png" />
     <Content Include="Resources\USGS.png" />
+    <Content Include="Resources\Zoom-In-icon.png" />
+    <Content Include="Resources\Zoom-Out-icon.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

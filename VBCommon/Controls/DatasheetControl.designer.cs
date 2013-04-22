@@ -67,7 +67,6 @@
             this.Controls.Add(this.listView1);
             this.Name = "DatasheetControl";
             this.Size = new System.Drawing.Size(1066, 602);
-            this.Load += new System.EventHandler(this.datasheet_load);
             ((System.ComponentModel.ISupportInitialize)(this.dgv)).EndInit();
             this.ResumeLayout(false);
 
