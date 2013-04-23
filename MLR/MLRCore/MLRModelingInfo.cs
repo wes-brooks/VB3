@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using VBCommon;
 using Newtonsoft.Json;
+using ZedGraph;
 
 namespace MLRCore
 {
@@ -24,6 +25,8 @@ namespace MLRCore
 
         private VBCommon.Transforms.DependentVariableTransforms _thresholdTransform;
 	    private VBCommon.Transforms.DependentVariableTransforms _importedTransform;
+        private double[] _listFitnessProgressX = null;
+        private double[] _listFitnessProgressY = null;
         private double _thresholdPowerTransformExponent = 1;
         private double _depVarTransformExponent = 1;
         private string _dependendVariable = "";
@@ -56,6 +59,53 @@ namespace MLRCore
         public MLRModelingInfo() { }
 
         //statistics
+        [JsonProperty]
+        public double[] FitnessProgressListX
+        {
+            get { return _listFitnessProgressX; }
+            set { _listFitnessProgressX = value; }
+        }
+
+        [JsonProperty]
+        public double[] FitnessProgressListY
+        {
+            get { return _listFitnessProgressY; }
+            set { _listFitnessProgressY = value; }
+        }
+
+        public IPointListEdit GetFitnessProgress()
+        {
+            { 
+                double[] x, y;
+                x = _listFitnessProgressX;
+                y = _listFitnessProgressY;
+
+                PointPairList ppl = new PointPairList(x, y);
+                return ppl;
+            }
+        }
+
+        public void SetFitnessProgress(IPointList points)
+        {
+            {
+                List<double> tempListX = new List<double>();
+                List<double> tempListY = new List<double>();
+
+                if (points != null)
+                {
+                    for (int i = 0; i < points.Count; i++)
+                    {
+                        PointPair item = points[i];
+                        tempListX.Add(item.X);
+                        tempListY.Add(item.Y);
+                    }
+
+                    _listFitnessProgressX = tempListX.ToArray();
+                    _listFitnessProgressY = tempListY.ToArray();
+                }
+            }
+        }
+
         [JsonProperty]
         public double AIC
         {

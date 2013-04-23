@@ -30,6 +30,7 @@ namespace VBCommon.Controls
 
         //This event alerts the containing control to the fact that a notifiable change has been made to the datasheet.
         public event EventHandler NotifiableChangeEvent;
+        private event DataGridViewDataErrorEventHandler InvalidDataEnteredEvent;
 
         private int intSelectedColIndex = -1;
         private int intSelectedRowIndex = -1;
@@ -37,7 +38,6 @@ namespace VBCommon.Controls
         private string strResponseVarColName = string.Empty;
         private string strResponseVarColNameAsImported = string.Empty;
         private string strSelectedColName = string.Empty;
-        private dynamic initialValue;
 
         private enum AddReplace { Add, Replace };
         private AddReplace addreplace;
@@ -185,6 +185,8 @@ namespace VBCommon.Controls
         {
             InitializeComponent();
             InitializeContextMenus();
+            
+            this.InvalidDataEnteredEvent += new DataGridViewDataErrorEventHandler(dgv_DataError);
         }
 
 
@@ -1085,30 +1087,33 @@ namespace VBCommon.Controls
         {            
             dgv.EndEdit();
 
-            double dblValue = Convert.ToDouble(dgv[e.ColumnIndex, e.RowIndex].Value);
-            dt.Rows[e.RowIndex][e.ColumnIndex] = dblValue;
-            dt.AcceptChanges();
-            state = dtState.dirty;
-            NotifyContainer();
-            maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName); //ensure disabled rows/cols stay red
+            try
+            {
+                double dblValue = Convert.ToDouble(dgv[e.ColumnIndex, e.RowIndex].Value);
+                dt.Rows[e.RowIndex][e.ColumnIndex] = dblValue;
+                dt.AcceptChanges();
+                state = dtState.dirty;
+                NotifyContainer();
+                maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName); //ensure disabled rows/cols stay red
+            }
+            catch (InvalidCastException ex)
+            {
+                if (this.InvalidDataEnteredEvent != null)
+                {
+                    FormatException exc = new FormatException("Input string was not in a correct format");
+                    DataGridViewDataErrorEventArgs args = new DataGridViewDataErrorEventArgs(exc, e.ColumnIndex, e.RowIndex, DataGridViewDataErrorContexts.Parsing);
+                    this.InvalidDataEnteredEvent(dgv, args);
+                }
+                dgv.CancelEdit();
+            }
         }
 
 
         public void dgv_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
-            double result;
-            string scellval = dgv[e.ColumnIndex, e.RowIndex].Value.ToString();
-            if (double.TryParse(scellval, out result))
-                if (result == 0.0d)
-                {
-                    MessageBox.Show("Grid cell values cannot be blank or non-numeric", "Cell Error", MessageBoxButtons.OK);
-                    e.Cancel = true;
-                    dgv[e.ColumnIndex, e.RowIndex].Selected = true;
-                }
-                else
-                {
-                    e.Cancel = false;
-                }
+            MessageBox.Show("Grid cell values cannot be blank or non-numeric", "Cell Error", MessageBoxButtons.OK);
+            e.Cancel = true;
+            dgv[e.ColumnIndex, e.RowIndex].Selected = true;
         }
 
 
@@ -1119,6 +1124,7 @@ namespace VBCommon.Controls
                 Clipboard.SetDataObject(dgv.GetClipboardContent());
             }
         }
+
 
         // user clicked on the UI grid - decide what to do if anything
         public void dgv_MouseUp(object sender, MouseEventArgs e)

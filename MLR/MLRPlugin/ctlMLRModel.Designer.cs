@@ -89,6 +89,7 @@
             // tpVarSelection
             // 
             this.tpVarSelection.AutoScroll = true;
+            this.tpVarSelection.AutoScrollMinSize = new System.Drawing.Size(500, 500);
             this.tpVarSelection.BackColor = System.Drawing.SystemColors.Control;
             this.tpVarSelection.Controls.Add(this.ctlVariableSelection1);
             this.tpVarSelection.Location = new System.Drawing.Point(4, 22);
@@ -105,11 +106,13 @@
             this.ctlVariableSelection1.Location = new System.Drawing.Point(3, 6);
             this.ctlVariableSelection1.MinimumSize = new System.Drawing.Size(500, 0);
             this.ctlVariableSelection1.Name = "ctlVariableSelection1";
-            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 0);
+            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 497);
             this.ctlVariableSelection1.TabIndex = 0;
             // 
             // tpModel
             // 
+            this.tpModel.AutoScroll = true;
+            this.tpModel.AutoScrollMinSize = new System.Drawing.Size(600, 480);
             this.tpModel.Controls.Add(this.frmModel1);
             this.tpModel.Location = new System.Drawing.Point(4, 22);
             this.tpModel.Name = "tpModel";
@@ -120,16 +123,17 @@
             // 
             // frmModel1
             // 
+            this.frmModel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.frmModel1.AutoScroll = true;
-            this.frmModel1.AutoScrollMinSize = new System.Drawing.Size(410, 610);
             this.frmModel1.DepVarTrans = VBCommon.Transforms.DependentVariableTransforms.none;
             this.frmModel1.DepVarTransExp = 1D;
-            this.frmModel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.frmModel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.frmModel1.Location = new System.Drawing.Point(0, 0);
+            this.frmModel1.Location = new System.Drawing.Point(3, 3);
             this.frmModel1.Name = "frmModel1";
             this.frmModel1.SelectedVariables = null;
-            this.frmModel1.Size = new System.Drawing.Size(955, 584);
+            this.frmModel1.Size = new System.Drawing.Size(949, 578);
             this.frmModel1.TabIndex = 0;
             // 
             // ctlMLRModel

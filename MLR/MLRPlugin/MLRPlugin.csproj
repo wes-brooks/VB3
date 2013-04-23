@@ -76,6 +76,9 @@
       <HintPath>..\..\Externals\DotSpatial\DotSpatial.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Externals\Json.NET\Net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -107,6 +110,10 @@
     <ProjectReference Include="..\..\VBCommon\VBCommon.csproj">
       <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
       <Name>VBCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\VBDatasheet\VBDatasheet.csproj">
+      <Project>{58500DA9-66D3-4B69-86D4-E1BD43ED10B1}</Project>
+      <Name>VBDatasheet</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\VBDockManager\VBDockManager.csproj">
       <Project>{CA689A10-4A7F-4D9F-8C94-5B0FFF2F71AF}</Project>

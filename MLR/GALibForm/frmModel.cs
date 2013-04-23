@@ -53,6 +53,8 @@ namespace GALibForm
 
         private volatile bool _cancelRun = false;
 
+        private IPointListEdit _listFitnessProgress = null;
+
         //This is the full data table from the datasheet
         private DataTable _dtFull = null;        
 
@@ -316,6 +318,7 @@ namespace GALibForm
             _modelingInfo.VIF = indiv.VIF;
 
             _modelingInfo.SelectedModel = _selectedModelIndex;
+            _modelingInfo.SetFitnessProgress(_listFitnessProgress);
 
             mlrPackState.Add("MLRModelingInfo", _modelingInfo);
 
@@ -343,7 +346,8 @@ namespace GALibForm
             mlrPackState.Add("NumGenerations", txtNumGen.Text);
             mlrPackState.Add("MutationRate", txtMutRate.Text);
             mlrPackState.Add("CrossoverRate", txtCrossoverRate.Text);
-            mlrPackState.Add("SelectionCriterion", cbCriteria.SelectedItem.ToString());        
+            mlrPackState.Add("SelectionCriterion", cbCriteria.SelectedItem.ToString());
+            mlrPackState.Add("ActiveAlgorithmTab", tabControlModelGeneration.SelectedIndex);
             
             return mlrPackState;
         }
@@ -385,6 +389,9 @@ namespace GALibForm
 
             if (dictProjectState.ContainsKey("SelectionCriterion"))
                 cbCriteria.SelectedItem = dictProjectState["SelectionCriterion"].ToString();
+
+            if (dictProjectState.ContainsKey("ActiveAlgorithmTab"))
+                tabControlModelGeneration.SelectedIndex = Convert.ToInt32(dictProjectState["ActiveAlgorithmTab"].ToString());
 
             MLRModelingInfo mi = null;
             object jsonObj = null;
@@ -454,16 +461,45 @@ namespace GALibForm
                 listBox1.Items.Add(item);
             }
 
+            //Restore the Fitness Progress plot:
+            //Console.WriteLine("Generation: " + generation.ToString() + "   Fitness: " + max.ToString());
+            // Make sure that the curvelist has at least one curve
+            InitProgressGraph();
+            if (mi.GetFitnessProgress() != null)
+            {
+                if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
+                    return;
+
+                // Get the first CurveItem in the graph
+                LineItem curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
+                if (curve == null)
+                    return;
+
+                // Get the PointPairList
+                curve.Points = mi.GetFitnessProgress();
+
+                // Keep the X scale at a rolling 30 second interval, with one
+                // major step between the max X value and the end of the axis
+                Scale xScale = zedGraphControl1.GraphPane.XAxis.Scale;
+                if (mi.FitnessProgressListX.Last() > xScale.Max - xScale.MajorStep)
+                {
+                    xScale.Max = mi.FitnessProgressListX.Last() + xScale.MajorStep;
+                }
+
+                // Make sure the Y axis is rescaled to accommodate actual data
+                zedGraphControl1.AxisChange();
+                zedGraphControl1.Invoke((MethodInvoker)delegate { zedGraphControl1.Refresh(); });
+                _listFitnessProgress = zedGraphControl1.GraphPane.CurveList[0].Points as IPointListEdit;
+            }
+
             _numObs = _dtFull.Rows.Count;
             lblNumObs.Text = "Number of Observations: " + _numObs.ToString();
 
             int maxVar = _numObs / 5;            
             int recVar = Math.Min(((_numObs / 10) + 1), (_lstSelectedVariables.Count));
             lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
-            //txtMaxVars.Text = recVar.ToString();
 
             InitResultsGraph();
-            InitProgressGraph();
 
             listBox1.SelectedIndex = mi.SelectedModel;
         }
@@ -1163,11 +1199,11 @@ namespace GALibForm
                 return;
 
             // Get the PointPairList
-            IPointListEdit list = curve.Points as IPointListEdit;
+            _listFitnessProgress = curve.Points as IPointListEdit;
 
             // If this is null, it means the reference at curve.Points does not
             // support IPointListEdit, so we won't be able to modify it
-            if (list == null)
+            if (_listFitnessProgress == null)
                 return;
 
             // Time is measured in seconds
@@ -1175,7 +1211,7 @@ namespace GALibForm
             double time = generation;
 
             // 3 seconds per cycle
-            list.Add(generation, max);
+            _listFitnessProgress.Add(generation, max);
 
             // Keep the X scale at a rolling 30 second interval, with one
             // major step between the max X value and the end of the axis
