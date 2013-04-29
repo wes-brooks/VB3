@@ -89,6 +89,8 @@ namespace VBLocation
 
             if (_site != null)
             {
+                dictPluginState.Add("ZoomLevel", zoomlevel);
+
                 if (_site.Orientation != null)
                 {
                     dictPluginState.Add("Orientation", _site.Orientation);
@@ -125,6 +127,8 @@ namespace VBLocation
                     dictWaterMarker.Add("Longitude", _site.WaterMarker.Longitude);
                     dictPluginState.Add("WaterMarker", dictWaterMarker);
                 }
+
+                dictPluginState.Add("PlaceName", textBoxGeo.Text);
             }
 
             if (dictPluginState.ContainsKey("Location") && dictPluginState.ContainsKey("Orientation") && dictPluginState.ContainsKey("LeftMarker") && dictPluginState.ContainsKey("RightMarker") && dictPluginState.ContainsKey("WaterMarker"))
@@ -142,7 +146,66 @@ namespace VBLocation
 
         public void UnpackState(IDictionary<string, object> dictPackedState)
         {
-            if (dictPackedState.Count == 0) return;
+            _site = new Site();            
+
+            if (dictPackedState.ContainsKey("Orientation"))
+            {
+                _site.Orientation = Convert.ToDouble(dictPackedState["Orientation"]);
+                txtBeachAngle.Text = _site.Orientation.ToString("####0.##");
+            }
+
+            if (dictPackedState.ContainsKey("Location"))
+            {
+                Dictionary<string, double> LocationMarker = (Dictionary<string, double>)dictPackedState["Location"];
+                _site.Location.Latitude = Convert.ToDouble(LocationMarker["Latitude"]);
+                _site.Location.Longitude = Convert.ToDouble(LocationMarker["Longitude"]);
+                textBoxLat.Text = _site.Location.Latitude.ToString("####0.##");
+                textBoxLng.Text = _site.Location.Longitude.ToString("####0.##");
+                textBoxCurrLat.Text = _site.Location.Latitude.ToString("####0.##");
+                textBoxCurrLng.Text = _site.Location.Longitude.ToString("####0.##");
+            }
+
+            if (dictPackedState.ContainsKey("PlaceName"))
+            {
+                textBoxGeo.Text = dictPackedState["PlaceName"].ToString();
+            }
+
+            if (dictPackedState.ContainsKey("LeftMarker"))
+            {
+                Dictionary<string, double> LeftMarker = (Dictionary<string, double>)dictPackedState["LeftMarker"];
+                _site.LeftMarker.Latitude = Convert.ToDouble(LeftMarker["Latitude"]);
+                _site.LeftMarker.Longitude = Convert.ToDouble(LeftMarker["Longitude"]);
+            }
+
+            if (dictPackedState.ContainsKey("RightMarker"))
+            {
+                Dictionary<string, double> RightMarker = (Dictionary<string, double>)dictPackedState["RightMarker"];
+                _site.RightMarker.Latitude = Convert.ToDouble(RightMarker["Latitude"]);
+                _site.RightMarker.Longitude = Convert.ToDouble(RightMarker["Longitude"]);
+            }
+
+            if (dictPackedState.ContainsKey("WaterMarker"))
+            {
+                Dictionary<string, double> WaterMarker = (Dictionary<string, double>)dictPackedState["WaterMarker"];
+                _site.WaterMarker.Latitude = Convert.ToDouble(WaterMarker["Latitude"]);
+                _site.WaterMarker.Longitude = Convert.ToDouble(WaterMarker["Longitude"]);
+            }
+            /*
+            _site.Location.Longitude = Convert.ToDouble(textBoxCurrLng.Text);
+            _site.LeftMarker.Latitude = firstBeachMarker.Position.Lat;//marker1.Lat;
+            _site.LeftMarker.Longitude = firstBeachMarker.Position.Lng;//marker1.Long;
+
+            _site.RightMarker.Latitude = secondBeachMarker.Position.Lat;//marker2.Lat;
+            _site.RightMarker.Longitude = secondBeachMarker.Position.Lng;//marker2.Long;
+
+            _site.WaterMarker.Latitude = waterMarker.Position.Lat;//watermark.Lat;
+            _site.WaterMarker.Longitude = waterMarker.Position.Lng;//watermark.Long;
+
+            txtBeachAngle.Text = deg.ToString("####0.##");*/
+
+            //Set the zoom level last to make sure it is faithfully recreated.
+            showMap();
+            if (dictPackedState.ContainsKey("ZoomLevel")) { zoomlevel = Convert.ToInt32(dictPackedState["ZoomLevel"]); }
         }
 
 
@@ -547,7 +610,7 @@ namespace VBLocation
 
 
         // go to
-        private void button8_Click(object sender, EventArgs e)
+        private void btnGoLatLng_Click(object sender, EventArgs e)
         {
             double lat = double.Parse(textBoxLat.Text, CultureInfo.InvariantCulture);
             double lng = double.Parse(textBoxLng.Text, CultureInfo.InvariantCulture);
@@ -570,11 +633,11 @@ namespace VBLocation
         }
 
 
-        // reload map
+        /*// reload map
         private void button1_Click(object sender, EventArgs e)
         {
             MainMap.ReloadMap();
-        }
+        }*/
 
 
         // cache config
@@ -586,7 +649,7 @@ namespace VBLocation
         }
 
 
-        // clear cache
+        /*// clear cache
         private void button2_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are You sure?", "Clear GMap.NET cache?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
@@ -600,10 +663,10 @@ namespace VBLocation
                     MessageBox.Show(ex.Message);
                 }
             }
-        }
+        }*/
 
 
-        // add test route
+        /*// add test route
         private void button3_Click(object sender, EventArgs e)
         {
             MapRoute route = GMaps.Instance.GetRouteBetweenPoints(start, end, false, MainMap.Zoom);
@@ -635,10 +698,10 @@ namespace VBLocation
 
                 }
             }
-        }
+        }*/
 
 
-        // add marker on current position
+        /*// add marker on current position
         private void button4_Click(object sender, EventArgs e)
         {
             GMapMarker m = new GMapMarkerGoogleGreen(currentMarker.Position);
@@ -663,21 +726,21 @@ namespace VBLocation
 
             objects.Markers.Add(m);
             objects.Markers.Add(mBorders);
-        }
+        }*/
 
 
-        // clear routes
+        /*// clear routes
         private void button6_Click(object sender, EventArgs e)
         {
             routes.Routes.Clear();
-        }
+        }*/
 
 
-        // clear markers
+        /*// clear markers
         private void button5_Click(object sender, EventArgs e)
         {
             objects.Markers.Clear();
-        }
+        }*/
 
 
         // show current marker
@@ -714,7 +777,7 @@ namespace VBLocation
         }
 
 
-        // zoom to max for markers
+        /*// zoom to max for markers
         private void button7_Click(object sender, EventArgs e)
         {
             MainMap.ZoomAndCenterMarkers("objects");
@@ -798,7 +861,7 @@ namespace VBLocation
             {
                 MessageBox.Show("Image failed to save: " + ex.Message, "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
+        }*/
 
 
         // debug
@@ -808,7 +871,7 @@ namespace VBLocation
         }
 
 
-        private void button13_Click(object sender, EventArgs e)
+        /*private void button13_Click(object sender, EventArgs e)
         {
             RectLatLng area = MainMap.SelectedArea;
             if (!area.IsEmpty)
@@ -821,10 +884,10 @@ namespace VBLocation
             {
                 MessageBox.Show("Select map area holding ALT", "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-        }
+        }*/
 
 
-        public Site saveMapProjectInfo()
+        /*public Site saveMapProjectInfo()
         {
             Site site = new Site();
             //site.Project = txtboxProjName.Text.ToString();
@@ -880,7 +943,7 @@ namespace VBLocation
             }
 
             return site;
-        }
+        }*/
 
 
         public void initMarkers()
@@ -891,7 +954,7 @@ namespace VBLocation
         }
 
 
-        private void button3_Click_1(object sender, EventArgs e)
+        private void btnGoPlace_Click(object sender, EventArgs e)
         {
             KeyPressEventArgs kp = new KeyPressEventArgs(Convert.ToChar(Keys.Enter));
             textBoxGeo_KeyPress(sender, kp);
@@ -1010,12 +1073,6 @@ namespace VBLocation
  
                 _site.WaterMarker.Latitude = waterMarker.Position.Lat;//watermark.Lat;
                 _site.WaterMarker.Longitude = waterMarker.Position.Lng;//watermark.Long;
-
-                /*if (_plugin != null)
-                {
-                    //VBCommon.Interfaces.IBeachSite site = _plugin as VBCommon.Interfaces.IBeachSite;
-                    _plugin.Site = _site.Clone();
-                }*/
 
                 if (LocationFormEvent != null)
                 {

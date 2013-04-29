@@ -53,6 +53,7 @@ namespace MLRPlugin
 
         //complete and visible flags
         public Boolean boolComplete = false;
+        private Boolean boolVirgin = true;
         public Boolean boolVisible;
         public Boolean boolRunCancelled;
         public Boolean boolStopRun;
@@ -78,6 +79,7 @@ namespace MLRPlugin
             
             mlrModelForm = cMlr.ModelForm;
             mlrModelForm.ModelChanged += new frmModel.ModelChangedEventHandler(ModelChanged);
+            cMlr.ModelingTabControl.SelectedIndexChanged += new EventHandler(UpdateControlStatus);
             
             AddPanel();
             AddRibbon("Activate");
@@ -174,6 +176,27 @@ namespace MLRPlugin
             App.HeaderControl.SelectRoot(strPanelKey);
 
             //add sub-ribbon
+            string grpManipulate = "Manipulate Data";
+
+            btnComputeAO = new SimpleActionItem(strPanelKey, "Compute A O", cMlr.btnComputeAO_Click);
+            btnComputeAO.LargeImage = Properties.Resources.EPAComputeAO;
+            btnComputeAO.GroupCaption = grpManipulate;
+            btnComputeAO.Enabled = true;
+            App.HeaderControl.Add(btnComputeAO);
+
+            btnManipulate = new SimpleActionItem(strPanelKey, "Manipulate", cMlr.btnManipulate_Click);
+            btnManipulate.LargeImage = Properties.Resources.EPAmanipulate;
+            btnManipulate.GroupCaption = grpManipulate;
+            btnManipulate.Enabled = true;
+            App.HeaderControl.Add(btnManipulate);
+
+            btnTransform = new SimpleActionItem(strPanelKey, "Transform", cMlr.btnTransform_Click);
+            btnTransform.LargeImage = Properties.Resources.EPAtransform;
+            btnTransform.GroupCaption = grpManipulate;
+            btnTransform.Enabled = true;
+            App.HeaderControl.Add(btnTransform);
+
+            //add sub-ribbon
             string rGroupCaption = "Model";
 
             btnRun = new SimpleActionItem(strPanelKey, "Run", btnRun_Click);
@@ -227,6 +250,7 @@ namespace MLRPlugin
         public void Broadcast()
         {
             boolChanged = true;
+            boolVirgin = false;
             //get packed state, add complete and visible and raise broadcast event
             IDictionary<string, object> dictPackedState = cMlr.PackProjectState();
             dictPackedState["Origin"] = strPanelKey;
@@ -237,8 +261,9 @@ namespace MLRPlugin
                     boolComplete = true;
             }
 
-            dictPackedState.Add("Complete", true);
+            dictPackedState.Add("Complete", cMlr.Complete);
             dictPackedState.Add("Visible", boolVisible);
+
             signaller.RaiseBroadcastRequest(this, dictPackedState);
             signaller.TriggerUndoStack();
             MakeActive();
@@ -298,6 +323,7 @@ namespace MLRPlugin
                     {
                         boolInitialEntry = false;
                         boolComplete = false;
+                        boolVirgin = true;
                         cMlr.UnpackProjectState(e.PackedPluginState);
                         boolChanged = true;
                     }
@@ -310,9 +336,14 @@ namespace MLRPlugin
         private void ProjectSavedListener(object sender, VBCommon.PluginSupport.SerializationEventArgs e)
         {
             //go pack state, add complete and visible, and add to dictionary of plugins
-            IDictionary<string, object> packedState = cMlr.PackProjectState();
+            IDictionary<string, object> packedState = new Dictionary<string, object>();
+            
+            if (!boolVirgin)
+                packedState = cMlr.PackProjectState();
+
             packedState.Add("Complete", boolComplete);
             packedState.Add("Visible", boolVisible);
+            packedState.Add("Virgin", boolVirgin);
 
             e.PackedPluginStates.Add(strPanelKey, packedState);
         }
@@ -326,6 +357,12 @@ namespace MLRPlugin
             {
                 dictPlugin = e.PackedPluginStates[strPanelKey];
 
+                //Set the virigin flag
+                boolVirgin = true;
+                if (dictPlugin.ContainsKey("Virgin"))
+                    if (!(bool)(dictPlugin["Virgin"]))
+                        boolVirgin = false;
+
                 //repopulate plugin Complete flags from saved project
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolInitialEntry = false; //opening projects have been entered before
@@ -338,10 +375,13 @@ namespace MLRPlugin
                 if ((bool)dictPlugin["Visible"] && !e.PredictionOnly)
                     Show();
 
-                //Disable the notifiabledataevent during the unpacking or it'll overwrite the saved variable selection.
-                cMlr.AllowNotifiableDataEvent = false;
-                cMlr.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
-                cMlr.AllowNotifiableDataEvent = true;
+                if (!boolVirgin)
+                {
+                    //Disable the notifiabledataevent during the unpacking or it'll overwrite the saved variable selection.
+                    cMlr.AllowNotifiableDataEvent = false;
+                    cMlr.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
+                    cMlr.AllowNotifiableDataEvent = true;
+                }
             }
             else
             {
@@ -432,9 +472,44 @@ namespace MLRPlugin
             catch { }
         }
 
+
         public void ModelChanged()
         {
             Broadcast();
+        }
+
+
+        public void UpdateControlStatus(object sender, EventArgs e)
+        {
+            try
+            {
+                string strActiveTabName = cMlr.ModelingTabControl.SelectedTab.Name.ToString();
+
+                if (strActiveTabName == "tpData")
+                {
+                    btnComputeAO.Enabled = true;
+                    btnManipulate.Enabled = true;
+                    btnTransform.Enabled = true;
+                    btnRun.Enabled = false;
+                }
+                else if (strActiveTabName == "tpVarSelection")
+                {
+                    btnComputeAO.Enabled = false;
+                    btnManipulate.Enabled = false;
+                    btnTransform.Enabled = false;
+                    btnRun.Enabled = false;
+                }
+                else if (strActiveTabName == "tpModel")
+                {
+                    btnComputeAO.Enabled = false;
+                    btnManipulate.Enabled = false;
+                    btnTransform.Enabled = false;
+                    btnRun.Enabled = true;
+                    //cMlr.SetModelData();
+                }
+            }
+            catch
+            { }
         }
     }
 }

@@ -106,7 +106,7 @@
             this.ctlVariableSelection1.Location = new System.Drawing.Point(3, 6);
             this.ctlVariableSelection1.MinimumSize = new System.Drawing.Size(500, 0);
             this.ctlVariableSelection1.Name = "ctlVariableSelection1";
-            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 497);
+            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 419);
             this.ctlVariableSelection1.TabIndex = 0;
             // 
             // tpModel

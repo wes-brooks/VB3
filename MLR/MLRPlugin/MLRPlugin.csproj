@@ -139,12 +139,20 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\EPAComputeAO.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Cancel.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Run.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EPAtransform.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EPAmanipulate.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

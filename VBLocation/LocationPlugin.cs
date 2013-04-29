@@ -271,11 +271,11 @@ namespace VBLocation
 
         private void BroadcastStateListener(object sender, BroadcastEventArgs e)
         {
-            if (((IPlugin)(e.Sender)).PanelKey == strPanelKey)
+            /*if (((IPlugin)(e.Sender)).PanelKey == strPanelKey)
             {
                 //Unpack the state of this plugin.
                 cLocation.UnpackState(new Dictionary<string, object>());
-            }          
+            }       */   
         }
 
 

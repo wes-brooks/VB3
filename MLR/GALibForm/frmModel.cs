@@ -33,10 +33,7 @@ namespace GALibForm
 {
     public partial class frmModel : UserControl
     {
-        //private VariableSelection _ctlVarSelection = null;
-
-        //public ListBox lbAvailableVariables = null;
-        //public ListBox lbIndVariables = null;
+        private Dictionary<string, object> dictPackedState;
         public List<string> _lstSelectedVariables = null;
 
         public event EventHandler ClearList;
@@ -48,10 +45,10 @@ namespace GALibForm
 
         public delegate void ModelChangedEventHandler();
         public ModelChangedEventHandler ModelChanged;
-
         public event EventHandler ModelSelected;
 
         private volatile bool _cancelRun = false;
+        private bool boolModelingComplete = false;
 
         private IPointListEdit _listFitnessProgress = null;
 
@@ -87,8 +84,7 @@ namespace GALibForm
         double dblThresholdPowerTransformExponent = 1;
 
         public static bool ThresholdChecked;        //For reporting/plotting of optional eval criteria
-
-
+        
         private int[] _ndxs;        //for ROC curve plotting
         private List<double[]> _XYPlotdata;
         private int _selectedModelIndex = -1;
@@ -162,6 +158,12 @@ namespace GALibForm
         }
 
 
+        public Dictionary<string, object> PackedState
+        {
+            get { return dictPackedState; }
+        }
+
+
         public MLRModelingInfo ModelInfo { get { return _modelingInfo; } }
 
 
@@ -175,6 +177,12 @@ namespace GALibForm
 
         private void frmModel_Load(object sender, EventArgs e)
         {
+        }
+
+
+        public bool ModelingComplete
+        {
+            get { return boolModelingComplete; }
         }
 
 
@@ -197,6 +205,7 @@ namespace GALibForm
                 _list.Clear();
                 _list = null;
             }
+            boolModelingComplete = false;
             listBox1.Items.Clear();
             listView1.Items.Clear();
             listView2.Items.Clear();
@@ -220,7 +229,8 @@ namespace GALibForm
         //Pack State for Serializing
         public IDictionary<string, object> PackProjectState()
         {
-            return ProjectSave();
+            //return ProjectSave();
+            return PackedState;
         }
 
 
@@ -724,6 +734,7 @@ namespace GALibForm
             lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
 
             mlrPlots1.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
+            mlrPlots2.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
         }
 
 
@@ -1242,6 +1253,14 @@ namespace GALibForm
         }
 
 
+        public void ClearModelingTab()
+        {
+            InitializeComponent();
+            _dataMgr = MLRDataManager.GetDataManager();
+            cbCriteria.SelectedIndex = 0;
+        }
+
+
         private void UpdateResults(List<double[]> data)
         {
             DataTable dt = _dtFull;
@@ -1298,10 +1317,10 @@ namespace GALibForm
             GraphPane zgc2pane = zedGraphControl2.GraphPane;
             //...best I can do for now
             zgc2pane.XAxis.Cross = 0;
-
-
+            
             // Make sure the Y axis is rescaled to accommodate actual data
             zedGraphControl2.AxisChange();
+
             // Force a redraw
             zedGraphControl2.Invalidate();
             listBox1.Refresh();
@@ -1500,14 +1519,13 @@ namespace GALibForm
             listView2.Items.Add(lvi);
 
             UpdateResults(data);
-            ProjectSave();
+            //ProjectSave();
 
             //mlrPlots1.UpdateResults(data, ind.RMSE, MLRPlots.Exceedance.model);
             //mlrPlots1.btnXYPlot_Click(null, null);
           
             _dataMgr.Model = ind.Model;
-
-            ProjectSave();
+            dictPackedState = ProjectSave();
 
             ModelFitExceedances();
 
@@ -1516,7 +1534,8 @@ namespace GALibForm
 
             _listRebuilds = new List<MultipleRegression>();
 
-            showResiduals(ind);
+            ShowResiduals(ind);
+            boolModelingComplete = true;
 
             ModelChanged();
         }
@@ -1562,7 +1581,8 @@ namespace GALibForm
         private void ModelRebuildFitExceedances()
         {
             //DataTable dtMData = _dataMgr.ModelDataTable;
-            DataTable dtMData = _modelBuildTables.Tables[_selectedRebuild];
+            //DataTable dtMData = _modelBuildTables.Tables[_selectedRebuild];
+            DataTable dtMData = _modelBuildTables.Tables[listBox2.SelectedIndex];
             DataView dv = dtMData.DefaultView;
             List<string> listVarsInModel = _modelingInfo.Model.Keys.ToList<string>();
             listVarsInModel.RemoveAt(0);
@@ -2309,8 +2329,7 @@ namespace GALibForm
 
                             //comment next line to use piecewiseconstant integral calc
                             auc = auc2;
-
-
+                            
                             item[0] = _list[li].Fitness.ToString("##.####");
                             //item[1] = string.Format("{0:f6}", auc.ToString());
                             item[1] = auc.ToString("#.######");
@@ -2730,7 +2749,7 @@ namespace GALibForm
 
         #region residual tab controls and methods
 
-        private void showResiduals(MLRIndividual selectedModel)
+        private void ShowResiduals(MLRIndividual selectedModel)
         {
             Dictionary<string, double> modeldic = _dataMgr.Model;
 
@@ -2751,10 +2770,13 @@ namespace GALibForm
 
                 if (model != null)
                 {
+                    //Make sure that clearing listBox2 doesn't trigger the listBox2_SelectedIndexChanged event:
+                    listBox2.SelectedIndexChanged -= new System.EventHandler(this.listBox2_SelectedIndexChanged);
+
                     _recsRemoved = new List<int>();
                     _residValueRemoved = new List<double>();
                     _residTypeRemoved = new List<string>();
-
+                    
                     listBox2.Items.Clear();
                     _modelBuildTables.Tables.Clear();
 
@@ -2767,6 +2789,7 @@ namespace GALibForm
                     double cooksThreshold = 4.0d / (double)model.PredictedValues.Length;
 
                     setLabels(true, dffitsThreshold, cooksThreshold);
+                    listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
                 }
             }
         }
@@ -3387,8 +3410,10 @@ namespace GALibForm
 
             ModelRebuildFitExceedances();
             mlrPlots2.UpdateResults(data, model.RMSE, MLRPlots.Exceedance.model);
+            mlrPlots2.btnXYPlot_Click(null, null);
 
             master.Add(gpResidPlot);
+            rbTable_CheckedChanged(null, null);
 
             using (Graphics g = this.CreateGraphics())
             { master.SetLayout(g, PaneLayout.SquareColPreferred); }
@@ -3478,7 +3503,7 @@ namespace GALibForm
                 createResidvFittedPlot(model);
 
                 _selectedRebuildIndex = _selectedRebuild;
-                ProjectSave();
+                dictPackedState = ProjectSave();
                 ModelChanged();
             }
         }

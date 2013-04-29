@@ -120,6 +120,7 @@
             this.btnClearStations.TabIndex = 54;
             this.btnClearStations.Text = "Remove Station Locations";
             this.btnClearStations.UseVisualStyleBackColor = true;
+            this.btnClearStations.Click += new System.EventHandler(btnClearStations_Click);
             // 
             // cbncdc
             // 
@@ -206,6 +207,7 @@
             this.btnShowDataSources.TabIndex = 49;
             this.btnShowDataSources.Text = "Show Station Locations";
             this.btnShowDataSources.UseVisualStyleBackColor = true;
+            this.btnShowDataSources.Click += new System.EventHandler(btnShowDataSources_Click);
             // 
             // groupBox8
             // 
@@ -229,6 +231,7 @@
             this.btnBeachMarker.TabIndex = 18;
             this.btnBeachMarker.Text = "Add 1st Beach Marker";
             this.btnBeachMarker.UseVisualStyleBackColor = true;
+            this.btnBeachMarker.Click += new System.EventHandler(btnBeachMarker_Click);
             // 
             // btnSelectWater
             // 
@@ -238,6 +241,7 @@
             this.btnSelectWater.TabIndex = 17;
             this.btnSelectWater.Text = "Add Water Marker";
             this.btnSelectWater.UseVisualStyleBackColor = true;
+            this.btnSelectWater.Click += new System.EventHandler(btnSelectWater_Click);
             // 
             // btnBeachMarker2
             // 
@@ -247,6 +251,7 @@
             this.btnBeachMarker2.TabIndex = 16;
             this.btnBeachMarker2.Text = "Add 2nd Beach Marker";
             this.btnBeachMarker2.UseVisualStyleBackColor = true;
+            this.btnBeachMarker2.Click += new System.EventHandler(btnBeachMarker2_Click);
             // 
             // label5
             // 
@@ -367,6 +372,7 @@
             this.btnGoPlace.TabIndex = 12;
             this.btnGoPlace.Text = "GoTo Place";
             this.btnGoPlace.UseVisualStyleBackColor = true;
+            this.btnGoPlace.Click += new System.EventHandler(btnGoPlace_Click);
             // 
             // label6
             // 
@@ -393,6 +399,7 @@
             this.btnGoLatLng.TabIndex = 8;
             this.btnGoLatLng.Text = "GoTo Lat/Lng";
             this.btnGoLatLng.UseVisualStyleBackColor = true;
+            this.btnGoLatLng.Click += new System.EventHandler(btnGoLatLng_Click);
             // 
             // label2
             // 

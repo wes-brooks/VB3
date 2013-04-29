@@ -107,7 +107,9 @@ namespace VBControls
             tbThresholdReg.Text = _mandateThreshold.ToString();
             //_sprobabilityThreshold = "50";
             //_sdecisionThreshold = tbThresholdDec.Text;
-            //_smandateThreshold = tbThresholdReg.Text;    
+            //_smandateThreshold = tbThresholdReg.Text;   
+
+            btnXYPlot_Click(null, null);
         }
 
         public void SetThresholds(string decisionThreshold, string mandateThreshold)
@@ -117,6 +119,8 @@ namespace VBControls
             //_sprobabilityThreshold = "50";
             //_sdecisionThreshold = tbThresholdDec.Text;
             //_smandateThreshold = tbThresholdReg.Text;
+
+            btnXYPlot_Click(null, null);
         }
 
         public VBCommon.Transforms.DependentVariableTransforms Transform

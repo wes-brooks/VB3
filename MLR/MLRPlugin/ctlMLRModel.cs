@@ -26,8 +26,22 @@ namespace MLRPlugin
 
             dsControl1.NotifiableChangeEvent +=new EventHandler(dsControl1_NotifiableChangeEvent);
             ctlVariableSelection1.VariablesChanged += new EventHandler(ctlVariableSelection1_UpdateVariableList);
+            //dsControl1.NotifiableChangeEvent += new EventHandler(dsControl1_NotifiableChangeEvent);
             frmModel1.ClearList += new EventHandler(frmModel1_ClearList);
             frmModel1.AddToList += new frmModel.MyEventHandler(frmModel1_AddToList);
+        }
+
+
+        public TabControl ModelingTabControl
+        {
+            get { return tabControl1; }
+        }
+
+
+        //Return a flag indicating whether the plugin is ready to export a completed model
+        public bool Complete
+        {
+            get { return frmModel1.ModelingComplete; }
         }
 
 
@@ -35,6 +49,24 @@ namespace MLRPlugin
         {
             get { return bAllowNotifiableDataEvent; }
             set { bAllowNotifiableDataEvent = value; }
+        }
+
+
+        public void btnComputeAO_Click(object sender, EventArgs e)
+        {
+            dsControl1.btnComputeAO_Click(sender, e);
+        }
+
+
+        public void btnManipulate_Click(object sender, EventArgs e)
+        {
+            dsControl1.btnManipulate_Click(sender, e);
+        }
+
+
+        public void btnTransform_Click(object sender, EventArgs e)
+        {
+            dsControl1.btnTransform_Click(sender, e);
         }
 
 
@@ -60,6 +92,7 @@ namespace MLRPlugin
             List<string> lstSelectedVariables = ctlVariableSelection1.SelectedVariables.ToList();
             MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
             _dataMgr.ModelDataTable = dsControl1.DT.Copy();
+            //frmModel1.ClearModelingTab();
             frmModel1.InitControls();
             frmModel1.SetData();
             frmModel1.SelectedVariables = lstSelectedVariables;
