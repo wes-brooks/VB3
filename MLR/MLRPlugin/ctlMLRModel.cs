@@ -25,10 +25,10 @@ namespace MLRPlugin
             MLRControl = this;
 
             dsControl1.NotifiableChangeEvent +=new EventHandler(dsControl1_NotifiableChangeEvent);
-            ctlVariableSelection1.VariablesChanged += new EventHandler(ctlVariableSelection1_UpdateVariableList);
+            //frmModel1.VariablesChanged += new EventHandler(ctlVariableSelection1_UpdateVariableList);
             //dsControl1.NotifiableChangeEvent += new EventHandler(dsControl1_NotifiableChangeEvent);
-            frmModel1.ClearList += new EventHandler(frmModel1_ClearList);
-            frmModel1.AddToList += new frmModel.MyEventHandler(frmModel1_AddToList);
+            //frmModel1.ClearList += new EventHandler(frmModel1_ClearList);
+            //frmModel1.AddToList += new frmModel.MyEventHandler(frmModel1_AddToList);
         }
 
 
@@ -70,7 +70,7 @@ namespace MLRPlugin
         }
 
 
-        private void frmModel1_ClearList(object sender, EventArgs e)
+        /*private void frmModel1_ClearList(object sender, EventArgs e)
         {
             ctlVariableSelection1.ClearAll();
         }
@@ -79,7 +79,7 @@ namespace MLRPlugin
         private void frmModel1_AddToList(frmModel.MyEventArg e)
         {
             ctlVariableSelection1.AddToList(e.ModelVars);
-        }
+        }*/
 
 
         //Handle changes in the local datasheet control
@@ -88,18 +88,25 @@ namespace MLRPlugin
             if (!bAllowNotifiableDataEvent)
                 return;
 
-            ctlVariableSelection1.SetData(dsControl1.DT.Copy());
+            /*ctlVariableSelection1.SetData(dsControl1.DT.Copy());
             List<string> lstSelectedVariables = ctlVariableSelection1.SelectedVariables.ToList();
             MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
             _dataMgr.ModelDataTable = dsControl1.DT.Copy();
             //frmModel1.ClearModelingTab();
             frmModel1.InitControls();
             frmModel1.SetData();
-            frmModel1.SelectedVariables = lstSelectedVariables;
+            frmModel1.SelectedVariables = lstSelectedVariables;*/
+
+            
+            MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
+            _dataMgr.ModelDataTable = dsControl1.DT.Copy();
+            //frmModel1.ClearModelingTab();
+            frmModel1.InitControls();
+            frmModel1.SetData();
         }
 
 
-        //Handle changes in the variable selection control
+        /*//Handle changes in the variable selection control
         private void ctlVariableSelection1_SelectionChanged(object sender, EventArgs e)
         {
             //Make a copy of the list
@@ -109,14 +116,14 @@ namespace MLRPlugin
             frmModel1.InitControls();
             frmModel1.SetData();
             frmModel1.SelectedVariables = lstSelectedVariables;
-        }
+        }*/
 
 
-        private void ctlVariableSelection1_UpdateVariableList(object sender, EventArgs e)
+        /*private void ctlVariableSelection1_UpdateVariableList(object sender, EventArgs e)
         {
             List<string> lstSelectedVariables = ctlVariableSelection1.SelectedVariables.ToList();
-            frmModel1.SelectedVariables = lstSelectedVariables;
-        }
+            //frmModel1.SelectedVariables = lstSelectedVariables;
+        }*/
 
 
         public GALibForm.frmModel ModelForm
@@ -152,7 +159,7 @@ namespace MLRPlugin
             }
 
             pluginState.Add("PackedDatasheetState", dsControl1.PackState());
-            pluginState.Add("VarSelectionState", ctlVariableSelection1.PackState());
+            //pluginState.Add("VarSelectionState", ctlVariableSelection1.PackState());
             pluginState.Add("ActiveTab", tabControl1.SelectedIndex);
             pluginState.Add("Model", frmModel1.PackProjectState());
 
@@ -187,11 +194,11 @@ namespace MLRPlugin
             if (dictProjectState.ContainsKey("PackedDatasheetState"))            
                 dsControl1.UnpackState(dictProjectState["PackedDatasheetState"] as IDictionary<string, object>);
             
-            if (dictProjectState.ContainsKey("VarSelectionState"))
+            /*if (dictProjectState.ContainsKey("VarSelectionState"))
             {
                 ctlVariableSelection1.UnpackState(dictProjectState["VarSelectionState"] as Dictionary<string, List<ListItem>>);
                 frmModel1.SelectedVariables = ctlVariableSelection1.SelectedVariables.ToList();
-            }
+            }*/
 
             MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
             _dataMgr.ModelDataTable = dsControl1.DT.Copy();

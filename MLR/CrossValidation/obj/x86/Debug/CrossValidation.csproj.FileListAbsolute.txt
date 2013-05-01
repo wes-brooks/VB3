@@ -6,13 +6,13 @@ C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\ResolveAssemblyReference.
 C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\CrossValidation.frmCrossValidation.resources
 C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\svn\svn\trunk\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\VB3\bin\debug\Plugins\VBMLR\CrossValidation.dll
+C:\VB3\bin\debug\Plugins\VBMLR\CrossValidation.pdb
+C:\VB3\bin\debug\Binaries\VBMLR\CrossValidation.dll
+C:\VB3\bin\debug\Binaries\VBMLR\CrossValidation.pdb
 C:\VB3\MLR\CrossValidation\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\VB3\MLR\CrossValidation\obj\x86\Debug\CrossValidation.frmCrossValidation.resources
 C:\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\VB3\MLR\CrossValidation\obj\x86\Debug\GenerateResource.write.1.tlog
-C:\VB3\bin\debug\Plugins\VBMLR\CrossValidation.dll
-C:\VB3\bin\debug\Plugins\VBMLR\CrossValidation.pdb
 C:\VB3\MLR\CrossValidation\obj\x86\Debug\CrossValidation.dll
 C:\VB3\MLR\CrossValidation\obj\x86\Debug\CrossValidation.pdb
-C:\VB3\bin\debug\Binaries\VBMLR\CrossValidation.dll
-C:\VB3\bin\debug\Binaries\VBMLR\CrossValidation.pdb

@@ -25,6 +25,10 @@ C:\svn\svn\trunk\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmModel.resources
 C:\svn\svn\trunk\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmModelingReport.resources
 C:\svn\svn\trunk\VB3\MLR\GALibForm\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\svn\svn\trunk\VB3\MLR\GALibForm\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\VB3\bin\debug\Plugins\VBMLR\GALibForm.dll
+C:\VB3\bin\debug\Plugins\VBMLR\GALibForm.pdb
+C:\VB3\bin\debug\Binaries\VBMLR\GALibForm.dll
+C:\VB3\bin\debug\Binaries\VBMLR\GALibForm.pdb
 C:\VB3\MLR\GALibForm\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmDataTable.resources
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmEvalPlots.resources
@@ -32,9 +36,5 @@ C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmModel.resources
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmModelingReport.resources
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GenerateResource.write.1.tlog
-C:\VB3\bin\debug\Plugins\VBMLR\GALibForm.dll
-C:\VB3\bin\debug\Plugins\VBMLR\GALibForm.pdb
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.dll
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.pdb
-C:\VB3\bin\debug\Binaries\VBMLR\GALibForm.dll
-C:\VB3\bin\debug\Binaries\VBMLR\GALibForm.pdb

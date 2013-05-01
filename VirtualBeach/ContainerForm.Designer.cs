@@ -42,7 +42,6 @@ namespace VirtualBeach
             // 
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2,
             this.toolStripStatusLabel3,
             this.toolStripProgressBar1});
             this.statusBar.Location = new System.Drawing.Point(0, 346);
@@ -59,15 +58,14 @@ namespace VirtualBeach
             // 
             // toolStripStatusLabel2
             // 
-            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(269, 17);
-            this.toolStripStatusLabel2.Spring = true;
-            this.toolStripStatusLabel2.Text = "Beach Name:    ";
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel2";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(338, 17);
+            this.toolStripStatusLabel1.Text = "";
             // 
             // toolStripStatusLabel3
             // 
             this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
-            this.toolStripStatusLabel3.Size = new System.Drawing.Size(269, 17);
+            this.toolStripStatusLabel3.Size = new System.Drawing.Size(569, 17);
             this.toolStripStatusLabel3.Spring = true;
             this.toolStripStatusLabel3.Text = "Status:";
             this.toolStripStatusLabel3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;

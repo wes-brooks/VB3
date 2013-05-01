@@ -29,6 +29,7 @@
       private void InitializeComponent()
       {
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.MainMap = new VBLocation.Map();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
             this.gbControls = new System.Windows.Forms.GroupBox();
             this.btnClearStations = new System.Windows.Forms.Button();
@@ -52,7 +53,6 @@
             this.progressBar2 = new System.Windows.Forms.ProgressBar();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -66,7 +66,6 @@
             this.textBoxLat = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.MainMap = new VBLocation.Map();
             this.groupBox4.SuspendLayout();
             this.gbControls.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -91,6 +90,22 @@
             this.groupBox4.TabIndex = 27;
             this.groupBox4.TabStop = false;
             // 
+            // MainMap
+            // 
+            this.MainMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MainMap.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.MainMap.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.MainMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.MainMap.CanDragMap = true;
+            this.MainMap.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.MainMap.Location = new System.Drawing.Point(6, 16);
+            this.MainMap.MarkersEnabled = true;
+            this.MainMap.Name = "MainMap";
+            this.MainMap.Size = new System.Drawing.Size(549, 639);
+            this.MainMap.TabIndex = 0;
+            // 
             // gbControls
             // 
             this.gbControls.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -114,18 +129,18 @@
             // 
             // btnClearStations
             // 
-            this.btnClearStations.Location = new System.Drawing.Point(12, 544);
+            this.btnClearStations.Location = new System.Drawing.Point(15, 475);
             this.btnClearStations.Name = "btnClearStations";
             this.btnClearStations.Size = new System.Drawing.Size(142, 26);
             this.btnClearStations.TabIndex = 54;
             this.btnClearStations.Text = "Remove Station Locations";
             this.btnClearStations.UseVisualStyleBackColor = true;
-            this.btnClearStations.Click += new System.EventHandler(btnClearStations_Click);
+            this.btnClearStations.Click += new System.EventHandler(this.btnClearStations_Click);
             // 
             // cbncdc
             // 
             this.cbncdc.AutoSize = true;
-            this.cbncdc.Location = new System.Drawing.Point(94, 510);
+            this.cbncdc.Location = new System.Drawing.Point(97, 441);
             this.cbncdc.Name = "cbncdc";
             this.cbncdc.Size = new System.Drawing.Size(56, 17);
             this.cbncdc.TabIndex = 53;
@@ -135,7 +150,7 @@
             // cbstoret
             // 
             this.cbstoret.AutoSize = true;
-            this.cbstoret.Location = new System.Drawing.Point(14, 525);
+            this.cbstoret.Location = new System.Drawing.Point(17, 456);
             this.cbstoret.Name = "cbstoret";
             this.cbstoret.Size = new System.Drawing.Size(70, 17);
             this.cbstoret.TabIndex = 52;
@@ -145,7 +160,7 @@
             // cbnwis
             // 
             this.cbnwis.AutoSize = true;
-            this.cbnwis.Location = new System.Drawing.Point(14, 511);
+            this.cbnwis.Location = new System.Drawing.Point(17, 442);
             this.cbnwis.Name = "cbnwis";
             this.cbnwis.Size = new System.Drawing.Size(55, 17);
             this.cbnwis.TabIndex = 51;
@@ -158,9 +173,9 @@
             this.groupBox6.Controls.Add(this.textBoxCurrLat);
             this.groupBox6.Controls.Add(this.label13);
             this.groupBox6.Controls.Add(this.label14);
-            this.groupBox6.Location = new System.Drawing.Point(5, 576);
+            this.groupBox6.Location = new System.Drawing.Point(8, 507);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(152, 75);
+            this.groupBox6.Size = new System.Drawing.Size(169, 75);
             this.groupBox6.TabIndex = 50;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Current Location";
@@ -170,7 +185,7 @@
             this.textBoxCurrLng.Location = new System.Drawing.Point(6, 46);
             this.textBoxCurrLng.Name = "textBoxCurrLng";
             this.textBoxCurrLng.ReadOnly = true;
-            this.textBoxCurrLng.Size = new System.Drawing.Size(111, 20);
+            this.textBoxCurrLng.Size = new System.Drawing.Size(129, 20);
             this.textBoxCurrLng.TabIndex = 9;
             // 
             // textBoxCurrLat
@@ -178,13 +193,13 @@
             this.textBoxCurrLat.Location = new System.Drawing.Point(6, 20);
             this.textBoxCurrLat.Name = "textBoxCurrLat";
             this.textBoxCurrLat.ReadOnly = true;
-            this.textBoxCurrLat.Size = new System.Drawing.Size(111, 20);
+            this.textBoxCurrLat.Size = new System.Drawing.Size(129, 20);
             this.textBoxCurrLat.TabIndex = 8;
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(117, 49);
+            this.label13.Location = new System.Drawing.Point(141, 49);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(25, 13);
             this.label13.TabIndex = 11;
@@ -193,7 +208,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(117, 23);
+            this.label14.Location = new System.Drawing.Point(141, 23);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(22, 13);
             this.label14.TabIndex = 10;
@@ -201,13 +216,13 @@
             // 
             // btnShowDataSources
             // 
-            this.btnShowDataSources.Location = new System.Drawing.Point(14, 478);
+            this.btnShowDataSources.Location = new System.Drawing.Point(17, 409);
             this.btnShowDataSources.Name = "btnShowDataSources";
             this.btnShowDataSources.Size = new System.Drawing.Size(140, 26);
             this.btnShowDataSources.TabIndex = 49;
             this.btnShowDataSources.Text = "Show Station Locations";
             this.btnShowDataSources.UseVisualStyleBackColor = true;
-            this.btnShowDataSources.Click += new System.EventHandler(btnShowDataSources_Click);
+            this.btnShowDataSources.Click += new System.EventHandler(this.btnShowDataSources_Click);
             // 
             // groupBox8
             // 
@@ -216,47 +231,47 @@
             this.groupBox8.Controls.Add(this.btnBeachMarker2);
             this.groupBox8.Controls.Add(this.label5);
             this.groupBox8.Controls.Add(this.txtBeachAngle);
-            this.groupBox8.Location = new System.Drawing.Point(5, 316);
+            this.groupBox8.Location = new System.Drawing.Point(5, 267);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(169, 144);
+            this.groupBox8.Size = new System.Drawing.Size(169, 136);
             this.groupBox8.TabIndex = 48;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Beach Orientation";
             // 
             // btnBeachMarker
             // 
-            this.btnBeachMarker.Location = new System.Drawing.Point(9, 19);
+            this.btnBeachMarker.Location = new System.Drawing.Point(12, 19);
             this.btnBeachMarker.Name = "btnBeachMarker";
-            this.btnBeachMarker.Size = new System.Drawing.Size(142, 24);
+            this.btnBeachMarker.Size = new System.Drawing.Size(142, 23);
             this.btnBeachMarker.TabIndex = 18;
             this.btnBeachMarker.Text = "Add 1st Beach Marker";
             this.btnBeachMarker.UseVisualStyleBackColor = true;
-            this.btnBeachMarker.Click += new System.EventHandler(btnBeachMarker_Click);
+            this.btnBeachMarker.Click += new System.EventHandler(this.btnBeachMarker_Click);
             // 
             // btnSelectWater
             // 
-            this.btnSelectWater.Location = new System.Drawing.Point(7, 78);
+            this.btnSelectWater.Location = new System.Drawing.Point(12, 77);
             this.btnSelectWater.Name = "btnSelectWater";
             this.btnSelectWater.Size = new System.Drawing.Size(142, 23);
             this.btnSelectWater.TabIndex = 17;
             this.btnSelectWater.Text = "Add Water Marker";
             this.btnSelectWater.UseVisualStyleBackColor = true;
-            this.btnSelectWater.Click += new System.EventHandler(btnSelectWater_Click);
+            this.btnSelectWater.Click += new System.EventHandler(this.btnSelectWater_Click);
             // 
             // btnBeachMarker2
             // 
-            this.btnBeachMarker2.Location = new System.Drawing.Point(7, 49);
+            this.btnBeachMarker2.Location = new System.Drawing.Point(12, 48);
             this.btnBeachMarker2.Name = "btnBeachMarker2";
             this.btnBeachMarker2.Size = new System.Drawing.Size(142, 23);
             this.btnBeachMarker2.TabIndex = 16;
             this.btnBeachMarker2.Text = "Add 2nd Beach Marker";
             this.btnBeachMarker2.UseVisualStyleBackColor = true;
-            this.btnBeachMarker2.Click += new System.EventHandler(btnBeachMarker2_Click);
+            this.btnBeachMarker2.Click += new System.EventHandler(this.btnBeachMarker2_Click);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 124);
+            this.label5.Location = new System.Drawing.Point(6, 112);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(92, 13);
             this.label5.TabIndex = 6;
@@ -264,7 +279,7 @@
             // 
             // txtBeachAngle
             // 
-            this.txtBeachAngle.Location = new System.Drawing.Point(105, 118);
+            this.txtBeachAngle.Location = new System.Drawing.Point(105, 106);
             this.txtBeachAngle.Name = "txtBeachAngle";
             this.txtBeachAngle.Size = new System.Drawing.Size(49, 20);
             this.txtBeachAngle.TabIndex = 3;
@@ -274,7 +289,7 @@
             this.groupBoxLoading.Controls.Add(this.progressBar3);
             this.groupBoxLoading.Controls.Add(this.progressBar2);
             this.groupBoxLoading.Controls.Add(this.progressBar1);
-            this.groupBoxLoading.Location = new System.Drawing.Point(5, 657);
+            this.groupBoxLoading.Location = new System.Drawing.Point(8, 588);
             this.groupBoxLoading.Name = "groupBoxLoading";
             this.groupBoxLoading.Size = new System.Drawing.Size(169, 48);
             this.groupBoxLoading.TabIndex = 47;
@@ -310,24 +325,14 @@
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.button1);
             this.groupBox5.Controls.Add(this.label7);
             this.groupBox5.Controls.Add(this.comboBoxMapType);
             this.groupBox5.Location = new System.Drawing.Point(5, 184);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(169, 126);
+            this.groupBox5.Size = new System.Drawing.Size(169, 77);
             this.groupBox5.TabIndex = 46;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Map Settings";
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(50, 80);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(53, 24);
-            this.button1.TabIndex = 9;
-            this.button1.Text = "Reload";
-            this.button1.UseVisualStyleBackColor = true;
             // 
             // label7
             // 
@@ -346,6 +351,7 @@
             this.comboBoxMapType.Name = "comboBoxMapType";
             this.comboBoxMapType.Size = new System.Drawing.Size(125, 21);
             this.comboBoxMapType.TabIndex = 9;
+            this.comboBoxMapType.DropDownClosed += new System.EventHandler(this.comboBoxMapType_DropDownClosed);
             // 
             // groupBox3
             // 
@@ -372,7 +378,7 @@
             this.btnGoPlace.TabIndex = 12;
             this.btnGoPlace.Text = "GoTo Place";
             this.btnGoPlace.UseVisualStyleBackColor = true;
-            this.btnGoPlace.Click += new System.EventHandler(btnGoPlace_Click);
+            this.btnGoPlace.Click += new System.EventHandler(this.btnGoPlace_Click);
             // 
             // label6
             // 
@@ -399,7 +405,7 @@
             this.btnGoLatLng.TabIndex = 8;
             this.btnGoLatLng.Text = "GoTo Lat/Lng";
             this.btnGoLatLng.UseVisualStyleBackColor = true;
-            this.btnGoLatLng.Click += new System.EventHandler(btnGoLatLng_Click);
+            this.btnGoLatLng.Click += new System.EventHandler(this.btnGoLatLng_Click);
             // 
             // label2
             // 
@@ -460,22 +466,6 @@
             this.trackBar1.TabIndex = 29;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             this.trackBar1.Value = 12;
-            // 
-            // MainMap
-            // 
-            this.MainMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.MainMap.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.MainMap.BackColor = System.Drawing.SystemColors.AppWorkspace;
-            this.MainMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.MainMap.CanDragMap = true;
-            this.MainMap.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.MainMap.Location = new System.Drawing.Point(6, 16);
-            this.MainMap.MarkersEnabled = true;
-            this.MainMap.Name = "MainMap";
-            this.MainMap.Size = new System.Drawing.Size(549, 639);
-            this.MainMap.TabIndex = 0;
             // 
             // frmLocation
             // 
@@ -542,7 +532,6 @@
       private System.Windows.Forms.ProgressBar progressBar2;
       private System.Windows.Forms.ProgressBar progressBar1;
       private System.Windows.Forms.GroupBox groupBox5;
-      private System.Windows.Forms.Button button1;
       private System.Windows.Forms.Label label7;
       private System.Windows.Forms.ComboBox comboBoxMapType;
       private System.Windows.Forms.GroupBox groupBox3;

@@ -195,32 +195,20 @@ namespace MLRPlugin
             btnTransform.GroupCaption = grpManipulate;
             btnTransform.Enabled = true;
             App.HeaderControl.Add(btnTransform);
-
-            //add sub-ribbon
-            string rGroupCaption = "Model";
-
-            btnRun = new SimpleActionItem(strPanelKey, "Run", btnRun_Click);
-            btnRun.LargeImage = Properties.Resources.Run;
-            btnRun.GroupCaption = rGroupCaption;
-            btnRun.Enabled = false;
-            App.HeaderControl.Add(btnRun);
-
-            btnCancel = new SimpleActionItem(strPanelKey, "Cancel", btnCancel_Click);
-            btnCancel.LargeImage = Properties.Resources.Cancel;
-            btnCancel.GroupCaption = rGroupCaption;
-            btnCancel.Enabled = false;
-            App.HeaderControl.Add(btnCancel);
         }
 
-        void btnRun_Click(object sender, EventArgs e)
+
+        /*void btnRun_Click(object sender, EventArgs e)
         {
 
         }
+
 
         void btnCancel_Click(object sender, EventArgs e)
         {
 
-        }
+        }*/
+
 
         //returns this model's packed state
         public IDictionary<string, object> PackedPlugin
@@ -229,10 +217,12 @@ namespace MLRPlugin
             set { dictPlugin = value; }
         }
 
+
         public Globals.PluginType PluginType
         {
             get { return pluginType; }
         }
+
 
         //keep track if model already has a datasheet
         public Boolean InitialEntry

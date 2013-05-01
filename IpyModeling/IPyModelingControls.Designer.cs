@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.DatasheetTab = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
@@ -49,6 +49,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.lbAvailableVariables = new System.Windows.Forms.ListBox();
             this.ModelingTab = new System.Windows.Forms.TabPage();
+            this.lblChartTitle = new System.Windows.Forms.Label();
             this.lblDecisionThreshold = new System.Windows.Forms.Label();
             this.pnlThresholdingButtons = new System.Windows.Forms.Panel();
             this.btnRight25 = new System.Windows.Forms.Button();
@@ -85,7 +86,6 @@
             this.tbThreshold = new System.Windows.Forms.TextBox();
             this.DiagnosticTab = new System.Windows.Forms.TabPage();
             this.zgcDiagnostic = new ZedGraph.ZedGraphControl();
-            this.lblChartTitle = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.DatasheetTab.SuspendLayout();
             this.VariableSelectionTab.SuspendLayout();
@@ -112,7 +112,7 @@
             this.tabControl1.Location = new System.Drawing.Point(1, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1085, 610);
+            this.tabControl1.Size = new System.Drawing.Size(1068, 610);
             this.tabControl1.TabIndex = 0;
             // 
             // DatasheetTab
@@ -123,7 +123,7 @@
             this.DatasheetTab.Location = new System.Drawing.Point(4, 22);
             this.DatasheetTab.Name = "DatasheetTab";
             this.DatasheetTab.Padding = new System.Windows.Forms.Padding(3);
-            this.DatasheetTab.Size = new System.Drawing.Size(1094, 619);
+            this.DatasheetTab.Size = new System.Drawing.Size(1060, 584);
             this.DatasheetTab.TabIndex = 0;
             this.DatasheetTab.Text = "Data Manipulation";
             // 
@@ -157,7 +157,7 @@
             this.dsControl1.ResponseVarColNameAsImported = "";
             this.dsControl1.SelectColName = "";
             this.dsControl1.SelectedColIndex = -1;
-            this.dsControl1.Size = new System.Drawing.Size(1066, 494);
+            this.dsControl1.Size = new System.Drawing.Size(1049, 494);
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
             // 
@@ -178,7 +178,7 @@
             this.VariableSelectionTab.Location = new System.Drawing.Point(4, 22);
             this.VariableSelectionTab.Name = "VariableSelectionTab";
             this.VariableSelectionTab.Padding = new System.Windows.Forms.Padding(3);
-            this.VariableSelectionTab.Size = new System.Drawing.Size(1094, 619);
+            this.VariableSelectionTab.Size = new System.Drawing.Size(1077, 584);
             this.VariableSelectionTab.TabIndex = 1;
             this.VariableSelectionTab.Text = "Variable Selection";
             // 
@@ -303,9 +303,21 @@
             this.ModelingTab.Location = new System.Drawing.Point(4, 22);
             this.ModelingTab.Name = "ModelingTab";
             this.ModelingTab.Padding = new System.Windows.Forms.Padding(3);
-            this.ModelingTab.Size = new System.Drawing.Size(1077, 584);
+            this.ModelingTab.Size = new System.Drawing.Size(1060, 584);
             this.ModelingTab.TabIndex = 2;
             this.ModelingTab.Text = "Model";
+            // 
+            // lblChartTitle
+            // 
+            this.lblChartTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblChartTitle.AutoSize = true;
+            this.lblChartTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblChartTitle.Location = new System.Drawing.Point(573, 3);
+            this.lblChartTitle.Name = "lblChartTitle";
+            this.lblChartTitle.Size = new System.Drawing.Size(143, 20);
+            this.lblChartTitle.TabIndex = 131;
+            this.lblChartTitle.Text = "Threshold tuning";
             // 
             // lblDecisionThreshold
             // 
@@ -325,14 +337,14 @@
             this.pnlThresholdingButtons.Controls.Add(this.btnLeft25);
             this.pnlThresholdingButtons.Location = new System.Drawing.Point(439, 543);
             this.pnlThresholdingButtons.Name = "pnlThresholdingButtons";
-            this.pnlThresholdingButtons.Size = new System.Drawing.Size(487, 30);
+            this.pnlThresholdingButtons.Size = new System.Drawing.Size(470, 30);
             this.pnlThresholdingButtons.TabIndex = 127;
             this.pnlThresholdingButtons.Visible = false;
             // 
             // btnRight25
             // 
             this.btnRight25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRight25.Location = new System.Drawing.Point(409, 3);
+            this.btnRight25.Location = new System.Drawing.Point(392, 3);
             this.btnRight25.Name = "btnRight25";
             this.btnRight25.Size = new System.Drawing.Size(75, 23);
             this.btnRight25.TabIndex = 112;
@@ -343,7 +355,7 @@
             // btnRight1
             // 
             this.btnRight1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRight1.Location = new System.Drawing.Point(328, 3);
+            this.btnRight1.Location = new System.Drawing.Point(311, 3);
             this.btnRight1.Name = "btnRight1";
             this.btnRight1.Size = new System.Drawing.Size(75, 23);
             this.btnRight1.TabIndex = 111;
@@ -374,7 +386,7 @@
             // lblSpec
             // 
             this.lblSpec.AutoSize = true;
-            this.lblSpec.Location = new System.Drawing.Point(374, 9);
+            this.lblSpec.Location = new System.Drawing.Point(374, 32);
             this.lblSpec.Name = "lblSpec";
             this.lblSpec.Size = new System.Drawing.Size(103, 13);
             this.lblSpec.TabIndex = 129;
@@ -387,33 +399,33 @@
             this.chartValidation.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea1.AxisX.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisX.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.AxisX2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisX2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.AxisY.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisY.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.AxisY2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
-            chartArea1.AxisY2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
-            chartArea1.Name = "ChartArea1";
-            this.chartValidation.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chartValidation.Legends.Add(legend1);
-            this.chartValidation.Location = new System.Drawing.Point(389, 9);
+            chartArea3.AxisX.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea3.AxisX.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea3.AxisX2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea3.AxisX2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea3.AxisY.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea3.AxisY.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea3.AxisY2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.NotSet;
+            chartArea3.AxisY2.MajorTickMark.TickMarkStyle = System.Windows.Forms.DataVisualization.Charting.TickMarkStyle.AcrossAxis;
+            chartArea3.Name = "ChartArea1";
+            this.chartValidation.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.chartValidation.Legends.Add(legend3);
+            this.chartValidation.Location = new System.Drawing.Point(389, 32);
             this.chartValidation.Name = "chartValidation";
-            series1.BorderWidth = 2;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series1.Legend = "Legend1";
-            series1.Name = "True positives";
-            series2.BorderWidth = 2;
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series2.Legend = "Legend1";
-            series2.Name = "True negatives";
-            this.chartValidation.Series.Add(series1);
-            this.chartValidation.Series.Add(series2);
-            this.chartValidation.Size = new System.Drawing.Size(670, 531);
+            series5.BorderWidth = 2;
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series5.Legend = "Legend1";
+            series5.Name = "True positives";
+            series6.BorderWidth = 2;
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series6.Legend = "Legend1";
+            series6.Name = "True negatives";
+            this.chartValidation.Series.Add(series5);
+            this.chartValidation.Series.Add(series6);
+            this.chartValidation.Size = new System.Drawing.Size(653, 508);
             this.chartValidation.TabIndex = 128;
             this.chartValidation.Text = "chart1";
             // 
@@ -686,7 +698,7 @@
             this.DiagnosticTab.Controls.Add(this.zgcDiagnostic);
             this.DiagnosticTab.Location = new System.Drawing.Point(4, 22);
             this.DiagnosticTab.Name = "DiagnosticTab";
-            this.DiagnosticTab.Size = new System.Drawing.Size(1094, 576);
+            this.DiagnosticTab.Size = new System.Drawing.Size(1077, 584);
             this.DiagnosticTab.TabIndex = 3;
             this.DiagnosticTab.Text = "Diagnostics";
             // 
@@ -707,17 +719,6 @@
             this.zgcDiagnostic.Size = new System.Drawing.Size(1094, 534);
             this.zgcDiagnostic.TabIndex = 64;
             // 
-            // lblChartTitle
-            // 
-            this.lblChartTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblChartTitle.AutoSize = true;
-            this.lblChartTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblChartTitle.Location = new System.Drawing.Point(661, 9);
-            this.lblChartTitle.Name = "lblChartTitle";
-            this.lblChartTitle.Size = new System.Drawing.Size(143, 20);
-            this.lblChartTitle.TabIndex = 131;
-            this.lblChartTitle.Text = "Threshold tuning";
-            // 
             // IPyModelingControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -727,7 +728,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.tabControl1);
             this.Name = "IPyModelingControl";
-            this.Size = new System.Drawing.Size(1084, 602);
+            this.Size = new System.Drawing.Size(1067, 602);
             this.tabControl1.ResumeLayout(false);
             this.DatasheetTab.ResumeLayout(false);
             this.DatasheetTab.PerformLayout();

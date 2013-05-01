@@ -29,14 +29,25 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.lblNumObs = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lblNumAvailVars = new System.Windows.Forms.Label();
+            this.lblNumIndVars = new System.Windows.Forms.Label();
+            this.btnRemoveInputVariable = new System.Windows.Forms.Button();
+            this.btnAddInputVariable = new System.Windows.Forms.Button();
+            this.lblDepVarName = new System.Windows.Forms.Label();
+            this.lblDepVariable = new System.Windows.Forms.Label();
+            this.lblIndVars = new System.Windows.Forms.Label();
+            this.lbIndVariables = new System.Windows.Forms.ListBox();
+            this.lbAvailableVariables = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.btnRun = new System.Windows.Forms.Button();
             this.tabControlModelGeneration = new System.Windows.Forms.TabControl();
@@ -161,6 +172,7 @@
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.groupBox6.SuspendLayout();
             this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabControlModelGeneration.SuspendLayout();
             this.tabManual.SuspendLayout();
@@ -226,12 +238,134 @@
             // 
             this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(6, 19);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(362, 595);
             this.tabControl1.TabIndex = 66;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.lblNumAvailVars);
+            this.tabPage1.Controls.Add(this.lblNumIndVars);
+            this.tabPage1.Controls.Add(this.btnRemoveInputVariable);
+            this.tabPage1.Controls.Add(this.btnAddInputVariable);
+            this.tabPage1.Controls.Add(this.lblDepVarName);
+            this.tabPage1.Controls.Add(this.lblDepVariable);
+            this.tabPage1.Controls.Add(this.lblIndVars);
+            this.tabPage1.Controls.Add(this.lbIndVariables);
+            this.tabPage1.Controls.Add(this.lbAvailableVariables);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(354, 569);
+            this.tabPage1.TabIndex = 2;
+            this.tabPage1.Text = "Variable Selection";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 22);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(96, 13);
+            this.label3.TabIndex = 103;
+            this.label3.Text = "Available Variables";
+            // 
+            // lblNumAvailVars
+            // 
+            this.lblNumAvailVars.AutoSize = true;
+            this.lblNumAvailVars.Location = new System.Drawing.Point(108, 22);
+            this.lblNumAvailVars.Name = "lblNumAvailVars";
+            this.lblNumAvailVars.Size = new System.Drawing.Size(19, 13);
+            this.lblNumAvailVars.TabIndex = 95;
+            this.lblNumAvailVars.Text = "    ";
+            // 
+            // lblNumIndVars
+            // 
+            this.lblNumIndVars.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblNumIndVars.AutoSize = true;
+            this.lblNumIndVars.Location = new System.Drawing.Point(279, 22);
+            this.lblNumIndVars.Name = "lblNumIndVars";
+            this.lblNumIndVars.Size = new System.Drawing.Size(22, 13);
+            this.lblNumIndVars.TabIndex = 102;
+            this.lblNumIndVars.Text = "     ";
+            // 
+            // btnRemoveInputVariable
+            // 
+            this.btnRemoveInputVariable.Location = new System.Drawing.Point(164, 121);
+            this.btnRemoveInputVariable.Name = "btnRemoveInputVariable";
+            this.btnRemoveInputVariable.Size = new System.Drawing.Size(23, 22);
+            this.btnRemoveInputVariable.TabIndex = 101;
+            this.btnRemoveInputVariable.Text = "<";
+            this.btnRemoveInputVariable.Click += new System.EventHandler(this.btnRemoveInputVariable_Click);
+            // 
+            // btnAddInputVariable
+            // 
+            this.btnAddInputVariable.Location = new System.Drawing.Point(164, 94);
+            this.btnAddInputVariable.Name = "btnAddInputVariable";
+            this.btnAddInputVariable.Size = new System.Drawing.Size(23, 21);
+            this.btnAddInputVariable.TabIndex = 100;
+            this.btnAddInputVariable.Text = ">";
+            this.btnAddInputVariable.Click += new System.EventHandler(this.btnAddInputVariable_Click);
+            // 
+            // lblDepVarName
+            // 
+            this.lblDepVarName.AutoSize = true;
+            this.lblDepVarName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDepVarName.Location = new System.Drawing.Point(110, 4);
+            this.lblDepVarName.Name = "lblDepVarName";
+            this.lblDepVarName.Size = new System.Drawing.Size(80, 13);
+            this.lblDepVarName.TabIndex = 99;
+            this.lblDepVarName.Text = "depvar name";
+            // 
+            // lblDepVariable
+            // 
+            this.lblDepVariable.AutoSize = true;
+            this.lblDepVariable.Location = new System.Drawing.Point(6, 4);
+            this.lblDepVariable.Name = "lblDepVariable";
+            this.lblDepVariable.Size = new System.Drawing.Size(107, 13);
+            this.lblDepVariable.TabIndex = 98;
+            this.lblDepVariable.Text = "Dependent Variable: ";
+            // 
+            // lblIndVars
+            // 
+            this.lblIndVars.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblIndVars.AutoSize = true;
+            this.lblIndVars.Location = new System.Drawing.Point(190, 22);
+            this.lblIndVars.Name = "lblIndVars";
+            this.lblIndVars.Size = new System.Drawing.Size(83, 13);
+            this.lblIndVars.TabIndex = 97;
+            this.lblIndVars.Text = "Indep. Variables";
+            // 
+            // lbIndVariables
+            // 
+            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbIndVariables.FormattingEnabled = true;
+            this.lbIndVariables.HorizontalScrollbar = true;
+            this.lbIndVariables.Location = new System.Drawing.Point(193, 38);
+            this.lbIndVariables.MinimumSize = new System.Drawing.Size(100, 4);
+            this.lbIndVariables.Name = "lbIndVariables";
+            this.lbIndVariables.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.lbIndVariables.Size = new System.Drawing.Size(152, 524);
+            this.lbIndVariables.TabIndex = 96;
+            // 
+            // lbAvailableVariables
+            // 
+            this.lbAvailableVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbAvailableVariables.FormattingEnabled = true;
+            this.lbAvailableVariables.HorizontalScrollbar = true;
+            this.lbAvailableVariables.Location = new System.Drawing.Point(6, 38);
+            this.lbAvailableVariables.MinimumSize = new System.Drawing.Size(100, 4);
+            this.lbAvailableVariables.Name = "lbAvailableVariables";
+            this.lbAvailableVariables.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.lbAvailableVariables.Size = new System.Drawing.Size(152, 524);
+            this.lbAvailableVariables.TabIndex = 94;
             // 
             // tabPage2
             // 
@@ -286,9 +420,9 @@
             this.chkAllCombinations.AutoSize = true;
             this.chkAllCombinations.Location = new System.Drawing.Point(27, 54);
             this.chkAllCombinations.Name = "chkAllCombinations";
-            this.chkAllCombinations.Size = new System.Drawing.Size(124, 17);
+            this.chkAllCombinations.Size = new System.Drawing.Size(141, 17);
             this.chkAllCombinations.TabIndex = 51;
-            this.chkAllCombinations.Text = "Run all combinations";
+            this.chkAllCombinations.Text = "Run all {0} combinations";
             this.chkAllCombinations.UseVisualStyleBackColor = true;
             // 
             // label15
@@ -1237,39 +1371,39 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvResid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvResid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvResid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvResid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle18.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle18.Format = "N0";
-            dataGridViewCellStyle18.NullValue = null;
-            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvResid.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.Format = "N0";
+            dataGridViewCellStyle2.NullValue = null;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvResid.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvResid.Location = new System.Drawing.Point(345, 19);
             this.dgvResid.Name = "dgvResid";
             this.dgvResid.ReadOnly = true;
-            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle19.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle19.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvResid.RowHeadersDefaultCellStyle = dataGridViewCellStyle19;
-            dataGridViewCellStyle20.Format = "N4";
-            dataGridViewCellStyle20.NullValue = null;
-            this.dgvResid.RowsDefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvResid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle4.Format = "N4";
+            dataGridViewCellStyle4.NullValue = null;
+            this.dgvResid.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.dgvResid.RowTemplate.DefaultCellStyle.Format = "N0";
             this.dgvResid.RowTemplate.DefaultCellStyle.NullValue = null;
             this.dgvResid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -1592,6 +1726,8 @@
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabControlModelGeneration.ResumeLayout(false);
             this.tabManual.ResumeLayout(false);
@@ -1768,5 +1904,16 @@
         private ZedGraph.ZedGraphControl zgcResidualsPlot;
         private System.Windows.Forms.Label lblADPVal;
         private System.Windows.Forms.Label lblADStat;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.Label lblNumAvailVars;
+        private System.Windows.Forms.Label lblNumIndVars;
+        private System.Windows.Forms.Button btnRemoveInputVariable;
+        private System.Windows.Forms.Button btnAddInputVariable;
+        private System.Windows.Forms.Label lblDepVarName;
+        private System.Windows.Forms.Label lblDepVariable;
+        private System.Windows.Forms.Label lblIndVars;
+        private System.Windows.Forms.ListBox lbIndVariables;
+        private System.Windows.Forms.ListBox lbAvailableVariables;
+        private System.Windows.Forms.Label label3;
     }
 }

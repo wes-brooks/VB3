@@ -28,23 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ctlMLRModel));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tpData = new System.Windows.Forms.TabPage();
             this.dsControl1 = new VBCommon.Controls.DatasheetControl();
-            this.tpVarSelection = new System.Windows.Forms.TabPage();
-            this.ctlVariableSelection1 = new VBCommon.Controls.VariableSelection();
             this.tpModel = new System.Windows.Forms.TabPage();
             this.frmModel1 = new GALibForm.frmModel();
             this.tabControl1.SuspendLayout();
             this.tpData.SuspendLayout();
-            this.tpVarSelection.SuspendLayout();
             this.tpModel.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tpData);
-            this.tabControl1.Controls.Add(this.tpVarSelection);
             this.tabControl1.Controls.Add(this.tpModel);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
@@ -86,29 +83,6 @@
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
             // 
-            // tpVarSelection
-            // 
-            this.tpVarSelection.AutoScroll = true;
-            this.tpVarSelection.AutoScrollMinSize = new System.Drawing.Size(500, 500);
-            this.tpVarSelection.BackColor = System.Drawing.SystemColors.Control;
-            this.tpVarSelection.Controls.Add(this.ctlVariableSelection1);
-            this.tpVarSelection.Location = new System.Drawing.Point(4, 22);
-            this.tpVarSelection.Name = "tpVarSelection";
-            this.tpVarSelection.Padding = new System.Windows.Forms.Padding(3);
-            this.tpVarSelection.Size = new System.Drawing.Size(955, 584);
-            this.tpVarSelection.TabIndex = 3;
-            this.tpVarSelection.Text = "Variable Selection";
-            // 
-            // ctlVariableSelection1
-            // 
-            this.ctlVariableSelection1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.ctlVariableSelection1.Location = new System.Drawing.Point(3, 6);
-            this.ctlVariableSelection1.MinimumSize = new System.Drawing.Size(500, 0);
-            this.ctlVariableSelection1.Name = "ctlVariableSelection1";
-            this.ctlVariableSelection1.Size = new System.Drawing.Size(500, 419);
-            this.ctlVariableSelection1.TabIndex = 0;
-            // 
             // tpModel
             // 
             this.tpModel.AutoScroll = true;
@@ -130,10 +104,10 @@
             this.frmModel1.DepVarTrans = VBCommon.Transforms.DependentVariableTransforms.none;
             this.frmModel1.DepVarTransExp = 1D;
             this.frmModel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.frmModel1.Location = new System.Drawing.Point(3, 3);
+            this.frmModel1.Location = new System.Drawing.Point(0, 0);
             this.frmModel1.Name = "frmModel1";
-            this.frmModel1.SelectedVariables = null;
-            this.frmModel1.Size = new System.Drawing.Size(949, 578);
+            this.frmModel1.SelectedVariables = ((System.Collections.Generic.List<string>)(resources.GetObject("frmModel1.SelectedVariables")));
+            this.frmModel1.Size = new System.Drawing.Size(953, 582);
             this.frmModel1.TabIndex = 0;
             // 
             // ctlMLRModel
@@ -147,7 +121,6 @@
             this.Size = new System.Drawing.Size(963, 610);
             this.tabControl1.ResumeLayout(false);
             this.tpData.ResumeLayout(false);
-            this.tpVarSelection.ResumeLayout(false);
             this.tpModel.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -159,8 +132,6 @@
         private System.Windows.Forms.TabPage tpData;
         private System.Windows.Forms.TabPage tpModel;
         private VBCommon.Controls.DatasheetControl dsControl1;
-        private System.Windows.Forms.TabPage tpVarSelection;
         private GALibForm.frmModel frmModel1;
-        private VBCommon.Controls.VariableSelection ctlVariableSelection1;
     }
 }

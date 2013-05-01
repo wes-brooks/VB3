@@ -36,9 +36,9 @@ namespace GALibForm
         private Dictionary<string, object> dictPackedState;
         public List<string> _lstSelectedVariables = null;
 
-        public event EventHandler ClearList;
-        public event MyEventHandler AddToList;
-        public delegate void MyEventHandler(MyEventArg args);
+        //public event EventHandler ClearList;
+        //public event MyEventHandler AddToList;
+        //public delegate void MyEventHandler(MyEventArg args);
 
         public System.Windows.Forms.Label lblAvailVars = null;
         public System.Windows.Forms.Label lblDepVars = null;
@@ -186,7 +186,7 @@ namespace GALibForm
         }
 
 
-        public List<string> SelectedVariables
+        /*public List<string> SelectedVariables
         {
             get { return _lstSelectedVariables; }
             set 
@@ -195,7 +195,7 @@ namespace GALibForm
                 if (_lstSelectedVariables != null)
                     SelectedVariablesChanged();
             }
-        }
+        }*/
 
 
         public void InitControls()
@@ -229,7 +229,15 @@ namespace GALibForm
         //Pack State for Serializing
         public IDictionary<string, object> PackProjectState()
         {
-            //return ProjectSave();
+            if (PackedState != null)
+            {
+                //Pack the variable selection as it is right now:
+                if (PackedState.ContainsKey("VariableSelection"))
+                    PackedState.Remove("VariableSelection");
+
+                PackedState.Add("VariableSelection", PackVariableSelectionState());
+            }
+
             return PackedState;
         }
 
@@ -370,6 +378,18 @@ namespace GALibForm
             if (dictProjectState == null || dictProjectState.Keys.Count < 1)
                 return;
 
+            if (dictProjectState.ContainsKey("VariableSelection"))
+            {
+                //We must conver the variable selection state from its JSON representation first.
+                object varSelectionState = dictProjectState["VariableSelection"];
+                if (varSelectionState.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    string strJson = varSelectionState.ToString();
+                    Dictionary<string, List<ListItem>> varSelectionPackedState = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, List<ListItem>>>(strJson);
+                    UnpackVariableSelectionState(varSelectionPackedState);
+                }                
+            }
+
             if (dictProjectState.ContainsKey("DecisionThreshold"))
                 tbDecThreshHoriz.Text = dictProjectState["DecisionThreshold"].ToString();
 
@@ -508,6 +528,7 @@ namespace GALibForm
             int maxVar = _numObs / 5;            
             int recVar = Math.Min(((_numObs / 10) + 1), (_lstSelectedVariables.Count));
             lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
+            chkAllCombinations.Text = "Run all " + Math.Pow(2, _lstSelectedVariables.Count).ToString() + " combinations";
 
             InitResultsGraph();
 
@@ -568,129 +589,133 @@ namespace GALibForm
 
         private bool verifyGlobalModelingParams()
         {
-            _numVars = _lstSelectedVariables.Count;                       
-            int numRecommendedVars = _numObs / 5;
-            _userSpecifiedNumVars = Convert.ToInt32(txtMaxVars.Text);
+            try
+            {
+                _numVars = _lstSelectedVariables.Count;
+                int numRecommendedVars = _numObs / 5;
+                _userSpecifiedNumVars = Convert.ToInt32(txtMaxVars.Text);
 
-            if (_userSpecifiedNumVars > numRecommendedVars)
-            {
-                string msg;
-                msg = "The maximum number of variables in model for this dataset (" + _numObs.ToString() + " observations)" + Environment.NewLine;
-                msg += " is " + numRecommendedVars.ToString() + ".";
-                MessageBox.Show(msg);
-                //txtMaxVars.Focus();                
-                return false;
-            }
-            if (_userSpecifiedNumVars > _numVars)
-            {
-                string msg = "The maximum number of variables in model is limited to the number of independent variables in the list.";
-                MessageBox.Show(msg);
-                _userSpecifiedNumVars = _numVars;
-                //txtMaxVars.Text = _numVars.ToString();
-                //txtMaxVars.Focus();
-                return false;
-            }
-
-            if (_userSpecifiedNumVars < 1)
-            {
-                MessageBox.Show("Maximum number of variables must be an integer value > 1.");
-                return false;
-            }
-            
-            if (double.TryParse(tbDecThreshHoriz.Text, out _decisionThreshold) == false)
-            {
-                string msg = @"Decision criterion must be a numeric value.";
-                MessageBox.Show(msg);
-                return false;
-            }
-            else if (double.TryParse(tbRegThreshVert.Text, out _mandateThreshold) == false)
-            {
-                string msg = @"Regulatory standard must be a numeric value.";
-                MessageBox.Show(msg);
-                return false;
-            }
-            else
-            {                
-                mlrPlots1.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
-                mlrPlots1.DependentVarXFrm = _depVarTransform;
-                mlrPlots1.PowerTransformExponent = _depVarPowerTransformExponent;
-
-                mlrPlots2.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
-                mlrPlots2.DependentVarXFrm = _depVarTransform;
-                mlrPlots2.PowerTransformExponent = _depVarPowerTransformExponent;
-                               
-                if (rbLog10ValMET.Checked)
+                if (_userSpecifiedNumVars > numRecommendedVars)
                 {
-                    _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Log10);
-                    _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Log10);
-                    mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
-                    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;                    
+                    string msg;
+                    msg = "The maximum number of variables in model for this dataset (" + _numObs.ToString() + " observations)" + Environment.NewLine;
+                    msg += " is " + numRecommendedVars.ToString() + ".";
+                    MessageBox.Show(msg);
+                    //txtMaxVars.Focus();                
+                    return false;
                 }
-                else if (rbLogeValMET.Checked)
+                if (_userSpecifiedNumVars > _numVars)
                 {
-                    _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Ln);
-                    _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Ln);
-                     mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
-                     mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
+                    string msg = "The maximum number of variables in model is limited to the number of independent variables in the list.";
+                    MessageBox.Show(msg);
+                    _userSpecifiedNumVars = _numVars;
+                    //txtMaxVars.Text = _numVars.ToString();
+                    //txtMaxVars.Focus();
+                    return false;
                 }
-                else if (rbPwrValMET.Checked)
+
+                if (_userSpecifiedNumVars < 1)
                 {
-                    double pwr;
-                    if (double.TryParse(txtPwrValMET.Text , out pwr) == false)
+                    MessageBox.Show("Maximum number of variables must be an integer value > 1.");
+                    return false;
+                }
+
+                if (double.TryParse(tbDecThreshHoriz.Text, out _decisionThreshold) == false)
+                {
+                    string msg = @"Decision criterion must be a numeric value.";
+                    MessageBox.Show(msg);
+                    return false;
+                }
+                else if (double.TryParse(tbRegThreshVert.Text, out _mandateThreshold) == false)
+                {
+                    string msg = @"Regulatory standard must be a numeric value.";
+                    MessageBox.Show(msg);
+                    return false;
+                }
+                else
+                {
+                    mlrPlots1.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
+                    mlrPlots1.DependentVarXFrm = _depVarTransform;
+                    mlrPlots1.PowerTransformExponent = _depVarPowerTransformExponent;
+
+                    mlrPlots2.SetThresholds(tbDecThreshHoriz.Text, tbRegThreshVert.Text);
+                    mlrPlots2.DependentVarXFrm = _depVarTransform;
+                    mlrPlots2.PowerTransformExponent = _depVarPowerTransformExponent;
+
+                    if (rbLog10ValMET.Checked)
                     {
-                        string msg = @"Power exponent must be a numeric value.";
+                        _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Log10);
+                        _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Log10);
+                        mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
+                        mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Log10;
+                    }
+                    else if (rbLogeValMET.Checked)
+                    {
+                        _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Ln);
+                        _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Ln);
+                        mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
+                        mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Ln;
+                    }
+                    else if (rbPwrValMET.Checked)
+                    {
+                        double pwr;
+                        if (double.TryParse(txtPwrValMET.Text, out pwr) == false)
+                        {
+                            string msg = @"Power exponent must be a numeric value.";
+                            MessageBox.Show(msg);
+                            return false;
+                        }
+
+                        _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Power, pwr);
+                        _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Power, pwr);
+                        mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
+                        mlrPlots1.PowerExponent = pwr;
+
+                        mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
+                        mlrPlots2.PowerExponent = pwr;
+                    }
+                    else
+                    {
+                        _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.none);
+                        _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.none);
+                        mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
+                        mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
+                    }
+
+                    if (_depVarTransform == DependentVariableTransforms.Power)
+                    {
+                        _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform, _depVarPowerTransformExponent);
+                        _mandateThreshold = Apply.TransformThreshold(_mandateThreshold, _depVarTransform, _depVarPowerTransformExponent);
+                    }
+                    else
+                    {
+                        _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform);
+                        _mandateThreshold = Apply.TransformThreshold(_mandateThreshold, _depVarTransform);
+                    }
+
+                    if (_decisionThreshold < 0 || _decisionThreshold.Equals(double.NaN))
+                    {
+                        string msg = @"Decision criterion must be a numeric value greater than 0.";
                         MessageBox.Show(msg);
                         return false;
                     }
 
-                    _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.Power, pwr);
-                    _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.Power, pwr);
-                    mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
-                    mlrPlots1.PowerExponent = pwr;
-
-                    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.Power;
-                    mlrPlots2.PowerExponent = pwr;
-                }
-                else
-                {
-                    _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, DependentVariableTransforms.none);
-                    _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, DependentVariableTransforms.none);
-                    mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
-                    mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.none;              
+                    if (_mandateThreshold < 0 || _mandateThreshold.Equals(double.NaN))
+                    {
+                        string msg = @"Regulatory standard must be a numeric value greater than 0.";
+                        MessageBox.Show(msg);
+                        return false;
+                    }
                 }
 
-                if (_depVarTransform == DependentVariableTransforms.Power)
+                if (Int32.TryParse(txtMaxVIF.Text, out _maxVIF) == false)
                 {
-                    _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform, _depVarPowerTransformExponent);
-                    _mandateThreshold = Apply.TransformThreshold(_mandateThreshold, _depVarTransform, _depVarPowerTransformExponent);
-                }
-                else
-                {
-                    _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, _depVarTransform);
-                    _mandateThreshold = Apply.TransformThreshold(_mandateThreshold, _depVarTransform);
-                }
-
-                if (_decisionThreshold < 0 || _decisionThreshold.Equals(double.NaN)) 
-                {
-                    string msg = @"Decision criterion must be a numeric value greater than 0.";
+                    string msg = "Maximum Variance Inflation Factor (VIF) must be a valid integer";
                     MessageBox.Show(msg);
                     return false;
                 }
-
-                if (_mandateThreshold < 0 || _mandateThreshold.Equals(double.NaN))
-                {
-                    string msg = @"Regulatory standard must be a numeric value greater than 0.";
-                    MessageBox.Show(msg);
-                    return false;
-                } 
             }
-
-            if (Int32.TryParse(txtMaxVIF.Text, out _maxVIF) == false)
-            {
-                string msg = "Maximum Variance Inflation Factor (VIF) must be a valid integer";
-                MessageBox.Show(msg);
-                return false;
-            }
+            catch { return false; }
 
             return true;
         }
@@ -705,6 +730,7 @@ namespace GALibForm
         public void SetData()
         {            
             _dtFull = MLRDataManager.GetDataManager().ModelDataTable.Copy();
+            EstablishValidVariables(_dtFull);
 
             string exp = _dtFull.Columns[MLRDataManager.GetDataManager().ModelDependentVariable].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLEDEFINEDTRANSFORM].ToString();
             string[] components = exp.Split(",".ToCharArray());
@@ -1519,10 +1545,6 @@ namespace GALibForm
             listView2.Items.Add(lvi);
 
             UpdateResults(data);
-            //ProjectSave();
-
-            //mlrPlots1.UpdateResults(data, ind.RMSE, MLRPlots.Exceedance.model);
-            //mlrPlots1.btnXYPlot_Click(null, null);
           
             _dataMgr.Model = ind.Model;
             dictPackedState = ProjectSave();
@@ -1553,35 +1575,12 @@ namespace GALibForm
             int idx = listBox1.SelectedIndex;
             MLRIndividual ind = (MLRIndividual)_list[idx];
 
-            //List<double> lstProbEx = new List<double>();
-            bool bFlag = true;
-
-            //for (int i = 0; i < dtMData.Rows.Count; i++)
-            //{
-                //prediction...
-                //double pred = ind.PredictedValues[i];
-
-                //model variables and values... (little x)
-                //DataRow dr = dtModelVarVals.Rows[i];
-
-                //do the matrix math... (dr == x, dtModelVarVals == X...)
-                //double[] probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, ind.PredictedValues, ind.DecisionThreshold, ind.RMSE, bFlag);
-
-                //reset the matrix control flag so (X`*X)inv isn't computed again
-                //bFlag = false;
-            //}
-
-            //now set to exceedances for plotting here...
-            //mlrPlots1.Exceedances = lstProbEx.ToArray<double>();
             mlrPlots1.Exceedances = VBCommon.Statistics.Statistics.PExceedFits(dtModelVarVals, ind.PredictedValues, ind.DecisionThreshold, ind.RMSE);
-            //mlrPlots2.Exceedances = lstProbEx.ToArray<double>();
         }
 
 
         private void ModelRebuildFitExceedances()
         {
-            //DataTable dtMData = _dataMgr.ModelDataTable;
-            //DataTable dtMData = _modelBuildTables.Tables[_selectedRebuild];
             DataTable dtMData = _modelBuildTables.Tables[listBox2.SelectedIndex];
             DataView dv = dtMData.DefaultView;
             List<string> listVarsInModel = _modelingInfo.Model.Keys.ToList<string>();
@@ -1591,104 +1590,10 @@ namespace GALibForm
             int idx = listBox2.SelectedIndex;
             MultipleRegression ind = (MultipleRegression)_listRebuilds[idx];
 
-            List<double> lstProbEx = new List<double>();
-            bool bFlag = true;
-
-            for (int i = 0; i < dtMData.Rows.Count; i++)
-            {
-                //prediction...
-                double pred = ind.PredictedValues[i];
-
-                //model variables and values... (little x)
-                DataRow dr = dtModelVarVals.Rows[i];
-
-                //do the matrix math... (dr == x, dtModelVarVals == X...)
-                //double probEx = VBCommon.Statistics.Statistics.PExceedFits(dr, dtModelVarVals, pred, _decisionThreshold, ind.RMSE, bFlag);
-                //lstProbEx.Add(probEx);
-
-                //reset the matrix control flag so (X`*X)inv isn't computed again
-                bFlag = false;
-            }
-
-            //now set to exceedances for plotting here...
-            //mlrPlots1.Exceedances = lstProbEx.ToArray<double>();
-            mlrPlots2.Exceedances = lstProbEx.ToArray<double>();
+            mlrPlots2.Exceedances = VBCommon.Statistics.Statistics.PExceedFits(dtModelVarVals, ind.PredictedValues, _decisionThreshold, ind.RMSE);
         }
 
-
-        private void btnAddInputVariable_Click(object sender, EventArgs e)
-        {
-            //List<ListItem> items = new List<ListItem>();
-
-            //int selectedIndices = lbAvailableVariables.SelectedIndices.Count;
-            //for (int i = 0; i < selectedIndices; i++)
-            //{
-            //    ListItem li = (ListItem)lbAvailableVariables.Items[lbAvailableVariables.SelectedIndices[i]];
-            //    items.Add(li);
-            //}
-
-            //foreach (ListItem li in items)
-            //{
-            //    lbAvailableVariables.Items.Remove(li);
-            //    lbIndVariables.Items.Add(li);
-            //}
-
-
-            //SetCombinations();
-
-            //lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
-            //lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
-            ////_IndepVarCount = lbIndVariables.Items.Count;
-
-            //_state = _mlrState.dirty;
-            ////listBox1.Items.Clear();
-            //initControls();
-        }
-
- 
-        private void btnRemoveInputVariable_Click(object sender, EventArgs e)
-        {
-            //List<ListItem> items = new List<ListItem>();
-
-            //for (int i = 0; i < lbIndVariables.SelectedIndices.Count; i++)
-            //{
-            //    ListItem li = (ListItem)lbIndVariables.Items[lbIndVariables.SelectedIndices[i]];
-            //    items.Add(li);
-            //}
-
-            //foreach (ListItem li in items)
-            //{
-            //    lbIndVariables.Items.Remove(li);
-
-            //    bool foundIdx = false;
-            //    int j = 0;
-            //    for (j = 0; j < lbAvailableVariables.Items.Count; j++)
-            //    {
-            //        ListItem li2 = (ListItem)lbAvailableVariables.Items[j];
-            //        if (Convert.ToInt32(li2.ValueItem) > Convert.ToInt32(li.ValueItem))
-            //        {
-            //            lbAvailableVariables.Items.Insert(j, li);
-            //            foundIdx = true;
-            //            break;
-            //        }
-            //    }
-            //    if (foundIdx == false)
-            //        lbAvailableVariables.Items.Insert(j, li);
-
-            //}
-
-
-            //SetCombinations();
-
-            //lblAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
-            //lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
-
-            //_state = _mlrState.dirty;
-            ////listBox1.Items.Clear();
-            //initControls();
-        }
-
-        
+                        
         private void ESComplete(ExhaustiveSearchManager esManager)
         {
             RunComplete(esManager.Results);
@@ -1761,7 +1666,6 @@ namespace GALibForm
             {
                 combinations = new Combinations<short>(combList.ToArray(), i, GenerateOption.WithoutRepetition);
                 totalComb += combinations.Count;
-
             }
 
             string nModels = string.Empty;
@@ -1772,7 +1676,6 @@ namespace GALibForm
             }
             else
             {
-
                 if (totalComb < 0)
                 {
                     //we've flipped the storage capacity (not of totalComb [decimal type good to 7.8(10)**28], something else)
@@ -1785,13 +1688,8 @@ namespace GALibForm
                     nModels = string.Format("{0:#,###,###,###}", totalComb);
                 }
             }
-
-            //VBLogger.getLogger().logEvent("Total number of possible models: " + nModels,
-            //    VBLogger.messageIntent.UserAndLogFile, VBLogger.targetSStrip.StatusStrip3);
-
-            //lblCombinations.Text = String.Format("{0:G9}", totalComb);
-
         }
+
 
         private void chkAllCombinations_CheckedChanged(object sender, EventArgs e)
         {
@@ -1805,20 +1703,20 @@ namespace GALibForm
             }
             SetCombinations();
         }
-
-
+        
 
         private void frmModel_Activated(object sender, EventArgs e)
-        {
-            
+        {            
             //if (_dtFull != null)
             //    lbDepVarName.Text = _dtFull.Columns[1].ColumnName.ToString();
         }
+
 
         private void tabControlModelGeneration_SelectedIndexChanged(object sender, EventArgs e)
         {
             InitProgressGraph();
         }
+
 
         public void CopyListViewToClipboard(ListView lv)
         {
@@ -1845,23 +1743,23 @@ namespace GALibForm
                     buffer.Append(Environment.NewLine);
                 }
             }
-
             Clipboard.SetText(buffer.ToString());
         }
 
-
-
+        
         private void listView1_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.C) && (e.Modifiers == Keys.Control))
                 CopyListViewToClipboard(listView1);
         }
 
+
         private void listView2_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.C) && (e.Modifiers == Keys.Control))
                 CopyListViewToClipboard(listView2);
         }
+
 
         private void changeControlStatus(bool enable)
         {           
@@ -1915,11 +1813,13 @@ namespace GALibForm
 
         }
 
+
         private void frmModel_Validating(object sender, CancelEventArgs e)
         {
             if (_dataMgr.ModelRunning)
                 e.Cancel = true;
         }
+
 
         private void txtMaxVars_Validating(object sender, CancelEventArgs e)
         {
@@ -1932,6 +1832,7 @@ namespace GALibForm
         {
             txtSeed.Enabled = chkSeed.Checked;
         }
+
 
         private void btnViewReport_Click(object sender, EventArgs e)
         {
@@ -1951,6 +1852,7 @@ namespace GALibForm
             frmRpt.Show();
         }
 
+
         private void btnViewRptChangeStatus(bool status)
         {
             btnViewReport.Invoke((MethodInvoker)delegate
@@ -1959,10 +1861,11 @@ namespace GALibForm
             });
         }
 
+
         private void btnClearList_Click(object sender, EventArgs e)
         {
-
-            if (ClearList != null) ClearList(sender, e);
+            //if (ClearList != null) ClearList(sender, e);
+            ClearAllVariables();
 
             //for (int li = 0; li < lbIndVariables.Items.Count; li++)
             //    lbIndVariables.SetSelected(li, true);
@@ -2004,6 +1907,7 @@ namespace GALibForm
             //lblDepVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
         }
 
+
         private void btnAddtoList_Click(object sender, EventArgs e)
         {
             if (listView1.Items.Count < 1) return;
@@ -2015,12 +1919,14 @@ namespace GALibForm
                 modelVars.Add(iv);
             }
 
-            MyEventArg myE = new MyEventArg();
-            myE.ModelVars = modelVars;
+            //MyEventArg myE = new MyEventArg();
+            //myE.ModelVars = modelVars;
             
 
-            if (AddToList != null) AddToList(myE);
-            return;
+            //if (AddToList != null) AddToList(myE);
+            //return;
+
+            AddToList(modelVars);
 
             //if (lbAvailableVariables.SelectedItems.Count > 0)
                 //btnAddInputVariable_Click(this, new EventArgs());
@@ -2051,15 +1957,21 @@ namespace GALibForm
         //private void lblDepVars_TextChanged(object sender, EventArgs e)
         private void SelectedVariablesChanged()
         {
-                int availVar = _lstSelectedVariables.Count;
-                int maxVar = Math.Min((_numObs / 5), availVar);
-                int recVar = Math.Min(((_numObs / 10) + 1), availVar);
+            int availVar = _lstSelectedVariables.Count;
+            int maxVar = Math.Min((_numObs / 5), availVar);
+            int recVar = Math.Min(((_numObs / 10) + 1), availVar);
 
-                lblMaxAndRecommended.Text = "Available: " + availVar.ToString() +
-                    ", Recommended: " + recVar.ToString() +
-                    ", Max: " + maxVar.ToString();
+            lblMaxAndRecommended.Text = "Available: " + availVar.ToString() +
+                ", Recommended: " + recVar.ToString() +
+                ", Max: " + maxVar.ToString();
 
-                txtMaxVars.Text = recVar.ToString();
+            txtMaxVars.Text = recVar.ToString();
+            chkAllCombinations.Text = "Run all " + Math.Pow(2, _lstSelectedVariables.Count).ToString() + " combinations";
+
+            if (VariablesChanged != null)
+            {
+                VariablesChanged(this, new EventArgs());
+            }
         }
 
 
@@ -2133,6 +2045,7 @@ namespace GALibForm
 
             return pp;
         }
+
 
         /// <summary>
         /// given a mlr model, vary the threshold by increments to find model sensitivity and specificity
@@ -3745,7 +3658,7 @@ namespace GALibForm
         #endregion
 
 
-        public class MyEventArg:EventArgs
+        /*public class MyEventArg:EventArgs
         {
             public MyEventArg()
             {
@@ -3756,6 +3669,272 @@ namespace GALibForm
             {
                 set { modelVars = value; }
                 get { return modelVars; }
+            }
+        }*/
+
+
+
+
+        public event EventHandler VariablesChanged;
+
+
+
+        /// <summary>
+        /// Set the data for variable selection
+        /// </summary>
+        /// <param name="dt"></param>
+        public void EstablishValidVariables(DataTable dt)
+        {
+            if (dt == null || dt.Columns.Count < 2)
+                return;
+
+            lbAvailableVariables.Items.Clear();
+            lbIndVariables.Items.Clear();
+            _lstSelectedVariables = new List<string>();
+
+            List<string> fieldList = new List<string>();
+            for (int i = 1; i < dt.Columns.Count; i++)
+            {
+                bool bDependentVariableColumn = false;
+
+                if (dt.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.DEPENDENTVAR))
+                {
+                    if (dt.Columns[i].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR].ToString() == "True")
+                    {
+                        bDependentVariableColumn = true;
+                        lblDepVarName.Text = dt.Columns[i].ColumnName;
+                    }
+                }
+
+                if (!bDependentVariableColumn && dt.Columns[i].ExtendedProperties.ContainsKey(VBCommon.Globals.ENABLED))
+                {
+                    if (dt.Columns[i].ExtendedProperties[VBCommon.Globals.ENABLED].ToString() == "True")
+                        fieldList.Add(dt.Columns[i].ColumnName);
+                }
+                else if (!bDependentVariableColumn)
+                    fieldList.Add(dt.Columns[i].ColumnName);
+            }
+
+            for (int i=0;i<fieldList.Count;i++)
+                lbAvailableVariables.Items.Add(new ListItem(fieldList[i], i.ToString()));        
+        }
+
+
+        public void SetSelectedVariables(List<string> Selected)
+        {
+            ClearAllVariables();
+            AddToList(Selected);
+        }
+
+
+        public void ClearAllVariables()
+        {
+            List<ListItem> items = new List<ListItem>();
+            _lstSelectedVariables = new List<string>();
+
+            for (int i = 0; i < lbIndVariables.Items.Count; i++)
+            {
+                ListItem li = (ListItem)lbIndVariables.Items[i];
+                items.Add(li);
+            }
+
+            foreach (ListItem li in items)
+            {
+                lbIndVariables.Items.Remove(li);
+
+                bool foundIdx = false;
+                int j = 0;
+                for (j = 0; j < lbAvailableVariables.Items.Count; j++)
+                {
+                    ListItem li2 = (ListItem)lbAvailableVariables.Items[j];
+                    if (Convert.ToInt32(li2.ValueItem) > Convert.ToInt32(li.ValueItem))
+                    {
+                        lbAvailableVariables.Items.Insert(j, li);
+                        foundIdx = true;
+                        break;
+                    }
+                }
+                if (foundIdx == false)
+                    lbAvailableVariables.Items.Insert(j, li);
+            }
+            
+            lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+
+            SelectedVariablesChanged();
+        }
+
+
+        public void AddToList(List<string> varlist)
+        {
+            List<ListItem> items = new List<ListItem>();
+
+            for (int i = 0; i < lbAvailableVariables.Items.Count; i++)
+            {
+                ListItem li = (ListItem)lbAvailableVariables.Items[i];
+                if (varlist.Contains<string>(li.DisplayItem))
+                {
+                    items.Add(li);
+                }
+            }
+
+            foreach (ListItem li in items)
+            {
+                lbAvailableVariables.Items.Remove(li);
+                lbIndVariables.Items.Add(li);
+                _lstSelectedVariables.Add(li.DisplayItem);
+            }
+
+            lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+
+            SelectedVariablesChanged();
+        }
+
+
+        private void btnAddInputVariable_Click(object sender, EventArgs e)
+        {
+            List<ListItem> items = new List<ListItem>();
+
+            int selectedIndices = lbAvailableVariables.SelectedIndices.Count;
+            for (int i = 0; i < selectedIndices; i++)
+            {
+                ListItem li = (ListItem)lbAvailableVariables.Items[lbAvailableVariables.SelectedIndices[i]];
+                items.Add(li);
+            }
+
+            foreach (ListItem li in items)
+            {
+                lbAvailableVariables.Items.Remove(li);
+                lbIndVariables.Items.Add(li);
+                _lstSelectedVariables.Add(li.DisplayItem);
+            }
+
+            lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+
+            SelectedVariablesChanged();
+        }
+
+
+        private void btnRemoveInputVariable_Click(object sender, EventArgs e)
+        {
+            List<ListItem> items = new List<ListItem>();
+
+            for (int i = 0; i < lbIndVariables.SelectedIndices.Count; i++)
+            {
+                ListItem li = (ListItem)lbIndVariables.Items[lbIndVariables.SelectedIndices[i]];
+                items.Add(li);
+            }
+
+            foreach (ListItem li in items)
+            {
+                lbIndVariables.Items.Remove(li);
+                if (_lstSelectedVariables.Contains(li.DisplayItem)) { _lstSelectedVariables.Remove(li.DisplayItem); }
+
+                bool foundIdx = false;
+                int j = 0;
+                for (j = 0; j < lbAvailableVariables.Items.Count; j++)
+                {
+                    ListItem li2 = (ListItem)lbAvailableVariables.Items[j];
+                    if (Convert.ToInt32(li2.ValueItem) > Convert.ToInt32(li.ValueItem))
+                    {
+                        lbAvailableVariables.Items.Insert(j, li);
+                        foundIdx = true;
+                        break;
+                    }
+                }
+                if (foundIdx == false)
+                    lbAvailableVariables.Items.Insert(j, li);
+            }
+            
+            lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+
+            SelectedVariablesChanged();
+        }
+
+
+        public List<string> SelectedVariables
+        {
+            get 
+            {
+                List<string> list = new List<string>();
+                for (int i = 0; i < lbIndVariables.Items.Count; i++)
+                {
+                    ListItem li = lbIndVariables.Items[i] as ListItem;
+                    list.Add(li.DisplayItem);
+                }
+                return list;
+            }
+            set
+            {
+                _lstSelectedVariables = value;
+                SetSelectedVariables(_lstSelectedVariables);
+                //only invoke if the list has been populated
+                if (_lstSelectedVariables != null)
+                    SelectedVariablesChanged();
+            }
+        }
+
+
+        private void groupBox1_Resize(object sender, EventArgs e)
+        {
+            Control control = (Control)sender;
+
+            int width = control.Width;
+
+            if (width <= control.MinimumSize.Width)
+                return;
+
+            lbAvailableVariables.Width = (width - 100) / 2;
+
+            int xLoc = lbAvailableVariables.Location.X + lbAvailableVariables.Width + 50;
+            lbIndVariables.Location = new Point(xLoc, lbAvailableVariables.Location.Y);
+            lbIndVariables.Width = (width - 100) / 2;
+
+            xLoc = lbAvailableVariables.Location.X + lbAvailableVariables.Width + 10;
+            btnAddInputVariable.Location = new Point(xLoc, btnAddInputVariable.Location.Y);
+            btnRemoveInputVariable.Location = new Point(xLoc, btnRemoveInputVariable.Location.Y);
+        }
+
+
+        public Dictionary<string, List<ListItem>> PackVariableSelectionState()
+        {
+            Dictionary<string, List<ListItem>> dctState = new Dictionary<string, List<ListItem>>();
+            List<ListItem> listAvail = new List<ListItem>();
+            List<ListItem> listInd = new List<ListItem>(); ;
+
+            for (int i = 0; i < lbAvailableVariables.Items.Count; i++)
+                listAvail.Add(lbAvailableVariables.Items[i] as ListItem);
+
+            for (int i = 0; i < lbIndVariables.Items.Count; i++)
+                listInd.Add(lbIndVariables.Items[i] as ListItem);
+
+            dctState.Add("AvailableVariables", listAvail);
+            dctState.Add("IndependentVariables", listInd);
+
+            return dctState;
+        }
+
+
+        public void UnpackVariableSelectionState(Dictionary<string, List<ListItem>> state)
+        {
+            List<ListItem> list = null;
+            if (state.Keys.Contains("AvailableVariables"))
+            {
+                list = state["AvailableVariables"];
+                for (int i = 0; i < list.Count; i++)
+                    lbAvailableVariables.Items.Add(list[i]);
+            }
+
+            list = null;
+
+            if (state.Keys.Contains("IndependentVariables"))
+            {
+                list = state["IndependentVariables"];
+                for (int i = 0; i < list.Count; i++)
+                    lbIndVariables.Items.Add(list[i]);
             }
         }
     }

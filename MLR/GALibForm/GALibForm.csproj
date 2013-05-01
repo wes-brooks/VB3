@@ -113,6 +113,10 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="VBCommon, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Debug\VBCommon.dll</HintPath>
+    </Reference>
     <Reference Include="WeifenLuo.WinFormsUI.Docking">
       <HintPath>..\..\Externals\WeifenLuo.WinformsUI.Docking\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
       <Private>False</Private>
@@ -170,10 +174,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\VBCommon\VBCommon.csproj">
-      <Project>{EFA81E23-0526-4DA7-9B56-046579AF86C0}</Project>
-      <Name>VBCommon</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CrossValidation\CrossValidation.csproj">
       <Project>{A9B51300-27DC-4187-BF92-E73C0059F8A1}</Project>
       <Name>CrossValidation</Name>

@@ -44,6 +44,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.groupBox1.Controls.Add(this.lblNumAvailVars);
             this.groupBox1.Controls.Add(this.lblNumIndVars);
             this.groupBox1.Controls.Add(this.btnRemoveInputVariable);
@@ -54,19 +58,20 @@
             this.groupBox1.Controls.Add(this.lbIndVariables);
             this.groupBox1.Controls.Add(this.lblAvailVars);
             this.groupBox1.Controls.Add(this.lbAvailableVariables);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
-            this.groupBox1.MinimumSize = new System.Drawing.Size(0, 400);
+            this.groupBox1.MinimumSize = new System.Drawing.Size(260, 400);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(500, 412);
+            this.groupBox1.Size = new System.Drawing.Size(260, 412);
             this.groupBox1.TabIndex = 84;
             this.groupBox1.TabStop = false;
             this.groupBox1.Resize += new System.EventHandler(this.groupBox1_Resize);
             // 
             // lblNumAvailVars
             // 
+            this.lblNumAvailVars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblNumAvailVars.AutoSize = true;
-            this.lblNumAvailVars.Location = new System.Drawing.Point(137, 27);
+            this.lblNumAvailVars.Location = new System.Drawing.Point(108, 34);
             this.lblNumAvailVars.Name = "lblNumAvailVars";
             this.lblNumAvailVars.Size = new System.Drawing.Size(19, 13);
             this.lblNumAvailVars.TabIndex = 86;
@@ -74,9 +79,10 @@
             // 
             // lblNumIndVars
             // 
-            this.lblNumIndVars.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblNumIndVars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblNumIndVars.AutoSize = true;
-            this.lblNumIndVars.Location = new System.Drawing.Point(377, 27);
+            this.lblNumIndVars.Location = new System.Drawing.Point(228, 34);
             this.lblNumIndVars.Name = "lblNumIndVars";
             this.lblNumIndVars.Size = new System.Drawing.Size(22, 13);
             this.lblNumIndVars.TabIndex = 93;
@@ -84,40 +90,36 @@
             // 
             // btnRemoveInputVariable
             // 
-            this.btnRemoveInputVariable.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnRemoveInputVariable.Location = new System.Drawing.Point(235, 145);
+            this.btnRemoveInputVariable.Location = new System.Drawing.Point(122, 137);
             this.btnRemoveInputVariable.Name = "btnRemoveInputVariable";
-            this.btnRemoveInputVariable.Size = new System.Drawing.Size(30, 20);
+            this.btnRemoveInputVariable.Size = new System.Drawing.Size(14, 22);
             this.btnRemoveInputVariable.TabIndex = 92;
             this.btnRemoveInputVariable.Text = "<";
             this.btnRemoveInputVariable.Click += new System.EventHandler(this.btnRemoveInputVariable_Click);
             // 
             // btnAddInputVariable
             // 
-            this.btnAddInputVariable.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnAddInputVariable.Location = new System.Drawing.Point(235, 119);
+            this.btnAddInputVariable.Location = new System.Drawing.Point(122, 110);
             this.btnAddInputVariable.Name = "btnAddInputVariable";
-            this.btnAddInputVariable.Size = new System.Drawing.Size(30, 20);
+            this.btnAddInputVariable.Size = new System.Drawing.Size(14, 21);
             this.btnAddInputVariable.TabIndex = 91;
             this.btnAddInputVariable.Text = ">";
             this.btnAddInputVariable.Click += new System.EventHandler(this.btnAddInputVariable_Click);
             // 
             // lblDepVarName
             // 
-            this.lblDepVarName.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblDepVarName.AutoSize = true;
             this.lblDepVarName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDepVarName.Location = new System.Drawing.Point(132, 13);
+            this.lblDepVarName.Location = new System.Drawing.Point(110, 16);
             this.lblDepVarName.Name = "lblDepVarName";
-            this.lblDepVarName.Size = new System.Drawing.Size(150, 13);
+            this.lblDepVarName.Size = new System.Drawing.Size(80, 13);
             this.lblDepVarName.TabIndex = 90;
-            this.lblDepVarName.Text = "dependent variable name";
+            this.lblDepVarName.Text = "depvar name";
             // 
             // lblDepVariable
             // 
-            this.lblDepVariable.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblDepVariable.AutoSize = true;
-            this.lblDepVariable.Location = new System.Drawing.Point(23, 12);
+            this.lblDepVariable.Location = new System.Drawing.Point(6, 16);
             this.lblDepVariable.Name = "lblDepVariable";
             this.lblDepVariable.Size = new System.Drawing.Size(107, 13);
             this.lblDepVariable.TabIndex = 89;
@@ -125,31 +127,30 @@
             // 
             // lblIndVars
             // 
-            this.lblIndVars.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblIndVars.AutoSize = true;
-            this.lblIndVars.Location = new System.Drawing.Point(264, 34);
+            this.lblIndVars.Location = new System.Drawing.Point(139, 34);
             this.lblIndVars.Name = "lblIndVars";
-            this.lblIndVars.Size = new System.Drawing.Size(113, 13);
+            this.lblIndVars.Size = new System.Drawing.Size(83, 13);
             this.lblIndVars.TabIndex = 88;
-            this.lblIndVars.Text = "Independent Variables";
+            this.lblIndVars.Text = "Indep. Variables";
             // 
             // lbIndVariables
             // 
-            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.lbIndVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lbIndVariables.FormattingEnabled = true;
             this.lbIndVariables.HorizontalScrollbar = true;
-            this.lbIndVariables.Location = new System.Drawing.Point(275, 50);
-            this.lbIndVariables.MinimumSize = new System.Drawing.Size(200, 4);
+            this.lbIndVariables.Location = new System.Drawing.Point(142, 50);
+            this.lbIndVariables.MinimumSize = new System.Drawing.Size(100, 4);
             this.lbIndVariables.Name = "lbIndVariables";
             this.lbIndVariables.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lbIndVariables.Size = new System.Drawing.Size(200, 355);
+            this.lbIndVariables.Size = new System.Drawing.Size(111, 355);
             this.lbIndVariables.TabIndex = 87;
             // 
             // lblAvailVars
             // 
-            this.lblAvailVars.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblAvailVars.AutoSize = true;
-            this.lblAvailVars.Location = new System.Drawing.Point(23, 34);
+            this.lblAvailVars.Location = new System.Drawing.Point(3, 34);
             this.lblAvailVars.Name = "lblAvailVars";
             this.lblAvailVars.Size = new System.Drawing.Size(96, 13);
             this.lblAvailVars.TabIndex = 85;
@@ -157,14 +158,15 @@
             // 
             // lbAvailableVariables
             // 
-            this.lbAvailableVariables.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.lbAvailableVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.lbAvailableVariables.FormattingEnabled = true;
             this.lbAvailableVariables.HorizontalScrollbar = true;
-            this.lbAvailableVariables.Location = new System.Drawing.Point(25, 50);
-            this.lbAvailableVariables.MinimumSize = new System.Drawing.Size(200, 4);
+            this.lbAvailableVariables.Location = new System.Drawing.Point(6, 50);
+            this.lbAvailableVariables.MinimumSize = new System.Drawing.Size(100, 4);
             this.lbAvailableVariables.Name = "lbAvailableVariables";
             this.lbAvailableVariables.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lbAvailableVariables.Size = new System.Drawing.Size(200, 355);
+            this.lbAvailableVariables.Size = new System.Drawing.Size(111, 355);
             this.lbAvailableVariables.TabIndex = 84;
             // 
             // VariableSelection
@@ -172,9 +174,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.groupBox1);
-            this.MinimumSize = new System.Drawing.Size(500, 0);
+            this.MinimumSize = new System.Drawing.Size(260, 0);
             this.Name = "VariableSelection";
-            this.Size = new System.Drawing.Size(500, 412);
+            this.Size = new System.Drawing.Size(260, 412);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

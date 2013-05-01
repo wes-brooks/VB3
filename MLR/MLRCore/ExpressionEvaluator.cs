@@ -15,7 +15,7 @@ namespace MLRCore
 
 
 
-        public DataTable EvaluateTable(string[] expressions, DataTable dt)
+        /*public DataTable EvaluateTable(string[] expressions, DataTable dt)
         {
             MyTable = dt;
 
@@ -61,7 +61,7 @@ namespace MLRCore
                 dtCalcValues.Rows.Add(dr);
             }
             return dtCalcValues;
-        }
+        }*/
 
         //public List<double> Evaluate(string expression, DataTable dt)
         public DataTable Evaluate(string expression, DataTable dt)//, bool row0Only)
