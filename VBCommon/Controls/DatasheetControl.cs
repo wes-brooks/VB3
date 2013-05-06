@@ -489,7 +489,7 @@ namespace VBCommon.Controls
                     //set properties of new rv
                     strResponseVarColName = newcolname;
                     intResponseVarColIndex = dtCopy.Columns.IndexOf(strResponseVarColName);
-                    dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLETRANSFORM] = false;
+                    dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVARIBLETRANSFORM] = true;
                     dtCopy.Columns[newcolname].ExtendedProperties[VBCommon.Globals.DEPENDENTVAR] = true;
 
                     //set properties of old one

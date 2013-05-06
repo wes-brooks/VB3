@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.lblNumObs = new System.Windows.Forms.Label();
@@ -101,7 +101,6 @@
             this.tabResults = new System.Windows.Forms.TabPage();
             this.zedGraphControl2 = new ZedGraph.ZedGraphControl();
             this.tabObsPred2 = new System.Windows.Forms.TabPage();
-            this.mlrPlots1 = new VBControls.MLRPlots();
             this.tabROC = new System.Windows.Forms.TabPage();
             this.btnView = new System.Windows.Forms.Button();
             this.listView4 = new System.Windows.Forms.ListView();
@@ -134,7 +133,6 @@
             this.lblADStat = new System.Windows.Forms.Label();
             this.zgcResidvFitted = new ZedGraph.ZedGraphControl();
             this.tabFitVSObs = new System.Windows.Forms.TabPage();
-            this.mlrPlots2 = new VBControls.MLRPlots();
             this.tabDFFITSCooks = new System.Windows.Forms.TabPage();
             this.gboxResidTable = new System.Windows.Forms.GroupBox();
             this.zgcResidualsPlot = new ZedGraph.ZedGraphControl();
@@ -170,6 +168,9 @@
             this.btnViewReport = new System.Windows.Forms.Button();
             this.helpProvider1 = new System.Windows.Forms.HelpProvider();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.mlrPlots1 = new VBControls.MLRPlots();
+            this.mlrPlots2 = new VBControls.MLRPlots();
+            this.lblCombinationCount = new System.Windows.Forms.Label();
             this.groupBox6.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -243,7 +244,7 @@
             this.tabControl1.Location = new System.Drawing.Point(6, 19);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(362, 595);
+            this.tabControl1.Size = new System.Drawing.Size(362, 603);
             this.tabControl1.TabIndex = 66;
             // 
             // tabPage1
@@ -261,7 +262,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(354, 569);
+            this.tabPage1.Size = new System.Drawing.Size(354, 556);
             this.tabPage1.TabIndex = 2;
             this.tabPage1.Text = "Variable Selection";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -351,7 +352,7 @@
             this.lbIndVariables.MinimumSize = new System.Drawing.Size(100, 4);
             this.lbIndVariables.Name = "lbIndVariables";
             this.lbIndVariables.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lbIndVariables.Size = new System.Drawing.Size(152, 524);
+            this.lbIndVariables.Size = new System.Drawing.Size(152, 511);
             this.lbIndVariables.TabIndex = 96;
             // 
             // lbAvailableVariables
@@ -364,7 +365,7 @@
             this.lbAvailableVariables.MinimumSize = new System.Drawing.Size(100, 4);
             this.lbAvailableVariables.Name = "lbAvailableVariables";
             this.lbAvailableVariables.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.lbAvailableVariables.Size = new System.Drawing.Size(152, 524);
+            this.lbAvailableVariables.Size = new System.Drawing.Size(152, 511);
             this.lbAvailableVariables.TabIndex = 94;
             // 
             // tabPage2
@@ -377,7 +378,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(354, 569);
+            this.tabPage2.Size = new System.Drawing.Size(354, 577);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Control Options";
             // 
@@ -420,9 +421,9 @@
             this.chkAllCombinations.AutoSize = true;
             this.chkAllCombinations.Location = new System.Drawing.Point(27, 54);
             this.chkAllCombinations.Name = "chkAllCombinations";
-            this.chkAllCombinations.Size = new System.Drawing.Size(141, 17);
+            this.chkAllCombinations.Size = new System.Drawing.Size(124, 17);
             this.chkAllCombinations.TabIndex = 51;
-            this.chkAllCombinations.Text = "Run all {0} combinations";
+            this.chkAllCombinations.Text = "Run all combinations";
             this.chkAllCombinations.UseVisualStyleBackColor = true;
             // 
             // label15
@@ -805,6 +806,7 @@
             this.txtMaxVars.Size = new System.Drawing.Size(38, 20);
             this.txtMaxVars.TabIndex = 86;
             this.txtMaxVars.Text = "2";
+            this.txtMaxVars.TextChanged += new System.EventHandler(this.txtMaxVars_TextChanged);
             // 
             // txtMaxVIF
             // 
@@ -956,20 +958,6 @@
             this.tabObsPred2.TabIndex = 4;
             this.tabObsPred2.Text = "Fitted vs Observed";
             this.tabObsPred2.UseVisualStyleBackColor = true;
-            // 
-            // mlrPlots1
-            // 
-            this.mlrPlots1.AutoScroll = true;
-            this.mlrPlots1.DependentVarXFrm = VBCommon.Transforms.DependentVariableTransforms.none;
-            this.mlrPlots1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mlrPlots1.Exceedances = null;
-            this.mlrPlots1.Location = new System.Drawing.Point(0, 0);
-            this.mlrPlots1.Name = "mlrPlots1";
-            this.mlrPlots1.PowerExponent = double.NaN;
-            this.mlrPlots1.PowerTransformExponent = double.NaN;
-            this.mlrPlots1.Size = new System.Drawing.Size(677, 344);
-            this.mlrPlots1.TabIndex = 0;
-            this.mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
             // 
             // tabROC
             // 
@@ -1311,19 +1299,6 @@
             this.tabFitVSObs.Text = "Fitted vs Observed";
             this.tabFitVSObs.UseVisualStyleBackColor = true;
             // 
-            // mlrPlots2
-            // 
-            this.mlrPlots2.DependentVarXFrm = VBCommon.Transforms.DependentVariableTransforms.none;
-            this.mlrPlots2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mlrPlots2.Exceedances = null;
-            this.mlrPlots2.Location = new System.Drawing.Point(3, 3);
-            this.mlrPlots2.Name = "mlrPlots2";
-            this.mlrPlots2.PowerExponent = double.NaN;
-            this.mlrPlots2.PowerTransformExponent = double.NaN;
-            this.mlrPlots2.Size = new System.Drawing.Size(520, 288);
-            this.mlrPlots2.TabIndex = 0;
-            this.mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
-            // 
             // tabDFFITSCooks
             // 
             this.tabDFFITSCooks.Controls.Add(this.gboxResidTable);
@@ -1371,39 +1346,39 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvResid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvResid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvResid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this.dgvResid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.Format = "N0";
-            dataGridViewCellStyle2.NullValue = null;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvResid.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle14.Format = "N0";
+            dataGridViewCellStyle14.NullValue = null;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvResid.DefaultCellStyle = dataGridViewCellStyle14;
             this.dgvResid.Location = new System.Drawing.Point(345, 19);
             this.dgvResid.Name = "dgvResid";
             this.dgvResid.ReadOnly = true;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvResid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            dataGridViewCellStyle4.Format = "N4";
-            dataGridViewCellStyle4.NullValue = null;
-            this.dgvResid.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvResid.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle16.Format = "N4";
+            dataGridViewCellStyle16.NullValue = null;
+            this.dgvResid.RowsDefaultCellStyle = dataGridViewCellStyle16;
             this.dgvResid.RowTemplate.DefaultCellStyle.Format = "N0";
             this.dgvResid.RowTemplate.DefaultCellStyle.NullValue = null;
             this.dgvResid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -1708,11 +1683,49 @@
             // 
             this.errorProvider1.ContainerControl = this;
             // 
+            // mlrPlots1
+            // 
+            this.mlrPlots1.AutoScroll = true;
+            this.mlrPlots1.DependentVarXFrm = VBCommon.Transforms.DependentVariableTransforms.none;
+            this.mlrPlots1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mlrPlots1.Exceedances = null;
+            this.mlrPlots1.Location = new System.Drawing.Point(0, 0);
+            this.mlrPlots1.Name = "mlrPlots1";
+            this.mlrPlots1.PowerExponent = double.NaN;
+            this.mlrPlots1.PowerTransformExponent = double.NaN;
+            this.mlrPlots1.Size = new System.Drawing.Size(677, 344);
+            this.mlrPlots1.TabIndex = 0;
+            this.mlrPlots1.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
+            // 
+            // mlrPlots2
+            // 
+            this.mlrPlots2.DependentVarXFrm = VBCommon.Transforms.DependentVariableTransforms.none;
+            this.mlrPlots2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mlrPlots2.Exceedances = null;
+            this.mlrPlots2.Location = new System.Drawing.Point(3, 3);
+            this.mlrPlots2.Name = "mlrPlots2";
+            this.mlrPlots2.PowerExponent = double.NaN;
+            this.mlrPlots2.PowerTransformExponent = double.NaN;
+            this.mlrPlots2.Size = new System.Drawing.Size(520, 288);
+            this.mlrPlots2.TabIndex = 0;
+            this.mlrPlots2.Transform = VBCommon.Transforms.DependentVariableTransforms.none;
+            // 
+            // lblCombinationCount
+            // 
+            this.lblCombinationCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblCombinationCount.AutoSize = true;
+            this.lblCombinationCount.Location = new System.Drawing.Point(19, 643);
+            this.lblCombinationCount.Name = "lblCombinationCount";
+            this.lblCombinationCount.Size = new System.Drawing.Size(179, 13);
+            this.lblCombinationCount.TabIndex = 68;
+            this.lblCombinationCount.Text = "There are {0} possible combinations.";
+            // 
             // frmModel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
+            this.Controls.Add(this.lblCombinationCount);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1773,6 +1786,7 @@
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -1915,5 +1929,6 @@
         private System.Windows.Forms.ListBox lbIndVariables;
         private System.Windows.Forms.ListBox lbAvailableVariables;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblCombinationCount;
     }
 }

@@ -49,7 +49,6 @@
             this.label9 = new System.Windows.Forms.Label();
             this.lbAvailableVariables = new System.Windows.Forms.ListBox();
             this.ModelingTab = new System.Windows.Forms.TabPage();
-            this.lblChartTitle = new System.Windows.Forms.Label();
             this.lblDecisionThreshold = new System.Windows.Forms.Label();
             this.pnlThresholdingButtons = new System.Windows.Forms.Panel();
             this.btnRight25 = new System.Windows.Forms.Button();
@@ -112,7 +111,7 @@
             this.tabControl1.Location = new System.Drawing.Point(1, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1068, 610);
+            this.tabControl1.Size = new System.Drawing.Size(1051, 610);
             this.tabControl1.TabIndex = 0;
             // 
             // DatasheetTab
@@ -123,7 +122,7 @@
             this.DatasheetTab.Location = new System.Drawing.Point(4, 22);
             this.DatasheetTab.Name = "DatasheetTab";
             this.DatasheetTab.Padding = new System.Windows.Forms.Padding(3);
-            this.DatasheetTab.Size = new System.Drawing.Size(1060, 584);
+            this.DatasheetTab.Size = new System.Drawing.Size(1043, 584);
             this.DatasheetTab.TabIndex = 0;
             this.DatasheetTab.Text = "Data Manipulation";
             // 
@@ -157,7 +156,7 @@
             this.dsControl1.ResponseVarColNameAsImported = "";
             this.dsControl1.SelectColName = "";
             this.dsControl1.SelectedColIndex = -1;
-            this.dsControl1.Size = new System.Drawing.Size(1049, 494);
+            this.dsControl1.Size = new System.Drawing.Size(1032, 494);
             this.dsControl1.State = VBCommon.Controls.DatasheetControl.dtState.dirty;
             this.dsControl1.TabIndex = 0;
             // 
@@ -178,7 +177,7 @@
             this.VariableSelectionTab.Location = new System.Drawing.Point(4, 22);
             this.VariableSelectionTab.Name = "VariableSelectionTab";
             this.VariableSelectionTab.Padding = new System.Windows.Forms.Padding(3);
-            this.VariableSelectionTab.Size = new System.Drawing.Size(1077, 584);
+            this.VariableSelectionTab.Size = new System.Drawing.Size(1060, 584);
             this.VariableSelectionTab.TabIndex = 1;
             this.VariableSelectionTab.Text = "Variable Selection";
             // 
@@ -291,7 +290,6 @@
             // ModelingTab
             // 
             this.ModelingTab.BackColor = System.Drawing.SystemColors.Control;
-            this.ModelingTab.Controls.Add(this.lblChartTitle);
             this.ModelingTab.Controls.Add(this.lblDecisionThreshold);
             this.ModelingTab.Controls.Add(this.pnlThresholdingButtons);
             this.ModelingTab.Controls.Add(this.lblSpec);
@@ -303,21 +301,9 @@
             this.ModelingTab.Location = new System.Drawing.Point(4, 22);
             this.ModelingTab.Name = "ModelingTab";
             this.ModelingTab.Padding = new System.Windows.Forms.Padding(3);
-            this.ModelingTab.Size = new System.Drawing.Size(1060, 584);
+            this.ModelingTab.Size = new System.Drawing.Size(1043, 584);
             this.ModelingTab.TabIndex = 2;
             this.ModelingTab.Text = "Model";
-            // 
-            // lblChartTitle
-            // 
-            this.lblChartTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblChartTitle.AutoSize = true;
-            this.lblChartTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblChartTitle.Location = new System.Drawing.Point(573, 3);
-            this.lblChartTitle.Name = "lblChartTitle";
-            this.lblChartTitle.Size = new System.Drawing.Size(143, 20);
-            this.lblChartTitle.TabIndex = 131;
-            this.lblChartTitle.Text = "Threshold tuning";
             // 
             // lblDecisionThreshold
             // 
@@ -337,14 +323,14 @@
             this.pnlThresholdingButtons.Controls.Add(this.btnLeft25);
             this.pnlThresholdingButtons.Location = new System.Drawing.Point(439, 543);
             this.pnlThresholdingButtons.Name = "pnlThresholdingButtons";
-            this.pnlThresholdingButtons.Size = new System.Drawing.Size(470, 30);
+            this.pnlThresholdingButtons.Size = new System.Drawing.Size(453, 30);
             this.pnlThresholdingButtons.TabIndex = 127;
             this.pnlThresholdingButtons.Visible = false;
             // 
             // btnRight25
             // 
             this.btnRight25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRight25.Location = new System.Drawing.Point(392, 3);
+            this.btnRight25.Location = new System.Drawing.Point(375, 3);
             this.btnRight25.Name = "btnRight25";
             this.btnRight25.Size = new System.Drawing.Size(75, 23);
             this.btnRight25.TabIndex = 112;
@@ -355,7 +341,7 @@
             // btnRight1
             // 
             this.btnRight1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRight1.Location = new System.Drawing.Point(311, 3);
+            this.btnRight1.Location = new System.Drawing.Point(294, 3);
             this.btnRight1.Name = "btnRight1";
             this.btnRight1.Size = new System.Drawing.Size(75, 23);
             this.btnRight1.TabIndex = 111;
@@ -425,7 +411,7 @@
             series6.Name = "True negatives";
             this.chartValidation.Series.Add(series5);
             this.chartValidation.Series.Add(series6);
-            this.chartValidation.Size = new System.Drawing.Size(653, 508);
+            this.chartValidation.Size = new System.Drawing.Size(636, 508);
             this.chartValidation.TabIndex = 128;
             this.chartValidation.Text = "chart1";
             // 
@@ -698,7 +684,7 @@
             this.DiagnosticTab.Controls.Add(this.zgcDiagnostic);
             this.DiagnosticTab.Location = new System.Drawing.Point(4, 22);
             this.DiagnosticTab.Name = "DiagnosticTab";
-            this.DiagnosticTab.Size = new System.Drawing.Size(1077, 584);
+            this.DiagnosticTab.Size = new System.Drawing.Size(1060, 584);
             this.DiagnosticTab.TabIndex = 3;
             this.DiagnosticTab.Text = "Diagnostics";
             // 
@@ -728,7 +714,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.tabControl1);
             this.Name = "IPyModelingControl";
-            this.Size = new System.Drawing.Size(1067, 602);
+            this.Size = new System.Drawing.Size(1050, 602);
             this.tabControl1.ResumeLayout(false);
             this.DatasheetTab.ResumeLayout(false);
             this.DatasheetTab.PerformLayout();
@@ -806,6 +792,5 @@
         private VBCommon.Controls.DatasheetControl dsControl1;
         private System.Windows.Forms.Label label3;
         private ZedGraph.ZedGraphControl zgcDiagnostic;
-        private System.Windows.Forms.Label lblChartTitle;
     }
 }

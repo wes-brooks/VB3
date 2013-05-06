@@ -170,6 +170,8 @@ namespace GALibForm
         public frmModel()
         {
             InitializeComponent();
+            mlrPlots1.CallForProbs += new EventHandler(UpdateExceedanceProbs);
+            mlrPlots2.CallForProbs += new EventHandler(UpdateExceedanceProbs);
             _dataMgr = MLRDataManager.GetDataManager();
             cbCriteria.SelectedIndex = 0;
         }
@@ -528,11 +530,45 @@ namespace GALibForm
             int maxVar = _numObs / 5;            
             int recVar = Math.Min(((_numObs / 10) + 1), (_lstSelectedVariables.Count));
             lblMaxAndRecommended.Text = "Recommended: " + recVar.ToString() + ", Max: " + maxVar.ToString();
-            chkAllCombinations.Text = "Run all " + Math.Pow(2, _lstSelectedVariables.Count).ToString() + " combinations";
+            lblCombinationCount.Text = "There are " + Combinations(Available: _lstSelectedVariables.Count, MaxSelect: Convert.ToInt32(txtMaxVars.Text)) + " possible variable combinations";
 
             InitResultsGraph();
 
             listBox1.SelectedIndex = mi.SelectedModel;
+        }
+
+
+        private int Combinations(int Available, int MaxSelect)
+        {
+            if (Available == MaxSelect)
+            {
+                return Convert.ToInt32(Math.Pow(2, Available));
+            }
+            else
+            {
+                int num = Factorial(Available);
+                int sum = 0;
+
+                for (int i = 0; i <= MaxSelect; i++)
+                {
+                    sum = sum + num / Factorial(i) / Factorial(Available - i);
+                }
+
+                return sum;
+            }
+        }
+
+
+        private int Factorial(int n)
+        {
+            if (n <= 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return n * Factorial(n - 1);
+            }
         }
 
 
@@ -1563,34 +1599,52 @@ namespace GALibForm
         }
 
 
-        private void ModelFitExceedances()
+        private void ModelFitExceedances(double Threshold=-1)
         {
-            //MLRPredPlugin has similar code for prediction exceedances
-            DataTable dtMData = _dataMgr.ModelDataTable;
-            DataView dv = dtMData.DefaultView;
-            List<string> listVarsInModel = _modelingInfo.Model.Keys.ToList<string>();
-            listVarsInModel.RemoveAt(0);
-            DataTable dtModelVarVals = dv.ToTable("ModelVarVals", true, listVarsInModel.ToArray());
+            if (_modelingInfo != null)
+            {
+                //MLRPredPlugin has similar code for prediction exceedances
+                DataTable dtMData = _dataMgr.ModelDataTable;
+                DataView dv = dtMData.DefaultView;
+                List<string> listVarsInModel = _modelingInfo.Model.Keys.ToList<string>();
+                listVarsInModel.RemoveAt(0);
+                DataTable dtModelVarVals = dv.ToTable("ModelVarVals", true, listVarsInModel.ToArray());
 
-            int idx = listBox1.SelectedIndex;
-            MLRIndividual ind = (MLRIndividual)_list[idx];
+                int idx = listBox1.SelectedIndex;
+                MLRIndividual ind = (MLRIndividual)_list[idx];
 
-            mlrPlots1.Exceedances = VBCommon.Statistics.Statistics.PExceedFits(dtModelVarVals, ind.PredictedValues, ind.DecisionThreshold, ind.RMSE);
+                double dblThreshold;
+                if (Threshold == -1)
+                    dblThreshold = ind.DecisionThreshold;
+                else
+                    dblThreshold = Threshold;
+
+                mlrPlots1.Exceedances = VBCommon.Statistics.Statistics.PExceedFits(dtModelVarVals, ind.PredictedValues, dblThreshold, ind.RMSE);
+            }
         }
 
 
-        private void ModelRebuildFitExceedances()
+        private void ModelRebuildFitExceedances(double Threshold=-1)
         {
-            DataTable dtMData = _modelBuildTables.Tables[listBox2.SelectedIndex];
-            DataView dv = dtMData.DefaultView;
-            List<string> listVarsInModel = _modelingInfo.Model.Keys.ToList<string>();
-            listVarsInModel.RemoveAt(0);
-            DataTable dtModelVarVals = dv.ToTable("ModelVarVals", true, listVarsInModel.ToArray());
+            if (_modelingInfo != null)
+            {
+                DataTable dtMData = _modelBuildTables.Tables[listBox2.SelectedIndex];
+                DataView dv = dtMData.DefaultView;
+                List<string> listVarsInModel = _modelingInfo.Model.Keys.ToList<string>();
+                listVarsInModel.RemoveAt(0);
+                DataTable dtModelVarVals = dv.ToTable("ModelVarVals", true, listVarsInModel.ToArray());
 
-            int idx = listBox2.SelectedIndex;
-            MultipleRegression ind = (MultipleRegression)_listRebuilds[idx];
+                double dblThreshold;
+                if (Threshold == -1)
+                    dblThreshold = _decisionThreshold;
+                else
+                    dblThreshold = Threshold;
 
-            mlrPlots2.Exceedances = VBCommon.Statistics.Statistics.PExceedFits(dtModelVarVals, ind.PredictedValues, _decisionThreshold, ind.RMSE);
+                int idx = listBox2.SelectedIndex;
+                MultipleRegression ind = (MultipleRegression)_listRebuilds[idx];
+
+                mlrPlots2.Exceedances = VBCommon.Statistics.Statistics.PExceedFits(dtModelVarVals, ind.PredictedValues, dblThreshold, ind.RMSE);
+            }
         }
 
                         
@@ -1966,7 +2020,7 @@ namespace GALibForm
                 ", Max: " + maxVar.ToString();
 
             txtMaxVars.Text = recVar.ToString();
-            chkAllCombinations.Text = "Run all " + Math.Pow(2, _lstSelectedVariables.Count).ToString() + " combinations";
+            lblCombinationCount.Text = "There are " + Combinations(Available: _lstSelectedVariables.Count, MaxSelect: Convert.ToInt32(txtMaxVars.Text)) + " possible variable combinations";
 
             if (VariablesChanged != null)
             {
@@ -3422,28 +3476,6 @@ namespace GALibForm
         }
 
 
-        /*private void SaveModel(DataTable dt, MultipleRegression model)
-        {
-            //throw new NotImplementedException();
-            //update the serialized model string with the new model dictionary, model datatable
-
-            //Dictionary<string, double> parameters = new Dictionary<string, double>();
-            //for (int i = 0; i < model.Parameters.Rows.Count; i++)
-            //{
-            //    parameters.Add(model.Parameters.Rows[i][0].ToString(), Convert.ToDouble(model.Parameters.Rows[i][1]));
-            //}
-
-
-            _dataMgr.Model = model.Model;
-            //MLRModel m = MLRModel.getMLRModel();
-
-            //update with new info
-            //m.ModelDic = parameters;
-            //m.ModelDT = dt;
-            //m.RegressionDataTable = dt;
-        }*/
-
-
         private void tboxAutoConstantThresholdValue_Validated(object sender, EventArgs e)
         {
             errorProvider1.SetError(tboxAutoConstantThresholdValue, "");
@@ -3656,28 +3688,9 @@ namespace GALibForm
             frmDT.Show();
         }
         #endregion
-
-
-        /*public class MyEventArg:EventArgs
-        {
-            public MyEventArg()
-            {
-            }
-
-            private List<string> modelVars;
-            public List<string> ModelVars
-            {
-                set { modelVars = value; }
-                get { return modelVars; }
-            }
-        }*/
-
-
-
+        
 
         public event EventHandler VariablesChanged;
-
-
 
         /// <summary>
         /// Set the data for variable selection
@@ -3923,6 +3936,7 @@ namespace GALibForm
             List<ListItem> list = null;
             if (state.Keys.Contains("AvailableVariables"))
             {
+                lbAvailableVariables.Items.Clear();
                 list = state["AvailableVariables"];
                 for (int i = 0; i < list.Count; i++)
                     lbAvailableVariables.Items.Add(list[i]);
@@ -3932,10 +3946,38 @@ namespace GALibForm
 
             if (state.Keys.Contains("IndependentVariables"))
             {
+                lbIndVariables.Items.Clear();
                 list = state["IndependentVariables"];
                 for (int i = 0; i < list.Count; i++)
                     lbIndVariables.Items.Add(list[i]);
             }
+
+            lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";
+            lblNumIndVars.Text = "(" + lbIndVariables.Items.Count.ToString() + ")";
+        }
+
+
+        private void txtMaxVars_TextChanged(object sender, EventArgs e)
+        {
+            int maxvars;
+
+            if (Int32.TryParse(txtMaxVars.Text, out maxvars))
+            {
+                lblCombinationCount.Text = "There are " + Combinations(Available: _lstSelectedVariables.Count, MaxSelect: Convert.ToInt32(txtMaxVars.Text)) + " possible variable combinations";
+            }
+            else
+            {
+                lblCombinationCount.Text = "Maximum variables is not a valid entry.";
+            }
+        }
+
+
+        private void UpdateExceedanceProbs(object sender, EventArgs args)
+        {
+            if (sender.Equals(mlrPlots1))
+                ModelFitExceedances(Threshold: mlrPlots1.ThresholdHoriz);
+            else if (sender.Equals(mlrPlots2))
+                ModelRebuildFitExceedances(Threshold: mlrPlots2.ThresholdHoriz);
         }
     }
 }

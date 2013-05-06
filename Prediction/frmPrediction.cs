@@ -1476,21 +1476,24 @@ namespace Prediction
             for (int k=0; k<strExpressionChunks.Count(); k++)
             {
                 string var = strExpressionChunks[k];
-                int intIndx;
-                string strVariable = var.Trim();
-                if ((intIndx = strVariable.IndexOf('(')) != -1)
-                    if ((intIndx = strVariable.IndexOf(')', intIndx)) != -1)
-                        intIndx = 0;
-
-                if ((intIndx = strVariable.IndexOf('*')) != -1)
-                    strVariable = strVariable.Substring(intIndx + 1);
-
-                //If the column name can be cast to a double, then it is the intercept and should be ignored.
-                double intercept;
-                bool castable = double.TryParse(strVariable, out intercept);
-                if (!castable)
+                if (var != "")
                 {
-                    strExpressions.Add(strVariable);
+                    int intIndx;
+                    string strVariable = var.Trim();
+                    if ((intIndx = strVariable.IndexOf('(')) != -1)
+                        if ((intIndx = strVariable.IndexOf(')', intIndx)) != -1)
+                            intIndx = 0;
+
+                    if ((intIndx = strVariable.IndexOf('*')) != -1)
+                        strVariable = strVariable.Substring(intIndx + 1);
+
+                    //If the column name can be cast to a double, then it is the intercept and should be ignored.
+                    double intercept;
+                    bool castable = double.TryParse(strVariable, out intercept);
+                    if (!castable)
+                    {
+                        strExpressions.Add(strVariable);
+                    }
                 }
             }
 

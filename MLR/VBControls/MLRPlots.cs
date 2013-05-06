@@ -16,6 +16,7 @@ namespace VBControls
     public partial class MLRPlots : UserControl
     {
         private List<double[]> _XYPlotdata;
+
         //Threshold value used for sensitiviy, specificity, accuracy
         double _decisionThreshold;
         double _mandateThreshold;
@@ -28,6 +29,8 @@ namespace VBControls
         string _sdecisionThreshold;
         string _smandateThreshold;
         string _sprobabilityThreshold;
+
+        public EventHandler CallForProbs;
 
         private string[] _rptlist = new string[]{
                 "Plot: Pred vs Obs",
@@ -70,6 +73,11 @@ namespace VBControls
         public double ThresholdHoriz
         {
             get { return _decisionThreshold; }
+        }
+
+        public double ProbabilityThreshold
+        {
+            get { return _probabilityThreshold; }
         }
 
         public double ThresholdVert
@@ -220,31 +228,11 @@ namespace VBControls
 
         public void UpdateResults(List<double[]> data, double rmse, Exceedance exceedance)
         {
-            ////string[] rptlist = null;
             string plotName = string.Empty;
             if (exceedance == Exceedance.prediction)
                 plotName = "Pred vs Obs";
              else 
                 plotName = "Fit vs Obs";
-            
- 
-                
-            //    "Plot: Pred vs Obs",
-            //    "Error Table: CFU as DC",
-            //    "Plot: % Exc vs Obs",
-            //    "Error Table: % Exc as DC"
-            //    };
-            //}
-            //else
-            //{
-            //    _rptlist = new string[]{
-            //    "Plot: Fit vs Obs",
-            //    "Error Table: CFU as DC",
-            //    "Plot: % Exc vs Obs",
-            //    "Error Table: % Exc as DC"
-            //    };
-            //}
-            //cboxPlotList.DataSource = _rptlist;
 
             _XYPlotdata = data;
             _rmse = rmse;
@@ -278,7 +266,7 @@ namespace VBControls
                 myPane.CurveList.Clear();
                 myPane = addPlotXY(_obs, _pred, null, null);
                 myPane = addThresholdCurve(myPane, null);
-                //myPane.XAxis.Cross = 0.0;
+
                 zgc.AxisChange();
                 zgc.Refresh();
 
@@ -298,6 +286,7 @@ namespace VBControls
                 CreatePExceedTable();
             }
         }
+
 
         /// <summary>
         /// accessor to populate probabilities; used from prediction
@@ -320,6 +309,7 @@ namespace VBControls
             }
             _smandateThreshold = tbThresholdReg.Text;
         }
+
 
         private void tbThresholdDec_TextChanged(object sender, EventArgs e)
         {
@@ -344,6 +334,7 @@ namespace VBControls
             }
         }
 
+
         private void txtPwr_Leave(object sender, EventArgs e)
         {
             double power;
@@ -357,9 +348,9 @@ namespace VBControls
                 return;
             }
             //_powerExp = Convert.ToDouble(txtBox.Text.ToString());
-            _powerExp = power;
-            
+            _powerExp = power;            
         }
+
 
         private void rbPwrValue_CheckedChanged(object sender, EventArgs e)
         {
@@ -376,9 +367,9 @@ namespace VBControls
             }
         }
 
+
         public void btnXYPlot_Click(object sender, EventArgs e)
         {
-
             //just validate and get the thresholds, and then transform
             tbThresholdDec_TextChanged(null, EventArgs.Empty);
             tbThresholdReg_TextChanged(null, EventArgs.Empty);
@@ -399,6 +390,10 @@ namespace VBControls
                 rbPwrValue_Changed(null, EventArgs.Empty);
             }
 
+            if (CallForProbs != null && _XYPlotdata != null)
+            {
+                CallForProbs(this, null);
+            }
             UpdateResults(_XYPlotdata, _rmse, _exceedance);
         }
 
@@ -407,89 +402,87 @@ namespace VBControls
         {
             if (rbValue.Checked)
             {
+                //Create three variables to hold working values of the thresholds.
                 double tv = double.NaN;
                 double th = double.NaN;
+                double dblDecisionThreshold = double.NaN;
+
                 try
                 {
+                    //Initialize the working values.
                     tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
                     th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                    if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1) { dblDecisionThreshold = th; }
+                    else { dblDecisionThreshold = Convert.ToDouble(_sdecisionThreshold); }
 
-                    tv = Apply.UntransformThreshold(tv, DependentVariableTransforms.none);
-                    th = Apply.UntransformThreshold(th, DependentVariableTransforms.none);
-
+                    //Apply the plotting transform to the thresholds:
                     if (_depVarXFrm == DependentVariableTransforms.Power)
                     {
                         tv = Apply.TransformThreshold(tv, DependentVariableTransforms.Power, _pwrXFrmExponent);
-                        th = Apply.TransformThreshold(th, DependentVariableTransforms.Power, _pwrXFrmExponent);
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVariableTransforms.Power, _pwrXFrmExponent);
                     }
                     else
                     {
                         tv = Apply.TransformThreshold(tv, DependentVarXFrm);
-                        th = Apply.TransformThreshold(th, DependentVarXFrm);
-                    }
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVarXFrm);
+                    }                    
                 }
                 catch
                 {
                     string msg = @"Cannot convert thresholds. (" + tbThresholdDec.Text + ", " + tbThresholdReg.Text + ") ";
                     MessageBox.Show(msg);
                     return;
-                }                
-
-                _mandateThreshold = tv;
-                //_decisionThreshold = th;
-                if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1)
-                {
-                    _decisionThreshold = th;
-                    _sdc = "Decision Criterion: " + tbThresholdDec.Text;
                 }
-                else if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3)
-                    _probabilityThreshold = th;
-                //_decisionThreshold = th;
 
-               
+                //Store the thresholds
+                _mandateThreshold = tv;
+                _decisionThreshold = dblDecisionThreshold;
+                if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3) { _probabilityThreshold = th; }
+
+                _sdc = "Decision Criterion: " + _sdecisionThreshold;
             }
         }
+
 
         private void rbLog10Value_CheckedChanged(object sender, EventArgs e)
         {
             if (rbLog10Value.Checked)
             {
+                //Create three variables to hold working values of the thresholds.
                 double tv = double.NaN;
                 double th = double.NaN;
+                double dblDecisionThreshold = double.NaN;
+
                 //ms has no fp error checking... check for all conditions.
                 //log10(x) when x == 0 results in NaN and when x < 0 results in -Infinity
-                bool xyPlot = cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1;
-
-                tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
-                th = Convert.ToDouble(tbThresholdDec.Text.ToString());
-
+                
                 try
                 {
-                    //tv = Math.Log10(Convert.ToDouble(tbThresholdReg.Text.ToString()));
-                    tv = Apply.UntransformThreshold(tv, DependentVariableTransforms.Log10);
-                    if (DependentVarXFrm == DependentVariableTransforms.Power)
-                        tv = Apply.TransformThreshold(tv, DependentVariableTransforms.Power, _pwrXFrmExponent);
-                    else
-                        tv = Apply.TransformThreshold(tv, DependentVarXFrm);
+                    //Initialize the working values.
+                    tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
+                    th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                    if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1) { dblDecisionThreshold = th; }
+                    else { dblDecisionThreshold = Convert.ToDouble(_sdecisionThreshold); }
 
-                    if (xyPlot)
+                    //Remove the input transform from both thresholds
+                    tv = Apply.UntransformThreshold(tv, DependentVariableTransforms.Log10);
+                    dblDecisionThreshold = Apply.UntransformThreshold(dblDecisionThreshold, DependentVariableTransforms.Log10);
+
+                    //Apply the plotting transform to both thresholds
+                    if (DependentVarXFrm == DependentVariableTransforms.Power)
                     {
-                        
-                        th = Apply.UntransformThreshold(th, DependentVariableTransforms.Log10);
-                        if (DependentVarXFrm == DependentVariableTransforms.Power)                           
-                            th = Apply.TransformThreshold(th, DependentVariableTransforms.Power, _pwrXFrmExponent);                        
-                        else
-                            th = Apply.TransformThreshold(th, DependentVarXFrm);
-                        
-                       // th = Math.Log10(Convert.ToDouble(tbThresholdDec.Text.ToString()));
-                        _sdc = "Decision Criterion: " + "Log(" + tbThresholdDec.Text + ")";
+                        tv = Apply.TransformThreshold(tv, DependentVariableTransforms.Power, _pwrXFrmExponent);
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVariableTransforms.Power, _pwrXFrmExponent);
                     }
-                    else if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3)
-                        th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                    else
+                    {
+                        tv = Apply.TransformThreshold(tv, DependentVarXFrm);
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVarXFrm);
+                    }
                 }
                 catch
                 {
-                    string msg = @"Cannot Log 10 transform thresholds. (" + tbThresholdDec.Text + ", " + tbThresholdReg.Text + ") ";
+                    string msg = @"Cannot Exponentiate transform thresholds. (" + tbThresholdDec.Text + ", " + tbThresholdReg.Text + ") ";
                     MessageBox.Show(msg);
                     return;
                 }
@@ -504,61 +497,57 @@ namespace VBControls
                     string msg = @"Entered values must be greater than 0. (" + tbThresholdDec.Text + ", " + tbThresholdReg.Text + ") ";
                     MessageBox.Show(msg);
                     return;
-                }                
-                _mandateThreshold = tv;
+                }
 
-                if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1)
-                    _decisionThreshold = th;
-                else if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3)
-                    _probabilityThreshold = th;
-                //_decisionThreshold = th;
-                
+                //Store the thresholds
+                _mandateThreshold = tv;
+                _decisionThreshold = dblDecisionThreshold;
+                if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3) { _probabilityThreshold = th; }
+
+                _sdc = "Decision Criterion: " + "10^(" + _sdecisionThreshold + ")";
             }
         }
+
 
         private void rbLogeValue_CheckedChanged(object sender, EventArgs e)
         {
             if (rbLogeValue.Checked)
             {
+                //Create three variables to hold the working values of the thresholds.
                 double tv = double.NaN;
                 double th = double.NaN;
+                double dblDecisionThreshold = double.NaN;
+
                 //ms has no fp error checking... check for all conditions.
                 //loge(x) when x == 0 results in NaN and when x < 0 results in -Infinity
-
-                bool xyPlot = cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1;
-
-                tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
-                th = Convert.ToDouble(tbThresholdDec.Text.ToString());
-
-                tv = Apply.UntransformThreshold(tv, DependentVariableTransforms.Ln);
-                if (DependentVarXFrm == DependentVariableTransforms.Power)                
-                    tv = Apply.TransformThreshold(tv, DependentVariableTransforms.Power, _pwrXFrmExponent);
-                else
-                    tv = Apply.TransformThreshold(tv, DependentVarXFrm);
-
-             
-
+                
                 try
                 {
-                    //tv = Math.Log(Convert.ToDouble(tbThresholdReg.Text.ToString()));
-                    if (xyPlot)
-                    {
-                        
-                        th = Apply.UntransformThreshold(th, DependentVariableTransforms.Ln);
-                        if (DependentVarXFrm == DependentVariableTransforms.Power)
-                            th = Apply.TransformThreshold(th, DependentVariableTransforms.Power, _pwrXFrmExponent);                        
-                        else
-                            th = Apply.TransformThreshold(th, DependentVarXFrm);                        
+                    //Initialize the working values. 
+                    tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
+                    th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                    if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1) { dblDecisionThreshold = th; }
+                    else { dblDecisionThreshold = Convert.ToDouble(_sdecisionThreshold); }
+                    
+                    //Remove the input trransform from both thresholds
+                    dblDecisionThreshold = Apply.UntransformThreshold(dblDecisionThreshold, DependentVariableTransforms.Ln);
+                    tv = Apply.UntransformThreshold(tv, DependentVariableTransforms.Ln);
 
-                        //th = Math.Log(Convert.ToDouble(tbThresholdDec.Text.ToString()));
-                        _sdc = "Decision Criterion: " + "Ln(" + tbThresholdDec.Text + ")";
+                    //Apply the plotting transform to both thresholds
+                    if (DependentVarXFrm == DependentVariableTransforms.Power)
+                    {
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVariableTransforms.Power, _pwrXFrmExponent);
+                        tv = Apply.TransformThreshold(tv, DependentVariableTransforms.Power, _pwrXFrmExponent);
                     }
-                    else if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3)
-                        th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                    else
+                    {
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVarXFrm);
+                        tv = Apply.TransformThreshold(tv, DependentVarXFrm);
+                    }
                 }
                 catch
                 {
-                    string msg = @"Cannot Log e transform thresholds. (" + tbThresholdDec.Text + ", " + tbThresholdReg.Text + ") ";
+                    string msg = @"Cannot exponentiate transform thresholds. (" + tbThresholdDec.Text + ", " + tbThresholdReg.Text + ") ";
                     MessageBox.Show(msg);
                     return;
                 }
@@ -575,61 +564,53 @@ namespace VBControls
                     return;
                 }
 
-               
-
+                //Store the thresholds
                 _mandateThreshold = tv;
-                //_decisionThreshold = th;
-                if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1)
-                    _decisionThreshold = th;
-                else if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3)
-                    _probabilityThreshold = th;
-                //_decisionThreshold = th;
+                _decisionThreshold = dblDecisionThreshold;
+                if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3) { _probabilityThreshold = th; }
 
-                
+                _sdc = "Decision Criterion: " + "Exp(" + _sdecisionThreshold + ")";
             }
-
         }
+
 
         private void rbPwrValue_Changed(object sender, EventArgs e)
         {
             if (rbPwrValue.Checked)
             {
+                //Create four variables to hold working values of the thresholds.
                 double tv = double.NaN;
                 double th = double.NaN;
                 double power = double.NaN;
+                double dblDecisionThreshold = double.NaN;
+
                 //ms has no fp error checking... check for all conditions.
                 //loge(x) when x == 0 results in NaN and when x < 0 results in -Infinity
 
-                bool xyPlot = cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1;
-
-                tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
-                th = Convert.ToDouble(tbThresholdDec.Text.ToString());
-                power = Convert.ToDouble(txtPwrValue.Text);
-
-                tv = Apply.UntransformThreshold(tv, DependentVariableTransforms.Power, power);
-                if (DependentVarXFrm == DependentVariableTransforms.Power)
-                    tv = Apply.TransformThreshold(tv, DependentVariableTransforms.Power, _pwrXFrmExponent);
-                else
-                    tv = Apply.TransformThreshold(tv, DependentVarXFrm);
-
                 try
-                {                    
-                    //tv = Math.Pow(Convert.ToDouble(tbThresholdReg.Text), power);
-                    if (xyPlot)
-                    {
-                        th = Apply.UntransformThreshold(th, DependentVariableTransforms.Power, power);
-                        if (DependentVarXFrm == DependentVariableTransforms.Power)
-                            th = Apply.TransformThreshold(th, DependentVariableTransforms.Power, _pwrXFrmExponent);                        
-                        else
-                            th = Apply.TransformThreshold(th, DependentVarXFrm);
-                        
-                        //th = Math.Pow(Convert.ToDouble(tbThresholdDec.Text), power);
-                    }
-                    else if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3)
-                        th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                {
+                    //Initialize the working values
+                    tv = Convert.ToDouble(tbThresholdReg.Text.ToString());
+                    th = Convert.ToDouble(tbThresholdDec.Text.ToString());
+                    power = Convert.ToDouble(txtPwrValue.Text);
+                    if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1) { dblDecisionThreshold = th; }
+                    else { dblDecisionThreshold = Convert.ToDouble(_sdecisionThreshold); }
 
-                    //tv = Math.Pow(Convert.ToDouble(tbThresholdReg.Text), power);
-                    //th = Math.Pow(Convert.ToDouble(tbThresholdDec.Text), power);
+                    //Remove the input transform from both thresholds
+                    tv = Apply.UntransformThreshold(tv, DependentVariableTransforms.Power, power);
+                    dblDecisionThreshold = Apply.UntransformThreshold(dblDecisionThreshold, DependentVariableTransforms.Power, power);
+
+                    //Apply the plotting transform to both thresholds
+                    if (DependentVarXFrm == DependentVariableTransforms.Power)
+                    {
+                        tv = Apply.TransformThreshold(tv, DependentVariableTransforms.Power, _pwrXFrmExponent);
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVariableTransforms.Power, _pwrXFrmExponent);   
+                    }
+                    else
+                    {
+                        tv = Apply.TransformThreshold(tv, DependentVarXFrm);
+                        dblDecisionThreshold = Apply.TransformThreshold(dblDecisionThreshold, DependentVarXFrm);
+                    }
                 }
                 catch
                 {
@@ -650,19 +631,12 @@ namespace VBControls
                     return;
                 }
 
-                
-
-
+                //Store the thresholds
                 _mandateThreshold = tv;
- 
-                if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1)
-                {
-                    _decisionThreshold = th;
-                    _sdc = "Decision Criterion: " + "(" + tbThresholdDec.Text + ")" + "**" + txtPwrValue.Text;
-                }
-                else if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3)
-                    _probabilityThreshold = th;
-                //_decisionThreshold = th;
+                _decisionThreshold = th;
+                if (cboxPlotList.SelectedIndex == 2 || cboxPlotList.SelectedIndex == 3) { _probabilityThreshold = th; }
+
+                _sdc = "Decision Criterion: " + "(" + _sdecisionThreshold + ")" + "** (1/" + txtPwrValue.Text + ")"; 
             }
         }
 
@@ -707,6 +681,10 @@ namespace VBControls
                 groupBox3.Visible = false;
             }
 
+            if (CallForProbs != null && _XYPlotdata != null)
+            {
+                CallForProbs(this, null);
+            }
             UpdateResults(_XYPlotdata, _rmse, _exceedance);
         }
 
@@ -857,7 +835,6 @@ namespace VBControls
 
             for (int i = 0; i < npts; i++)
             {
-                //tag = tags[i];
                 ppl1.Add(obs[i], pexceed[i]); //, tag);
             }
 
@@ -891,6 +868,7 @@ namespace VBControls
 
             return gp;
         }
+
 
         private GraphPane addProbThresholdCurve(GraphPane myPane)
         {

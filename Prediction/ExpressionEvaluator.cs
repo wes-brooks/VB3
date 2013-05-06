@@ -46,14 +46,12 @@ namespace Prediction
             {
                 MyCurrentRow = dt.Rows[i];
                 dr = dtCalcValues.NewRow();
-                //dr[0] = MyCurrentRow[0] as string;
 
                 for (int j = 0; j < expressions.Count(); j++)
                 {
                     // Evaluate the expression; Flee will query for the values of the columns
                     double dlbResult = (double)listDE[j].Evaluate();
-                    listCalcValues[j].Add(dlbResult);                                        
-                    //dr[j+1] = dlbResult;
+                    listCalcValues[j].Add(dlbResult);
                     dr[j] = dlbResult;
                     Console.WriteLine("Row {0}, Column {1} = {2}", i, j, dlbResult);
                 }

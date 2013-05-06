@@ -375,7 +375,7 @@ namespace IPyModeling
 
             signaller.RaiseBroadcastRequest(this, dictPackedState);
             signaller.TriggerUndoStack();
-            //MakeActive();
+            MakeActive();
         }
 
 
