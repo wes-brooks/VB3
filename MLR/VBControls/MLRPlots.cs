@@ -24,12 +24,14 @@ namespace VBControls
         double _powerExp = double.NaN;
         double _rmse = double.NaN;
         DependentVariableTransforms _depVarXFrm = DependentVariableTransforms.none;
+        DependentVariableTransforms _thresholdXfrm = DependentVariableTransforms.none;
         double _pwrXFrmExponent = double.NaN;
 
         string _sdecisionThreshold;
         string _smandateThreshold;
         string _sprobabilityThreshold;
-
+        string _sxfrmThresholdExponent;
+        
         public EventHandler CallForProbs;
 
         private string[] _rptlist = new string[]{
@@ -70,19 +72,45 @@ namespace VBControls
             get { return _prob; }
         }
 
+
+        public int ChartType
+        {
+            get { return cboxPlotList.SelectedIndex; }
+            set
+            {
+                cboxPlotList.SelectedIndex = value;
+            }
+        }
+
+
         public double ThresholdHoriz
         {
             get { return _decisionThreshold; }
+            set
+            {
+                _sdecisionThreshold = value.ToString();
+                _decisionThreshold = value;
+            }
         }
 
         public double ProbabilityThreshold
         {
             get { return _probabilityThreshold; }
+            set
+            {
+                _sprobabilityThreshold = value.ToString();
+                _probabilityThreshold = value;
+            }
         }
 
         public double ThresholdVert
         {
             get { return _mandateThreshold; }
+            set
+            {
+                tbThresholdReg.Text = _smandateThreshold = value.ToString();
+                _mandateThreshold = value;
+            }
         }
 
         public ZedGraphControl ZGC
@@ -96,40 +124,66 @@ namespace VBControls
         }
 
         public DependentVariableTransforms DependentVarXFrm
-        {
-            set { _depVarXFrm = value; }
+        {            
             get { return _depVarXFrm; }
+            set { _depVarXFrm = value; }
+        }
+
+        public DependentVariableTransforms ThresholdTransform
+        {
+            get { return _thresholdXfrm; }
+            set
+            {
+                _thresholdXfrm = value;
+                switch (_thresholdXfrm)
+                {
+                    case DependentVariableTransforms.none:
+                        rbValue.Checked = true;
+                        break;
+                    case DependentVariableTransforms.Ln:
+                        rbLogeValue.Checked = true;
+                        break;
+                    case DependentVariableTransforms.Log10:
+                        rbLog10Value.Checked = true;
+                        break;
+                    case DependentVariableTransforms.Power:
+                        rbPwrValue.Checked = true;
+                        break;
+                }                
+            }
         }
 
         public double PowerTransformExponent
         {
             get { return _pwrXFrmExponent; }
-            set { _pwrXFrmExponent = value; }
+            set
+            {
+                txtPwrValue.Text = _sxfrmThresholdExponent = value.ToString();
+                _pwrXFrmExponent = value;               
+            }
         }
 
         public void SetThresholds(double decisionThreshold, double mandateThreshold)
         {
             _decisionThreshold = decisionThreshold;
             _mandateThreshold = mandateThreshold;
-            tbThresholdDec.Text = _decisionThreshold.ToString();
-            tbThresholdReg.Text = _mandateThreshold.ToString();
-            //_sprobabilityThreshold = "50";
-            //_sdecisionThreshold = tbThresholdDec.Text;
-            //_smandateThreshold = tbThresholdReg.Text;   
+            _sdecisionThreshold = _decisionThreshold.ToString();
+            tbThresholdReg.Text = _smandateThreshold = _mandateThreshold.ToString();
 
+            cboxPlotList_SelectedIndexChanged(null, null);
             btnXYPlot_Click(null, null);
         }
+
 
         public void SetThresholds(string decisionThreshold, string mandateThreshold)
         {
-            tbThresholdDec.Text = decisionThreshold;
-            tbThresholdReg.Text = mandateThreshold;
-            //_sprobabilityThreshold = "50";
-            //_sdecisionThreshold = tbThresholdDec.Text;
-            //_smandateThreshold = tbThresholdReg.Text;
+            _sdecisionThreshold  = decisionThreshold;
+            tbThresholdReg.Text = _smandateThreshold = mandateThreshold;
 
+            cboxPlotList_SelectedIndexChanged(null, null);
             btnXYPlot_Click(null, null);
         }
+
 
         public VBCommon.Transforms.DependentVariableTransforms Transform
         {
@@ -208,9 +262,7 @@ namespace VBControls
             //LineItem curve = myPane.AddCurve("Y", list, Color.Red, SymbolType.Circle);
             LineItem curve = myPane.AddCurve("", list, Color.Red, SymbolType.Circle);
             curve.Line.IsVisible = false;
-            // Hide the symbol outline
             curve.Symbol.Border.IsVisible = true;
-            // Fill the symbol interior with color
             curve.Symbol.Fill = new Fill(Color.Firebrick);
 
             //Vertical and horizontal threshold lines
@@ -245,9 +297,6 @@ namespace VBControls
 
             _obs = new double[data.Count];
             _pred = new double[data.Count];
-            //prediction will use the accessor SetPredictionProbabilities to populate _prob
-            //if (exceedance == Exceedance.model) 
-            //    _prob = new double[data.Count];
 
             double dc = ThresholdHoriz;
 
@@ -255,9 +304,6 @@ namespace VBControls
             {
                 _obs[i] = data[i][0];
                 _pred[i] = data[i][1];
-                //prediction will use the accessor SetPredictionProbabilities to populate _prob
-                //if (exceedance == Exceedance.model)
-                    //_prob[i] = Statistics.PExceed(_pred[i],  _decisionThreshold, _rmse);
             }
 
             if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1)
@@ -302,7 +348,6 @@ namespace VBControls
 
             if (Double.TryParse(tbThresholdReg.Text, out _mandateThreshold) == false)
             {
-                //string msg = @"Mandate threshold must be a numeric value.";
                 string msg = @"Regulatory standard must be a numeric value.";
                 MessageBox.Show(msg);
                 return;
@@ -320,7 +365,6 @@ namespace VBControls
                 MessageBox.Show(msg);
                 return;
             }
-
             
             if (cboxPlotList.SelectedIndex == 0 || cboxPlotList.SelectedIndex == 1)
             {
@@ -344,10 +388,9 @@ namespace VBControls
             {
                 MessageBox.Show("Invalid number.");
                 txtBox.Focus();
-                //_sdc = "Decision Criterion: ";
                 return;
             }
-            //_powerExp = Convert.ToDouble(txtBox.Text.ToString());
+            _sxfrmThresholdExponent = txtBox.Text.ToString();
             _powerExp = power;            
         }
 
@@ -357,13 +400,10 @@ namespace VBControls
             if (rbPwrValue.Checked)
             {
                 txtPwrValue.Enabled = true;
-                //txtPwr_Leave(this.txtPwrValue, null);
-               // _sdc += "(" + tbThresholdDec.Text + ")" + "**" + txtPwrValue.Text;
             }
             else
             {
                 txtPwrValue.Enabled = false;
-                //_sdc = "Decision Criterion: ";
             }
         }
 
@@ -406,6 +446,7 @@ namespace VBControls
                 double tv = double.NaN;
                 double th = double.NaN;
                 double dblDecisionThreshold = double.NaN;
+                _thresholdXfrm = DependentVariableTransforms.none;
 
                 try
                 {
@@ -452,6 +493,7 @@ namespace VBControls
                 double tv = double.NaN;
                 double th = double.NaN;
                 double dblDecisionThreshold = double.NaN;
+                _thresholdXfrm = DependentVariableTransforms.Log10;
 
                 //ms has no fp error checking... check for all conditions.
                 //log10(x) when x == 0 results in NaN and when x < 0 results in -Infinity
@@ -517,6 +559,7 @@ namespace VBControls
                 double tv = double.NaN;
                 double th = double.NaN;
                 double dblDecisionThreshold = double.NaN;
+                _thresholdXfrm = DependentVariableTransforms.Ln;
 
                 //ms has no fp error checking... check for all conditions.
                 //loge(x) when x == 0 results in NaN and when x < 0 results in -Infinity
@@ -583,6 +626,7 @@ namespace VBControls
                 double th = double.NaN;
                 double power = double.NaN;
                 double dblDecisionThreshold = double.NaN;
+                _thresholdXfrm = DependentVariableTransforms.Power;
 
                 //ms has no fp error checking... check for all conditions.
                 //loge(x) when x == 0 results in NaN and when x < 0 results in -Infinity
@@ -640,6 +684,7 @@ namespace VBControls
             }
         }
 
+
         private void cboxPlotList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxPlotList.SelectedIndex == 0)
@@ -688,12 +733,12 @@ namespace VBControls
             UpdateResults(_XYPlotdata, _rmse, _exceedance);
         }
 
+
         private void CreatePExceedTable()
         {
             listView1.Clear();
             listView1.View = View.Details;
 
-            //string[] cols = { "P(Exceedance)", " FN ", " FP ", "Total", "Specificity", "Sensitivity", "Accuracy" };
             string[] cols = { "P(Exceedance)", "False Non-Exceed", "False Exceed", "Total", "Sensitivity", "Specificity", "Accuracy" };
             for (int i = 0; i < cols.Length; i++)
             {
@@ -701,7 +746,6 @@ namespace VBControls
                 listView1.Columns[i].Text = cols[i];
                 listView1.Columns[i].TextAlign = HorizontalAlignment.Left;
             }
-            //listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
 
             for (int prob = 5; prob < 101; prob = prob + 5)
             {
@@ -722,8 +766,6 @@ namespace VBControls
                 ListViewItem lvi = new ListViewItem(line);
                 listView1.Items.Add(lvi);
             }
-            //listView1.Items.Add(new ListViewItem(""));
-            //listView1.Items.Add(_sdc);
             string[] newline = new string[] { "", "", "", "", "", "", "" };
             listView1.Items.Add(new ListViewItem(newline));
             newline[0] = _sdc;
@@ -731,9 +773,9 @@ namespace VBControls
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
 
+
         private void CreateMFailTable()
         {
-
             //just validate and get the thresholds, and then transform
             tbThresholdDec_TextChanged(null, EventArgs.Empty);
             tbThresholdReg_TextChanged(null, EventArgs.Empty);
@@ -759,7 +801,6 @@ namespace VBControls
             listView1.Clear();
             listView1.View = View.Details;
 
-            //string[] cols = { "Decision Threshold", "FN", "FP", "Specificity", "Sensitivity", "Accuracy" };
             string[] cols = { "Decision Threshold", "False Non-Exceed", "False Exceed", "Total", "Sensitivity", "Specificity", "Accuracy" };
             for (int i = 0; i < cols.Length; i++)
             {
@@ -767,8 +808,6 @@ namespace VBControls
                 listView1.Columns[i].Text = cols[i];
                 listView1.Columns[i].TextAlign = HorizontalAlignment.Left;
             }
-            //listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-
 
             double dcMax = _pred.Max();
             double dcMin = _pred.Min();
@@ -803,7 +842,6 @@ namespace VBControls
 
                 line[0] = tdc.ToString("n4");
 
-                //ModelErrorCounts mec = new ModelErrorCounts();
                 mec = new ModelErrorCounts();
                 mec.getCounts(dc, _mandateThreshold, _pred, _obs);
                 line[1] = mec.FNCount.ToString();
@@ -822,8 +860,8 @@ namespace VBControls
             newline[0] = _sdc;
             listView1.Items.Add(new ListViewItem(newline));
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-
         }
+
 
         private GraphPane addPlotPROB(double[] obs, double[] pexceed, string[] tags, string plot)
         {
@@ -910,12 +948,11 @@ namespace VBControls
             curve1.Line.IsVisible = true;
 
             return myPane;
-
         }
+
 
         private GraphPane addPlotXY(double[] obs, double[] pred, string[] tags, string plot /*, double[] unbiased */)
         {
-
             PointPairList ppl1 = new PointPairList();
 
             string tag = string.Empty;
@@ -924,15 +961,13 @@ namespace VBControls
 
             for (int i = 0; i < npts; i++)
             {
-                //tag = tags[i];
-                ppl1.Add(obs[i], pred[i]); //, tag);
+                ppl1.Add(obs[i], pred[i]);
             }
 
             GraphPane gp = zgc.GraphPane;
             LineItem curve1 = gp.AddCurve(null, ppl1, Color.Red, SymbolType.Circle);
             curve1.Symbol.Border.IsVisible = true;
             curve1.Symbol.Fill = new Fill(Color.Firebrick);
-            //LineItem curve2 = gp.AddCurve("Unbiased Estimates", ppl2, Color.Blue);
             curve1.Line.IsVisible = false;
 
             gp.XAxis.Title.Text = "Observed";
@@ -998,6 +1033,7 @@ namespace VBControls
             return myPane;
         }
 
+
         private void listView1_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.Modifiers & Keys.Control) != 0)
@@ -1008,6 +1044,7 @@ namespace VBControls
                 }
             }
         }
+
 
         public void CopyListViewToClipboard(ListView lv)
         {
@@ -1038,6 +1075,7 @@ namespace VBControls
             Clipboard.SetText(buffer.ToString());
         }
 
+
         private void rbValue_CheckedChanged_1(object sender, EventArgs e)
         {
             if (rbValue.Checked)
@@ -1047,8 +1085,8 @@ namespace VBControls
                     _sdc = "Decision Criterion: " + tbThresholdDec.Text;
                 }
             }
-
         }
+
 
         private void rbLog10Value_CheckedChanged_1(object sender, EventArgs e)
         {
@@ -1059,8 +1097,8 @@ namespace VBControls
                     _sdc = "Decision Criterion: " + "Log(" + tbThresholdDec.Text + ")";
                 }
             }
-
         }
+
 
         private void rbLogeValue_CheckedChanged_1(object sender, EventArgs e)
         {
@@ -1070,8 +1108,45 @@ namespace VBControls
                 {
                     _sdc = "Decision Criterion: " + "Ln(" + tbThresholdDec.Text + ")";
                 }
-            }
-  
+            }  
+        }
+
+
+        public Dictionary<string, object> PackState()
+        {
+            Dictionary<string, object> dictPackedState = new Dictionary<string, object>();
+
+            dictPackedState.Add("ChartType", cboxPlotList.SelectedIndex);
+            dictPackedState.Add("ProbabilityThreshold", _sprobabilityThreshold);
+            dictPackedState.Add("DecisionThreshold", _sdecisionThreshold);
+            dictPackedState.Add("RegulatoryThreshold", _smandateThreshold);
+            dictPackedState.Add("ThresholdTransformExponent", _sxfrmThresholdExponent);
+            dictPackedState.Add("ThresholdTransformType", _thresholdXfrm);
+            dictPackedState.Add("DepVarTransformType", _depVarXFrm);
+
+            return dictPackedState;
+        }
+
+
+        public void UnpackState(Dictionary<string, object> PackedState)
+        {
+            if (PackedState.ContainsKey("ProbabilityThreshold"))
+                ProbabilityThreshold = Convert.ToDouble(PackedState["ProbabilityThreshold"]);
+            if (PackedState.ContainsKey("DecisionThreshold"))
+                ThresholdHoriz = Convert.ToDouble(PackedState["DecisionThreshold"]);
+            if (PackedState.ContainsKey("RegulatoryThreshold"))
+                ThresholdVert = Convert.ToDouble(PackedState["RegulatoryThreshold"]);
+            if (PackedState.ContainsKey("ThresholdTransformExponent"))
+                PowerTransformExponent = Convert.ToDouble(PackedState["ThresholdTransformExponent"]);
+            if (PackedState.ContainsKey("ThresholdTransformType"))
+                ThresholdTransform = (DependentVariableTransforms)(Convert.ToInt32(PackedState["ThresholdTransformType"]));
+            if (PackedState.ContainsKey("DepVarTransformType"))
+                DependentVarXFrm = (DependentVariableTransforms)(Convert.ToInt32(PackedState["DepVarTransformType"]));
+            if (PackedState.ContainsKey("ChartType"))
+                ChartType = Convert.ToInt32(PackedState["ChartType"]);
+            
+            //Trigger the control to redraw itself with the correct display settings:
+            cboxPlotList_SelectedIndexChanged(null, null);
         }
     }
 }

@@ -2512,7 +2512,7 @@ namespace Prediction
 
             DataTable dtCopy = dt.Copy();
             DataTable dtSaved = dt.Copy();
-            frmMissingValues frmMissVal = new frmMissingValues(dgvVariables, dtCopy);
+            frmMissingPredValues frmMissVal = new frmMissingPredValues(dgvVariables, dtCopy);
             frmMissVal.ShowDialog();
             if (frmMissVal.Status)
             {

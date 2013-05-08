@@ -144,7 +144,7 @@ namespace GALibForm
         private bool _continue = true;
         #endregion
 
-        public VBCommon.Transforms.DependentVariableTransforms DepVarTrans
+        public DependentVariableTransforms DepVarTrans
         {
             set { _depVarTransform = value; }
             get { return _depVarTransform; }
@@ -152,12 +152,71 @@ namespace GALibForm
 
 
         public double DepVarTransExp
-        {
-            set { _depVarPowerTransformExponent = value; }
+        {            
             get { return _depVarPowerTransformExponent; }
+            set
+            { _depVarPowerTransformExponent = value; }
         }
 
 
+        public double DecisionThreshold
+        {
+            get { return _decisionThreshold; }
+            set
+            {
+                _decisionThreshold = value;
+                tbDecThreshHoriz.Text = value.ToString();
+            }
+        }
+
+
+        public double RegulatoryThreshold
+        {
+            get { return _mandateThreshold; }
+            set
+            {
+                _mandateThreshold = value;
+                tbRegThreshVert.Text = value.ToString();
+            }
+        }
+
+
+        public DependentVariableTransforms ThresholdTransform
+        {
+            get { return xfrmThreshold; }
+            set
+            {
+                xfrmThreshold = value;
+                switch (value)
+                {
+                    case DependentVariableTransforms.none:
+                        rbValMET.Checked = true;
+                        break;
+                    case DependentVariableTransforms.Log10:
+                        rbLog10ValMET.Checked = true;
+                        break;
+                    case DependentVariableTransforms.Ln:
+                        rbLogeValMET.Checked = true;
+                        break;
+                    case DependentVariableTransforms.Power:
+                        rbPwrValMET.Checked = true;
+                        break;
+                }
+            }
+        }
+
+
+        public double ThresholdTransformExponent
+        {
+            get { return dblThresholdPowerTransformExponent; }
+            set
+            {
+                dblThresholdPowerTransformExponent = value;
+                txtPwrValMET.Text = value.ToString();
+            }
+        }
+
+        
         public Dictionary<string, object> PackedState
         {
             get { return dictPackedState; }
@@ -188,16 +247,16 @@ namespace GALibForm
         }
 
 
-        /*public List<string> SelectedVariables
+        private void ConvertThresholdsToModeledUnits()
         {
-            get { return _lstSelectedVariables; }
-            set 
-            {   _lstSelectedVariables = value;
-                //only invoke if the list has been populated
-                if (_lstSelectedVariables != null)
-                    SelectedVariablesChanged();
-            }
-        }*/
+            //Remove the threshold transform
+            _decisionThreshold = Apply.UntransformThreshold(_decisionThreshold, ThresholdTransform, ThresholdTransformExponent);
+            _mandateThreshold = Apply.UntransformThreshold(_mandateThreshold, ThresholdTransform, ThresholdTransformExponent);
+
+            //Apply the input transform
+            _decisionThreshold = Apply.TransformThreshold(_decisionThreshold, DepVarTrans, DepVarTransExp);
+            _mandateThreshold = Apply.TransformThreshold(_mandateThreshold, DepVarTrans, DepVarTransExp);
+        }
 
 
         public void InitControls()
@@ -217,14 +276,10 @@ namespace GALibForm
             InitResultsGraph();
             zgcROC.GraphPane.CurveList.Clear();
             zgcROC.Refresh();
+
             //huh? init this bad boy somehow...
-            //mlrPredObs1.UpdateResults(null);
-            //mlrPlots1.UpdateResults(null, 1, MLRPlots.Exceedance.model);
             mlrPlots1.ZGC.GraphPane.CurveList.Clear();
-            mlrPlots1.LISTVIEW.Items.Clear();
-            //mlrPredObs1.zedGraphControl1.GraphPane.CurveList.Clear();
-            //mlrPredObs1.zedGraphControl1.Refresh();
-            //listBox2.Items.Clear();            
+            mlrPlots1.LISTVIEW.Items.Clear();        
         }
 
 
@@ -233,11 +288,14 @@ namespace GALibForm
         {
             if (PackedState != null)
             {
-                //Pack the variable selection as it is right now:
-                if (PackedState.ContainsKey("VariableSelection"))
-                    PackedState.Remove("VariableSelection");
+                //Pack the variable selection control and prediction-v-observation charts:
+                if (PackedState.ContainsKey("VariableSelection")) { PackedState.Remove("VariableSelection"); }
+                if (PackedState.ContainsKey("PredPlot1")) { PackedState.Remove("PredPlot1"); }
+                if (PackedState.ContainsKey("PredPlot2")) { PackedState.Remove("PredPlot2"); }
 
                 PackedState.Add("VariableSelection", PackVariableSelectionState());
+                PackedState.Add("PredPlot1", mlrPlots1.PackState());
+                PackedState.Add("PredPlot2", mlrPlots2.PackState());
             }
 
             return PackedState;
@@ -359,6 +417,8 @@ namespace GALibForm
             //Pack up the textboxes that control modeling
             mlrPackState.Add("RegulatoryThreshold", dblRegulatoryThresholdTextbox);
             mlrPackState.Add("DecisionThreshold", dblDecisionThresholdTextbox);
+            mlrPackState.Add("ThresholdTransformExponent", dblThresholdPowerTransformExponent);
+            mlrPackState.Add("ThresholdTransform", xfrmThreshold);
             mlrPackState.Add("MaxVars", txtMaxVars.Text);
             mlrPackState.Add("MaxVIF", txtMaxVIF.Text);
             mlrPackState.Add("PseudorandomSeed", txtSeed.Text);
@@ -380,23 +440,19 @@ namespace GALibForm
             if (dictProjectState == null || dictProjectState.Keys.Count < 1)
                 return;
 
-            if (dictProjectState.ContainsKey("VariableSelection"))
-            {
-                //We must conver the variable selection state from its JSON representation first.
-                object varSelectionState = dictProjectState["VariableSelection"];
-                if (varSelectionState.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
-                {
-                    string strJson = varSelectionState.ToString();
-                    Dictionary<string, List<ListItem>> varSelectionPackedState = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, List<ListItem>>>(strJson);
-                    UnpackVariableSelectionState(varSelectionPackedState);
-                }                
-            }
-
             if (dictProjectState.ContainsKey("DecisionThreshold"))
-                tbDecThreshHoriz.Text = dictProjectState["DecisionThreshold"].ToString();
+                DecisionThreshold = Convert.ToDouble(dictProjectState["DecisionThreshold"]);
 
             if (dictProjectState.ContainsKey("RegulatoryThreshold"))
-                 tbRegThreshVert.Text = dictProjectState["RegulatoryThreshold"].ToString();
+                 RegulatoryThreshold = Convert.ToDouble(dictProjectState["RegulatoryThreshold"]);
+
+            if (dictProjectState.ContainsKey("ThresholdTransform"))
+                ThresholdTransform = (DependentVariableTransforms)(Convert.ToDouble(dictProjectState["ThresholdTransform"]));
+
+            if (dictProjectState.ContainsKey("ThresholdTransformExponent"))
+                ThresholdTransformExponent = Convert.ToDouble(dictProjectState["ThresholdTransformExponent"]);
+
+            ConvertThresholdsToModeledUnits();
 
             if (dictProjectState.ContainsKey("MaxVars"))
                 txtMaxVars.Text = dictProjectState["MaxVars"].ToString();
@@ -424,6 +480,42 @@ namespace GALibForm
 
             if (dictProjectState.ContainsKey("ActiveAlgorithmTab"))
                 tabControlModelGeneration.SelectedIndex = Convert.ToInt32(dictProjectState["ActiveAlgorithmTab"].ToString());
+
+            if (dictProjectState.ContainsKey("VariableSelection"))
+            {
+                //We must conver the variable selection state from its JSON representation first.
+                object varSelectionState = dictProjectState["VariableSelection"];
+                if (varSelectionState.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    string strJson = varSelectionState.ToString();
+                    Dictionary<string, List<ListItem>> varSelectionPackedState = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, List<ListItem>>>(strJson);
+                    UnpackVariableSelectionState(varSelectionPackedState);
+                }
+            }
+
+            if (dictProjectState.ContainsKey("PredPlot1"))
+            {
+                //We must conver the variable selection state from its JSON representation first.
+                object jsonPredPlotState = dictProjectState["PredPlot1"];
+                if (jsonPredPlotState.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    string strJson = jsonPredPlotState.ToString();
+                    Dictionary<string, object> dictPredPlotState = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(strJson);
+                    mlrPlots1.UnpackState(dictPredPlotState);
+                }
+            }
+
+            if (dictProjectState.ContainsKey("PredPlot2"))
+            {
+                //We must conver the variable selection state from its JSON representation first.
+                object jsonPredPlotState = dictProjectState["PredPlot2"];
+                if (jsonPredPlotState.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    string strJson = jsonPredPlotState.ToString();
+                    Dictionary<string, object> dictPredPlotState = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(strJson);
+                    mlrPlots2.UnpackState(dictPredPlotState);
+                }
+            }
 
             MLRModelingInfo mi = null;
             object jsonObj = null;
@@ -461,24 +553,7 @@ namespace GALibForm
                     chromosomes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<List<short>>>(strJson);
                 }  
             }
-
-            switch(mi.ThresholdTransform)
-            {
-                case DependentVariableTransforms.none:
-                    rbValMET.Checked = true;
-                    break;
-                case DependentVariableTransforms.Log10:
-                    rbLog10ValMET.Checked = true;
-                    break;
-                case DependentVariableTransforms.Ln:
-                    rbPwrValMET.Checked = true;
-                    break;
-                case DependentVariableTransforms.Power:
-                    rbPwrValMET.Checked = true;
-                    txtPwrValMET.Text = mi.ThresholdPowerTransformExponent.ToString();
-                    break;
-            }
-            
+                                    
             listBox1.SelectedIndex = -1;
             _list = new List<IIndividual>();
 
@@ -495,9 +570,9 @@ namespace GALibForm
 
             //Restore the Fitness Progress plot:
             //Console.WriteLine("Generation: " + generation.ToString() + "   Fitness: " + max.ToString());
-            // Make sure that the curvelist has at least one curve
+            //Make sure that the curvelist has at least one curve
             InitProgressGraph();
-            if (mi.GetFitnessProgress() != null)
+            if (mi.FitnessProgressListX != null)
             {
                 if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
                     return;
@@ -533,7 +608,7 @@ namespace GALibForm
             lblCombinationCount.Text = "There are " + Combinations(Available: _lstSelectedVariables.Count, MaxSelect: Convert.ToInt32(txtMaxVars.Text)) + " possible variable combinations";
 
             InitResultsGraph();
-
+                        
             listBox1.SelectedIndex = mi.SelectedModel;
         }
 
@@ -597,9 +672,7 @@ namespace GALibForm
 
         private bool VerifyGAModelParams()
         {
-            //_numVars = lbIndVariables.Items.Count;
             _numVars = _lstSelectedVariables.Count;
-            //int numRecommendedVars = _numObs / 3;
             int numRecommendedVars = _numObs / 5;
 
             if (chkSeed.Checked)
@@ -1601,7 +1674,7 @@ namespace GALibForm
 
         private void ModelFitExceedances(double Threshold=-1)
         {
-            if (_modelingInfo != null)
+            if (_modelingInfo != null && _list != null)
             {
                 //MLRPredPlugin has similar code for prediction exceedances
                 DataTable dtMData = _dataMgr.ModelDataTable;
@@ -3947,9 +4020,13 @@ namespace GALibForm
             if (state.Keys.Contains("IndependentVariables"))
             {
                 lbIndVariables.Items.Clear();
+                _lstSelectedVariables.Clear();
                 list = state["IndependentVariables"];
                 for (int i = 0; i < list.Count; i++)
+                {
                     lbIndVariables.Items.Add(list[i]);
+                    _lstSelectedVariables.Add(list[i].DisplayItem);
+                }
             }
 
             lblNumAvailVars.Text = "(" + lbAvailableVariables.Items.Count.ToString() + ")";

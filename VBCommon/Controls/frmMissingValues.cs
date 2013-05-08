@@ -45,7 +45,7 @@ namespace VBCommon.Controls
         //target dropdownlists content depends on which radio button action seleced
         private string[] strArrDdlReplaceWith = { "Only This Cell", "Entire Row", "Entire Column", "Entire Sheet" };
         private string[] strArrDdlDeleteRow = { "Only This Row", "Entire Column", "Entire Sheet" };
-        private string[] strArrDdlDeletColumn = { "Only This Column", "Entire Row", "Entire Sheet" };
+        private string[] strArrDdlDeleteColumn = { "Only This Column", "Entire Row", "Entire Sheet" };
 
         private bool boolUpdatetargetrow = true;
         private bool boolUpdatetargetcol = true;
@@ -125,16 +125,36 @@ namespace VBCommon.Controls
         /// <param name="e"></param>
         private void btnScan_Click(object sender, EventArgs e)
         {
+            bool bColumnsOnly = false;
             lstBadCells = VBCommon.IO.ImportExport.GetBadCellsByRow(_dt, strFindstring);
+            if (lstBadCells.Count == 0)
+            {
+                bColumnsOnly = true;
+                lstBadCells = VBCommon.IO.ImportExport.GetBadColumns(_dt);
+            }
             int[] cellNdxs = new int[2];
 
-            if (lstBadCells.Count > 0)
+            if (lstBadCells.Count > 0 && !bColumnsOnly)
             {
                 cellNdxs = lstBadCells[0];
                 _dgv.Rows[cellNdxs[1]].Cells[cellNdxs[0]].Selected = true;
                 _dgv.CurrentCell = _dgv.SelectedCells[0];
                 btnReturn.Enabled = false; //can't return until clean
                 boolStatus = false;
+                //return badCells;
+            }
+            else if (lstBadCells.Count > 0)
+            {
+                int[] col = lstBadCells[0];
+                _dgv.Rows[0].Cells[col[0]].Selected = true; //.Cells[cellNdxs[0]].Selected = true;
+                _dgv.CurrentCell = _dgv.SelectedCells[0];
+                btnReturn.Enabled = false; //can't return until clean
+                boolStatus = false;
+                rbActionDelRow.Enabled = false;
+                rbActionReplace.Enabled = false;
+                txtReplaceWith.Enabled = false;
+                rbActionDelCol.Checked = true;
+                lblStatus.Text = "Column has no distinct values.";
                 //return badCells;
             }
             else
@@ -256,9 +276,12 @@ namespace VBCommon.Controls
             //possible targets are specified in the global _ddreplacewith, _dddeletecol and _dddeleterow lists
             //and the selectable targets available are controled by which UI radio button is checked
             bool stop = false;
-            for (int ndx = 0; ndx < lstBadCells.Count; ndx++)
+            if (lstBadCells.Count > 0)
             {
-                if (stop = doAction(ndx)) break;
+                for (int ndx = 0; ndx < lstBadCells.Count; ndx++)
+                {
+                    if (stop = doAction(ndx)) break;
+                }
             }
 
             //re-scan the table - maybe the target was limited and bad cells remain
@@ -291,7 +314,9 @@ namespace VBCommon.Controls
             bool breakloop = false;
             string target = cboCols.SelectedValue.ToString();
 
-            int[] location = lstBadCells[ndx];
+            int[] location;
+            location = lstBadCells[ndx];
+
             int rndx = location[1];
             int cndx = location[0];
 
@@ -466,7 +491,7 @@ namespace VBCommon.Controls
 
         private void rbActionDelCol_CheckedChanged(object sender, EventArgs e)
         {
-            if (rbActionDelCol.Checked) cboCols.DataSource = strArrDdlDeletColumn;
+            if (rbActionDelCol.Checked) cboCols.DataSource = strArrDdlDeleteColumn;
         }
 
         #endregion

@@ -76,8 +76,12 @@ def ValidatePLS(data, target, threshold, specificity, folds='', callback='', **a
             
             try: candidate_threshold = max([x for x in candidates if x <= prediction])
             except: candidate_threshold = min(candidates)
-            spec.append(len([i for i in range(len(fitted)) if actual[i]<regulatory and fitted[i]<candidate_threshold]) / num_candidates)
-            sensitivity.append(len([i for i in range(len(fitted)) if actual[i]>=regulatory and fitted[i]>=candidate_threshold]) / float(len(actual) - num_candidates))
+            
+            if num_candidates > 0: spec.append(len([i for i in range(len(fitted)) if actual[i]<regulatory and fitted[i]<candidate_threshold]) / num_candidates)
+            else: spec.append(1.)
+			
+            if len(actual) > num_candidates: sensitivity.append(len([i for i in range(len(fitted)) if actual[i]>=regulatory and fitted[i]>=candidate_threshold]) / float(len(actual) - num_candidates))
+            else: sensitivity.append(1.)
             
             #the first candidate threshold that would be below this threshold
             try: threshold.append(max([x for x in fitted if x <= prediction]))

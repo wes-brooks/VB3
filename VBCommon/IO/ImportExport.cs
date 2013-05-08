@@ -149,29 +149,7 @@ namespace VBCommon.IO
                 if (_dt.Columns.Cast<DataColumn>().Where(x => Regex.IsMatch(x.ColumnName, @"^[^a-zA-Z]")).Count() > 0)
                 {
                     throw new InvalidColumnNameException();
-                }
-
-                //Count the distinct values in each column.
-                var results = _dt.Columns
-                .Cast<DataColumn>()
-                .Select(dc => new {
-                    Name = dc.ColumnName,
-                    Values = _dt.Rows
-                        .Cast<DataRow>()
-                        .Select(row => row[dc])
-                        .Distinct()
-                        .Count()})
-                .OrderBy(item => item.Values);//.ToList<int>();
-
-                //Remove any columns that have fewer than two distinct values.
-                foreach (var entry in results)
-                {
-                    if (entry.Values < 2)
-                    {
-                        System.Windows.Forms.MessageBox.Show("The column " + entry.Name + " contains no distinct values and will be removed from the data set.");
-                        _dt.Columns.Remove(entry.Name);
-                    }
-                }
+                }                
             }
             catch (InvalidColumnNameException ex)
             {
@@ -326,6 +304,39 @@ namespace VBCommon.IO
                 }
             }
             return badCells;
+        }
+
+
+        public static List<int[]> GetBadColumns(DataTable RawData)
+        {
+            List<int[]>  listBadColumns = new List<int[]>();
+
+            //Count the distinct values in each column.
+            var results = RawData.Columns
+            .Cast<DataColumn>()
+            .Select(dc => new
+            {
+                Name = dc.ColumnName,
+                Index = RawData.Columns.IndexOf(dc),
+                Values = RawData.Rows
+                    .Cast<DataRow>()
+                    .Select(row => row[dc])
+                    .Distinct()
+                    .Count()
+            })
+            .OrderBy(item => item.Values);//.ToList<int>();
+
+            //Remove any columns that have fewer than two distinct values.
+            foreach (var entry in results)
+            {                
+                if (entry.Values < 2)
+                {
+                    int[] col = {entry.Index, 0};
+                    listBadColumns.Add(col);
+                }
+            }
+
+            return listBadColumns;
         }
     }
 }
