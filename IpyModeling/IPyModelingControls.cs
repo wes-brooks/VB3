@@ -322,7 +322,7 @@ namespace IPyModeling
             Cursor.Current = Cursors.WaitCursor;
 
             //Datasheet's packed state coming in
-            DataTable dtCorr = dsControl1.DT;
+            DataTable dtCorr = dsControl1.FilteredDataTable;
             DataView dvCorr = dtCorr.DefaultView;
 
             List<string> list = new List<string>();
@@ -544,7 +544,7 @@ namespace IPyModeling
                 else { }
             }
 
-            intNumObs = _dtFull.Rows.Count;
+            intNumObs = dsControl1.DTRI.DTRowInfo.Count(x => x.Value == true); //_dtFull.Rows.Count;
             lblNumObs.Text = "Number of Observations: " + intNumObs.ToString();
 
             lbAvailableVariables.Items.Clear();

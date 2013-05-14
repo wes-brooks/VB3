@@ -17,7 +17,6 @@ namespace VBCommon.Statistics
     {
         private MultipleLinearRegression _model;
 
-        //private VariableCollection _data = null;
         private DataTable _dataTable = null;
         private string _dependentVar = "";
         private string[] _independentVars = null;
@@ -29,7 +28,6 @@ namespace VBCommon.Statistics
         private double _Press;
         private double _RMSE;
 
-        //private Dictionary<string, double> _parameters = null;
         private double[] _studentizedResiduals = null;
         private double[] _dffits = null;
         private double[] _cooks = null;
@@ -51,6 +49,10 @@ namespace VBCommon.Statistics
 
         private double _WSresidPvalue = double.NaN;
         private double _WSresidNormStatVal = double.NaN;
+
+
+        public MultipleRegression() { }
+
 
         public MultipleRegression(DataTable dataTable, string dependentVariable, string[] independentVariables)
         {
@@ -80,7 +82,6 @@ namespace VBCommon.Statistics
                 }
                 arrInputData[i] = temp;
             }
-            //_data = new VariableCollection(dataTable);
         }
 
 
@@ -93,8 +94,6 @@ namespace VBCommon.Statistics
             strInputName = InputName;
 
             _independentVars = new string[1] { InputName };
-
-            //_model = new MultipleRegression(
         }
 
 
@@ -103,7 +102,8 @@ namespace VBCommon.Statistics
             //Set up the DataTable with two columns:
             _dataTable = new DataTable();
             _dataTable.Columns.Add(OutputName, typeof(double));
-            _dataTable.Columns.Add(InputName, typeof(double));
+            try {  _dataTable.Columns.Add(InputName, typeof(double)); }
+            catch (DuplicateNameException) { _dataTable.Columns.Add(InputName + ".", typeof(double)); }
 
             arrOutputData = OutputData;
             arrInputData = new double[InputData.Length][];
@@ -118,9 +118,30 @@ namespace VBCommon.Statistics
 
             _independentVars = new string[1] { InputName };
             strOutputName = _dependentVar = OutputName;
-
-            //_model = new MultipleRegression(new DataTable(), OutputName, _independentVars);
         }
+
+
+        /*public Dictionary<string, object> PackState()
+        {
+            Dictionary<string, object> dictPackedState = new Dictionary<string,object>();
+            dictPackedState.Add("Data", _dataTable);
+            dictPackedState.Add("OutputName", strOutputName);
+            dictPackedState.Add("InputNames", _independentVars.ToList<string>());
+
+            return dictPackedState;
+        }
+
+
+        public void UnpackState(Dictionary<string, object> PackedState)
+        {
+            if (PackedState.ContainsKey("Data") && PackedState.ContainsKey("InputNames") && PackedState.ContainsKey("OutputName"))
+            {
+                DataTable dt = (DataTable)PackedState["Data"];
+                string output = PackedState["OutputName"].ToString();
+                string[] inputs = ((List<string>)(PackedState["InputNames"])).ToArray();
+
+            }
+        }*/
 
 
         public double R2
@@ -207,11 +228,6 @@ namespace VBCommon.Statistics
         {
             get { return _WSresidNormStatVal; }
         }
-
-        //public Dictionary<string, double> VIFs
-        //{
-        //    get { return _VIF; }
-        //}
 
         public double MaxVIF
         {
@@ -350,17 +366,6 @@ namespace VBCommon.Statistics
 
             double[,] corrMatrix = inputMat.Transpose().Multiply(inputMat);              
             double[,] InvCorrMatrix = corrMatrix.Inverse();
-            
-            /*Extreme.Mathematics.Matrix InvCorrMatrix = corrMatrix.GetInverse();
-            Extreme.Mathematics.Vector VIFVector = InvCorrMatrix.GetDiagonal();
-            Extreme.Mathematics.Vector vifs = InvCorrMatrix.GetDiagonal().ToArray();
-
-            _VIF = new Dictionary<string, double>();
-            for (int i = 0; i < vifs.Count(); i++)
-                _VIF.Add(_independentVars[i].ToString(), vifs.GetValue(i));
-
-            _maxVIF = VIFVector.AbsoluteMax();
-            _maxVIFParameter = _independentVars[VIFVector.AbsoluteMaxIndex()];           */ 
         }
 
 

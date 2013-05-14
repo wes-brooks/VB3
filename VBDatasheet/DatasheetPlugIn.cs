@@ -43,6 +43,7 @@ namespace VBDatasheet
         private Boolean boolFirstPass = true;
         private Boolean boolClean = true;
         private Boolean boolChanged = false;
+        private Boolean boolValidated = false;
 
         private Stack<string> UndoKeys;
         private Stack<string> RedoKeys;
@@ -285,6 +286,7 @@ namespace VBDatasheet
             dictPackedState.Add("Complete", boolComplete);
             dictPackedState.Add("Visible", boolVisible);
             dictPackedState.Add("FirstPass", boolFirstPass);
+            dictPackedState.Add("Validated", boolValidated);
 
             e.PackedPluginStates.Add(strPanelKey, dictPackedState);
         }
@@ -302,12 +304,25 @@ namespace VBDatasheet
                     {
                         this.Show();
 
-                        if ((bool)dictPlugin["Complete"])
+                        //If there's data on the datasheet, then enable the validation button
+                        if (dictPlugin.ContainsKey("FirstPass") && dictPlugin.ContainsKey("Clean"))
                         {
-                            btnComputeAO.Enabled = true;
-                            btnGoToModeling.Enabled = true;
-                            btnManipulate.Enabled = true;
-                            btnTransform.Enabled = true;
+                            if (!(bool)dictPlugin["FirstPass"] || !(bool)dictPlugin["Clean"])
+                            {
+                                btnValidate.Enabled = true;
+                            }
+                        }
+
+                        //If the data's been validated, then enable the manipulation buttons.
+                        if (dictPlugin.ContainsKey("Validated"))
+                        {
+                            if ((bool)dictPlugin["Validated"])
+                            {
+                                btnComputeAO.Enabled = true;
+                                btnGoToModeling.Enabled = true;
+                                btnManipulate.Enabled = true;
+                                btnTransform.Enabled = true;
+                            }
                         }
                     }
                     else { Hide(); }
@@ -319,6 +334,7 @@ namespace VBDatasheet
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolClean = (bool)dictPlugin["Clean"];
                 boolFirstPass = (bool)dictPlugin["FirstPass"];
+                if (dictPlugin.ContainsKey("Validated")) { boolValidated = (bool)dictPlugin["Validated"]; }
             }
             else
             {
@@ -470,6 +486,7 @@ namespace VBDatasheet
                 btnManipulate.Enabled = false;
                 btnTransform.Enabled = false;
                 btnGoToModeling.Enabled = false;
+                boolValidated = false;
                 Broadcast();
             }
         }
@@ -484,6 +501,7 @@ namespace VBDatasheet
                 btnManipulate.Enabled = true;
                 btnTransform.Enabled = true;
                 btnGoToModeling.Enabled = true;
+                boolValidated = true;
                 Broadcast();
             }
             else
@@ -492,6 +510,7 @@ namespace VBDatasheet
                 btnManipulate.Enabled = false;
                 btnTransform.Enabled = false;
                 btnGoToModeling.Enabled = false;
+                boolValidated = false;
             }
         }
 

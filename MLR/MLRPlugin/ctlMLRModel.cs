@@ -73,7 +73,7 @@ namespace MLRPlugin
                 return;
             
             MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
-            _dataMgr.ModelDataTable = dsControl1.DT.Copy();
+            _dataMgr.ModelDataTable = dsControl1.FilteredDataTable;
             frmModel1.InitControls();
             frmModel1.SetData();
         }
@@ -154,7 +154,7 @@ namespace MLRPlugin
             }*/
 
             MLRCore.MLRDataManager _dataMgr = MLRCore.MLRDataManager.GetDataManager();
-            _dataMgr.ModelDataTable = dsControl1.DT.Copy();
+            _dataMgr.ModelDataTable = dsControl1.FilteredDataTable;
 
             frmModel1.InitControls();
             frmModel1.SetData();

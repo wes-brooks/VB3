@@ -362,6 +362,7 @@ namespace GALibForm
                     _modelingInfo.SelectedModel = _selectedModelIndex;
                     _modelingInfo.SelectedRebuildIndex = _selectedRebuildIndex;
                 }
+                mlrPackState.Add("RebuildList", _listRebuilds);
             }
 
             mlrPackState.Add("IndependentVariables", _lstSelectedVariables);
@@ -480,7 +481,7 @@ namespace GALibForm
 
             if (dictProjectState.ContainsKey("ActiveAlgorithmTab"))
                 tabControlModelGeneration.SelectedIndex = Convert.ToInt32(dictProjectState["ActiveAlgorithmTab"].ToString());
-
+            
             if (dictProjectState.ContainsKey("VariableSelection"))
             {
                 //We must conver the variable selection state from its JSON representation first.
@@ -553,6 +554,18 @@ namespace GALibForm
                     chromosomes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<List<short>>>(strJson);
                 }  
             }
+
+            if (dictProjectState.ContainsKey("RebuildList"))
+            {
+                //We must conver the variable selection state from its JSON representation first.
+                object jsonPredPlotState = dictProjectState["RebuildList"];
+                if (jsonPredPlotState.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                {
+                    string strJson = jsonPredPlotState.ToString();
+                    List<MultipleRegression> listMlrRebuilds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MultipleRegression>>(strJson);
+                    //mlrPlots1.UnpackState(dictPredPlotState);
+                }
+            }
                                     
             listBox1.SelectedIndex = -1;
             _list = new List<IIndividual>();
@@ -613,28 +626,28 @@ namespace GALibForm
         }
 
 
-        private int Combinations(int Available, int MaxSelect)
+        private string Combinations(int Available, int MaxSelect)
         {
             if (Available == MaxSelect)
             {
-                return Convert.ToInt32(Math.Pow(2, Available));
+                return Math.Pow(2, Available).ToString();
             }
             else
             {
-                int num = Factorial(Available);
-                int sum = 0;
+                double num = Factorial(Available);
+                double sum = 0;
 
                 for (int i = 0; i <= MaxSelect; i++)
                 {
                     sum = sum + num / Factorial(i) / Factorial(Available - i);
                 }
 
-                return sum;
+                return sum.ToString();
             }
         }
 
 
-        private int Factorial(int n)
+        private double Factorial(int n)
         {
             if (n <= 0)
             {
@@ -660,7 +673,6 @@ namespace GALibForm
             list.Add(_dataMgr.ModelDependentVariable);
 
             int numVars = _lstSelectedVariables.Count;
-            //int numVars = lbIndVariables.Items.Count;
             for (int i = 0; i < numVars; i++)
                 list.Add(_lstSelectedVariables[i].ToString());
 
@@ -830,10 +842,10 @@ namespace GALibForm
         }
 
 
-        public void SetDataTable(DataTable dt)
+        /*public void SetDataTable(DataTable dt)
         {
             _dtFull = dt;
-        }
+        }*/
 
 
         public void SetData()

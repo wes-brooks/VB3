@@ -651,13 +651,20 @@ namespace VBCommon.Controls
             //filter out disabled rows
             DataTable dtCopy = dt.Copy();
             Dictionary<string, bool> rstatus = dtRI.DTRowInfo;
-            for (int i = 0; i < dtCopy.Rows.Count; i++)
+            for (int i = dtCopy.Rows.Count - 1; i >= 0; i--)
             {
                 if (!rstatus[dtCopy.Rows[i][0].ToString()])
                     dtCopy.Rows[i].Delete();
             }
             dtCopy.AcceptChanges();
             return dtCopy;
+        }
+
+
+        // strips disabled records from the table passed to modeling
+        public DataTable FilteredDataTable
+        {
+            get { return filterDataTableRows(this.DT); }
         }
 
 
@@ -1580,7 +1587,7 @@ namespace VBCommon.Controls
                         for (int r = 0; r < dtCopy.Rows.Count; r++)
                             dtCopy.Rows[r][dc.Caption] = dvalues[r];
 
-                        if (ndx > dtCopy.Columns.Count)
+                        if (ndx >= dtCopy.Columns.Count)
                         {
                             ndx = dtCopy.Columns.Count - 1;
                         }

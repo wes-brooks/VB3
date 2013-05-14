@@ -1469,8 +1469,9 @@ namespace Prediction
         private DataTable BuildPredictionTable(DataTable tblRaw, string strModelExpression)
         {
             DataTable tblForPrediction = new DataTable();
-            
-            string[] strExpressionChunks = strModelExpression.Split(new char[] {'+', '-'});
+
+            //Match only +/- symbols that are surrounded by spaces, which is the only place we should see breaks between additive terms.
+            string[] strExpressionChunks = Regex.Split(strModelExpression, " [+-] ");
             List<string> strExpressions = new List<string>();
 
             for (int k=0; k<strExpressionChunks.Count(); k++)
