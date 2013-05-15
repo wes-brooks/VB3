@@ -55,15 +55,22 @@ class Model(object):
         
         #Generate a PLS model in R.
         self.formula = r.Call('as.formula', obj=utils.SanitizeVariableName(self.target) + '~.')
-        self.pls_params = {'formula' : self.formula, \
-            'data' : self.data_frame, \
-            'validation' : 'LOO', \
-            'x' : True }
+        if len(self.data_dictionary) > 2:
+            self.pls_params = {'formula' : self.formula, \
+                'data' : self.data_frame, \
+                'validation' : 'LOO', \
+                'x' : True }
+        else:
+            self.pls_params = {'formula' : self.formula, \
+                'data' : self.data_frame, \
+                'validation' : 'none', \
+                'x' : True }
         #self.model = r.Call(function='plsr', **self.pls_params).AsList()
                 
         #Get the number of columns from the validation step
         #(Might be fewer than the number of predictor variables if n<p)
-        self.ncomp_max = int(list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2])
+        if len(self.data_dictionary) > 2: self.ncomp_max = int(list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2])
+        else: self.ncomp_max = 1
             
         #Use cross-validation to find the best number of components in the model.
         self.GetActual()
@@ -87,26 +94,33 @@ class Model(object):
         
         #Get the data into R
         self.target = args['target']
-        data = args['data']
+        data  = self.data_dictionary = copy.copy(args['data'])
         self.data_frame = utils.DictionaryToR(data)
-        self.data_dictionary = copy.copy(data)
         self.num_predictors = len(self.data_dictionary.keys()) - 1
         
-        #Generate a PLS model in R.
+        #Generate a PLS model in R. Special handling for only one predictor.
         self.formula = r.Call('as.formula', obj=utils.SanitizeVariableName(self.target) + '~.')
-        self.pls_params = {'formula' : self.formula, \
-            'data' : self.data_frame, \
-            'validation' : 'LOO', \
-            'x' : True }    
+        if len(data) > 2:
+            self.pls_params = {'formula' : self.formula, \
+                'data' : self.data_frame, \
+                'validation' : 'LOO', \
+                'x' : True }
+        else:
+            self.pls_params = {'formula' : self.formula, \
+                'data' : self.data_frame, \
+                'validation' : 'none', \
+                'x' : True }
         self.model = r.Call(function='plsr', **self.pls_params).AsList()
         
         #Get the number of columns from the validation step
         #(Might be fewer than the number of predictor variables if n<p)
-        self.ncomp_max = int(list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2])
+        if len(data) > 2: self.ncomp_max = int(list(r.Call(function="dim", x=self.model['validation'].AsList()['pred']).AsNumeric())[2])
+        else: self.ncomp_max = 1
         
         #Use cross-validation to find the best number of components in the model.
         self.GetActual()
-        self.CrossValidation(**args)
+        if len(data) > 2: self.CrossValidation(**args)
+        else: self.ncomp = 1
         self.GetFitted()
         
         #Establish a decision threshold
@@ -123,15 +137,11 @@ class Model(object):
             
         #use R's MSEP function to estimate the variance.
         elif model_part == 'MSEP':
-            #part = list( r.Call(function='MSEP', object=self.model).AsVector() )
             part = sum([(self.fitted[i] - self.actual[i])**2 for i in range(len(self.fitted))]) / len(self.fitted)
-            #part = part['val'].AsVector()[self.ncomp]
             
         #use R's RMSEP function to estimate the standard error.
         elif model_part == 'RMSEP':
             part = (sum([(self.fitted[i] - self.actual[i])**2 for i in range(len(self.fitted))]) / len(self.fitted))**0.5
-            #part = part['val'].AsVector()[self.ncomp]
-            #part = list( r.Call(function='RMSEP', object=self.model).AsList() )
         
         #Get the variable names, ordered as R sees them.
         elif model_part == 'names':
@@ -141,8 +151,7 @@ class Model(object):
             except: pass
         
         #otherwise, go to the data structure itself
-        else:
-            part = container[model_part]
+        else: part = container[model_part]
             
         return part
 
@@ -153,12 +162,10 @@ class Model(object):
         
         prediction = r.Call(function='predict', **prediction_params).AsVector()
         prediction = array.array('d', prediction)
-        #prediction = np.array( prediction, dtype=float )
         
         #Reshape the vector of predictions
         columns = min(self.num_predictors, self.ncomp_max)
-        rows = len(prediction) / columns        
-        #prediction.shape = (columns, rows)
+        rows = len(prediction) / columns
         
         pp = []
         for k in range(int(columns)):
@@ -167,7 +174,6 @@ class Model(object):
             pp.append(array.array('d', prediction[b:e]))
         prediction = pp
         
-        #prediction = prediction.transpose()
         return prediction
         
         

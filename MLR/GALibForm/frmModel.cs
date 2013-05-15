@@ -362,7 +362,14 @@ namespace GALibForm
                     _modelingInfo.SelectedModel = _selectedModelIndex;
                     _modelingInfo.SelectedRebuildIndex = _selectedRebuildIndex;
                 }
-                mlrPackState.Add("RebuildList", _listRebuilds);
+
+                List<Dictionary<string, object>> listPackedRebuilds = new List<Dictionary<string, object>>();
+                foreach (MultipleRegression mlrModel in _listRebuilds)
+                {
+                    listPackedRebuilds.Add(mlrModel.PackState());
+                }
+                mlrPackState.Add("RebuildList", listPackedRebuilds);
+                mlrPackState.Add("RebuildResidualDict", _residualInfo);
             }
 
             mlrPackState.Add("IndependentVariables", _lstSelectedVariables);
@@ -554,18 +561,6 @@ namespace GALibForm
                     chromosomes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<List<short>>>(strJson);
                 }  
             }
-
-            if (dictProjectState.ContainsKey("RebuildList"))
-            {
-                //We must conver the variable selection state from its JSON representation first.
-                object jsonPredPlotState = dictProjectState["RebuildList"];
-                if (jsonPredPlotState.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
-                {
-                    string strJson = jsonPredPlotState.ToString();
-                    List<MultipleRegression> listMlrRebuilds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MultipleRegression>>(strJson);
-                    //mlrPlots1.UnpackState(dictPredPlotState);
-                }
-            }
                                     
             listBox1.SelectedIndex = -1;
             _list = new List<IIndividual>();
@@ -623,6 +618,49 @@ namespace GALibForm
             InitResultsGraph();
                         
             listBox1.SelectedIndex = mi.SelectedModel;
+
+            //Unpack the model "rebuilds"
+            if (dictProjectState.ContainsKey("RebuildList") && dictProjectState.ContainsKey("RebuildResidualDict"))
+            {
+                //Make sure that unpacking models doesn't trigger the listBox2_SelectedIndexChanged event:
+                listBox2.SelectedIndexChanged -= new System.EventHandler(this.listBox2_SelectedIndexChanged);
+
+                //Unpack the rebuilds.
+                object jsonRebuilds = dictProjectState["RebuildList"];
+                if (jsonRebuilds.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                {
+                    Newtonsoft.Json.Linq.JArray ja = jsonRebuilds as Newtonsoft.Json.Linq.JArray;
+                    List<MultipleRegression> listMlrRebuilds = new List<MultipleRegression>();
+
+                    foreach (Newtonsoft.Json.Linq.JToken token in ja)
+                    {
+                        Dictionary<string, object> dictPackedMLR = token.ToObject<Dictionary<string, object>>();
+
+                        MultipleRegression myModel = new MultipleRegression();
+                        myModel.UnpackState(dictPackedMLR);
+                        listMlrRebuilds.Add(myModel);
+                    }
+                    _listRebuilds = listMlrRebuilds;
+                }
+
+                //Unpack the dictionary that stores residual types for the rebuilds.
+                Dictionary<int, string> listRebuildResids = new Dictionary<int, string>();
+                object jsonRebuildResidualDict = dictProjectState["RebuildResidualDict"];
+                if (jsonRebuildResidualDict.GetType().ToString() == "Newtonsoft.Json.Linq.JObject")
+                {
+                    Newtonsoft.Json.Linq.JObject jo = jsonRebuildResidualDict as Newtonsoft.Json.Linq.JObject;
+                    listRebuildResids = jo.ToObject<Dictionary<int, string>>();
+                }
+
+                //Link the restored rebuilds to listBox2:
+                for (int i = 1; i < _listRebuilds.Count; i++)
+                {
+                    MultipleRegression rebuild = _listRebuilds[i];
+                    UpdateModelList(rebuild, "rebuild", rebuild.Data, listRebuildResids[i]);
+                }
+                listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
+                listBox2.SelectedIndex = mi.SelectedRebuildIndex;
+            }
         }
 
 
@@ -842,12 +880,6 @@ namespace GALibForm
         }
 
 
-        /*public void SetDataTable(DataTable dt)
-        {
-            _dtFull = dt;
-        }*/
-
-
         public void SetData()
         {            
             _dtFull = MLRDataManager.GetDataManager().ModelDataTable.Copy();
@@ -956,7 +988,7 @@ namespace GALibForm
             changeControlStatus(true);
 
             UpdateFitnessListBox();
-
+            listBox1.SelectedIndex = 0;
             return;
         }
 
@@ -1139,7 +1171,6 @@ namespace GALibForm
                 {
                     if (VerifyGAModelParams() == false)
                         return;
-
 
                     _dataMgr.ModelDataTable = CreateModelDataTable();
                     _cancelRun = false;
@@ -1334,6 +1365,12 @@ namespace GALibForm
 
             _dataMgr.ModelRunning = false;
             changeControlStatus(true);
+
+            listBox1.Invoke((MethodInvoker)delegate
+            {
+                //Default is to select the top model
+                listBox1.SelectedIndex = 0;
+            });
         }
 
 
@@ -1652,7 +1689,6 @@ namespace GALibForm
                 ThresholdChecked = false;
             }
 
-
             item = new string[2];
             item[0] = "";
             item[1] = "";
@@ -1679,8 +1715,8 @@ namespace GALibForm
 
             ShowResiduals(ind);
             boolModelingComplete = true;
-
-            ModelChanged();
+            
+            if (ModelChanged != null) { ModelChanged(); }
         }
 
 
@@ -1711,7 +1747,7 @@ namespace GALibForm
 
         private void ModelRebuildFitExceedances(double Threshold=-1)
         {
-            if (_modelingInfo != null)
+            if (_modelingInfo != null && listBox2.Items.Count>0)
             {
                 DataTable dtMData = _modelBuildTables.Tables[listBox2.SelectedIndex];
                 DataView dv = dtMData.DefaultView;
@@ -2834,7 +2870,8 @@ namespace GALibForm
 
                     DataTable dffits = getDFFITSTable(model, modeldt, true);
                     DataTable cooks = getCooksDistanceTable(model, modeldt, true);
-                    updateModelList(model, "original", modeldt, "model");                    
+                    string modelname = UpdateModelList(model, "original", modeldt, "model");
+                    UpdateListViews(model, modelname);
                     createResidvFittedPlot(model);  //predictions vs standardized residuals plot
                     
                     double dffitsThreshold = Convert.ToDouble((2.0d * Math.Sqrt(((double)(CreateResidualModelDataTable()).Columns.Count - 2) / (double)model.PredictedValues.Length)).ToString());
@@ -3078,7 +3115,8 @@ namespace GALibForm
             _listRebuilds.Add(_model);
             //**********************
 
-            updateModelList(_model, "next", opdt, "df");
+            string modelname = UpdateModelList(_model, "next", opdt, "df");
+            UpdateListViews(_model, modelname);
             createResidPlot("DFFITS", dffits);
             createResidPlot("CooksDistance", cooks);
             createResidvFittedPlot(_model);
@@ -3114,7 +3152,8 @@ namespace GALibForm
             _listRebuilds.Add(_model);
             //**********************
 
-            updateModelList(_model, "next", opdt, "cd");
+            string modelname = UpdateModelList(_model, "next", opdt, "cd");
+            UpdateListViews(_model, modelname);
             createResidPlot("DFFITS", dffits);
             createResidPlot("CooksDistance", cooks);
             createResidvFittedPlot(_model);
@@ -3182,44 +3221,43 @@ namespace GALibForm
         }
 
 
-        private void updateModelList(MultipleRegression model, string name, DataTable dt, string residType)
+        private string UpdateModelList(MultipleRegression model, string name, DataTable dt, string residType)
         {
             //track models by their build tables and name
-
             //create a table name
             string listitem = string.Empty;
             int n = _modelBuildTables.Tables.Count;
-            if (name == "original")
+
+            if (!_residualInfo.ContainsKey(n))
             {
-                listitem = "SelectedModel";
+                if (name == "original")
+                {
+                    listitem = "SelectedModel";
+                }
+                else
+                {
+                    listitem = "Rebuild" + n;
+                }
+
+                //track rebuild info
+                _residualInfo.Add(n, residType);
+
+                //copy the model table and save it
+                DataTable newDT = new DataTable();
+                newDT = dt.Copy();
+                newDT.TableName = listitem.ToString();
+                if (!_modelBuildTables.Tables.Contains(listitem.ToString()))
+                    _modelBuildTables.Tables.Add(newDT);
+
+                //add the model (name) to the UI list
+                listBox2.Items.Add(listitem);
+                listBox2.SelectedItem = listitem;                                
             }
-            else
-            {
-                listitem = "Rebuild" + n;
-            }
-
-            //track rebuild info
-            _residualInfo.Add(n, residType);
-
-            //copy the model table and save it
-            DataTable newDT = new DataTable();
-            newDT = dt.Copy();
-            newDT.TableName = listitem.ToString();
-            if (!_modelBuildTables.Tables.Contains(listitem.ToString()))
-                _modelBuildTables.Tables.Add(newDT);
-
-            //add the model (name) to the UI list
-            listBox2.Items.Add(listitem);
-            listBox2.SelectedItem = listitem;
-            //and save the name for use elsewhere - always rebuild from last performed, not what is selected in UI listbox
-            _currentModelTableName = listitem;
-
-            //update the model stats UI lists
-            updateListViews(model, listitem.ToString());
+            return listitem;
         }
 
 
-        private void updateListViews(MultipleRegression model, string tabname)
+        private void UpdateListViews(MultipleRegression model, string tabname)
         {
             tabStats.TabPages["tabVariableStats"].Text =  "Variable Statistics - " + tabname;
             tabStats.TabPages["tabModelStats"].Text = "Model Statistics - " + tabname;
@@ -3231,7 +3269,8 @@ namespace GALibForm
             string[] item = null;
             ListViewItem lvi = null;
 
-            //show variable statistics
+            //show variable statistics and save the name for use elsewhere - always rebuild from last performed, not what is selected in UI listbox
+            _currentModelTableName = tabname;
             int numColumns = model.Parameters.Columns.Count;
             for (int i = 0; i < model.Parameters.Rows.Count; i++)
             {
@@ -3541,7 +3580,7 @@ namespace GALibForm
                 MultipleRegression model = computeModel(dt);
                 _dataMgr.ResidualAnalysisInfo.SelectedModelRMSE = model.RMSE;
                 _dataMgr.Model = model.Model;
-                updateListViews(model, modelname);
+                UpdateListViews(model, modelname);
 
                 if (rbDFFITS.Checked)
                 {
@@ -3556,7 +3595,7 @@ namespace GALibForm
 
                 _selectedRebuildIndex = _selectedRebuild;
                 dictPackedState = ProjectSave();
-                ModelChanged();
+                if (ModelChanged != null) { ModelChanged(); }
             }
         }
 
@@ -3618,13 +3657,13 @@ namespace GALibForm
             _residTypeRemoved = new List<string>();
 
             listBox2.Items.Clear();
-
             _modelBuildTables.Tables.Clear();
             _residualInfo = new Dictionary<int, string>();
 
             DataTable dffits = getDFFITSTable(model, modeldt, true);
             DataTable cooks = getCooksDistanceTable(model, modeldt, true);
-            updateModelList(model, "original", modeldt, "model");
+            string modelname = UpdateModelList(model, "original", modeldt, "model");
+            UpdateListViews(model, modelname);
 
             //create rediduals plots
             createResidPlot("DFFITS", dffits);

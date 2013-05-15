@@ -1497,7 +1497,8 @@ namespace IPyModeling
 
         public string ModelString()
         {
-            return(ipyInterface.GetModelExpression(ipyModel).Replace("[", "(").Replace("]", ")"));
+            try { return (ipyInterface.GetModelExpression(ipyModel).Replace("[", "(").Replace("]", ")")); }
+            catch { return "Error! There's no actual model for this method."; }
         }
 
 

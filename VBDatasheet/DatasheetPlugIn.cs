@@ -329,12 +329,18 @@ namespace VBDatasheet
                 }
                 else { Hide(); }
 
+                //We don't want to trigger a broadcast while opening a saved file.
+                _frmDatasheet.NotifiableDataEvent -= new EventHandler(NotifiableDataEventHandler);
+
                 _frmDatasheet.UnpackState(dictPlugin);
                 boolVisible = (bool)dictPlugin["Visible"];
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolClean = (bool)dictPlugin["Clean"];
                 boolFirstPass = (bool)dictPlugin["FirstPass"];
                 if (dictPlugin.ContainsKey("Validated")) { boolValidated = (bool)dictPlugin["Validated"]; }
+
+                //Reconnect the NotifiableDataEvent handler
+                _frmDatasheet.NotifiableDataEvent += new EventHandler(NotifiableDataEventHandler);
             }
             else
             {

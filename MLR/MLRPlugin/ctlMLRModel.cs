@@ -141,7 +141,7 @@ namespace MLRPlugin
         public void UnpackProjectState(IDictionary<string, object> dictProjectState)
         {
             //Something went wrong
-            if (dictProjectState == null || dictProjectState.Count < 1)
+            if (dictProjectState == null || dictProjectState.Count < 4)
                 return;
 
             if (dictProjectState.ContainsKey("PackedDatasheetState"))            

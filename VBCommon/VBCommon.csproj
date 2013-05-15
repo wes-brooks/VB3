@@ -184,6 +184,7 @@
     <Compile Include="ListItem.cs" />
     <Compile Include="PluginSupport\Utilities.cs" />
     <Compile Include="PersistentStackUtilities.cs" />
+    <Compile Include="Serialization.cs" />
     <Compile Include="Spatial\PointGeo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />

@@ -70,6 +70,5 @@ class Wrap():
             command = command + item + "=" + params[item] + ", "
             
         command = command[:-2] + ")"
-        
         result = self.r.EagerEvaluate(command)
         return result

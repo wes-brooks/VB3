@@ -504,7 +504,7 @@ namespace VBCommon.Controls
                     cmforResponseVar.MenuItems[3].Enabled = false;
 
                     state = dtState.dirty;
-                    NotifyContainer();
+                    //NotifyContainer();
                 }
                 catch (DuplicateNameException e)
                 {

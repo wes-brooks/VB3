@@ -56,32 +56,7 @@ namespace VBCommon.Statistics
 
         public MultipleRegression(DataTable dataTable, string dependentVariable, string[] independentVariables)
         {
-            _dataTable = dataTable;
-            strOutputName = _dependentVar = dependentVariable;
-            _independentVars = independentVariables;
-
-            arrOutputData = dataTable.Columns[dependentVariable].ToArray();
-            arrInputData = new double[dataTable.Rows.Count][];
-
-            Dictionary<int, int> dictColMap = new Dictionary<int, int>();
-            for (int k = 0; k < independentVariables.Length; k++)
-            {
-                for (int j = 0; j < dataTable.Columns.Count; j++)
-                    {
-                        if (dataTable.Columns[j].Caption == independentVariables[k])
-                            dictColMap.Add(k,j);
-                    }
-            }
-
-            for (int i = 0; i < dataTable.Rows.Count; i++)
-            {
-                double[] temp = new double[independentVariables.Length];
-                for (int k = 0; k < independentVariables.Length; k++)
-                {
-                    temp[k] = Convert.ToDouble(dataTable.Rows[i].ItemArray[dictColMap[k]]);
-                }
-                arrInputData[i] = temp;
-            }
+            Populate(dataTable, dependentVariable, independentVariables);
         }
 
 
@@ -121,10 +96,10 @@ namespace VBCommon.Statistics
         }
 
 
-        /*public Dictionary<string, object> PackState()
+        public Dictionary<string, object> PackState()
         {
             Dictionary<string, object> dictPackedState = new Dictionary<string,object>();
-            dictPackedState.Add("Data", _dataTable);
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: _dataTable, Container: dictPackedState, Slot: "Data");
             dictPackedState.Add("OutputName", strOutputName);
             dictPackedState.Add("InputNames", _independentVars.ToList<string>());
 
@@ -136,12 +111,51 @@ namespace VBCommon.Statistics
         {
             if (PackedState.ContainsKey("Data") && PackedState.ContainsKey("InputNames") && PackedState.ContainsKey("OutputName"))
             {
-                DataTable dt = (DataTable)PackedState["Data"];
+                DataTable dt = VBCommon.SerializationUtilities.DeserializeDataTable(PackedState, "Data"); //(dt, PackedState, "Data");
+                
                 string output = PackedState["OutputName"].ToString();
-                string[] inputs = ((List<string>)(PackedState["InputNames"])).ToArray();
-
+                string[] inputs = (PackedState["InputNames"] as Newtonsoft.Json.Linq.JArray).ToObject<List<string>>().ToArray();
+                Populate(dt, output, inputs);
+                Compute();
             }
-        }*/
+        }
+
+
+        private void Populate(DataTable dataTable, string dependentVariable, string[] independentVariables)
+        {
+            _dataTable = dataTable;
+            strOutputName = _dependentVar = dependentVariable;
+            _independentVars = independentVariables;
+
+            arrOutputData = dataTable.Columns[dependentVariable].ToArray();
+            arrInputData = new double[dataTable.Rows.Count][];
+
+            Dictionary<int, int> dictColMap = new Dictionary<int, int>();
+            for (int k = 0; k < independentVariables.Length; k++)
+            {
+                for (int j = 0; j < dataTable.Columns.Count; j++)
+                {
+                    if (dataTable.Columns[j].Caption == independentVariables[k])
+                        dictColMap.Add(k, j);
+                }
+            }
+
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                double[] temp = new double[independentVariables.Length];
+                for (int k = 0; k < independentVariables.Length; k++)
+                {
+                    temp[k] = Convert.ToDouble(dataTable.Rows[i].ItemArray[dictColMap[k]]);
+                }
+                arrInputData[i] = temp;
+            }
+        }
+
+
+        public DataTable Data
+        {
+            get { return _dataTable; }
+        }
 
 
         public double R2

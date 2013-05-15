@@ -274,6 +274,7 @@ namespace VBLocation
                 MainMap.MouseMove += new MouseEventHandler(MainMap_MouseMove);
                 MainMap.MouseDown += new MouseEventHandler(MainMap_MouseDown);
                 MainMap.MouseUp += new MouseEventHandler(MainMap_MouseUp);
+                MainMap.MouseDoubleClick += new MouseEventHandler(MainMap_MouseDoubleClick);
                 // custom: to paint the water
                 MainMap.Paint += new PaintEventHandler(MainMap_Paint);
 
@@ -508,6 +509,12 @@ namespace VBLocation
             }
         }
 
+
+        void MainMap_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            MainMap.CurrentPosition = MainMap.FromLocalToLatLng(e.X, e.Y);
+        }
+            
 
         // MapZoomChanged
         void MainMap_OnMapZoomChanged()

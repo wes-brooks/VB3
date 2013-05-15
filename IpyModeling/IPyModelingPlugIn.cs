@@ -96,8 +96,7 @@ namespace IPyModeling
         public void MakeActive()
         {            
             App.HeaderControl.SelectRoot(strPanelKey); 
-            App.DockManager.SelectPanel(strPanelKey);
-            //boolVisible = true;       
+            App.DockManager.SelectPanel(strPanelKey);    
         }
 
 

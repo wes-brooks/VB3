@@ -254,7 +254,6 @@ def Quantile(list, q):
     else:
         list.sort()
         position = int(math.ceil(q * (len(list)-1)))
-        print list[position]
         return list[position]
         
 

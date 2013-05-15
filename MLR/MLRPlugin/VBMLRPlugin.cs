@@ -26,7 +26,6 @@ namespace MLRPlugin
 
         private VBCommon.Signaller signaller;
 
-        //private ctlMLRPlugin cMlr;
         private ctlMLRModel cMlr;
         private MLRPredPlugin _mlrPredPlugin;
 
@@ -54,26 +53,22 @@ namespace MLRPlugin
         //complete and visible flags
         public Boolean boolComplete = false;
         private Boolean boolVirgin = true;
-        public Boolean boolVisible;
+        public Boolean boolVisible = true;
         public Boolean boolRunCancelled;
         public Boolean boolStopRun;
-        public Boolean boolInitialEntry = true; //first time here flag
+        public Boolean boolInitialEntry = true;
         private Boolean boolChanged = false;
 
-        private Boolean boolClearModel; //needed for IPlugin
+        private Boolean boolClearModel;
         
         private Stack<string> UndoKeys = new Stack<string>();
         private Stack<string> RedoKeys = new Stack<string>();
-
-            //UndoKeys = new Stack<string>();
-            //RedoKeys = new Stack<string>();
 
         public override void Activate()
         {
             UndoKeys = new Stack<string>();
             RedoKeys = new Stack<string>();
             
-            //cMlr = new ctlMLRPlugin();
             cMlr = new ctlMLRModel();
             _mlrPredPlugin = new MLRPredPlugin();
             
@@ -110,8 +105,6 @@ namespace MLRPlugin
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
             }
-            //if (e.ActivePanelKey.ToString() == "DataSheetPanel" && boolVisible)
-            //    Hide();
         }
 
         //a root item (plugin) has been selected
@@ -136,12 +129,12 @@ namespace MLRPlugin
         {
             if (boolVisible)
             {
-                boolChanged = true;
-                
+                boolChanged = true;                
                 App.HeaderControl.RemoveAll();
-                App.DockManager.HidePanel(strPanelKey);
+                ((VBDockManager.VBDockManager)App.DockManager).HidePanel(strPanelKey);
+                boolVisible = false;
             }
-            boolVisible = false;
+            
         }
 
 
@@ -155,16 +148,16 @@ namespace MLRPlugin
                 AddRibbon("Show");
                 App.DockManager.SelectPanel(strPanelKey);
                 App.HeaderControl.SelectRoot(strPanelKey);
-            }
-            boolVisible = true;
+                boolVisible = true;
+            }            
         }
 
 
         //make this plugin the active one
         public void MakeActive()
         {
-            App.DockManager.SelectPanel(strPanelKey);
             App.HeaderControl.SelectRoot(strPanelKey);
+            App.DockManager.SelectPanel(strPanelKey);
         }
 
         //add a datasheet plugin root item
@@ -196,18 +189,6 @@ namespace MLRPlugin
             btnTransform.Enabled = true;
             App.HeaderControl.Add(btnTransform);
         }
-
-
-        /*void btnRun_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-        void btnCancel_Click(object sender, EventArgs e)
-        {
-
-        }*/
 
 
         //returns this model's packed state
@@ -347,7 +328,7 @@ namespace MLRPlugin
             {
                 dictPlugin = e.PackedPluginStates[strPanelKey];
 
-                //Set the virigin flag
+                /*//Set the virigin flag
                 boolVirgin = true;
                 if (dictPlugin.ContainsKey("Virgin"))
                     if (!(bool)(dictPlugin["Virgin"]))
@@ -356,8 +337,8 @@ namespace MLRPlugin
                 //repopulate plugin Complete flags from saved project
                 boolComplete = (bool)dictPlugin["Complete"];
                 boolInitialEntry = false; //opening projects have been entered before
-
-                //check to see if there already is a model open, if so, close it before opening a saved project
+                */
+                /*//check to see if there already is a model open, if so, close it before opening a saved project
                 if ((Visible) && (Complete))
                     Hide();
 
@@ -365,13 +346,36 @@ namespace MLRPlugin
                 if ((bool)dictPlugin["Visible"] && !e.PredictionOnly)
                     Show();
 
-                if (!boolVirgin)
+                if (e.PredictionOnly)
                 {
-                    //Disable the notifiabledataevent during the unpacking or it'll overwrite the saved variable selection.
-                    cMlr.AllowNotifiableDataEvent = false;
-                    cMlr.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
-                    cMlr.AllowNotifiableDataEvent = true;
+                    Hide();
+                    boolVisible = false;
+                }*/
+
+                if (!e.PredictionOnly)
+                {
+                    if ((bool)dictPlugin["Visible"]) { Show(); }
+                    else { Hide(); }
+                    boolVisible = (bool)dictPlugin["Visible"];
                 }
+                else
+                {
+                    Hide();
+                    boolVisible = false;
+                }
+
+                //We don't want to trigger a broadcast while opening the project.
+                mlrModelForm.ModelChanged -= new frmModel.ModelChangedEventHandler(ModelChanged);
+
+                //Disable the notifiabledataevent during the unpacking or it'll overwrite the saved variable selection.
+                cMlr.AllowNotifiableDataEvent = false;
+                cMlr.UnpackProjectState(e.PackedPluginStates[strPanelKey]);
+                cMlr.AllowNotifiableDataEvent = true;
+                boolComplete = (bool)dictPlugin["Complete"];
+                boolVirgin = (bool)dictPlugin["Virgin"];
+
+                //Reconnect the ModelChanged event.
+                mlrModelForm.ModelChanged += new frmModel.ModelChangedEventHandler(ModelChanged);
             }
             else
             {

@@ -232,7 +232,7 @@ namespace Prediction
             txtDecCrit.Text = Convert.ToDouble(dictModel["DecisionThreshold"]).ToString();
             txtProbabilityThreshold.Text = Convert.ToDouble(dictModel["ProbabilityThreshold"]).ToString();
 
-            if (dictModel.ContainsKey("EnddatUrl")) { strEnddatURL = dictModel["EnddatURL"].ToString(); }
+            if (dictModel.ContainsKey("EnddatURL")) { strEnddatURL = dictModel["EnddatURL"].ToString(); }
             else { strEnddatURL = ""; }
 
             if (dictModel.ContainsKey("EnddatTimezone")) { strEnddatTimezone = dictModel["EnddatTimezone"].ToString(); }
@@ -270,21 +270,21 @@ namespace Prediction
             }
 
             //Unpack the current DataGridViews
-            dtVariables = DeserializeDataTable(Container: dictPackedState, Slot: "IVData", Title: "Variables");
+            dtVariables = VBCommon.SerializationUtilities.DeserializeDataTable(Container: dictPackedState, Slot: "IVData", Title: "Variables");
             //if (dtVariables != null)
             {
                 dgvVariables.DataSource = dtVariables;
                 SetViewOnGrid(dgvVariables);
             }
 
-            dtObs = DeserializeDataTable(Container: dictPackedState, Slot: "ObsData", Title: "Observations");
+            dtObs = VBCommon.SerializationUtilities.DeserializeDataTable(Container: dictPackedState, Slot: "ObsData", Title: "Observations");
             //if (dtObs != null)
             {
                 dgvObs.DataSource = dtObs;
                 SetViewOnGrid(dgvObs);
             }
 
-            dtStats = DeserializeDataTable(Container: dictPackedState, Slot: "StatData", Title: "Stats");
+            dtStats = VBCommon.SerializationUtilities.DeserializeDataTable(Container: dictPackedState, Slot: "StatData", Title: "Stats");
             //if (dtStats != null)
             {
                 dgvStats.DataSource = dtStats;
@@ -377,15 +377,15 @@ namespace Prediction
             //pack values
             dgvVariables.EndEdit();
             dtVariables = (DataTable)dgvVariables.DataSource;
-            SerializeDataTable(Data: dtVariables, Container: dictPluginState, Slot: "IVData", Title: "Variables");
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: dtVariables, Container: dictPluginState, Slot: "IVData", Title: "Variables");
 
             dgvObs.EndEdit();
             dtObs = (DataTable)dgvObs.DataSource;
-            SerializeDataTable(Data: dtObs, Container: dictPluginState, Slot: "ObsData", Title: "Observations");
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: dtObs, Container: dictPluginState, Slot: "ObsData", Title: "Observations");
 
             dgvStats.EndEdit();
             dtStats = (DataTable)dgvStats.DataSource;
-            SerializeDataTable(Data: dtStats, Container: dictPluginState, Slot: "StatData", Title: "Stats");
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: dtStats, Container: dictPluginState, Slot: "StatData", Title: "Stats");
 
             dictPluginState.Add("PredictionElements", dictPredictionElements);
 
@@ -489,17 +489,17 @@ namespace Prediction
                 dgvVariables.EndEdit();
                 dtVariables = (DataTable)dgvVariables.DataSource;
                 if (dtVariables != null)
-                    SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+                    VBCommon.SerializationUtilities.SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
 
                 dgvObs.EndEdit();
                 dtObs = (DataTable)dgvObs.DataSource;
                 if (dtObs != null)
-                    SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
+                    VBCommon.SerializationUtilities.SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
 
                 dgvStats.EndEdit();
                 dtStats = (DataTable)dgvStats.DataSource;
                 if (dtStats != null)
-                    SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
+                    VBCommon.SerializationUtilities.SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
 
                 //Pack up the data transformations
                 PackTransformations(Container: (IDictionary<string, object>)dictPredictionElements[strMethod]);
@@ -830,7 +830,7 @@ namespace Prediction
                             rbRaw.Checked = true;
                         }
 
-                        dtVariables = DeserializeDataTable(Container: dictNewModel, Slot: "IVData", Title: "Variables");
+                        dtVariables = VBCommon.SerializationUtilities.DeserializeDataTable(Container: dictNewModel, Slot: "IVData", Title: "Variables");
                         if (dtVariables != null)
                         {
                             dgvVariables.DataSource = dtVariables;
@@ -847,7 +847,7 @@ namespace Prediction
                         xfrmObs = DependentVariableTransforms.none;
                         dblObsPowerTransformExp = 1;
 
-                        dtObs = DeserializeDataTable(Container: dictNewModel, Slot: "ObsData", Title: "Observations");
+                        dtObs = VBCommon.SerializationUtilities.DeserializeDataTable(Container: dictNewModel, Slot: "ObsData", Title: "Observations");
                         if (dtObs != null)
                         {
                             dgvObs.DataSource = dtObs;
@@ -872,8 +872,8 @@ namespace Prediction
                             SetViewOnGrid(dgvObs);
                         }
                         SetObsTransformCheckmarks(Item: (int)xfrmObs);
-                        
-                        dtStats = DeserializeDataTable(Container: dictNewModel, Slot: "StatData", Title: "Stats");
+
+                        dtStats = VBCommon.SerializationUtilities.DeserializeDataTable(Container: dictNewModel, Slot: "StatData", Title: "Stats");
                         if (dtStats != null)
                         {
                             dgvStats.DataSource = dtStats;
@@ -1091,7 +1091,7 @@ namespace Prediction
             dtVariables = (DataTable)dgvVariables.DataSource;
             
             //Store prediction elements in case we want to navigate away from this model and then come back.
-            SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
             if (boolNewMapping)
             {
                 if (((IDictionary<string, object>)(dictPredictionElements[strMethod])).ContainsKey("VariableMapping"))
@@ -1205,7 +1205,7 @@ namespace Prediction
             dtVariables = (DataTable)dgvVariables.DataSource;
             
             //Store prediction elements in case we want to navigate away from this model and then come back.
-            SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: dtVariables, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "IVData", Title: "Variables");
             if (boolNewMapping)
             {
                 if (((IDictionary<string, object>)(dictPredictionElements[strMethod])).ContainsKey("VariableMapping"))
@@ -1264,9 +1264,9 @@ namespace Prediction
         {
             if (((IDictionary<string, object>)dictPredictionElements).ContainsKey(Method))
             {
-                SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "IVData");
-                SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "ObsData");
-                SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "StatData");
+                VBCommon.SerializationUtilities.SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "IVData");
+                VBCommon.SerializationUtilities.SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "ObsData");
+                VBCommon.SerializationUtilities.SerializeDataTable(Data: null, Container: (IDictionary<string, object>)dictPredictionElements[Method], Slot: "StatData");
             }
 
             //when changes made to modeling, clear the prediction tables (reset)
@@ -1358,7 +1358,7 @@ namespace Prediction
             //Store the imported data in case we want to move to another modeling method
             dgvObs.EndEdit();
             dtObs = (DataTable)dgvObs.DataSource;
-            SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: dtObs, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "ObsData", Title: "Observations");
             if (boolNewMapping)
             {
                 if (((IDictionary<string, object>)(dictPredictionElements[strMethod])).ContainsKey("ObsVariableMapping"))
@@ -1459,7 +1459,7 @@ namespace Prediction
             //Store the predictions in case we want to move to another modeling method
             dgvStats.EndEdit();
             dtStats = (DataTable)dgvStats.DataSource;
-            SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
+            VBCommon.SerializationUtilities.SerializeDataTable(Data: dtStats, Container: (IDictionary<string, object>)dictPredictionElements[strMethod], Slot: "StatData", Title: "Stats");
 
             VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             return true;
@@ -2649,57 +2649,8 @@ namespace Prediction
         {
             set { strModelTabClean = value; }
         }
-
-
-        private void SerializeDataTable(DataTable Data, IDictionary<string, object> Container, string Slot, string Title=null)
-        {
-            if (Title == null)
-                Title = Slot;
-
-            string strSerializedDataTable = null;
-
-            if (Data != null)
-            {
-                Data.AcceptChanges();
-                Data.TableName = Title;
-                StringWriter sw = new StringWriter();
-                Data.WriteXml(sw, XmlWriteMode.WriteSchema, false);
-                strSerializedDataTable = sw.ToString();
-                sw.Close();
-            }
-
-            //If there's already observations packed up for this modeling method, remove them before adding the new stuff.
-            if (Container.ContainsKey(Slot))
-                Container.Remove(Slot);
-            Container.Add(Slot, strSerializedDataTable);
-        }
-
-
-        private DataTable DeserializeDataTable(IDictionary<string, object> Container, string Slot, string Title = null)
-        {
-            DataTable tblData = null;
-
-            if (Title == null)
-                Title = Slot;
-
-            if (Container.ContainsKey(Slot))
-            {
-                if (Container[Slot] != null)
-                {
-                    string strPackedDataTable = Container[Slot].ToString();
-
-                    if (!String.IsNullOrWhiteSpace(strPackedDataTable))
-                    {
-                        DataSet ds = new DataSet();
-                        ds.ReadXml(new StringReader(strPackedDataTable), XmlReadMode.ReadSchema);
-                        tblData = ds.Tables[0];
-                    }
-                }
-            }
-            return tblData;
-        }
-
-
+        
+        
         private void NotifyContainer()
         {
             if (NotifiableChangeEvent != null && boolAllowNotification)
