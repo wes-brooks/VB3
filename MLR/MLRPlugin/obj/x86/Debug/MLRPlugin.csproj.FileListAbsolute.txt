@@ -2,10 +2,9 @@ C:\VB3\bin\debug\Plugins\VBMLR\MLRPlugin.dll
 C:\VB3\bin\debug\Plugins\VBMLR\MLRPlugin.pdb
 C:\VB3\bin\debug\Binaries\VBMLR\MLRPlugin.dll
 C:\VB3\bin\debug\Binaries\VBMLR\MLRPlugin.pdb
-C:\VB3\MLR\MLRPlugin\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\VB3\MLR\MLRPlugin\obj\x86\Debug\MLRPlugin.ctlMLRModel.resources
 C:\VB3\MLR\MLRPlugin\obj\x86\Debug\MLRPlugin.Properties.Resources.resources
-C:\VB3\MLR\MLRPlugin\obj\x86\Debug\GenerateResource.read.1.tlog
-C:\VB3\MLR\MLRPlugin\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\VB3\MLR\MLRPlugin\obj\x86\Debug\MLRPlugin.dll
 C:\VB3\MLR\MLRPlugin\obj\x86\Debug\MLRPlugin.pdb
+C:\VB3\MLR\MLRPlugin\obj\x86\Debug\MLRPlugin.csprojResolveAssemblyReference.cache
+C:\VB3\MLR\MLRPlugin\obj\x86\Debug\MLRPlugin.csproj.GenerateResource.Cache

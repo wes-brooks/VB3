@@ -4,10 +4,9 @@ C:\VB3\bin\Debug\Plugins\Location\IPyModeling.dll
 C:\VB3\bin\Debug\Plugins\Location\IPyModeling.pdb
 C:\VB3\bin\Debug\Binaries\IPyModeling\IPyModeling.dll
 C:\VB3\bin\Debug\Binaries\IPyModeling\IPyModeling.pdb
-C:\VB3\IpyModeling\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\VB3\IpyModeling\obj\x86\Debug\IPyModeling.Properties.Resources.resources
 C:\VB3\IpyModeling\obj\x86\Debug\IPyModeling.IPyModelingControl.resources
-C:\VB3\IpyModeling\obj\x86\Debug\GenerateResource.read.1.tlog
-C:\VB3\IpyModeling\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\VB3\IpyModeling\obj\x86\Debug\IPyModeling.dll
 C:\VB3\IpyModeling\obj\x86\Debug\IPyModeling.pdb
+C:\VB3\IpyModeling\obj\x86\Debug\IPyModeling.csprojResolveAssemblyReference.cache
+C:\VB3\IpyModeling\obj\x86\Debug\IPyModeling.csproj.GenerateResource.Cache

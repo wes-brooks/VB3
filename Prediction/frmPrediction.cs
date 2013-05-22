@@ -21,6 +21,8 @@ using Ciloci.Flee;
 using VBProjectManager;
 using DotSpatial.Controls;
 using Newtonsoft.Json;
+using System.Xml.Linq;
+using System.Net;
 
 
 namespace Prediction
@@ -1131,6 +1133,35 @@ namespace Prediction
             DataTable dt;
             try
             {
+                Regex reShapefile = new Regex("&?shapefile=[^&]*");
+                Regex reShapefileFeature = new Regex("&?shapefileFeature=[^&]*");
+                Regex reGeoDataPortalID = new Regex("&?gdpId=[^&]*");
+
+                if (reShapefile.Match(strEnddatURL).Success)
+                {
+                    string strShapefileFeature="Id", strShapefile, strGeoDataPortalID, strStatistic="MEAN", strPreamble="collection:MEAN:";
+                    strShapefile = reShapefile.Match(strEnddatURL).Value.Split('=')[1];
+
+                    if (reShapefileFeature.Match(strEnddatURL).Success) { strShapefileFeature = reShapefileFeature.Match(strEnddatURL).Value.Split('=')[1]; }
+                    if (reGeoDataPortalID.Match(strEnddatURL).Success)
+                    {
+                        strGeoDataPortalID = reGeoDataPortalID.Match(strEnddatURL).Value;
+                        reGeoDataPortalID.Replace(strEnddatURL, "");
+                        string[] chunks = strGeoDataPortalID.Split('=')[1].Split(':');
+                        strStatistic = chunks[1];
+                        strPreamble = chunks[0] + ":" + chunks[1] + ":";
+                    }
+
+                    DateTime dtStart = DateTime.Today.Subtract(new TimeSpan(days: 3, hours:0, minutes:0, seconds:0));
+                    DateTime dtEnd = DateTime.Today;
+
+                    string strStart = dtStart.Year.ToString() + "-" + dtStart.Month.ToString("D2") + "-" + dtStart.Day.ToString("D2");
+                    string strEnd = dtEnd.Year.ToString() + "-" + dtEnd.Month.ToString("D2") + "-" + dtEnd.Day.ToString("D2");
+
+                    string strNewGeoDataPortalID = GetGeoDataPortalID(Shapefile: strShapefile, Feature: strShapefileFeature, Start: strStart, End: strEnd, Statistic: strStatistic);
+                    strEnddatURL = strEnddatURL + "&gdpId=" + strPreamble + strNewGeoDataPortalID;
+                }
+
                 if (bUseTimestamp)
                 {
                     string strTimezone;
@@ -1217,6 +1248,144 @@ namespace Prediction
         }
 
 
+        private string GetGeoDataPortalID(string Shapefile, string Feature, string Start, string End, string Statistic)
+        {
+            string id = "";
+
+            string featureType = Shapefile;
+            string featureAttrName = Feature;
+            string dataUrl = "dods://motherlode.ucar.edu:8081/thredds/dodsC/grib/NPVU/RFC/KMSR-North-Central-RFC/collection";
+            string datasetId = "1-hour_Quantitative_Precip_Estimate_surface_1_Hour_Accumulation";
+            string endDate = End;
+            string startDate = Start;
+            string statistic = Statistic;
+
+            string urlToPost = "http://cida.usgs.gov/gdp/process/WebProcessingService";
+
+            string wpsExecute = String.Concat(new string[] {@"<?xml version=""1.0"" encoding=""UTF-8""?>",
+@"<wps:Execute xmlns:wps=""http://www.opengis.net/wps/1.0.0"" xmlns:ows=""http://www.opengis.net/ows/1.1"" xmlns:xlink=""http://www.w3.org/1999/xlink"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" service=""WPS"" version=""1.0.0"" xsi:schemaLocation=""http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd"">",
+@"	<ows:Identifier>gov.usgs.cida.gdp.wps.algorithm.FeatureWeightedGridStatisticsAlgorithm</ows:Identifier>",
+@"	<wps:DataInputs>",
+@"		<wps:Input>",
+@"			<ows:Identifier>FEATURE_COLLECTION</ows:Identifier>",
+@"			<wps:Reference xlink:href=""http://igsarm-cida-javadev1.er.usgs.gov:8086/geoserver/wfs"">",
+@"				<wps:Body>",
+@"					<wfs:GetFeature xmlns:gml=""http://www.opengis.net/gml"" xmlns:ogc=""http://www.opengis.net/ogc"" xmlns:wfs=""http://www.opengis.net/wfs"" outputFormat=""text/xml; subtype=gml/3.1.1"" service=""WFS"" version=""1.1.0"" xsi:schemaLocation=""http://www.opengis.net/wfs http://igsarm-cida-javadev1.er.usgs.gov:8086/geoserver/schemas/wfs/1.1.0/wfs.xsd"">",
+@" 					<wfs:Query typeName=""", featureType,@""">",
+"							<wfs:PropertyName>the_geom</wfs:PropertyName>",
+"							<wfs:PropertyName>", featureAttrName, "</wfs:PropertyName>",
+"						</wfs:Query>",
+"					</wfs:GetFeature>",
+"				</wps:Body>",
+"			</wps:Reference>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>FEATURE_ATTRIBUTE_NAME</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>", featureAttrName, "</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>DATASET_URI</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>" , dataUrl , "</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>DATASET_ID</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>" , datasetId , "</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>TIME_START</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>" , startDate , "T00:00:00.000Z</wps:LiteralData>", 
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>TIME_END</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>" , endDate , "T23:59:59.000Z</wps:LiteralData>", 
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>REQUIRE_FULL_COVERAGE</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>true</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>DELIMITER</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>COMMA</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"  	<wps:Input>",
+"			<ows:Identifier>STATISTICS</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>" , statistic , "</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>GROUP_BY</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>STATISTIC</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>SUMMARIZE_TIMESTEP</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>false</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"		<wps:Input>",
+"			<ows:Identifier>SUMMARIZE_FEATURE_ATTRIBUTE</ows:Identifier>",
+"			<wps:Data>",
+"				<wps:LiteralData>false</wps:LiteralData>",
+"			</wps:Data>",
+"		</wps:Input>",
+"	</wps:DataInputs>",
+"	<wps:ResponseForm>",
+@"		<wps:ResponseDocument storeExecuteResponse= ""true"" status=""true"">",
+@"			<wps:Output asReference=""true"">",
+"				<ows:Identifier>OUTPUT</ows:Identifier>",
+"			</wps:Output>",
+"		</wps:ResponseDocument>",
+"	</wps:ResponseForm>",
+"</wps:Execute>"});
+
+            using (WebClient client = new WebClient())
+            {
+                client.Headers[HttpRequestHeader.ContentType] = "application/xml";
+                string HtmlResult = client.UploadString(urlToPost, wpsExecute);
+
+                XElement xm = XElement.Parse(HtmlResult);
+                string strStatusLocation = xm.Attributes().First(x => x.Name == "statusLocation").Value;
+
+
+                bool bComplete = false;
+                while (!bComplete)
+                {
+                    string strStatusXml = client.DownloadString(strStatusLocation);
+                    xm = XElement.Parse(strStatusXml);
+                    int intSuccessCount = xm.Elements().First(x => x.Name.LocalName == "Status").Elements().Count(x => x.Name.LocalName == "ProcessSucceeded");
+                    if (intSuccessCount > 0)
+                    {
+                        string strHref = xm.Elements().First(x => x.Name.LocalName == "ProcessOutputs").Elements().First(x => x.Name.LocalName == "Output").Elements().First(x => x.Name.LocalName == "Reference").Attribute("href").Value;
+                        List<string> chunks = strHref.Split('?').ToList<string>();
+                        string idString = chunks.First(x => x.Split('=')[0] == "id");
+                        id = idString.Split('=')[1];
+                        bComplete = true;
+                    }
+                    else { System.Threading.Thread.Sleep(2000); }
+                }
+            }
+
+            return id;
+        }
+
+
         //import IV datatable
         public bool btnSetEnddatURL_Click(object sender, EventArgs e)
         {
@@ -1235,7 +1404,7 @@ namespace Prediction
                 Regex reLatest = new Regex("&?latest=[^&]*");
                 Regex reStyle = new Regex("&?style=[^&]*");
                 Regex reTimezone = new Regex("&?TZ=[^&]*");
-                Regex reDatetime = new Regex("&?datetime=[^&]*");
+                Regex reDatetime = new Regex("&?datetime=[^&]*");                
                 
                 strEnddatURL = reBegin.Replace(strEnddatURL, "");
                 strEnddatURL = reEnd.Replace(strEnddatURL, "");

@@ -12,6 +12,5 @@ C:\VB3\bin\debug\Plugins\VBMLR\GALib.dll
 C:\VB3\bin\debug\Plugins\VBMLR\GALib.pdb
 C:\VB3\bin\debug\Binaries\VBMLR\GALib.dll
 C:\VB3\bin\debug\Binaries\VBMLR\GALib.pdb
-C:\VB3\MLR\GALib\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\VB3\MLR\GALib\obj\x86\Debug\GALib.dll
 C:\VB3\MLR\GALib\obj\x86\Debug\GALib.pdb

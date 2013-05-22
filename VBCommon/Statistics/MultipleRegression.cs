@@ -256,7 +256,8 @@ namespace VBCommon.Statistics
             // containing all variables.
             double[][] input = new double[arrInputData.Length][];
             double[][] input2 = new double[arrInputData.Length][];
-            double[,] inputMat = new double[arrInputData.Length, arrInputData[0].Length+1];
+            double[,] designMat = new double[arrInputData.Length, arrInputData[0].Length+1];
+            double[,] inputMat = new double[arrInputData.Length, arrInputData[0].Length];
             for(int i=0; i<arrInputData.Length; i++)
             {
                 List<double> datarow = new List<double> {1};
@@ -264,14 +265,17 @@ namespace VBCommon.Statistics
                 input[i] = datarow.ToArray();
                 input2[i] = arrInputData[i];
 
-                inputMat[i, 0] = 1;
+                designMat[i, 0] = 1;
                 for (int j = 1; j <= arrInputData[0].Length; j++)
                 {
-                    inputMat[i,j] = arrInputData[i][j - 1];
+                    designMat[i,j] = arrInputData[i][j - 1];
+                    inputMat[i,j-1] = arrInputData[i][j - 1];
                 }
             }
 
-            EigenvalueDecomposition eigen = new EigenvalueDecomposition(inputMat.Transpose().Multiply(inputMat));
+            double[,] corrMat = inputMat.Transpose().Multiply(inputMat);
+
+            /*EigenvalueDecomposition eigen = new EigenvalueDecomposition(designMat.Transpose().Multiply(designMat));
             if (Math.Abs(eigen.RealEigenvalues.Max() / eigen.RealEigenvalues.Min()) > 1E14)
             {
                 //Matrix is singular
@@ -281,7 +285,7 @@ namespace VBCommon.Statistics
 
                 _Press = double.PositiveInfinity;
                 return;
-            }
+            }*/
 
             //Make sure the intercept appears first in the list of results:
             List<string> inputNames = new List<string>();
@@ -306,7 +310,7 @@ namespace VBCommon.Statistics
             double sse = M2.Table[M2.Table.Count-2].SumOfSquares;            
             int n = Convert.ToInt32(M2.Results.Length);
             double p = M2.CoefficientValues.Length;
-            double[,] H = inputMat.Multiply((inputMat.Transpose().Multiply(inputMat)).Inverse().Multiply(inputMat.Transpose()));
+            double[,] H = designMat.Multiply((designMat.Transpose().Multiply(designMat)).Inverse().Multiply(designMat.Transpose()));
             
             double[] SquaredResiduals = new double[M2.Results.Length];
             double[] Residuals = new double[M2.Results.Length];
@@ -380,18 +384,16 @@ namespace VBCommon.Statistics
             AD_stat = -Convert.ToDouble(n) - AD_stat / Convert.ToDouble(n);                        
             _ADresidNormStatVal = AD_stat;
             _ADresidPvalue = 1 - adinf(AD_stat);
+             
+            double[,] InvCorrMatrix = corrMat.Inverse();
+            double[] VIFs = InvCorrMatrix.Diagonal();
 
-            double[,] centered = new double[arrInputData.Length, _independentVars.Length];
-            for (int i=0; i<M2.Results.Length; i++)
-            {
-                for(int j=0; j<_independentVars.Length; j++)
-                {
-                    centered[i, j] = inputMat[i,j + 1];
-                }
-            }
+            _VIF = new Dictionary<string, double>();
+            for (int i = 0; i < VIFs.Count(); i++)
+                _VIF.Add(_independentVars[i].ToString(), VIFs[i]);
 
-            double[,] corrMatrix = inputMat.Transpose().Multiply(inputMat);              
-            double[,] InvCorrMatrix = corrMatrix.Inverse();
+            _maxVIF = VIFs.Abs().Max();
+            _maxVIFParameter = _independentVars[VIFs.Abs().First(x => x==_maxVIF)]; 
         }
 
 

@@ -46,9 +46,8 @@ C:\VB3\bin\Debug\Plugins\IPyGBMControl\IPyGBMControl.dll
 C:\VB3\bin\Debug\Plugins\IPyGBMControl\IPyGBMControl.pdb
 C:\VB3\bin\Debug\Binaries\IPyGBMControl\IPyGBMControl.dll
 C:\VB3\bin\Debug\Binaries\IPyGBMControl\IPyGBMControl.pdb
-C:\VB3\IPyGBMControl\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\IPyGBMControl\obj\Debug\IPyGBMControl.IPyGBMControl.resources
-C:\VB3\IPyGBMControl\obj\Debug\GenerateResource.read.1.tlog
-C:\VB3\IPyGBMControl\obj\Debug\GenerateResource.write.1.tlog
 C:\VB3\IPyGBMControl\obj\Debug\IPyGBMControl.dll
 C:\VB3\IPyGBMControl\obj\Debug\IPyGBMControl.pdb
+C:\VB3\IPyGBMControl\obj\Debug\IPyGBMControl.csprojResolveAssemblyReference.cache
+C:\VB3\IPyGBMControl\obj\Debug\IPyGBMControl.csproj.GenerateResource.Cache

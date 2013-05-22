@@ -18,6 +18,6 @@ C:\VB3\bin\Debug\VBDockManager.dll
 C:\VB3\bin\Debug\VBDockManager.pdb
 C:\VB3\bin\Debug\Binaries\VBDockManager\VBDockManager.dll
 C:\VB3\bin\Debug\Binaries\VBDockManager\VBDockManager.pdb
-C:\VB3\VBDockManager\obj\Debug\ResolveAssemblyReference.cache
 C:\VB3\VBDockManager\obj\Debug\VBDockManager.dll
 C:\VB3\VBDockManager\obj\Debug\VBDockManager.pdb
+C:\VB3\VBDockManager\obj\Debug\VBDockManager.csprojResolveAssemblyReference.cache

@@ -9,6 +9,8 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
+//using System.Net.Http;
 
 namespace Prediction
 {
@@ -113,7 +115,7 @@ namespace Prediction
         public DataTable ImportFromEnddat(string URL, DataTable tblCurrent)
         {
             string strEnddatURL = URL;
-            DataTable dt;
+            DataTable dt;            
             
             using (WebClient client = new WebClient())
             {
