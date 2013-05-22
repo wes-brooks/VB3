@@ -271,6 +271,18 @@ namespace VBCommon.Statistics
                 }
             }
 
+            EigenvalueDecomposition eigen = new EigenvalueDecomposition(inputMat.Transpose().Multiply(inputMat));
+            if (Math.Abs(eigen.RealEigenvalues.Max() / eigen.RealEigenvalues.Min()) > 1E14)
+            {
+                //Matrix is singular
+                _AIC = double.PositiveInfinity;
+                _AICC = double.PositiveInfinity;
+                _BIC = double.PositiveInfinity;
+
+                _Press = double.PositiveInfinity;
+                return;
+            }
+
             //Make sure the intercept appears first in the list of results:
             List<string> inputNames = new List<string>();
             inputNames.Add("(Intercept)");

@@ -446,11 +446,14 @@ namespace IPyModeling
         {
             if (boolChanged)
             {
-                //go pack state, add complete and visible, and add to dictionary of plugins
-                IDictionary<string, object> packedState = innerIronPythonControl.PackState();
+                IDictionary<string, object> packedState = innerIronPythonControl.PackedState;
 
                 if (packedState != null)
                 {
+                    if (packedState.ContainsKey("Complete")) { packedState.Remove("Complete"); }
+                    if (packedState.ContainsKey("Visible")) { packedState.Remove("Visible"); }
+                    if (packedState.ContainsKey("Virgin")) { packedState.Remove("Virgin"); }
+
                     packedState.Add("Complete", boolComplete);
                     packedState.Add("Visible", boolVisible);
                     packedState.Add("Virgin", boolVirgin);

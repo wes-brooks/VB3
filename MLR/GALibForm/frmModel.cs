@@ -1747,7 +1747,7 @@ namespace GALibForm
 
         private void ModelRebuildFitExceedances(double Threshold=-1)
         {
-            if (_modelingInfo != null && listBox2.Items.Count>0)
+            if (_modelingInfo != null && listBox2.Items.Count>1)
             {
                 DataTable dtMData = _modelBuildTables.Tables[listBox2.SelectedIndex];
                 DataView dv = dtMData.DefaultView;

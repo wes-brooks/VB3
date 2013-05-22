@@ -75,6 +75,8 @@ namespace IPyModeling
 
         //RunChanged = true:running, false:canceled
         public event EventHandler ControlStatusUpdated;
+        private IDictionary<string, object> dictPackedState = null;
+        private string strModelString = "";
 
         protected DependentVariableTransforms xfrmImported;
         protected DependentVariableTransforms xfrmThreshold;
@@ -90,6 +92,13 @@ namespace IPyModeling
 
         IDictionary<string, object> dictPackedPlugin = new Dictionary<string, object>();
 
+
+
+
+        public IDictionary<string, object> PackedState
+        {
+            get { return dictPackedState; }
+        }
 
         public IPyModelingControl()
         {
@@ -368,6 +377,7 @@ namespace IPyModeling
         public void ClearModelingTab(bool PreserveVariables=false)
         {
             ipyModel = null;
+            strModelString = "";
 
             chartValidation.Series["True positives"].Points.Clear();
             chartValidation.Series["True negatives"].Points.Clear();
@@ -443,6 +453,8 @@ namespace IPyModeling
             {
                 tbExponent.Enabled = enable;
             });
+
+            Cursor.Current = Cursors.Default;
         }
 
 
@@ -823,8 +835,9 @@ namespace IPyModeling
 
                 VBLogger.GetLogger().LogEvent("90", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
                 Cursor.Current = Cursors.WaitCursor;
-
                 Application.DoEvents();
+
+
                 VBLogger.GetLogger().LogEvent("95", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
 
                 boolRunning = false;
@@ -840,6 +853,14 @@ namespace IPyModeling
                 }
             }
             return;
+        }
+
+
+        private void UpdateStoredModelString()
+        {
+            //Pack up the model's state in two ways: one with the model represented by a dynamic object, the other with the model represented by a string
+            string strScratchDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach");
+            strModelString = ipyInterface.Serialize(Model, strScratchDir);
         }
 
 
@@ -954,6 +975,8 @@ namespace IPyModeling
             ListViewItem lvi = new ListViewItem(strArrValidation);
             lvValidation.Items.Clear();
             lvValidation.Items.Add(lvi);
+
+            Cursor.Current = Cursors.Default;
         }
                
         
@@ -998,9 +1021,9 @@ namespace IPyModeling
             if (Model == null)
                 return dictPluginState;
 
-            //Pack up the model's state in two ways: one with the model represented by a dynamic object, the other with the model represented by a string
+            /*//Pack up the model's state in two ways: one with the model represented by a dynamic object, the other with the model represented by a string
             string strScratchDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach");
-            string strModelString = ipyInterface.Serialize(Model, strScratchDir);
+            string strModelString = ipyInterface.Serialize(Model, strScratchDir);*/
 
             //Store the decision threshold.
             double dblDecisionThreshold;
@@ -1035,6 +1058,7 @@ namespace IPyModeling
             dictPluginState.Add("ThresholdingDictionary", dictThresholding);
             dictPluginState.Add("ThresholdingIndex", this.intThresholdIndex);
 
+            dictPackedState = dictPluginState;
             return dictPluginState;
         }
 
@@ -1070,7 +1094,8 @@ namespace IPyModeling
                 //ModelState modelState = (ModelState)dictProjectState["Model"];
                 Dictionary<string, object> dictModel = (Dictionary<string, object>)dictProjectState["Model"];
                 string strScratchDir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VirtualBeach");
-                this.ipyModel = ipyInterface.Deserialize(dictModel["ModelString"], strScratchDir);
+                strModelString = dictModel["ModelString"].ToString();
+                this.ipyModel = ipyInterface.Deserialize(strModelString, strScratchDir);
                 this.Method = (string)dictModel["Method"];
                 PopulateResults(this.ipyModel);
 

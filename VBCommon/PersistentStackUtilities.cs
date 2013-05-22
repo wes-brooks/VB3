@@ -10,7 +10,7 @@ namespace VBCommon
     public static class PersistentStackUtilities
     {
         //Generate random strings for use as keys to the Undo/Redo dictionaries
-        private static Random random = new Random((int)DateTime.Now.Ticks);//thanks to McAden
+        private static Random random = new Random((int)DateTime.Now.Ticks); //thanks to McAden
 
         public static string RandomString(int size)
         {
