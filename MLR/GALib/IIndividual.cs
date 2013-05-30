@@ -10,7 +10,7 @@ namespace GALib
         /// <summary>
         /// The List of 1s or 0s representing the chromosome
         /// </summary>
-        List<Int16> Chromosome
+        List<string> Chromosome
         {
             get;
             set;

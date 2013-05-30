@@ -80,10 +80,11 @@ namespace GALib
             IIndividual cloner = population.GetTopIndividuals(1)[0];
             
             for (int i = 0; i < _numberGenerations; i++)
-            {                
-                if (population.PopulationSize < population.MaximumPopulationSize)
+            {      
+                int iPopulationShortage = population.MaximumPopulationSize - population.PopulationSize;
+                if (iPopulationShortage > 0)
                 {
-                    for (int j=0; j<(population.MaximumPopulationSize - population.PopulationSize); j++)
+                    for (int j = 0; j < iPopulationShortage; j++)
                     {
                         IIndividual indiv = cloner.Clone();
                         indiv.Initialize();

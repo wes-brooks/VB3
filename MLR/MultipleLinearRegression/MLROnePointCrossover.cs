@@ -50,16 +50,16 @@ namespace MultipleLinearRegression
             }
             
             //
-            Dictionary<short, short> childGenes1 = new Dictionary<short, short>();
-            Dictionary<short, short> childGenes2 = new Dictionary<short, short>();
+            List<string> childGenes1 = new List<string>();
+            List<string> childGenes2 = new List<string>();
 
             for (short i = 0; i < chromosomeLength; i++)
             {
-                if (child1.Chromosome[i] > 0)
-                    childGenes1.Add(child1.Chromosome[i],i);
+                if (child1.Chromosome[i] != "")
+                    childGenes1.Add(child1.Chromosome[i]);
                 
-                if (child2.Chromosome[i] > 0)
-                    childGenes2.Add(child2.Chromosome[i],i);
+                if (child2.Chromosome[i] != "")
+                    childGenes2.Add(child2.Chromosome[i]);
             }
 
 
@@ -73,13 +73,13 @@ namespace MultipleLinearRegression
             for (int i = cutPoint; i < chromosomeLength; i++)
             {
 
-                if (childGenes2.ContainsKey(child1.Chromosome[i]))
-                    child2.Chromosome[i] = 0;
+                if (childGenes2.Contains(child1.Chromosome[i]))
+                    child2.Chromosome[i] = "";
                 else
                     child2.Chromosome[i] = child1.Chromosome[i];
 
-                if (childGenes1.ContainsKey(child2.Chromosome[i]))
-                    child1.Chromosome[i] = 0;
+                if (childGenes1.Contains(child2.Chromosome[i]))
+                    child1.Chromosome[i] = "";
                 else
                     child1.Chromosome[i] = child2.Chromosome[i];
                 

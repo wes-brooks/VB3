@@ -137,7 +137,7 @@ namespace GALibForm
 
                 //combinations = new Combinations<short>(combList.ToArray(), i, GenerateOption.WithoutRepetition);                
                 combinations = listAllComb[i - 1];
-                foreach (IList<short> comb in combinations)
+                foreach (IList<string> comb in combinations)
                 {
 
                     if ((!Double.IsNaN(_decisionThreshold)) && (!Double.IsNaN(_mandateThreshold)) && (_maxVIF != Int32.MaxValue))

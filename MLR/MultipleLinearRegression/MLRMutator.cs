@@ -39,18 +39,17 @@ namespace MultipleLinearRegression
             double dval = 0.0;
             int newVal = -1;
             bool valExists = false;
+            List<string> listIVsDomain = MLRCore.MLRDataManager.GetDataManager().ModelFieldList;
+            List<string> list = new List<string>();
+            list.Add("");            
 
-            List<short> list = new List<short>();
-            list.Add(0);
-
-            MLRIndividual indiv = individual as MLRIndividual;
             //Have to evaluate at this point to make sure calculated values are synched up with current chromosome.
+            MLRIndividual indiv = individual as MLRIndividual;
             indiv.Evaluate();
             if (!indiv.IsViable())
                 return;
 
-            DataTable dt = indiv.Parameters;
-            
+            DataTable dt = indiv.Parameters;            
             
             double pval = 0.0;
             double pvalMutationRate = 0.0;
@@ -61,12 +60,12 @@ namespace MultipleLinearRegression
                 //if the gene is already 0 or the pvalue for the gene is less than 0.05 then use standard mutation rate.
                 //if pvalue is between 0.05 and 0.8 use pvalue as mutation rate.
                 //if pvalue is greater than 0.8 use pvalue equal to 0.8.
-                if (individual.Chromosome[i] < 1)
+                if (individual.Chromosome[i] == "")
                     pvalMutationRate = _mutationRate;
                 else
                 {
                     list[0] = individual.Chromosome[i];
-                    string[] varName = MLRCore.MLRDataManager.GetDataManager().GetIndependentVariableList(list);
+                    string[] varName = list.ToArray();
                     DataRow[] dr = dt.Select("Name = '" + varName[0] + "'");
                     pval = Convert.ToDouble(dr[0]["PValue"]);
 
@@ -95,7 +94,7 @@ namespace MultipleLinearRegression
                         {
                             for (int j = 0; j < individual.Chromosome.Count; j++)
                             {
-                                if (individual.Chromosome[j] == newVal)
+                                if (individual.Chromosome[j] == listIVsDomain[newVal-1])
                                 {
                                     valExists = true;
                                     break;
@@ -105,15 +104,12 @@ namespace MultipleLinearRegression
                     }
 
                     if (!valExists)
-                        individual.Chromosome[i] = (short)newVal;
+                    {
+                        if (newVal > 0) { individual.Chromosome[i] = listIVsDomain[newVal - 1]; }
+                        else { individual.Chromosome[i] = ""; }
+                    }
                 }
-
             }
-
-                             
-            
-
-            //double pval = dt.Rows
         }
 
         public double MutationRate
