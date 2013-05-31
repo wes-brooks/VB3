@@ -278,7 +278,6 @@ namespace VBCommon.Controls
         /// <returns>return complex structure dictionary</returns>
         private Dictionary<object, object>  transforms()
         {
-
             Dictionary<object, object> corrResults = new Dictionary<object, object>();
 
             Dictionary<List<int>, List<double>> colPcoef = new Dictionary<List<int>, List<double>>();
@@ -366,7 +365,7 @@ namespace VBCommon.Controls
                         if (kv.Key.ToString() == Enum.GetName(_transform, _tnames.poly))
                         {
                             abc = new List<double>();
-                            skip = doTransform(out varlist, _dt, _dt.Columns.IndexOf(dc), out adjr2, out r2, out abc);
+                            skip = doTransform(out varlist, _dt, _dt.Columns.IndexOf(dc), _depVarColIndex, out adjr2, out r2, out abc);
                             if (!skip)
                             {
                                 vararray = varlist.ToArray();
@@ -509,7 +508,7 @@ namespace VBCommon.Controls
         /// <param name="r2"></param>
         /// <param name="abc"></param>
         /// <returns></returns>
-        private bool doTransform(out List<double> vals, DataTable dt, int colndx, out double adjr2, out double r2, out List<double> abc)
+        private bool doTransform(out List<double> vals, DataTable dt, int colndx, int depVarColIndex, out double adjr2, out double r2, out List<double> abc)
         {
             //use polynomial class to compute transforms
             //note: return false iff ok, true iff transform failed
@@ -519,7 +518,7 @@ namespace VBCommon.Controls
             vals = null;
             abc = new List<double>();
 
-            VBCommon.Statistics.Polynomial poly = new VBCommon.Statistics.Polynomial(_dt, colndx);
+            VBCommon.Statistics.Polynomial poly = new VBCommon.Statistics.Polynomial(_dt, colndx, depVarColIndex);
             vals = poly.getPolyT.ToList<double>();
             adjr2 = poly.getAdjRsqrd;
             r2 = poly.getRsqrd;

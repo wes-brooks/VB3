@@ -21,11 +21,11 @@ namespace VBCommon.Statistics
         public static DataTable _polyDT = null;
 
         //constructor for procedural processing in datasheet
-        public Polynomial(DataTable dt, int colndx)
+        public Polynomial(DataTable dt, int colndx, int depVarColIndex)
         {
             createResultsTable();
             _colname = dt.Columns[colndx].ColumnName;
-            _modelDT = createModelTable(dt, colndx);
+            _modelDT = createModelTable(dt, colndx, depVarColIndex);
             MultipleRegression model = new MultipleRegression(_modelDT, "Y", new [] { "X", "X**2"} );
             model.Compute();
             DataTable result = model.Parameters;
@@ -96,9 +96,9 @@ namespace VBCommon.Statistics
         {
             //throw new NotImplementedException();
             _polytransform = new double [_modelDT.Rows.Count];            
-            _c1 = (double)result.Rows[0]["Value"];
-            _c2 = (double)result.Rows[1]["Value"];
-            _intercept = (double)result.Rows[2]["Value"];
+            _intercept = (double)result.Rows[0]["Value"];
+            _c1 = (double)result.Rows[1]["Value"];
+            _c2 = (double)result.Rows[2]["Value"];
             int n = 0;
             foreach (DataRow r in _modelDT.Rows)
             { 
@@ -108,11 +108,11 @@ namespace VBCommon.Statistics
         }
 
 
-        private DataTable createModelTable(DataTable dt, int colndx)
+        private DataTable createModelTable(DataTable dt, int colndx, int depVarColIndex)
         {
             //throw new NotImplementedException();
             addModelTableCols();
-            double [] y = Utility.GetColumnFromTable(dt, 1);
+            double[] y = Utility.GetColumnFromTable(dt, depVarColIndex);
             double [] x = Utility.GetColumnFromTable(dt, colndx);
             VBCommon.Transforms.Transformer t = new VBCommon.Transforms.Transformer(dt, colndx);
             double[] x2 = t.SQUARE;

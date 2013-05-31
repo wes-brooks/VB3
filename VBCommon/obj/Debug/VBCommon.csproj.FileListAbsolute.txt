@@ -26,5 +26,6 @@ C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.VariableSelection.resources
 C:\VB3\VBCommon\obj\Debug\VBCommon.dll
 C:\VB3\VBCommon\obj\Debug\VBCommon.pdb
 C:\VB3\VBCommon\obj\Debug\VBCommon.Controls.frmMissingPredValues.resources
-C:\VB3\VBCommon\obj\Debug\VBCommon.csprojResolveAssemblyReference.cache
-C:\VB3\VBCommon\obj\Debug\VBCommon.csproj.GenerateResource.Cache
+C:\VB3\VBCommon\obj\Debug\ResolveAssemblyReference.cache
+C:\VB3\VBCommon\obj\Debug\GenerateResource.read.1.tlog
+C:\VB3\VBCommon\obj\Debug\GenerateResource.write.1.tlog

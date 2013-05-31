@@ -50,6 +50,8 @@ namespace MultipleLinearRegression
         private double _maxVIF = Double.NaN;
         private double _decisionThreshold = Double.NaN;
         private double _mandateThreshold = Double.NaN;
+        private double _eigenvalueRatio = Double.NaN;
+        private double _eigenvalueRatioLimit = Double.NaN;
 
         private bool _cantCompute = false;
 
@@ -320,6 +322,7 @@ namespace MultipleLinearRegression
                 _Press = mlr.Press;
                 _RMSE = mlr.RMSE;
                 _VIF = mlr.MaxVIF;
+                ;
 
                 _parameters = mlr.Parameters;
                 _predictedValues = mlr.PredictedValues;

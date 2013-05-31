@@ -1743,7 +1743,6 @@
             this.Name = "frmModel";
             this.helpProvider1.SetShowHelp(this, false);
             this.Size = new System.Drawing.Size(1120, 660);
-            this.Load += new System.EventHandler(this.frmModel_Load);
             this.HelpRequested += new System.Windows.Forms.HelpEventHandler(this.frmModel_HelpRequested);
             this.Validating += new System.ComponentModel.CancelEventHandler(this.frmModel_Validating);
             this.groupBox6.ResumeLayout(false);

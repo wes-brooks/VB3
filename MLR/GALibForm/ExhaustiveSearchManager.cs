@@ -87,11 +87,10 @@ namespace GALibForm
 
         public void Run()
         {
-
-            long percentComplete = 0;            
+            long percentComplete = 0;
+            List<string> listIVsDomain = MLRCore.MLRDataManager.GetDataManager().ModelFieldList;
             _exhuastiveCache = new Cache(10, 0.0);
-           
-
+            
             if ((_fitnessCrit == FitnessCriteria.R2) || (_fitnessCrit == FitnessCriteria.AdjustedR2))
             {
                 _exhuastiveCache.Comparer = new DescendSort();
@@ -111,9 +110,7 @@ namespace GALibForm
             short tmp = 0; ;
             for (int i = 0; i < _numVars; i++)
             {
-                //ListItem li = (ListItem)lbIndVariables.Items[i];
                 tmp = (short)(i + 1);
-                //tmp += Convert.ToInt16(li.ValueItem);
                 combList.Add(tmp);
             }
 
@@ -135,11 +132,9 @@ namespace GALibForm
                 if (Cancel)
                     break;
 
-                //combinations = new Combinations<short>(combList.ToArray(), i, GenerateOption.WithoutRepetition);                
                 combinations = listAllComb[i - 1];
-                foreach (IList<string> comb in combinations)
+                foreach (IList<short> comb in combinations)
                 {
-
                     if ((!Double.IsNaN(_decisionThreshold)) && (!Double.IsNaN(_mandateThreshold)) && (_maxVIF != Int32.MaxValue))
                         indiv = new MLRIndividual(i, i, _fitnessCrit, _maxVIF, _decisionThreshold, _mandateThreshold);
                     else if (_maxVIF != Int32.MaxValue)
@@ -148,7 +143,7 @@ namespace GALibForm
                         indiv = new MLRIndividual(i, i, _fitnessCrit);
 
                     for (int j = 0; j < comb.Count; j++)
-                        indiv.Chromosome[j] = comb[j];
+                        indiv.Chromosome[j] = listIVsDomain[comb[j]-1];
 
                     if (Cancel)
                         break;
@@ -156,15 +151,9 @@ namespace GALibForm
                     indiv.Evaluate();
 
                     if (indiv.IsViable())
-                    {                      
-                        //_exhuastiveCache.SortCache();
-                        //_exhuastiveCache.ReplaceMinimum(indiv);
+                    {
                         _exhuastiveCache.Add(indiv);
                     }
-                    //else
-                        //throw new Exception("Invalid individual.");
-
-                    
 
                     totalComplete++;
 
@@ -178,17 +167,9 @@ namespace GALibForm
                         //lblProgress.Refresh();
                         //Application.DoEvents();
                     }
-
                 }
             }
             _exhuastiveCache.Sort();
-
-            //list = _exhuastiveCache.CacheList;
-
-
-            //lbModels.Items.Clear();
-
-            //UpdateFitnessListBox();
             ESComplete(this);
         }
     }

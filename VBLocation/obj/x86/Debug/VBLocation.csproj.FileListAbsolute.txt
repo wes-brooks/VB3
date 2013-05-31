@@ -41,5 +41,6 @@ C:\VB3\VBLocation\obj\x86\Debug\VBLocation.Properties.Resources.resources
 C:\VB3\VBLocation\obj\x86\Debug\VBLocation.StaticImage.resources
 C:\VB3\VBLocation\obj\x86\Debug\VBLocation.dll
 C:\VB3\VBLocation\obj\x86\Debug\VBLocation.pdb
-C:\VB3\VBLocation\obj\x86\Debug\VBLocation.csprojResolveAssemblyReference.cache
-C:\VB3\VBLocation\obj\x86\Debug\VBLocation.csproj.GenerateResource.Cache
+C:\VB3\VBLocation\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\VB3\VBLocation\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\VB3\VBLocation\obj\x86\Debug\GenerateResource.write.1.tlog

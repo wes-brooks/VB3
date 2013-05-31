@@ -6,4 +6,4 @@ C:\VB3\bin\debug\Binaries\VBMLR\MultipleLinearRegression.dll
 C:\VB3\bin\debug\Binaries\VBMLR\MultipleLinearRegression.pdb
 C:\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\MultipleLinearRegression.dll
 C:\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\MultipleLinearRegression.pdb
-C:\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\MultipleLinearRegression.csprojResolveAssemblyReference.cache
+C:\VB3\MLR\MultipleLinearRegression\obj\x86\Debug\ResolveAssemblyReference.cache

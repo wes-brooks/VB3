@@ -35,5 +35,6 @@ C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmModel.resources
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.frmModelingReport.resources
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.dll
 C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.pdb
-C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.csprojResolveAssemblyReference.cache
-C:\VB3\MLR\GALibForm\obj\x86\Debug\GALibForm.csproj.GenerateResource.Cache
+C:\VB3\MLR\GALibForm\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\VB3\MLR\GALibForm\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\VB3\MLR\GALibForm\obj\x86\Debug\GenerateResource.write.1.tlog

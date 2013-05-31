@@ -86,4 +86,4 @@ C:\VB3\bin\Debug\Binaries\IPyCommon\IPyCommon.dll
 C:\VB3\bin\Debug\Binaries\IPyCommon\IPyCommon.pdb
 C:\VB3\IPyCommon\obj\Debug\IPyCommon.dll
 C:\VB3\IPyCommon\obj\Debug\IPyCommon.pdb
-C:\VB3\IPyCommon\obj\Debug\IPyCommon.csprojResolveAssemblyReference.cache
+C:\VB3\IPyCommon\obj\Debug\ResolveAssemblyReference.cache

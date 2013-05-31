@@ -1910,16 +1910,11 @@ namespace VBCommon.Controls
         {
             if (dt != null)
             {
-                //filter disabled cols
-                DataTable tblFiltered = filterDisabledCols(dt);
-
-                //filter transformed cols
+                //Filter disabled rows; disabled, categorical, response, and transformed columns from the data table for computing transformations
+                DataTable tblFiltered = FilteredDataTable;
+                tblFiltered = filterDisabledCols(tblFiltered);
                 tblFiltered = filterTcols(tblFiltered);
-
-                //filter hidden (untransformed) dependent variable
                 tblFiltered = filterRVHcols(tblFiltered);
-
-                //filter cat vars
                 tblFiltered = filterCatVars(tblFiltered);
 
                 int rvndx = tblFiltered.Columns.IndexOf(ResponseVarColName);
@@ -1940,16 +1935,14 @@ namespace VBCommon.Controls
                     dtnew = addHiddenResponseVarCols(dtnew, dt);
 
                     //add any previously transform cols back
-                    //dtnew = addOldTCols(dtnew, _dt);
                     dtnew = addOldTCols(dtnew, dt);
 
+                    //add back the categorical columns
                     dtnew = addCatCols(dtnew, dt);
 
                     foreach (DataColumn dc in dtnew.Columns)
                     {
-                        if (dc.ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM)) //||
-                            //dc.ExtendedProperties.ContainsKey(VBTools.Globals.OPERATION) ||
-                            //dc.ExtendedProperties.ContainsKey(VBTools.Globals.DECOMPOSITION) )
+                        if (dc.ExtendedProperties.ContainsKey(VBCommon.Globals.TRANSFORM))
                             dtnew = arrangeTableCols(dtnew, dc);
                     }
 
@@ -1962,17 +1955,8 @@ namespace VBCommon.Controls
                     ResponseVarColIndex = dt.Columns.IndexOf(ResponseVarColName);
                     maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName);
 
-                    //count iv columns and update list
-                    /*int nonivs = HiddenCols + 2;
-                    NumberIVs = dt.Columns.Count - nonivs;
-                    UpdateListView(VBCommon.Globals.listvals.NIVS, NumberIVs);
-                    UpdateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);
-                    */
                     UpdateListView();
-
                     NotifyContainer();
-
-                    //_state = _dtState.dirty;
                 }
             }
             else
@@ -1994,7 +1978,6 @@ namespace VBCommon.Controls
             {
                 DataTable tblFiltered = filterDisabledCols(dt);
                 int rvndx = tblFiltered.Columns.IndexOf(ResponseVarColName);
-                //string responseVarColName = dt.Columns[rvndx].Caption;
                 frmManipulate frmIA = new frmManipulate(tblFiltered, rvndx);
                 DialogResult dlgr = frmIA.ShowDialog();
 
@@ -2008,12 +1991,7 @@ namespace VBCommon.Controls
                     dt = dtnew;
                     maintainGrid(dgv, dtnew, SelectedColIndex, ResponseVarColName);
 
-                    /*int nonivs = HiddenCols + 2;
-                    NumberIVs = dt.Columns.Count - nonivs;
-                    UpdateListView(VBCommon.Globals.listvals.NIVS, NumberIVs);
-                    UpdateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);*/
                     UpdateListView();
-
                     NotifyContainer();
                 }
             }
@@ -2064,12 +2042,7 @@ namespace VBCommon.Controls
                 dgv.DataSource = dtnew;
                 maintainGrid(dgv, dt, SelectedColIndex, ResponseVarColName);
 
-                /*int nonivs = HiddenCols + 2;
-                NumberIVs = dt.Columns.Count - nonivs;
-                UpdateListView(VBCommon.Globals.listvals.NIVS, NumberIVs);
-                UpdateListView(VBCommon.Globals.listvals.NCOLS, dt.Columns.Count);*/
                 UpdateListView();
-
                 NotifyContainer();
             }
             else

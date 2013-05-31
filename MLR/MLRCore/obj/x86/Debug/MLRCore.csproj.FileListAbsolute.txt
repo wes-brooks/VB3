@@ -4,4 +4,4 @@ C:\VB3\bin\debug\Binaries\VBMLR\MLRCore.dll
 C:\VB3\bin\debug\Binaries\VBMLR\MLRCore.pdb
 C:\VB3\MLR\MLRCore\obj\x86\Debug\MLRCore.dll
 C:\VB3\MLR\MLRCore\obj\x86\Debug\MLRCore.pdb
-C:\VB3\MLR\MLRCore\obj\x86\Debug\MLRCore.csprojResolveAssemblyReference.cache
+C:\VB3\MLR\MLRCore\obj\x86\Debug\ResolveAssemblyReference.cache

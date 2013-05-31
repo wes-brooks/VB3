@@ -43,6 +43,7 @@ namespace VBCommon.Statistics
         private Dictionary<string, double> _VIF = null;
         private double _maxVIF = 0;
         private string _maxVIFParameter = "";
+        private double _eigenvalueRatio = 1;
 
         private double _ADresidPvalue = double.NaN;
         private double _ADresidNormStatVal = double.NaN;
@@ -248,6 +249,11 @@ namespace VBCommon.Statistics
             get { return _maxVIF; }
         }
 
+        public double EigenvalueRatio
+        {
+            get { return _eigenvalueRatio; }
+        }
+
         public void Compute()
         {
             // Now create the regression model. Parameters are the name 
@@ -274,19 +280,7 @@ namespace VBCommon.Statistics
             }
 
             double[,] corrMat = inputMat.Transpose().Multiply(inputMat);
-
-            /*EigenvalueDecomposition eigen = new EigenvalueDecomposition(designMat.Transpose().Multiply(designMat));
-            if (Math.Abs(eigen.RealEigenvalues.Max() / eigen.RealEigenvalues.Min()) > 1E14)
-            {
-                //Matrix is singular
-                _AIC = double.PositiveInfinity;
-                _AICC = double.PositiveInfinity;
-                _BIC = double.PositiveInfinity;
-
-                _Press = double.PositiveInfinity;
-                return;
-            }*/
-
+            
             //Make sure the intercept appears first in the list of results:
             List<string> inputNames = new List<string>();
             inputNames.Add("(Intercept)");
@@ -309,7 +303,7 @@ namespace VBCommon.Statistics
             //Calculate the selection criteria
             double sse = M2.Table[M2.Table.Count-2].SumOfSquares;            
             int n = Convert.ToInt32(M2.Results.Length);
-            double p = M2.CoefficientValues.Length;
+            int p = M2.CoefficientValues.Length;
             double[,] H = designMat.Multiply((designMat.Transpose().Multiply(designMat)).Inverse().Multiply(designMat.Transpose()));
             
             double[] SquaredResiduals = new double[M2.Results.Length];
@@ -384,16 +378,60 @@ namespace VBCommon.Statistics
             AD_stat = -Convert.ToDouble(n) - AD_stat / Convert.ToDouble(n);                        
             _ADresidNormStatVal = AD_stat;
             _ADresidPvalue = 1 - adinf(AD_stat);
-             
-            double[,] InvCorrMatrix = corrMat.Inverse();
-            double[] VIFs = InvCorrMatrix.Diagonal();
+            
+            _VIF = ComputeVIFs(designMat);
+            _maxVIF = _VIF.Values.Max(x => Math.Abs(x));
+            _maxVIFParameter = _VIF.First(x => Math.Abs(x.Value)==_maxVIF).Key;
 
-            _VIF = new Dictionary<string, double>();
-            for (int i = 0; i < VIFs.Count(); i++)
-                _VIF.Add(_independentVars[i].ToString(), VIFs[i]);
+            //Check the ratio between the largest, smallest Eigenvalues. Too large => design matrix is singular.
+            EigenvalueDecomposition eigen = new EigenvalueDecomposition(designMat.Transpose().Multiply(designMat));
+            _eigenvalueRatio = Math.Abs(eigen.RealEigenvalues.Max() / eigen.RealEigenvalues.Min());
+        }
 
-            _maxVIF = VIFs.Abs().Max();
-            _maxVIFParameter = _independentVars[VIFs.Abs().First(x => x==_maxVIF)]; 
+
+        private Dictionary<string, double> ComputeVIFs(double[,] DesignMatrix)
+        {
+            //Initialize the dictionary that'll hold the VIFs
+            Dictionary<string, double> VIFs = new Dictionary<string, double>();
+
+            //Establish some variables we'll need for our work later:
+            int n = DesignMatrix.GetColumn(0).Length;
+            int p = DesignMatrix.GetRow(0).Length;
+            double[,] XTX_Full = DesignMatrix.Transpose().Multiply(DesignMatrix);
+
+            //Compute VIFs: start the loop at 1 to skip the intercept's VIF
+            for (int i = 1; i < p; i++) 
+            {
+                try
+                {
+                    //Get the matrices prepared to build a linear model
+                    double[] Y = DesignMatrix.GetColumn(i);
+                    double[,] YY = new double[n, 1].SetColumn(0, Y);
+                    double[,] X = DesignMatrix.RemoveColumn(i);
+                    double[,] XTX = XTX_Full.RemoveColumn(i).RemoveRow(i);
+
+                    //Produce the model
+                    double[,] HY = X.Multiply(XTX.Inverse()).Multiply(X.Transpose());
+                    double[] Yhat = HY.Multiply(YY).GetColumn(0);
+
+                    //Compute the sums of squares for the full, intercept-only models
+                    double SSRI = 0;
+                    double SSRF = 0;
+                    double Ybar = Y.Mean();
+                    for (int j = 0; j < n; j++) { SSRI += Math.Pow(Y[j] - Ybar, 2); }
+                    for (int j = 0; j < n; j++) { SSRF += Math.Pow(Y[j] - Yhat[j], 2); }
+                    double R2 = 1 - SSRF / SSRI;
+
+                    //Calculate the VIF for this variable and add it to the list.
+                    VIFs.Add(_independentVars[i-1].ToString(), 1/(1-R2));
+                }
+                catch
+                {
+                    //If we can't calculate the VIF (e.g. because the design matrix is singular), then call it infinite
+                    VIFs.Add(_independentVars[i-1].ToString(), Double.PositiveInfinity);
+                }
+            }
+            return VIFs;
         }
 
 
