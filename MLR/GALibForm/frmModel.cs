@@ -668,7 +668,7 @@ namespace GALibForm
         {
             if (Available == MaxSelect)
             {
-                return Math.Pow(2, Available).ToString();
+                return (Math.Pow(2, Available) - 1).ToString();
             }
             else
             {
@@ -680,7 +680,7 @@ namespace GALibForm
                     sum = sum + num / Factorial(i) / Factorial(Available - i);
                 }
 
-                return sum.ToString();
+                return (sum-1).ToString();
             }
         }
 
@@ -1535,6 +1535,7 @@ namespace GALibForm
 
             listView1.Items.Clear();
             listView2.Items.Clear();
+            _selectedRebuildIndex = -1;
 
             int idx = listBox1.SelectedIndex;
             MLRIndividual ind = (MLRIndividual)_list[idx];

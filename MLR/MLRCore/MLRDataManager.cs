@@ -68,30 +68,6 @@ namespace MLRCore
             get
             {
                 DataTable dt = _modelData.Copy();
-                /*PropertyCollection dtri = dt.ExtendedProperties;
-
-                Dictionary<Int32, Boolean> dictRowEnabled = new Dictionary<Int32, Boolean>();
-                List<Int32> listKeys = new List<Int32>();
-                foreach (string key in dtri.Keys)
-                {
-                    int iKey;
-                    bool bEnabled;
-
-                    bool bInt = Int32.TryParse(key, out iKey);
-                    bool bBool = Boolean.TryParse(dtri[key].ToString(), out bEnabled);
-                    if (bInt && bBool)
-                    {
-                        dictRowEnabled.Add(iKey, bEnabled);
-                        listKeys.Add(iKey);
-                    }
-                }
-
-                listKeys.Sort((x,y)=>(y.CompareTo(x)));
-                foreach (Int32 item in listKeys)
-                {
-                    if (!dictRowEnabled[item]) { dt.Rows.RemoveAt(item); }
-                }*/
-
                 return dt;
             }
             set
