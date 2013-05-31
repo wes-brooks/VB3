@@ -91,7 +91,8 @@ namespace CrossValidation
             //
             for (int i = 0; i < _models.Count; i++)
             {                
-                string[] indepVars = projMgr.GetIndependentVariableList(_models[i].Chromosome);
+                //string[] indepVars = projMgr.GetIndependentVariableList(_models[i].Chromosome);
+                string[] indepVars = _models[i].Chromosome.ToArray();
                 _validatedModels[i] = new MSEP(_models[i], 0, indepVars);
             }
 

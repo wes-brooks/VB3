@@ -300,6 +300,7 @@ namespace IPyModeling
                     {
                         boolComplete = false;
                         boolVirgin = false;
+                        innerIronPythonControl.Clear();
                         innerIronPythonControl.SetData(e.PackedPluginState);
                         boolChanged = true;
                     }

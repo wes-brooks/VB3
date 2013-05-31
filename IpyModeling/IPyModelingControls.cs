@@ -791,6 +791,7 @@ namespace IPyModeling
             if (AnticipatingModel)
             {
                 this.ipyModel = validation_results[1];
+                UpdateStoredModelString();
                 PopulateResults(this.ipyModel);
 
                 //Now extract the valid thresholds and the corresponding specificities

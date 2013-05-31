@@ -97,13 +97,13 @@ namespace MultipleLinearRegression
 
         public int GetHashCode(IIndividual obj)
         {
-            List<short> list = obj.Chromosome.ToList();
+            List<string> list = obj.Chromosome.ToList();
             list.Sort();
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i] > 0)
+                if (list[i] != "")
                     sb.Append(list[i] + "_");                
             }
             return sb.ToString().GetHashCode();

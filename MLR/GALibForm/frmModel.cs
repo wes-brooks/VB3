@@ -236,11 +236,6 @@ namespace GALibForm
         }
 
 
-        private void frmModel_Load(object sender, EventArgs e)
-        {
-        }
-
-
         public bool ModelingComplete
         {
             get { return boolModelingComplete; }
@@ -375,10 +370,11 @@ namespace GALibForm
             mlrPackState.Add("IndependentVariables", _lstSelectedVariables);
             
             //Save the chromosomes
-            List<List<short>> chromosomes = new List<List<short>>();
+            List<List<string>> chromosomes = new List<List<string>>();
             for (int i = 0; i < _list.Count; i++)
             {
-                List<short> lst = new List<short>(_list[i].Chromosome);
+                //List<short> lst = new List<short>(_list[i].Chromosome);
+                List<string> lst = new List<string>(_list[i].Chromosome);
                 chromosomes.Add(lst);
             }
 
@@ -551,14 +547,14 @@ namespace GALibForm
                 }                
             }
 
-            List<List<short>> chromosomes = null;
+            List<List<string>> chromosomes = null;
             if (dictProjectState.ContainsKey("MLRIndividualChromosomes"))
             {
                 jsonObj = dictProjectState["MLRIndividualChromosomes"] as object;
                 if (jsonObj.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
                 {
                     string strJson = jsonObj.ToString();
-                    chromosomes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<List<short>>>(strJson);
+                    chromosomes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<List<string>>>(strJson);
                 }  
             }
                                     
@@ -568,7 +564,7 @@ namespace GALibForm
             for (int i = 0; i < chromosomes.Count; i++)
             {
                 MLRIndividual indiv = new MLRIndividual(chromosomes[i].Count, mi.MaxGeneValue, (FitnessCriteria)mi.FitnessCriteria, mi.MaxVIF, mi.DecisionThreshold, mi.MandatedThreshold);
-                indiv.Chromosome = new List<short>(chromosomes[i]);
+                indiv.Chromosome = new List<string>(chromosomes[i]);
                 indiv.Evaluate();
                 _list.Add(indiv);
 
@@ -658,8 +654,11 @@ namespace GALibForm
                     MultipleRegression rebuild = _listRebuilds[i];
                     UpdateModelList(rebuild, "rebuild", rebuild.Data, listRebuildResids[i]);
                 }
-                listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
+
+                //update the plugin to reflect the rebuild that was selected when the project was saved, then reconnect the event handler.
                 listBox2.SelectedIndex = mi.SelectedRebuildIndex;
+                this.listBox2_SelectedIndexChanged(null, null);
+                listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);                
             }
         }
 
@@ -881,7 +880,7 @@ namespace GALibForm
 
 
         public void SetData()
-        {            
+        {
             _dtFull = MLRDataManager.GetDataManager().ModelDataTable.Copy();
             EstablishValidVariables(_dtFull);
 
@@ -959,36 +958,28 @@ namespace GALibForm
             }
 
             DataTable dt = _dataMgr.ModelDataTable;
-            //int numVars = lbIndVariables.Items.Count;
             int numVars = _lstSelectedVariables.Count;
-
-            //string[] indVars = new string[numVars];
-            //for (int i = 0; i < numVars; i++)
-            //    indVars[i] = lbIndVariables.Items[i].ToString();
-
             FitnessCriteria fitnessCrit = GetFitnessCriteria();
 
-
+            //Produce a single model
             MLRIndividual indiv = null;
             indiv = new MLRIndividual(numVars, numVars, fitnessCrit, _maxVIF, _decisionThreshold, _mandateThreshold);
-
-            //indiv = new MLRIndividual(numVars, numVars, fitnessCrit);
-
-            for (int i = 0; i < numVars; i++)
-                indiv.Chromosome[i] = (short)(i + 1);
-
+            indiv.Chromosome = _lstSelectedVariables;
             indiv.Evaluate();
 
+            if (indiv.IsViable())
+            {
+                _list = new List<IIndividual>();
+                _list.Add(indiv);
 
-            _list = new List<IIndividual>();
-            _list.Add(indiv);
-
+                UpdateFitnessListBox();
+                listBox1.SelectedIndex = 0;
+            }
+            else { System.Windows.Forms.MessageBox.Show("Can't build a model using these variables. Try using different variables."); }
 
             btnRun.Text = "Run";
             changeControlStatus(true);
 
-            UpdateFitnessListBox();
-            listBox1.SelectedIndex = 0;
             return;
         }
 
@@ -1440,6 +1431,8 @@ namespace GALibForm
         public void ClearModelingTab()
         {
             InitializeComponent();
+            _modelingInfo = null;
+            tabPage1.Name = "";
             _dataMgr = MLRDataManager.GetDataManager();
             cbCriteria.SelectedIndex = 0;
         }

@@ -212,11 +212,12 @@ namespace GALib
                 return false;
 
 
-            Dictionary<short,short> dict = new Dictionary<short,short>();
+            //Dictionary<short,short> dict = new Dictionary<short,short>();
+            List<string> list = new List<string>();
             for (short i=0;i<individual.Chromosome.Count;i++)
             {
-                if (individual.Chromosome[i] > 0)
-                    dict.Add(individual.Chromosome[i],i);
+                if (individual.Chromosome[i] != "")
+                    list.Add(individual.Chromosome[i]);
             }
            
             
@@ -229,35 +230,17 @@ namespace GALib
                 count = 0;
                 for (int j = 0; j < indiv.Chromosome.Count; j++)
                 {
-                    if (indiv.Chromosome[j] > 0)
+                    if (indiv.Chromosome[j] != "")
                     {
-                        if (dict.ContainsKey(indiv.Chromosome[j]))
+                        if (list.Contains(indiv.Chromosome[j]))
                             count++;
                         else
                             break;
                     }
                 }
-                if (count == dict.Count)
+                if (count == list.Count)
                     return true;
-            }
-
-            //for (int i = 0; i < _cache.Count; i++)
-            //{
-            //    count = 0;
-            //    for (int j = 0; j < _cache[i].Chromosome.Count; j++)
-            //    {
-            //        if (_cache[i].Chromosome[j] > 0)
-            //        {
-            //            if (dict.ContainsKey(_cache[i].Chromosome[j]))
-            //                count++;
-            //            else
-            //                break;
-            //        }                    
-            //    }
-            //    if (count == dict.Count)
-            //        return true;
-            //}
-            
+            }            
             return false;
         }
 

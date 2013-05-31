@@ -29,7 +29,7 @@ namespace MultipleLinearRegression
         private double _fitness = 0.0;
         private int _numGenes;
         private int _maxGeneValue = 0;
-        private List<short> _chromosome = null;
+        private List<string> _chromosome = null;
         private FitnessCriteria _fitnessCriteria;
         private DataTable _parameters = null;
         private double[] _predictedValues = null;
@@ -187,10 +187,10 @@ namespace MultipleLinearRegression
         private void Init()
         {
             if (_numGenes < 1)
-                throw new Exception("MLR must have at least one independent variable.");            
+                throw new Exception("MLR must have at least one independent variable.");
 
-            short[] tmp = new short[_numGenes];
-            _chromosome = new List<short>(tmp);
+            string[] tmp = new string[_numGenes];
+            _chromosome = new List<string>(tmp);
            
             if (_fitnessCriteria == FitnessCriteria.Akaike)
                 _fitness = Double.PositiveInfinity;
@@ -202,12 +202,12 @@ namespace MultipleLinearRegression
 
         #region IIndividual Members
 
-        public List<short> Chromosome
+        public List<string> Chromosome
         {
             get { return _chromosome;}
             set 
             {
-                List<short> temp = value;
+                List<string> temp = value;
                 if (temp.Count != _numGenes)
                     throw new Exception("Invalid chromosome size.");
                 else
@@ -235,8 +235,11 @@ namespace MultipleLinearRegression
         /// </summary>
         public void Initialize()
         {
-            Dictionary<short, short> genes = new Dictionary<short, short>();
+            //Dictionary<short, short> genes = new Dictionary<short, short>();
+            List<string> genes = new List<string>();
             short geneVal = -1;
+            List<string> listIVsDomain = MLRDataManager.GetDataManager().ModelFieldList;
+
             for (int i = 0; i < _chromosome.Count; i++)
             {
                 //Have to do _maxGeneValue - 2 because first 2 columns of datatable are date and response value
@@ -244,7 +247,8 @@ namespace MultipleLinearRegression
 
                 if (geneVal > 0)
                 {
-                    while (genes.ContainsKey(geneVal) == true)
+                    //while (genes.ContainsKey(geneVal))
+                    while (genes.Contains(listIVsDomain[geneVal-1]))
                     {
                         geneVal = (short)RandomNumbers.NextInteger(_maxGeneValue+1);
                         if (geneVal < 1)
@@ -258,11 +262,14 @@ namespace MultipleLinearRegression
                 {
                     int j = 1;
                 }
-                
-                if (geneVal > 0)
-                    genes.Add(geneVal, geneVal);
 
-                _chromosome[i] = (short)geneVal;
+                if (geneVal > 0)
+                {
+                    //genes.Add(geneVal, geneVal);
+                    genes.Add(listIVsDomain[geneVal - 1]);
+                    _chromosome[i] = listIVsDomain[geneVal - 1];
+                }
+                else { _chromosome[i] = ""; }
             }
         }
 
@@ -273,12 +280,12 @@ namespace MultipleLinearRegression
             {
                 StringBuilder sb = new StringBuilder();
 
-                List<short> tmp = _chromosome.ToList();
+                List<string> tmp = _chromosome.ToList();
                 tmp.Sort();
 
                 for (int i = 0; i < tmp.Count; i++)
                 {
-                    if (tmp[i] > 0)
+                    if (tmp[i] != "")
                         sb.Append(tmp[i] + ",");
                 }
 
@@ -294,15 +301,12 @@ namespace MultipleLinearRegression
             try
             {
                 MLRDataManager _proj = MLRDataManager.GetDataManager();
-                //DataTable dt =DataStore.GetDataTable();
                 DataTable dt = _proj.ModelDataTable;
-
                 string depVar = _proj.ModelDependentVariable;
+                string[] indVars = _chromosome.Where(s => s != "").ToArray<string>();
 
-                string[] indVars = GetIndependentVariableNames();
-                //This happens when genes are all 0;
-                //IsValid will return false;
-                if (indVars == null)
+                //When genes are all "" IsValid will return false:
+                if (indVars.Count() == 0)
                     return;
 
                 MultipleRegression mlr = new MultipleRegression(dt, depVar, indVars);
@@ -400,27 +404,32 @@ namespace MultipleLinearRegression
             if (_cantCompute)
                 return false;
 
+            //Check for Variance Inflation Factor (VIF) above the threshold
             if (!Double.IsNaN(_VIF))
             {
                 if (_VIF > _maxVIF)
                     return false;
             }
 
-            Dictionary<short, short> genes = new Dictionary<short, short>();
+            //Check for duplicate covariates
+            List<string> genes = new List<string>();
+            //Dictionary<short, short> genes = new Dictionary<short, short>();
             for (int i = 0; i < _chromosome.Count; i++)
             {
                 
-                if (_chromosome[i] > 0)
+                if (_chromosome[i] != "")
                 {
-                    sumGenes += _chromosome[i];
-                    if (!genes.ContainsKey(_chromosome[i]))
-                        genes.Add(_chromosome[i], _chromosome[i]);
+                    //sumGenes += _chromosome[i];
+                    if (!genes.Contains(_chromosome[i]))
+                        //genes.Add(_chromosome[i], _chromosome[i]);
+                        genes.Add(_chromosome[i]);
                     else
                         return false;
                 }
             }
 
-            if (sumGenes < 1)
+            //Check for an empty model
+            if (genes.Count < 1)
                 return false;
 
             return true;
@@ -448,7 +457,7 @@ namespace MultipleLinearRegression
             get { return _dffits; }
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Returns an array of variable names.  First element is the depenedent variable
         /// The rest are the independent variable.
         /// </summary>
@@ -460,9 +469,8 @@ namespace MultipleLinearRegression
             MLRDataManager _proj = MLRDataManager.GetDataManager();
 
             string[] varNames = _proj.GetIndependentVariableList(_chromosome);
-            return varNames;
-            
-        }
+            return varNames;            
+        }*/
 
         public double AIC
         {
@@ -523,7 +531,7 @@ namespace MultipleLinearRegression
 
         public bool Equals(IIndividual x, IIndividual y)
         {
-            List<short> union = x.Chromosome.Union(y.Chromosome).ToList();
+            List<string> union = x.Chromosome.Union(y.Chromosome).ToList();
             if (union.Count == x.Chromosome.Count)
                 return true;
             else
@@ -532,7 +540,7 @@ namespace MultipleLinearRegression
 
         public int GetHashCode(IIndividual obj)
         {
-            List<short> list = obj.Chromosome.ToList();
+            List<string> list = obj.Chromosome.ToList();
             list.Sort();
 
             StringBuilder sb = new StringBuilder();

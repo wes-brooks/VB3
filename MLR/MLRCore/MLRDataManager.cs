@@ -102,7 +102,7 @@ namespace MLRCore
         
 
         /// <summary>
-        /// The list if independent variables in the current model
+        /// The list of independent variables in the current model
         /// Associated with the ModelDataTable
         /// </summary>
         public List<string> ModelFieldList
@@ -111,27 +111,22 @@ namespace MLRCore
         }
         
 
-        /// <summary>
+        /*/// <summary>
         /// Given an array of indices, return the corresponding field names from the model data table. 
         /// </summary>
         /// <param name="variableIdxArray"></param>
         /// <returns></returns>
-        public string[] GetIndependentVariableList(List<short> variableIdxArray)
+        public string[] GetIndependentVariableList(List<string> variableIdxArray)
         {
             List<string> names = new List<string>();
 
             int sumGenes = 0;
-            string field = "";
-            int geneVal = 0;
 
             for (int i = 0; i < variableIdxArray.Count; i++)
             {
-                if (variableIdxArray[i] > 0)
+                if (variableIdxArray[i] != "")
                 {
-                    sumGenes += variableIdxArray[i];
-                    geneVal = variableIdxArray[i];
-                    field = ModelFieldList[geneVal - 1];
-                    names.Add(field);
+                    names.Add(variableIdxArray[i]);
                 }
             }
 
@@ -139,7 +134,7 @@ namespace MLRCore
                 return null;
 
             return names.ToArray();
-        }
+        }*/
       
 
         public Dictionary<string, double> Model
