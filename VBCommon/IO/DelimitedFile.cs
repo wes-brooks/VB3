@@ -76,6 +76,7 @@ namespace VBCommon.IO
                     }
                 }
 
+                data.Columns[0].DataType = typeof(String);
                 DataRow dr = null;
                 line = sr.ReadLine();
                 while (line != null && line.Length > 0)

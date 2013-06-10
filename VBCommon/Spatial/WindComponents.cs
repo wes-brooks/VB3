@@ -61,25 +61,6 @@ namespace VBCommon.Spatial
             CalcValues();
         }
 
-        /*public WindComponents(double windspeed, double winddirection)
-        {
-            _UComp = new List<double>();
-            _VComp = new List<double>();
-            //VBProjectManager _proj = VBProjectManager.GetProjectManager();
-            _beachOrientation = _proj.SiteInfo.Orientation;
-
-            if (WindCmponents(windspeed, winddirection))
-            {
-                _UComp.Add(_Ucomp);
-                _VComp.Add(_Vcomp);
-            }
-            else
-            {
-                _UComp = null;
-                _VComp = null;
-            }
-
-        }*/
 
         public WindComponents(double windspeed, double winddirection, double beachOrientation)
         {
@@ -130,12 +111,10 @@ namespace VBCommon.Spatial
         }
 
 
-        //outputs
         public List<double> UComp
         {
             get 
             {
-                //CalcValues();
                 return _UComp; 
             }
         }
@@ -143,7 +122,6 @@ namespace VBCommon.Spatial
         {
             get
             {
-                //CalcValues();
                 return _VComp; 
             }
         }
@@ -181,9 +159,7 @@ namespace VBCommon.Spatial
                 foreach (DataRow r in _dt.Rows)
                 {
                     if (WindCmponents(Convert.ToDouble(r[_windSpeedColName].ToString()),
-                        Convert.ToDouble(r[_windDirColName].ToString())))//&&
-                    //vWindCmponent( Convert.ToDouble( r[_windSpeedColName].ToString() ), 
-                    //Convert.ToDouble( r[_windDirColName].ToString() ) ) )
+                        Convert.ToDouble(r[_windDirColName].ToString())))
                     {
                         _UComp.Add(_Ucomp);
                         _VComp.Add(_Vcomp);
@@ -199,7 +175,6 @@ namespace VBCommon.Spatial
                         _VComp = null;
                         break;
                     }
-
                 }
             }
             catch (FormatException ef) { showmessage(ef); }
@@ -221,10 +196,10 @@ namespace VBCommon.Spatial
                 //_Vcomp = (-1) * ws * Math.Cos(_beachOrientation * (Math.PI / 180.0d) -
                 //    wd * (Math.PI / 180.0d));
                 //change via MC 5/2010
-                _Vcomp = ws * Math.Sin(_beachOrientation * (Math.PI / 180.0d) -
-                    wd * (Math.PI / 180.0d));
-                _Ucomp = ws * Math.Cos(_beachOrientation * (Math.PI / 180.0d) -
-                    wd * (Math.PI / 180.0d));
+                //_Vcomp = ws * Math.Sin(_beachOrientation * (Math.PI / 180.0d) -
+                //    wd * (Math.PI / 180.0d));
+                //_Ucomp = ws * Math.Cos(_beachOrientation * (Math.PI / 180.0d) -
+                //    wd * (Math.PI / 180.0d));
                 //change via MC 5/2011
                 _Vcomp = ws * Math.Sin( (wd - _beachOrientation) * Math.PI / 180.0d);
                 _Ucomp = (-1) * ws * Math.Cos( (wd - _beachOrientation) * Math.PI / 180.0d);
@@ -235,10 +210,8 @@ namespace VBCommon.Spatial
             catch (InvalidOperationException ei) { showmessage(ei); return false; }
 
             _message = "OK";
-            return true;
-            
+            return true;            
         } 
-
 
         internal void showmessage(Exception e)
         {

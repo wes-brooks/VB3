@@ -1145,6 +1145,7 @@ namespace GALibForm
         {
             _state = _mlrState.dirty;
             _pmi = -1;
+            _modelingInfo = null;
 
             if (btnRun.Text == "Run")
             {

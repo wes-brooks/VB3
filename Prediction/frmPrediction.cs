@@ -1739,22 +1739,6 @@ namespace Prediction
                     dr["Decision_Criterion"] = dblCrit;
                     dr["Exceedance_Probability"] = lstExceedanceProbability[i];
                     dr["Regulatory_Standard"] = dblRegStd;
-                    //dr["Untransformed"] = VBCommon.Transforms.Apply.UntransformThreshold(dblPredValue, xfrmImported, dblImportedPowerTransformExp);
-
-                    /*if (dvt == VBCommon.Transforms.DependentVariableTransforms.Log10)
-                        dr["Untransformed"] = Math.Pow(10, dblPredValue);
-                    else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Ln)
-                        dr["Untransformed"] = Math.Pow(Math.E, dblPredValue);
-                    else if (dvt == VBCommon.Transforms.DependentVariableTransforms.Power)
-                    {
-                        double dblPower = (double)dictTransform["Exponent"];
-                        if (dblPower == double.NaN)
-                            dblPower = 1.0;
-
-                        dr["Untransformed"] = Math.Sign(dblPredValue) * Math.Pow(Math.Abs(dblPredValue), (1.0 / dblPower));
-                    }
-                    else //No transform
-                        dr["Untransformed"] = dblPredValue;*/
 
                     //determine if we have an error and its type
                     //No guarentee we have same num of obs as we do predictions or that we have any obs at all
@@ -1764,23 +1748,27 @@ namespace Prediction
                         DataRow[] rows = dtObs.Select("ID = '" + strId + "'");
 
                         if ((rows != null) && (rows.Length > 0))
-                        {
-                            double dblObs = VBCommon.Transforms.Apply.UntransformThreshold((double)rows[0][1], xfrmObs, dblObsPowerTransformExp);
-                            dblObs = VBCommon.Transforms.Apply.TransformThreshold(dblObs, xfrmDisplay, dblDisplayPowerTransformExp);
-                            if (rbRaw.Checked)
+                        {                  
+                            if (rows[0][1] is Double)
                             {
-                                if ((dblPredValue > dblCrit) && (dblObs < dblRegStd))
-                                    strErrType = "False Positive";
-                                else if ((dblObs > dblRegStd) && (dblPredValue < dblCrit))
-                                    strErrType = "False Negative";
+                                double dblObs = VBCommon.Transforms.Apply.UntransformThreshold((double)rows[0][1], xfrmObs, dblObsPowerTransformExp);
+                                dblObs = VBCommon.Transforms.Apply.TransformThreshold(dblObs, xfrmDisplay, dblDisplayPowerTransformExp);
+                                if (rbRaw.Checked)
+                                {
+                                    if ((dblPredValue > dblCrit) && (dblObs < dblRegStd))
+                                        strErrType = "False Positive";
+                                    else if ((dblObs > dblRegStd) && (dblPredValue < dblCrit))
+                                        strErrType = "False Negative";
+                                }
+                                else
+                                {
+                                    if ((lstExceedanceProbability[i] > dblProbThreshold) && (dblObs < dblRegStd))
+                                        strErrType = "False Positive";
+                                    else if ((dblObs > dblRegStd) && (lstExceedanceProbability[i] < dblProbThreshold))
+                                        strErrType = "False Negative";
+                                }
                             }
-                            else
-                            {
-                                if ((lstExceedanceProbability[i] > dblProbThreshold) && (dblObs < dblRegStd))
-                                    strErrType = "False Positive";
-                                else if ((dblObs > dblRegStd) && (lstExceedanceProbability[i] < dblProbThreshold))
-                                    strErrType = "False Negative";
-                            }
+                            else {strErrType = "No Obs Value"; }
                         }
                         dr["Error_Type"] = strErrType;
                     }

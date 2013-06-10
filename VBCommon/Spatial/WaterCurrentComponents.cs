@@ -9,14 +9,8 @@ namespace VBCommon.Spatial
 {
     public class WaterCurrentComponents
     {
-
         public static string _currentFlowSpeed = string.Empty;
         public static string _currentFlowDirection = string.Empty;
-
-
-
-        //public static string _currentSpeedColName = string.Empty;
-        //public static string _currentDirColName = string.Empty;
         public static double _beachOrientation = double.NaN;
         public static DataTable _dt = null;
 
@@ -31,19 +25,7 @@ namespace VBCommon.Spatial
         private string _message = string.Empty;
 
         private List<string> _ccompColNamesAdded;
-
-        //inputs
-        //public string CurrentSpeedColumnName
-        //{
-        //    set { _currentSpeedColName = value; }
-        //    get { return _currentSpeedColName; }
-        //}
-        //public string CurrentDirectionColumnName
-        //{
-        //    set { _currentDirColName = value; }
-        //    get { return _currentDirColName; }
-        //}
-
+        
         public string CurrentSpeedColName
         {
             set { _currentFlowSpeed = value; }
@@ -71,7 +53,6 @@ namespace VBCommon.Spatial
         {
             get
             {
-                //CalcValues();
                 return _UComp;
             }
         }
@@ -79,7 +60,6 @@ namespace VBCommon.Spatial
         {
             get
             {
-                //CalcValues();
                 return _VComp;
             }
         }
@@ -102,8 +82,6 @@ namespace VBCommon.Spatial
         {
             _UComp = new List<double>();
             _VComp = new List<double>();
-            //_currentSpeedColName = currentSpeedColumnName;
-            //_currentDirColName = currentDirectionColumnName;
             _currentFlowSpeed = currentSpeedColumnName;
             _currentFlowDirection = currentDirectionColumnName;
             _beachOrientation = BeachOrientation;
@@ -111,25 +89,6 @@ namespace VBCommon.Spatial
             CalcValues();
         }
 
-        /*public WaterCurrentComponents(double currentspeed, double currentdirection)
-        {
-            _UComp = new List<double>();
-            _VComp = new List<double>();
-            //VBProjectManager _proj = VBProjectManager.GetProjectManager();
-            _beachOrientation = _proj.SiteInfo.Orientation;
-
-            if (CurrentComponents(currentspeed, currentdirection))
-            {
-                _UComp.Add(_Ucomp);
-                _VComp.Add(_Vcomp);
-            }
-            else
-            {
-                _UComp = null;
-                _VComp = null;
-            }
-
-        }*/
 
         public WaterCurrentComponents(double currentspeed, double currentdirection, double beachOrientation)
         {
@@ -172,8 +131,8 @@ namespace VBCommon.Spatial
                 //_Vcomp = ws * Math.Sin( (_beachOrientation - wd + 180.0d) * (Math.PI / 180.0d) );
 
                 //change 5/19/2011 vi MC
-                _Ucomp = ws * Math.Cos( (wd - _beachOrientation) * (Math.PI / 180.0d));
-                _Vcomp = (-1) * ws * Math.Sin( (wd - _beachOrientation) * (Math.PI / 180.0d));
+                _Ucomp = (-1) * ws * Math.Cos((wd - _beachOrientation) * (Math.PI / 180.0d));
+                _Vcomp = ws * Math.Sin( (wd - _beachOrientation) * (Math.PI / 180.0d));
                
             }
             catch (FormatException ef) { showmessage(ef); return false; }
@@ -206,16 +165,10 @@ namespace VBCommon.Spatial
                 {
                     if (CurrentComponents(Convert.ToDouble(r[_currentFlowSpeed].ToString()),
                         Convert.ToDouble(r[_currentFlowDirection].ToString())))
-                    //if (CurrentComponents(Convert.ToDouble(r[_currentSpeedColName].ToString()),
-                    //    Convert.ToDouble(r[_currentDirColName].ToString())))    //&&
-                    //vWindCmponent( Convert.ToDouble( r[_windSpeedColName].ToString() ), 
-                    //Convert.ToDouble( r[_windDirColName].ToString() ) ) )
                     {
                         _UComp.Add(_Ucomp);
                         _VComp.Add(_Vcomp);
                         //update datatable
-                        //dt.Rows[i]["Current A-comp"] = (object)_Ucomp;
-                        //dt.Rows[i]["Current O-comp"] = (object)_Vcomp;
                         dt.Rows[i][colA] = (object)_Ucomp;
                         dt.Rows[i][colO] = (object)_Vcomp;
                         i++;

@@ -47,51 +47,6 @@ namespace VBCommon.Transforms
         }
 
 
-        /*protected double UntransformThreshold(double value)
-        {
-            if ((DependentVariableTransforms)this.dsControl1.DependentVariableTransform == DependentVariableTransforms.none)
-                return value;
-            else if ((DependentVariableTransforms)this.dsControl1.DependentVariableTransform == DependentVariableTransforms.Log10)
-                return Math.Pow(10, value);
-            else if ((DependentVariableTransforms)this.dsControl1.DependentVariableTransform == DependentVariableTransforms.Ln)
-                return Math.Exp(value);
-            else if ((DependentVariableTransforms)this.dsControl1.DependentVariableTransform == DependentVariableTransforms.Power)
-                return Math.Pow(value, 1 / (double)this.dsControl1.PowerTransformExponent);
-            else
-                return value;
-        }*/
-
-
-        /*public static double UntransformThreshold(double Value, DependentVariableTransforms Transform, double Exponent = 1)
-        {
-            if (Transform == DependentVariableTransforms.none)
-                return Value;
-            else if (Transform == DependentVariableTransforms.Log10)
-                return Math.Pow(10, Value);
-            else if (Transform == DependentVariableTransforms.Ln)
-                return Math.Exp(Value);
-            else if (Transform == DependentVariableTransforms.Power)
-                return Math.Pow(Value, 1 / Exponent);
-            else
-                return Value;
-        }
-
-
-        public static double TransformThreshold(double Value, DependentVariableTransforms Transform, double Exponent = 1)
-        {
-            if (Transform == DependentVariableTransforms.none)
-                return Value;
-            else if (Transform == DependentVariableTransforms.Log10)
-                return Math.Log10(Value);
-            else if (Transform == DependentVariableTransforms.Ln)
-                return Math.Log(Value);
-            else if (Transform == DependentVariableTransforms.Power)
-                return Math.Pow(Value, Exponent);
-            else
-                return Value;
-        }*/
-
-
         public static double TransformThreshold(double Value, string Transform, double Exponent = 1)
         {
             if (Transform == DependentVariableTransforms.none.ToString())

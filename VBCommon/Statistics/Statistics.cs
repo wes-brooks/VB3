@@ -258,12 +258,6 @@ namespace VBCommon.Statistics
             double correlation = deparray.Covariance(vararray) / (deparray.StandardDeviation() * vararray.StandardDeviation());
             return correlation;
         }
-
-
-        /*public static double PExceed(double prediction, double threshold, double se)
-        {
-            return NormalDistribution.Standard.DistributionFunction((prediction-threshold)/se) * 100.0d;
-        }*/
         
 
         /// <summary>

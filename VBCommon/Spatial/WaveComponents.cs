@@ -21,19 +21,16 @@ namespace VBCommon.Spatial
         {
             this._Ucomp = double.NaN;
             this._Vcomp = double.NaN;
-            this._UComp = null;
-            this._VComp = null;
             this._message = string.Empty;
             this._UComp = new List<double>();
             this._VComp = new List<double>();
         }
 
+
         public WaveComponents(double waveheight, double wavedirection, double beachOrientation)
         {
             this._Ucomp = double.NaN;
             this._Vcomp = double.NaN;
-            this._UComp = null;
-            this._VComp = null;
             this._message = string.Empty;
             this._UComp = new List<double>();
             this._VComp = new List<double>();
@@ -50,12 +47,11 @@ namespace VBCommon.Spatial
             }
         }
 
+
         public WaveComponents(DataTable DT, string waveHeightColumnName, string waveDirectionColumnName, double BeachOrientation)
         {
             this._Ucomp = double.NaN;
             this._Vcomp = double.NaN;
-            this._UComp = null;
-            this._VComp = null;
             this._message = string.Empty;
             this._UComp = new List<double>();
             this._VComp = new List<double>();
@@ -66,12 +62,13 @@ namespace VBCommon.Spatial
             this.CalcValues();
         }
 
+
         internal void CalcValues()
         {
             this._wcompColNamesAdded = new List<string>();
             DataTable table = _dt.Copy();
-            string columnName = "WaveA_comp[" + _waveHeight.ToString() + "," + _waveDirection.ToString() + "," + _beachOrientation.ToString() + "]";
-            string str2 = "WaveO_comp[" + _waveHeight.ToString() + "," + _waveDirection.ToString() + "," + _beachOrientation.ToString() + "]";
+            string columnName = "WaveA_comp[" + _waveDirection.ToString() + "," + _waveHeight.ToString() + "," + _beachOrientation.ToString() + "]";
+            string str2 = "WaveO_comp[" + _waveDirection.ToString() + "," + _waveHeight.ToString() + "," + _beachOrientation.ToString() + "]";
             table.Columns.Add(columnName, typeof(double));
             table.Columns.Add(str2, typeof(double));
             this._wcompColNamesAdded.Add(columnName);
@@ -93,7 +90,7 @@ namespace VBCommon.Spatial
                     {
                         this._UComp = null;
                         this._VComp = null;
-                        goto Label_0268;
+                        break;
                     }
                 }
             }
@@ -113,16 +110,16 @@ namespace VBCommon.Spatial
             {
                 this.showmessage(exception4);
             }
-        Label_0268:
             _dt = table;
         }
+
 
         private bool ComputeWaveComponents(double ws, double wd)
         {
             try
             {
-                this._Ucomp = ws * Math.Cos((wd - _beachOrientation) * 0.017453292519943295);
-                this._Vcomp = (-1.0 * ws) * Math.Sin((wd - _beachOrientation) * 0.017453292519943295);
+                this._Ucomp = -1 * ws * Math.Cos((wd - _beachOrientation) * Math.PI / 180.0d);
+                this._Vcomp = ws * Math.Sin((wd - _beachOrientation) * Math.PI / 180.0d);
             }
             catch (FormatException exception)
             {
@@ -148,9 +145,9 @@ namespace VBCommon.Spatial
             return true;
         }
 
-        internal void showmessage(Exception e)
-        {
-        }
+
+        internal void showmessage(Exception e) { }
+
 
         public double BeachOrientation
         {
@@ -164,6 +161,7 @@ namespace VBCommon.Spatial
             }
         }
 
+
         public DataTable DT
         {
             get
@@ -176,6 +174,7 @@ namespace VBCommon.Spatial
             }
         }
 
+
         public string Message
         {
             get
@@ -183,6 +182,7 @@ namespace VBCommon.Spatial
                 return this._message;
             }
         }
+
 
         public List<double> UComp
         {
@@ -192,6 +192,7 @@ namespace VBCommon.Spatial
             }
         }
 
+
         public List<double> VComp
         {
             get
@@ -199,6 +200,7 @@ namespace VBCommon.Spatial
                 return this._VComp;
             }
         }
+
 
         public string WaveDirectionColName
         {
@@ -212,6 +214,7 @@ namespace VBCommon.Spatial
             }
         }
 
+
         public string WaveHeightColName
         {
             get
@@ -224,12 +227,10 @@ namespace VBCommon.Spatial
             }
         }
 
+
         public List<string> WCompColNamesAdded
         {
-            get
-            {
-                return this._wcompColNamesAdded;
-            }
+            get { return this._wcompColNamesAdded; }
         }
     }
 }

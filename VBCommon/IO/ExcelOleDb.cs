@@ -142,6 +142,31 @@ namespace VBCommon.IO
 
                 if (dt != null)
                 {
+                    //Create the new datatable, datacolumn:
+                    string sColName = dt.Columns[0].ColumnName;
+                    DataTable dt2 = new DataTable();
+                    dt2.Columns.Add(new DataColumn(columnName:sColName, dataType:typeof(String)));
+
+                    //Populate the column:
+                    for (int j = 0; j < dt.Rows.Count; j++)
+                    {
+                        DataRow dr = dt2.NewRow();
+                        dr[0] = dt.Rows[j][0].ToString();
+                        dt2.Rows.Add(dr);
+                    }
+
+                    //Replace the index column in dt with the new column:
+                    dt.Columns.RemoveAt(0);
+                    dt.Columns.Add(new DataColumn(columnName: sColName, dataType: typeof(String)));
+
+                    for(int j=0; j<dt2.Rows.Count; j++)
+                    {
+                        dt.Rows[j][sColName] = dt2.Rows[j][sColName];
+                    }
+                    DataColumn dc = dt.Columns[sColName];
+                    dc.SetOrdinal(0);
+
+                    //Return the result
                     return dt;
                 }
                 else

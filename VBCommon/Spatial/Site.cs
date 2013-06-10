@@ -10,16 +10,11 @@ namespace VBCommon.Spatial
     [Serializable] 
     public class Site : VBCommon.Interfaces.IBeachSite
     {
-       
-
-
-        //private PointGeo _locationCenter;
         private PointGeo _markerLeft;
         private PointGeo _markerRight;
         private double _orientation = Double.NaN;
         private PointGeo _watermarker;
         private PointGeo _location;
-        //private string _project;
         private string _name = "";
 
         public Site()
@@ -29,12 +24,6 @@ namespace VBCommon.Spatial
             _markerRight = new PointGeo();
             _watermarker = new PointGeo();
         }
-
-        //public string Project
-        //{
-        //    get { return _project; }
-        //    set { _project = value; }
-        //}
 
         public PointGeo Location
         {
@@ -93,8 +82,6 @@ namespace VBCommon.Spatial
             site.WaterMarker.Longitude = _watermarker.Longitude;
 
             return site;
-
-        }
-        
+        }        
     }
 }

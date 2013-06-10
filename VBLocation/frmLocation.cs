@@ -980,24 +980,17 @@ namespace VBLocation
                 string addMarker = "Add Water Marker";
                 string removeMarker = "Remove Water Marker";
 
-                //GMap.NET.Point pointH2O = new GMap.NET.Point();
                 GMap.NET.Point pointH20 = new GMap.NET.Point();
-                //GMapNET.Point pointPerpendicular = new GMapNET.Point();
-                //GMap.NET.Point pointPerpendicular = new GMap.NET.Point();
                 if (btnSelectWater.Text == addMarker)
                 {
                     waterMarker = new GMapMarkerGoogleGreen(currentMarker.Position);
-                    //waterMarker = new GMapMarkerGoogleGreen(MainMap.CurrentPosition);
-                    //MainMap.Markers.Add(waterMarker);
                     top.Markers.Add(waterMarker);
                     btnSelectWater.Text = removeMarker;
                     pointH20 = MainMap.FromLatLngToLocal(waterMarker.Position);
-                    //pointPerpendicular = CoordinatePerpendicular();
                 }
                 else
                 {
                     btnSelectWater.Text = addMarker;
-                    //MainMap.Markers.Remove(waterMarker);
                     top.Markers.Remove(waterMarker);
                     waterMarker = null;
                     txtBeachAngle.Text = string.Empty;
@@ -1008,28 +1001,15 @@ namespace VBLocation
                 GMap.NET.Point pointA = MainMap.FromLatLngToLocal(firstBeachMarker.Position);
                 GMap.NET.Point pointB = MainMap.FromLatLngToLocal(secondBeachMarker.Position);
                 GMap.NET.Point pointWM = MainMap.FromLatLngToLocal(waterMarker.Position);
-                //GMapNET.Point pointA = MainMap.FromLatLngToLocal(firstBeachMarker.Position);
-                //GMapNET.Point pointB = MainMap.FromLatLngToLocal(secondBeachMarker.Position);
 
                 int side = CoordinatePerpendicular();
-
-                ////rotate marker points thru -pi/2 since we want due N as zero
-                //GMap.NET.Point Aprime = rotatePt(-Math.PI / 2, pointA);
-                //GMap.NET.Point Bprime = rotatePt(-Math.PI / 2, pointB);
-                //GMap.NET.Point WMprime = rotatePt(-Math.PI / 2, pointWM);
 
                 //returns negative angles ccw from pos x axis thru -pi (quads I and II),
                 //returns positive angles cw from pos x axis thru pi (quads IV and III)
                 double angle = Math.Atan2(pointB.Y - pointA.Y, pointB.X - pointA.X);
                 double deg = RadianToDegree((float)angle);
-                //double angle = Math.Atan2(Bprime.Y - Aprime.Y, Bprime.X - Aprime.X);
-                //double deg = RadianToDegree((float)angle);
-                
 
                 //slope
-                //double deltaX = Bprime.X - Aprime.X;
-                //double slope = double.NaN;
-                //if (deltaX != 0) slope = (Bprime.Y - Aprime.Y) / deltaX;
                 double deltaX = pointB.X - pointA.X;
                 double slope = double.NaN;
                 if (deltaX != 0) slope = (pointB.Y - pointA.Y) / deltaX;
@@ -1065,22 +1045,21 @@ namespace VBLocation
                 {
                     deg = deg - 90.0;                  
                 }
-
-
+                
                 txtBeachAngle.Text = deg.ToString("####0.##");
 
                 _site = new Site();
                 _site.Orientation = deg;
                 _site.Location.Latitude = Convert.ToDouble(textBoxCurrLat.Text);
                 _site.Location.Longitude = Convert.ToDouble(textBoxCurrLng.Text);
-                _site.LeftMarker.Latitude = firstBeachMarker.Position.Lat;//marker1.Lat;
-                _site.LeftMarker.Longitude = firstBeachMarker.Position.Lng;//marker1.Long;
+                _site.LeftMarker.Latitude = firstBeachMarker.Position.Lat;
+                _site.LeftMarker.Longitude = firstBeachMarker.Position.Lng;
  
-                _site.RightMarker.Latitude = secondBeachMarker.Position.Lat;//marker2.Lat;
-                _site.RightMarker.Longitude = secondBeachMarker.Position.Lng;//marker2.Long;
+                _site.RightMarker.Latitude = secondBeachMarker.Position.Lat;
+                _site.RightMarker.Longitude = secondBeachMarker.Position.Lng;
  
-                _site.WaterMarker.Latitude = waterMarker.Position.Lat;//watermark.Lat;
-                _site.WaterMarker.Longitude = waterMarker.Position.Lng;//watermark.Long;
+                _site.WaterMarker.Latitude = waterMarker.Position.Lat;
+                _site.WaterMarker.Longitude = waterMarker.Position.Lng;
 
                 if (LocationFormEvent != null)
                 {
@@ -1210,15 +1189,12 @@ namespace VBLocation
                 if (waterMarker != null)
                 {
                     double angle = Math.Atan2(pointB.Y - pointA.Y, pointB.X - pointA.X);
-                    //Console.Write("**MAngle = " + angle + "\n");
                     Matrix matrix = new Matrix();
 
                     float deg = RadianToDegree((float)angle);
                     double dist = Math.Sqrt((Math.Pow(pointA.Y - pointB.Y, 2) + Math.Pow(pointA.X - pointB.X, 2)));
-                    //Console.Write("**MDist = " + dist + "\n");
                     PointF rotPoint = new PointF(pointA.X, pointA.Y);
                     int side = CoordinatePerpendicular();
-                    //Console.Write("**MSide = " + side + "\n");
                     matrix.RotateAt(deg, rotPoint);
 
                     LinearGradientBrush lgb = null;
@@ -1237,14 +1213,8 @@ namespace VBLocation
                     // the gradient is still wrong....
                     if (rect.Width > 0 && rect.Height > 0)
                     {
-                        //lgb = new LinearGradientBrush(rect, Color.LightBlue, Color.DarkBlue, LinearGradientMode.Vertical);
                         g.Transform = matrix;
-                        //LinearGradientBrush lgb = new LinearGradientBrush(rect, Color.DarkBlue, Color.LightBlue, LinearGradientMode.Vertical);
-                        //pen = new Pen(Color.Blue);
                         g.FillRectangle(lgb, rect);
-                        //g.DrawRectangle(pen, pointA.X, pointA.Y, Convert.ToInt32(dist), (Convert.ToInt32(dist / 2)));
-                        //pointMid.X = (pointA.X + pointB.X) / 2;
-                        //pointMid.Y = (pointA.Y + pointB.Y) / 2;
                         g.ResetTransform();
                     }
                 }
@@ -1252,7 +1222,6 @@ namespace VBLocation
         }
 
 
-        //private GMapNET.Point CoordinatePerpendicular()
         private int CoordinatePerpendicular()
         {
             GMap.NET.Point pointA = new GMap.NET.Point();
@@ -1262,7 +1231,6 @@ namespace VBLocation
             {
                 pointA.X = -1;
                 pointA.Y = -1;
-                //return pointA;
                 return -999;
             }
 
@@ -1292,8 +1260,7 @@ namespace VBLocation
 
                 double b = (double)pointA.Y - (slope * (double)pointA.X);
                 double bNew = (double)pointH20.Y - (slope * (double)pointH20.X);
-
-
+                
                 if (bNew > b)
                     side = 1;
                 else
@@ -1326,14 +1293,7 @@ namespace VBLocation
                 return;
             }
 
-
             stations.Markers.Clear();
-
-            //if (_projMgr.SiteInfo.Project != "" || _projMgr.SiteInfo.Project != null)
-            //{
-                // _projMgr.SiteInfo.Location.Latitude = Convert.ToDouble(textBoxCurrLat.Text.ToString());
-                // _projMgr.SiteInfo.Location.Longitude = Convert.ToDouble(textBoxCurrLng.Text.ToString());
-            //}
 
             double minX = MainMap.CurrentViewArea.Left;
             double minY = MainMap.CurrentViewArea.Bottom;

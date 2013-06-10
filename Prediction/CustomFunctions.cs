@@ -184,8 +184,8 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double WaveA_comp(double waveDirection, double waveMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WindComponents wndCmp = new VBCommon.Spatial.WindComponents(waveMagnitude, waveDirection, beachOrientation);
-            double dblRetVal = wndCmp._Ucomp;
+            VBCommon.Spatial.WaveComponents waveCmp = new VBCommon.Spatial.WaveComponents(waveMagnitude, waveDirection, beachOrientation);
+            double dblRetVal = waveCmp._Ucomp;
             return dblRetVal;
         }
 
@@ -193,8 +193,8 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double WaveO_comp(double waveDirection, double waveMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WindComponents wndCmp = new VBCommon.Spatial.WindComponents(waveMagnitude, waveDirection, beachOrientation);
-            double dblRetVal = wndCmp._Vcomp;
+            VBCommon.Spatial.WaveComponents waveCmp = new VBCommon.Spatial.WaveComponents(waveMagnitude, waveDirection, beachOrientation);
+            double dblRetVal = waveCmp._Vcomp;
             return dblRetVal;
         }
     }

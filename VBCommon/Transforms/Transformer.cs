@@ -5,7 +5,6 @@ using System.Text;
 using System.Data;
 using System.Collections;
 
-//namespace VBDatasheet
 namespace VBCommon.Transforms
 {
     public class Transformer
@@ -41,28 +40,28 @@ namespace VBCommon.Transforms
         //see Mike Cyterski, VB2 PI for a validation/explanation of these rules.
 
         public const double nearzero = 1.0e-21;
-        //private const double nearzero = double.MinValue;
-
-        //private double[] _tarray = null;
         private double[] _data = null;
-        //private static string _message = string.Empty;
         private string _message = string.Empty;
         private double _exponent = double.NaN;
         private double _minnonzero = double.NaN;
         
 
-        public Transformer()
-        {
-        }
+        public Transformer() { }
+
+
         public Transformer(double value)
         {
             _data = new double[1];
             _data[0] = value;
         }
+
+
         public Transformer(double[] data)
         {
             _data = data;
         }
+
+
         public Transformer(DataTable dt, int colndx, double exponent)
         {
             int r = -1;
@@ -83,6 +82,8 @@ namespace VBCommon.Transforms
                     + dt.Rows[r][colndx].ToString() + " in column index " + colndx + ": " + e.Message;
             }
         }
+
+
         public Transformer(DataTable dt, int colndx)
         {
             int r = -1;
@@ -121,71 +122,73 @@ namespace VBCommon.Transforms
             }
         }
 
+
         public double MinNonZero
         {
             get { return _minnonzero; }
         }
+
 
         public double Exponent
         {
             get { return _exponent; }
         }
 
+
         public string Message
         {
             get { return _message; }
         }
+
 
         public double[] INVERSE
         {
             get { return transformInverse(); }
         }
 
+
         public double[] LOG10
         {
             get { return transformLog10(); }
         }
 
-        //public double[] ANTILOG10
-        //{
-        //    get { return transformantiLog10(); }
-        //}
-
-        //public double[] ANTILn
-        //{
-        //    get { return transformantiLn(); }
-        //}
 
         public double[] LOGE
         {
             get { return transformLogE(); }
         }
 
+
         public double[] SQUAREROOT
         {
             get { return transformSquareRoot(); }
         }
+
 
         public double[] SQUARE
         {
             get { return transformSquare(); }
         }
 
+
         public double[] QUARTICROOT
         {
             get { return transformQuarticRoot(); }
         }
+
 
         public double[] NONE
         {
             get { return _data; }
         }
 
+
         public double[] REALSQUARE
         {
             //cuz sometimes you just want one
             get { return transformRealSquare(); }
         }
+
 
         public double[] POWER
         {
@@ -204,73 +207,28 @@ namespace VBCommon.Transforms
         }
 
 
-
-        //private double[] transformantiLog10()
-        //{
-        //    {
-        //        double[] tarray = new double[_data.Length];
-        //        for (int i = 0; i < _data.Length; i++)
-        //        {
-        //            try
-        //            {
-        //                tarray[i] = Math.Pow(10.0d, Math.Abs(_data[i]));
-        //            }
-        //            catch (Exception e)
-        //            {
-        //                //Console.WriteLine("Trouble transforming " + newcolname + " skipping..." + e.Message);
-        //                _message = "Cannot transform anti-Log10( value = " + _data[i] + " ) at position " + i + ": " + e.Message;
-        //                return null;
-        //            }
-        //        }
-        //        return tarray;
-        //    }
-        //}
-
-        //private double[] transformantiLn()
-        //{
-        //    double[] tarray = new double[_data.Length];
-        //    for (int i = 0; i < _data.Length; i++)
-        //    {
-        //        try
-        //        {
-        //            tarray[i] = Math.Pow(Math.E, Math.Abs(_data[i]));
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            //Console.WriteLine("Trouble transforming " + newcolname + " skipping..." + e.Message);
-        //            _message = "Cannot transform anti-Ln( value = " + _data[i] + " ) at position " + i + ": " + e.Message;
-        //            return null;
-        //        }
-        //    }
-        //    return tarray;
-        //}
-
         private double[] transformPower()
         {
             double[] tarray = new double[_data.Length];
-            //bool skiptrans = zeroCount();
+
             for (int i = 0; i < _data.Length; i++)
             {
-
                 try
                 {
                     tarray[i] = Math.Sign(_data[i]) * Math.Pow(Math.Abs(_data[i]), _exponent);
                 }
-
                 catch (Exception e)
                 {
-                    //Console.WriteLine("Trouble transforming " + newcolname + " skipping..." + e.Message);
                     _message = "Cannot transform Power( value = " + _data[i] + " ) at position " + i + ": " + e.Message;
                     return null;
                 }
-
             }
             return tarray;
         }
 
+
         private double[] transformRealSquare()
         {
-            //throw new NotImplementedException();
             double[] tarray = new double[_data.Length];
             for (int i = 0; i < _data.Length; i++)
             {
@@ -289,9 +247,9 @@ namespace VBCommon.Transforms
             return tarray;
         }
 
+
         private double[] transformInverse()
         {
-            //double minNonZero = double.NaN;
             double [] tarray = new double[_data.Length];
             double minNonZero = double.NaN;
             bool skiptrans = zeroCount();
@@ -302,7 +260,6 @@ namespace VBCommon.Transforms
 
                 for (int i = 0; i < _data.Length; i++)
                 {
-
                     try
                     {
                         if (Math.Abs(Convert.ToDouble(_data[i])) < nearzero)
@@ -324,9 +281,8 @@ namespace VBCommon.Transforms
                 }
             }
             return tarray;
-            
-
         }
+
 
         private double[] transformLogE()
         {
@@ -340,13 +296,11 @@ namespace VBCommon.Transforms
                     {
                         if (Math.Abs(_data[i]) < 1.0d)
                         {
-                            //return null;
                             tarray[i] = 0.0d;
                         }
                         else
                         {
                             tarray[i] = Math.Sign(_data[i]) * Math.Log(Math.Abs(_data[i]));
-                            //if (Math.Abs(tarray[i]) < 1.0d) tarray[i] = 0.0d;
                         }
                     }
                     catch (Exception e)
@@ -360,6 +314,7 @@ namespace VBCommon.Transforms
             return tarray;
         }
 
+
         private double[] transformLog10()
         {
             double[] tarray = new double[_data.Length];
@@ -372,13 +327,11 @@ namespace VBCommon.Transforms
                     {
                         if (Math.Abs(_data[i]) < 1.0d)
                         {
-                            //return null;
                             tarray[i] = 0.0d;
                         }
                         else
                         {
                             tarray[i] = Math.Sign(_data[i]) * Math.Log10(Math.Abs(_data[i]));
-                            //if (Math.Abs(tarray[i]) < 1.0d) tarray[i] = 0.0d;
                         }
                     }
                     catch (Exception e)
@@ -391,6 +344,7 @@ namespace VBCommon.Transforms
             }
             return tarray;
         }
+
 
         private double[] transformSquare()
         {
@@ -412,6 +366,7 @@ namespace VBCommon.Transforms
             return tarray;
         }
 
+
         private double[] transformQuarticRoot()
         {
             double[] tarray = new double[_data.Length];
@@ -432,6 +387,7 @@ namespace VBCommon.Transforms
             return tarray;
         }
 
+
         private double[] transformSquareRoot()
         {
             double [] tarray = new double[_data.Length];
@@ -449,6 +405,7 @@ namespace VBCommon.Transforms
             }
             return tarray;
         }
+        
 
         public double INVERSEsv(double input)
         {
@@ -470,17 +427,15 @@ namespace VBCommon.Transforms
 
             catch (Exception e)
             {
-                //Console.WriteLine("Trouble transforming " + newcolname + " skipping..." + e.Message);
                 _message = "Cannot transform Inverse( value = " + input + " ) " + e.Message;
                 return double.NaN;
             }
-
             return retval;
         }
 
+
         private double closestToZero()
         {
-
             //don't want minimum; want value closest to zero
             double negmax;
             double posmin;
@@ -488,7 +443,6 @@ namespace VBCommon.Transforms
             try
             {
                 var posminval = (from x in _data
-                                 //where (double)x != 0.0
                                  where (double)x > 0.0
                                  select x).Min();
                 posmin = (double)posminval;
@@ -498,7 +452,6 @@ namespace VBCommon.Transforms
                 posmin = double.NaN;
             }
 
-
             try
             {
                 var negmaxval = (from x in _data
@@ -506,32 +459,26 @@ namespace VBCommon.Transforms
                                  select x).Max();
                 negmax = (double)negmaxval;
             }
-
             catch (InvalidOperationException)
             {
                 negmax = double.NaN;
             }
 
-
-            //if (posmin != double.NaN && negmax != double.NaN)
-            if (! posmin.Equals(double.NaN) && ! negmax.Equals(double.NaN)) // != double.NaN && negmax != double.NaN)
+            if (! posmin.Equals(double.NaN) && ! negmax.Equals(double.NaN))
             {
                 return posmin < Math.Abs(negmax) ? posmin/2.0d : negmax/2.0d;
-                //return closest;
             }
-            //else if (posmin == double.NaN && negmax != double.NaN)
             else if (posmin.Equals(double.NaN) && ! negmax.Equals(double.NaN))
             {
                 return negmax/2.0d;
             }
-            //else if (posmin != double.NaN && negmax == double.NaN)
-            else if (! posmin.Equals(double.NaN) && negmax.Equals(double.NaN)) // == double.NaN)
+            else if (! posmin.Equals(double.NaN) && negmax.Equals(double.NaN))
             {
                 return posmin/2.0d;
             }
             else { return nearzero/2.0d; }
-
         }
+
 
         private bool zeroCount()
         {
@@ -542,14 +489,12 @@ namespace VBCommon.Transforms
                 _message = "Zero count exceeds maximum (>10% row count).";
                 return true;
             }
-
             else
             {
                 _message = "";
                 return false;
 
             }
-        }
-        
+        }        
     }
 }
