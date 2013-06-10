@@ -30,6 +30,7 @@ namespace IPyModeling
         private static double dblProgressRangeLow, dblProgressRangeHigh;
         public delegate void ModelProgressEventDelegate(string message, double progress);
         public delegate void ModelValidationCompleteDelegate(dynamic result);
+        public delegate void ModelCancelledDelegate(string message);
         protected bool bAnticipatingModel = false;
         protected bool bAllowUpdateData = true;
 
@@ -780,7 +781,8 @@ namespace IPyModeling
 
             //Run the IronPython model-building code, then call PopulateResults to display the coefficients and the decision threshold.
             ModelValidationCompleteDelegate callbackDelegate = new ModelValidationCompleteDelegate(ModelingComplete);
-            ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod, callback: callbackDelegate);
+            ModelCancelledDelegate cancellationDelegate = new ModelCancelledDelegate(CancellationCallback);
+            ipyInterface.Validate(tblData, strTarget, dblThreshold, dblSpecificity, method: strMethod, callback: callbackDelegate, cancellationCallback:cancellationDelegate);
 
             bAnticipatingModel = true;
         }
@@ -876,9 +878,16 @@ namespace IPyModeling
                 ModelingCanceledEvent(this, args);
             }
 
+            ipyInterface.CancelModel();
             VBLogger.GetLogger().LogEvent("Model building was cancelled on the " + strMethod + " plugin.");
             VBLogger.GetLogger().LogEvent("100", Globals.messageIntent.UserOnly, Globals.targetSStrip.ProgressBar);
             Cursor.Current = Cursors.Default;
+        }
+
+
+        public void CancellationCallback(string Message)
+        {
+            System.Windows.Forms.MessageBox.Show(Message);
         }
 
 

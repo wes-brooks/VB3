@@ -39,6 +39,9 @@ from IronPython.virtualbeach import utils
 from IronPython.virtualbeach.utils import UIThread, BGThread
 import IronPython.virtualbeach.BeachController as Control
 
+import System.Threading
+from System.Threading import SynchronizationContext, WaitCallback, ThreadPool, SendOrPostCallback, CancellationToken, CancellationTokenSource
+from System import OperationCanceledException
 
 class BeachInterface(object):
     def __init__(self):
@@ -46,11 +49,11 @@ class BeachInterface(object):
         self.ProgressEvent = utils.ProgressEvent()
         Control.ProgressEvent += self.HandleProgressEvent
         Control.ModelValidationCompleteEvent += self.HandleModelValidationCompleteEvent
+        Control.ModelCancelledEvent += self.HandleModelCancelledEvent
 
         
-    def Validate(self, data, target, threshold, specificity='', folds='', method='PLS', callback='', **args):
-        '''This is the main function in the script. It uses the PLS modeling classes to build a predictive model.'''
-        
+    def Validate(self, data, target, threshold, specificity='', folds='', method='PLS', callback='', cancellationCallback='', **args):
+        '''This is the main function in the script. It uses the PLS modeling classes to build a predictive model.'''        
         #parse the inputs
         target = str(target)
         
@@ -59,10 +62,19 @@ class BeachInterface(object):
         combined = summary = []
         columns = ['specificity', 'true pos', 'true neg', 'false pos', 'false neg', 'total']
         
+        #Generate a new CancellationTokenSource that can be used to cancel the modeling operation.
+        self.tokensource = CancellationTokenSource()
+        token = self.tokensource.Token
+        
         #parse the modeling method and then call it
         Validate = getattr(Control, "Validate" + method)
-        result = Validate(data, target, threshold, specificity, folds, callback, **args)
+        result = Validate(data, target, threshold, specificity, folds, callback, cancellationCallback, token, **args)
         
+        
+    def CancelModel(self):
+        try: self.tokensource.Cancel()
+        except NameError: pass
+
 
     def SpecificityChart(self, validation_results):
         '''Just relay this call directly to the Controller.'''
@@ -141,5 +153,10 @@ class BeachInterface(object):
     def HandleModelValidationCompleteEvent(self, result='', callback=''):
         callback(result)
     
+    @utils.UIThread
+    def HandleModelCancelledEvent(self, message='', callback=''):
+        callback(message)
+
+
 Interface = BeachInterface()
 

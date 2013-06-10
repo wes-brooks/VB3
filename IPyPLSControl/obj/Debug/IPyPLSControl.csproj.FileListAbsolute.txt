@@ -49,6 +49,5 @@ C:\VB3\bin\Debug\Binaries\IPyPLSControl\IPyPLSControl.pdb
 C:\VB3\IPyPLSControl\obj\Debug\IPyPLSControl.IPyPLSControl.resources
 C:\VB3\IPyPLSControl\obj\Debug\IPyPLSControl.dll
 C:\VB3\IPyPLSControl\obj\Debug\IPyPLSControl.pdb
-C:\VB3\IPyPLSControl\obj\Debug\ResolveAssemblyReference.cache
-C:\VB3\IPyPLSControl\obj\Debug\GenerateResource.read.1.tlog
-C:\VB3\IPyPLSControl\obj\Debug\GenerateResource.write.1.tlog
+C:\VB3\IPyPLSControl\obj\Debug\IPyPLSControl.csprojResolveAssemblyReference.cache
+C:\VB3\IPyPLSControl\obj\Debug\IPyPLSControl.csproj.GenerateResource.Cache

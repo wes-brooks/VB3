@@ -80,19 +80,16 @@ namespace CrossValidation
                 _progBar.Step = 1;
             }
 
-            MLRDataManager projMgr = MLRDataManager.GetDataManager();
-            
+            MLRDataManager projMgr = MLRDataManager.GetDataManager();            
             DataTable dt = projMgr.ModelDataTable;
             if (dt == null)
                 throw new Exception("Model data table is null.");
 
             _validatedModels = new MSEP[_models.Count];
 
-            //
             for (int i = 0; i < _models.Count; i++)
             {                
-                //string[] indepVars = projMgr.GetIndependentVariableList(_models[i].Chromosome);
-                string[] indepVars = _models[i].Chromosome.ToArray();
+                string[] indepVars = _models[i].Chromosome.Where(x => x != "").ToArray();
                 _validatedModels[i] = new MSEP(_models[i], 0, indepVars);
             }
 
@@ -115,47 +112,25 @@ namespace CrossValidation
                 {
                     int idx = indexList[j];
                     dtTesting.ImportRow(dtTraining.Rows[idx]);
-                    // dtTesting.Rows.Add(dtTraining.Rows[idx]);
                     dtTraining.Rows[idx].Delete();
                 }
 
-                //foreach (IIndividual model in _models)
                 for (int j = 0; j < _validatedModels.Length; j++)
-                {
                     CrossValidateSingleModel(_validatedModels[j], dtTraining, dtTesting, indexList);
-                }
             }
 
             for (int i = 0; i < _validatedModels.Length; i++)
-            {
                 _validatedModels[i].msep = _validatedModels[i].msep / (double)_numIterations;
-            }
         }
+
 
         private void CrossValidateSingleModel(MSEP msepObjIn, DataTable dtTraining, DataTable dtTesting, List<int> indexList)
         {
-            double sumMSEP = 0;
-            double avgMSEP = 0;
-
-            //DataTable dtTraining = dt.Copy();
-            //DataTable dtTesting = dt.Clone();
             IIndividual model = msepObjIn.Model;
-
-            //string[] indepVars = new string[model.Chromosome.Count];
-            string[] indepVars = msepObjIn.IndependentVariables;
-
-            for (int i = 0; i < indepVars.Length; i++)
-            {
-                if (indepVars[i].Contains("coli"))
-                {
-                    string tmp = indepVars[i];
-                }
-            }
-
-            string depVar = dtTraining.Columns[1].ColumnName;
-
-            
+            string[] indepVars = msepObjIn.IndependentVariables;            
+            string depVar = dtTraining.Columns[1].ColumnName;            
             MultipleRegression mr = null;
+
             try
             {
                 mr = new MultipleRegression(dtTraining, depVar, indepVars);
@@ -163,7 +138,7 @@ namespace CrossValidation
             }
             catch (Exception e)
             {
-                //continue;
+                //continue
             }
 
             double msep = 0;
@@ -176,23 +151,12 @@ namespace CrossValidation
             }
 
             msep = msep / (double)numTestingRows;
-
             msepObjIn.msep += msep;
-            //sumMSEP += msep;
-
-            //avgMSEP = sumMSEP / (double)_numIterations;
-
-            
-            //return msepObj;
-
-            //_validatedModels.Add(msepObj);
-            
         }
 
 
         private List<int> RandList(int sampleSize, int numObservations)
         {
-
             int[] numList = new int[numObservations];
             List<int> sampledValues = new List<int>(sampleSize);
 
@@ -213,11 +177,7 @@ namespace CrossValidation
             }
 
             sampledValues.Sort();
-
             return sampledValues;
         }
-
-
-
     }
 }

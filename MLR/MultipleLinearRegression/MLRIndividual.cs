@@ -237,10 +237,9 @@ namespace MultipleLinearRegression
         /// </summary>
         public void Initialize()
         {
-            //Dictionary<short, short> genes = new Dictionary<short, short>();
-            List<string> genes = new List<string>();
-            short geneVal = -1;
+            List<string> genes = new List<string>();            
             List<string> listIVsDomain = MLRDataManager.GetDataManager().ModelFieldList;
+            short geneVal = -1;
 
             for (int i = 0; i < _chromosome.Count; i++)
             {
@@ -249,7 +248,6 @@ namespace MultipleLinearRegression
 
                 if (geneVal > 0)
                 {
-                    //while (genes.ContainsKey(geneVal))
                     while (genes.Contains(listIVsDomain[geneVal-1]))
                     {
                         geneVal = (short)RandomNumbers.NextInteger(_maxGeneValue+1);
@@ -267,7 +265,6 @@ namespace MultipleLinearRegression
 
                 if (geneVal > 0)
                 {
-                    //genes.Add(geneVal, geneVal);
                     genes.Add(listIVsDomain[geneVal - 1]);
                     _chromosome[i] = listIVsDomain[geneVal - 1];
                 }
@@ -322,8 +319,7 @@ namespace MultipleLinearRegression
                 _Press = mlr.Press;
                 _RMSE = mlr.RMSE;
                 _VIF = mlr.MaxVIF;
-                ;
-
+                
                 _parameters = mlr.Parameters;
                 _predictedValues = mlr.PredictedValues;
                 _observedValues = mlr.ObservedValues;
@@ -393,7 +389,6 @@ namespace MultipleLinearRegression
                 {
                     throw new Exception("Invalid Fitness Criteria: " + _fitness);
                 }
-
             }
             catch (Exception e)
             {
@@ -401,9 +396,9 @@ namespace MultipleLinearRegression
             }
         }
 
+
         public bool IsViable()
         {
-            int sumGenes = 0;
             if (_cantCompute)
                 return false;
 
@@ -416,15 +411,12 @@ namespace MultipleLinearRegression
 
             //Check for duplicate covariates
             List<string> genes = new List<string>();
-            //Dictionary<short, short> genes = new Dictionary<short, short>();
             for (int i = 0; i < _chromosome.Count; i++)
             {
                 
                 if (_chromosome[i] != "")
                 {
-                    //sumGenes += _chromosome[i];
                     if (!genes.Contains(_chromosome[i]))
-                        //genes.Add(_chromosome[i], _chromosome[i]);
                         genes.Add(_chromosome[i]);
                     else
                         return false;
@@ -437,8 +429,8 @@ namespace MultipleLinearRegression
 
             return true;
         }
-
         #endregion
+
 
         public DataTable Parameters
         {

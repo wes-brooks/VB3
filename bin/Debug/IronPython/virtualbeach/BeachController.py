@@ -12,12 +12,13 @@ boosting_iterations = 2000
 
 ProgressEvent = utils.ProgressEvent()
 ModelValidationCompleteEvent = utils.ModelValidationCompleteEvent()
+ModelCancelledEvent = utils.ModelCancelledEvent()
 
 from utils import UIThread, BGThread
     
 
 @BGThread
-def ValidatePLS(data, target, threshold, specificity, folds='', callback='', **args):
+def ValidatePLS(data, target, threshold, specificity, folds='', callback='', cancellationCallback='', canceltoken='', **args):
     '''Creates a PLS model and tests its performance with cross-validation.'''
     
     #convert the data from a .NET DataTable or DataView into a numpy array
@@ -34,6 +35,8 @@ def ValidatePLS(data, target, threshold, specificity, folds='', callback='', **a
     #Make a model for each fold and validate it.
     results = list()
     for f in folds:
+        if canceltoken.IsCancellationRequested: break
+        
         model_data = [data[i] for i in range(len(data)) if fold[i]!=f]
         validation_data = [data[i] for i in range(len(data)) if fold[i]==f]
         
@@ -87,18 +90,17 @@ def ValidatePLS(data, target, threshold, specificity, folds='', callback='', **a
             try: threshold.append(max([x for x in fitted if x <= prediction]))
             except: threshold.append(max(fitted))
         
-        #spec = np.array(spec)
-        #sensitivity = np.array(sensitivity)
         ProgressEvent(message="Model " + str(f) + " of " + str(folds[-1]) + " validated.", progress=float(f)/len(folds))
-        
-        #tpos = np.array(tpos)
-        #tneg = np.array(tneg)
-        #fpos = np.array(fpos)
-        #fneg = np.array(fneg)
         
         result = dict(threshold=threshold, sensitivity=sensitivity, specificity=spec, tpos=tpos, tneg=tneg, fpos=fpos, fneg=fneg )
         results.append(result)
 
+    if canceltoken.IsCancellationRequested:
+        print "cancelled PLS"
+        if not callback: return (results, model)
+        else: ModelCancelledEvent(message="cancelled PLS", callback=cancellationCallback)
+        return
+    
     model = pls.Model(data=data_dict, target=target, threshold=regulatory, specificity=specificity, **args)
     
     if not callback: return (results, model)
@@ -106,7 +108,7 @@ def ValidatePLS(data, target, threshold, specificity, folds='', callback='', **a
     
     
 @BGThread
-def ValidateGBM(data, target, threshold, specificity, folds='', callback='', **args):
+def ValidateGBM(data, target, threshold, specificity, folds='', callback='', cancellationCallback='', canceltoken='', **args):
     '''Creates a GBM model and tests its performance with cross-validation.'''
     
     #convert the data from a .NET DataTable or DataView into a numpy array
@@ -123,6 +125,8 @@ def ValidateGBM(data, target, threshold, specificity, folds='', callback='', **a
     #Make a model for each fold and validate it.
     results = list()
     for f in folds:
+        if canceltoken.IsCancellationRequested: break
+        
         model_data = [data[i] for i in range(len(data)) if fold[i]!=f]
         validation_data = [data[i] for i in range(len(data)) if fold[i]==f]
         
@@ -177,6 +181,12 @@ def ValidateGBM(data, target, threshold, specificity, folds='', callback='', **a
         result = dict(threshold=threshold, sensitivity=sensitivity, specificity=spec, tpos=tpos, tneg=tneg, fpos=fpos, fneg=fneg )
         results.append(result)
 
+    if canceltoken.IsCancellationRequested:
+        print "cancelled GBM"
+        if not callback: return (results, model)
+        else: ModelCancelledEvent(message="cancelled GBM", callback=cancellationCallback)
+        return
+    
     model = gbm.Model(data=data_dict, target=target, threshold=regulatory, specificity=specificity, **args)
     
     if not callback: return (results, model)

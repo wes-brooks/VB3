@@ -198,8 +198,8 @@ namespace GALib
 
             List<IIndividual> newList = Util.CloneRange(list, 0, count);
             return newList;
-
         }
+
 
         /// <summary>
         /// Generate next generation of individuals - i.e. crossover and mutate
@@ -215,6 +215,7 @@ namespace GALib
             Crossover();
             Mutation();
         }
+
 
         private void Crossover()
         {
@@ -232,8 +233,8 @@ namespace GALib
             {
                 iParent1 = _selector.Select(_population);
                 iParent2 = _selector.Select(_population);
-                //Dont want to select the same individual to crossover with itself
-                while (iParent1 == iParent2)
+
+                while (iParent1 == iParent2) //Dont want to select the same individual to crossover with itself
                 {
                     iParent2 = _selector.Select(_population);
                 }
@@ -257,6 +258,7 @@ namespace GALib
             _population = list;
         }
 
+
         private void Mutation()
         {
             if (_mutator == null)
@@ -267,6 +269,7 @@ namespace GALib
                 _mutator.Mutate(_population[i]);
             }
         }
+
 
         /// <summary>
         /// Remove non viable members of the population
@@ -280,6 +283,7 @@ namespace GALib
             }
         }
 
+
         /// <summary>
         /// Add an individual to the population
         /// </summary>
@@ -290,11 +294,13 @@ namespace GALib
                 _population.Add(individual);
         }
 
+
         public IIndividual this[int index]
         {
             get { return _population[index]; }
             set { _population[index] = value; }
         }
+
 
         public void ReplaceLeastFit(List<IIndividual> list)
         {
@@ -310,10 +316,10 @@ namespace GALib
             }
         }
 
+
         public List<IIndividual> Distinct()
         {
             List<IIndividual> list = Util.Distinct(_population);
-            //List<IIndividual> list = _population.Distinct(_chromosomeComparer).ToList();
             return list;            
         }
     }

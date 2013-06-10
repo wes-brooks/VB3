@@ -22,6 +22,5 @@ C:\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmMissingValues.resources
 C:\VB3\MLR\VBControls\obj\x86\Debug\VBControls.frmVariableSpecification.resources
 C:\VB3\MLR\VBControls\obj\x86\Debug\VBControls.dll
 C:\VB3\MLR\VBControls\obj\x86\Debug\VBControls.pdb
-C:\VB3\MLR\VBControls\obj\x86\Debug\ResolveAssemblyReference.cache
-C:\VB3\MLR\VBControls\obj\x86\Debug\GenerateResource.read.1.tlog
-C:\VB3\MLR\VBControls\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\VB3\MLR\VBControls\obj\x86\Debug\VBControls.csprojResolveAssemblyReference.cache
+C:\VB3\MLR\VBControls\obj\x86\Debug\VBControls.csproj.GenerateResource.Cache

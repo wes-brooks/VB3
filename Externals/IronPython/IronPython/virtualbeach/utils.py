@@ -15,7 +15,9 @@ import math
 
 import System
 import System.Threading
-from System.Threading import SynchronizationContext, WaitCallback, ThreadPool, SendOrPostCallback
+from System.Threading import SynchronizationContext, WaitCallback, ThreadPool, SendOrPostCallback, CancellationToken, CancellationTokenSource
+from System import OperationCanceledException
+
 
 #Defines a decorator that causes a function to execute on a background thread
 def BGThread(fun):
@@ -122,6 +124,34 @@ class ModelValidationCompleteEvent(object):
     def Fire(self, result='', callback=''):
         for handler in self.handlers:
             handler(result, callback)
+
+    def GetHandlerCount(self):
+        return len(self.handlers)
+
+    __iadd__ = Handle
+    __isub__ = Unhandle
+    __call__ = Fire
+    __len__  = GetHandlerCount
+	
+	
+class ModelCancelledEvent(object):
+    def __init__(self):
+        self.handlers = set()
+        
+    def Handle(self, handler):
+        self.handlers.add(handler)
+        return self
+
+    def Unhandle(self, handler):
+        try:
+            self.handlers.remove(handler)
+        except:
+            raise ValueError("Handler is not handling this event, so cannot unhandle it.")
+        return self
+
+    def Fire(self, message='', callback=''):
+        for handler in self.handlers:
+            handler(message, callback)
 
     def GetHandlerCount(self):
         return len(self.handlers)

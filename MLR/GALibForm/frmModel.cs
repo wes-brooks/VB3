@@ -1051,6 +1051,7 @@ namespace GALibForm
             }
 
             Population population = new Population(initPop);
+            population.Initialize();
             population.CrossoverMethod = new MLROnePointCrossover(crossoverRate);
 
             if (fitnessCriteria == FitnessCriteria.Akaike)
@@ -1142,21 +1143,13 @@ namespace GALibForm
 
         private void btnRun_Click(object sender, EventArgs e)
         {
-            //Cursor curTmp = this.Cursor;
-            //this.Cursor = Cursors.WaitCursor;
-            //btnViewReport.Enabled = false;
-
-            //btnViewRptChangeStatus(false);
-
-            if (verifyGlobalModelingParams() == false)
-                return;
-
             _state = _mlrState.dirty;
             _pmi = -1;
 
-            //DataTable modelDataTable = null;
             if (btnRun.Text == "Run")
             {
+                if (verifyGlobalModelingParams() == false)
+                    return;
 
                 if (tabControlModelGeneration.SelectedTab.Name == "tabGA")
                 {
@@ -1171,9 +1164,6 @@ namespace GALibForm
                 }
                 else if (tabControlModelGeneration.SelectedTab.Name == "tabManual")
                 {
-                    //if (VerifyManualModelParams() == false)
-                    //    return;
-
                     _dataMgr.ModelDataTable =  CreateModelDataTable();
                     _cancelRun = false;
                     btnRun.Text = "Cancel";
@@ -1183,8 +1173,6 @@ namespace GALibForm
                 else if (tabControlModelGeneration.SelectedTab.Name == "tabStepwise")
                 {
                     _dataMgr.ModelDataTable = CreateModelDataTable();
-                    //if (ForwardStepwise
-                    //RunStepwise();
                 }
             }
             else if (btnRun.Text == "Cancel")
@@ -1248,6 +1236,7 @@ namespace GALibForm
 
         private void ResetGraphs()
         {
+            _listFitnessProgress = null;
             GraphPane myPane = zedGraphControl1.GraphPane;
             LineItem curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
             IPointListEdit list = curve.Points as IPointListEdit;

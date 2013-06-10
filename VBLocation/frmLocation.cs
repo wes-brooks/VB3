@@ -14,6 +14,7 @@ using GMap.NET.CacheProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using VBCommon.Spatial;
+using VBD4EM;
 
 
 namespace VBLocation
@@ -1342,11 +1343,7 @@ namespace VBLocation
             try
             {
                 VBD4EM.D4EMData d4emData = new VBD4EM.D4EMData(minX, minY, maxX, maxY, "gcjjaDgainKJnfefJK");
-                //List<VBD4EM.StationInfo> nwisList = null;
-                //List<VBD4EM.StationInfo> ncdcList = null;
-                //List<VBD4EM.DomainObjects.StationInfo> list = null;
                 List<VBD4EM.StationInfo> list = null;
-
                 VBMarker stationMarker = null;
                 PointLatLng pt;
 
@@ -1380,33 +1377,8 @@ namespace VBLocation
                         stationMarker.ToolTipOffset = new System.Drawing.Point(7, 7);
                         stations.Markers.Add(stationMarker);
                     }
-                }
-
-                //if ((nwisList != null) && (nwisList.Count > 0))
-                //    list.AddRange(nwisList);
-
-                //if ((ncdcList != null) && (ncdcList.Count > 0))
-                //    list.AddRange(ncdcList);
-
-                //GMapMarkerGoogleGreen stationMarker = null;
-                
-
-
-                //for (int i = 0; i < list.Count; i++)
-                //{
-
-                //    pt = new PointLatLng(list[i].Latitude, list[i].Longitude);
-                //    //stationMarker = new GMapMarkerGoogleGreen(pt);
-                //    stationMarker = new VBMarker(pt);
-                //    stationMarker.MarkerImage = new Bitmap(Properties.Resources.USGS);
-                //    stationMarker.Size = new System.Drawing.Size(15, 15);
-                //    System.Drawing.Size size = stationMarker.Size;
-                //    stationMarker.TooltipMode = MarkerTooltipMode.OnMouseOver;
-                //    stationMarker.ToolTipText = "Station ID: " + list[i].ID + Environment.NewLine + "Station Name: " + list[i].Name;
-                //    stations.Markers.Add(stationMarker);
-                //}                
+                }            
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
