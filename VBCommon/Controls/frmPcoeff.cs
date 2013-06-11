@@ -239,11 +239,10 @@ namespace VBCommon.Controls
                 {
                     if (colname != varname)
                     {
-                        if (!_dtCopy.Columns[varname].ExtendedProperties.Contains(VBCommon.Globals.DECOMPOSITION.ToString()))
-                        {
-                            _dtCopy.Columns[varname].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
-
-                        }
+                        //if (!_dtCopy.Columns[varname].ExtendedProperties.Contains(VBCommon.Globals.DECOMPOSITION.ToString()))
+                        //{
+                        _dtCopy.Columns[varname].ExtendedProperties[VBCommon.Globals.ENABLED] = false;                            
+                        //}
                         _dtCopy.Columns[colname].ExtendedProperties[VBCommon.Globals.TRANSFORM] = true;
                     }
                     else

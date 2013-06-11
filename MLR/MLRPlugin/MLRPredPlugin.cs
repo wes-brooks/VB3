@@ -8,18 +8,15 @@ using MLRCore;
 
 namespace MLRPlugin
 {
-
     [Export(typeof(VBCommon.Interfaces.IModel))]
     [ExportMetadata("PluginKey", "MLR")]
     public class MLRPredPlugin : VBCommon.Interfaces.IModel
     {
-        //private ctlMLRPlugin _mlrPluginControl = null;
         private ctlMLRModel _mlrPluginControl = null;
         private List<double> _lstProbEx = null;
 
         public MLRPredPlugin()
         {
-            //_mlrPluginControl = ctlMLRPlugin.MLRControl;
             _mlrPluginControl = ctlMLRModel.MLRControl;
         }
 
@@ -61,12 +58,8 @@ namespace MLRPlugin
                 double pred = Convert.ToDouble(dtPredictions.Rows[i][1].ToString());
                 lstPred.Add(pred);
             }                       
-
-            //translate to model variables and values... (little x)
-            //DataRow mlrModelVarVals = Support.getMLRxVals(dr, _mlrPluginControl.ModelForm.ModelInfo.Model);
                  
             //do the matrix math... (mlrModelVar/Vals == x, dtModelVars == X...)
-            //double probEx = VBCommon.Statistics.Statistics.PExceed(mlrModelVarVals, dtModelVars, pred, tdc, rmse, bFlag);
             double[] predictions = lstPred.ToArray<double>();
             _lstProbEx = VBCommon.Statistics.Statistics.PExceed(dtModelVars, predictions, tdc, rmse, dtPredData: ds.Tables["Prediction"]);
 

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.txbSpecificity = new System.Windows.Forms.TextBox();
             this.txbAccuracy = new System.Windows.Forms.TextBox();
@@ -308,7 +309,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.ForeColor = System.Drawing.Color.Red;
+            this.label10.ForeColor = System.Drawing.Color.Green;
             this.label10.Location = new System.Drawing.Point(77, 68);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(148, 13);

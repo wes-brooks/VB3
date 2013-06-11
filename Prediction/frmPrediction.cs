@@ -74,7 +74,7 @@ namespace Prediction
         private double dblDisplayPowerTransformExp;
         
         List<string> listModels = new List<string>();
-        IDictionary<string, object> dictPredictionElements;
+        IDictionary<string, object> dictPredictionElements = new Dictionary<string, object>();
         private int intSelectedModel;
         private string strMethod;
         private string strEnddatURL;
@@ -118,7 +118,7 @@ namespace Prediction
             dblDisplayPowerTransformExp = double.NaN;
 
             intSelectedModel = -1;
-            dictPredictionElements = new Dictionary<string, object>();
+            //dictPredictionElements = new Dictionary<string, object>();
             dictMainEffects = null;
 
             strEnddatURL = "";
@@ -446,39 +446,9 @@ namespace Prediction
         private void lbAvailableModels_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             object selectedItem = lbAvailableModels.SelectedItem;
+            string strSelectedItem = "";
 
-            //didn't select a model
-            if (selectedItem == null)
-            {
-                txtModel.Clear();
-                txtPower.Text = "1";
-                txtRegStd.Text = "235";
-                txtProbabilityThreshold.Text = "50";
-                txtDecCrit.Text = "235";
-                strEnddatURL = "";
-                rbNone.Select();
-                rbRaw.Select();
-                strMethod = null;
-
-                //Deactivate all the ribbon buttons
-                if (ButtonStatusEvent != null)
-                {
-                    string[] strButtonStateKeys = {"ImportIVsEnabled", "ImportObsEnabled", "ValidationButtonEnabled",
-                                                                  "PredictionButtonEnabled", "PlotButtonEnabled", "ClearButtonEnabled",
-                                                                  "ExportButtonEnabled", "SetEnddatURLButtonEnabled",
-                                                                  "EnddatImportButtonEnabled" };
-                    IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
-                    foreach (string key in strButtonStateKeys)
-                        dictButtonStates[key] = false;
-
-                    ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
-                    ButtonStatusEvent(this, args);
-                }
-
-                return;
-            }
-
-            string strSelectedItem = selectedItem.ToString();
+            if (selectedItem != null) { strSelectedItem = selectedItem.ToString(); }
             intSelectedModel = lbAvailableModels.SelectedIndex;
 
             //First, pack up the data/observations/predictions for the current plugin
@@ -543,6 +513,39 @@ namespace Prediction
                     foreach (KeyValuePair<string, bool> kvp in dictButtonStates)
                         ((IDictionary<string, object>)dictPredictionElements[strMethod])[kvp.Key] = kvp.Value;
                 }
+
+            //didn't select a model
+            if (selectedItem == null)
+            {
+                txtModel.Clear();
+                txtPower.Text = "1";
+                txtRegStd.Text = "235";
+                txtProbabilityThreshold.Text = "50";
+                txtDecCrit.Text = "235";
+                strEnddatURL = "";
+                rbNone.Select();
+                rbRaw.Select();
+                strMethod = null;
+
+                //Deactivate all the ribbon buttons
+                if (ButtonStatusEvent != null)
+                {
+                    string[] strButtonStateKeys = {"ImportIVsEnabled", "ImportObsEnabled", "ValidationButtonEnabled",
+                                                                  "PredictionButtonEnabled", "PlotButtonEnabled", "ClearButtonEnabled",
+                                                                  "ExportButtonEnabled", "SetEnddatURLButtonEnabled",
+                                                                  "EnddatImportButtonEnabled" };
+                    IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                    foreach (string key in strButtonStateKeys)
+                        dictButtonStates[key] = false;
+
+                    ButtonStatusEventArgs args = new ButtonStatusEventArgs(dictButtonStates, Set: true);
+                    ButtonStatusEvent(this, args);
+                }
+
+                return;
+            }
+
+            
             }
 
             //Clear the column mappings
@@ -763,7 +766,20 @@ namespace Prediction
                     else
                     {
                         IDictionary<string, object> dictNewModel = (IDictionary<string, object>)dictPredictionElements[strModelPlugin];
+                        /*IDictionary<string, bool> dictButtonStates = new Dictionary<string, bool>();
+                        dictButtonStates["ImportIVsEnabled"] = true;
+                        dictButtonStates["ImportObsEnabled"] = true;
+                        dictButtonStates["ValidationButtonEnabled"] = false;
+                        dictButtonStates["PredictionButtonEnabled"] = false;
 
+                        dictButtonStates["PlotButtonEnabled"] = false;
+                        dictButtonStates["ClearButtonEnabled"] = true;
+                        dictButtonStates["ExportButtonEnabled"] = false;
+
+                        dictButtonStates["SetEnddatURLButtonEnabled"] = true;
+                        dictButtonStates["EnddatImportButtonEnabled"] = false;*/
+
+                        
                         if (dictNewModel.ContainsKey("EnddatURL"))
                         {
                             strEnddatURL = dictNewModel["EnddatURL"].ToString();
@@ -901,6 +917,9 @@ namespace Prediction
                             dblDisplayPowerTransformExp = 1;
                         }
                         SetStatsTransformCheckmarks(Item: (int)xfrmDisplay);
+
+                        //ButtonStatusEventArgs buttonArgs = new ButtonStatusEventArgs(dictButtonStates, Set: true);
+                        //ButtonStatusEvent(this, buttonArgs);
                     }
 
                     //determine which transform type box to check
@@ -1159,6 +1178,7 @@ namespace Prediction
                     string strEnd = dtEnd.Year.ToString() + "-" + dtEnd.Month.ToString("D2") + "-" + dtEnd.Day.ToString("D2");
 
                     string strNewGeoDataPortalID = GetGeoDataPortalID(Shapefile: strShapefile, Feature: strShapefileFeature, Start: strStart, End: strEnd, Statistic: strStatistic);
+                    if (strNewGeoDataPortalID == null) { return false; }
                     strEnddatURL = strEnddatURL + "&gdpId=" + strPreamble + strNewGeoDataPortalID;
                 }
 
@@ -1363,7 +1383,7 @@ namespace Prediction
                 XElement xm = XElement.Parse(HtmlResult);
                 string strStatusLocation = xm.Attributes().First(x => x.Name == "statusLocation").Value;
 
-
+                int i = 0;
                 bool bComplete = false;
                 while (!bComplete)
                 {
@@ -1378,7 +1398,19 @@ namespace Prediction
                         id = idString.Split('=')[1];
                         bComplete = true;
                     }
-                    else { System.Threading.Thread.Sleep(2000); }
+                    else
+                    {
+                        i++;
+                        if (i == 10)
+                        {
+                            i = 0;
+                            if (System.Windows.Forms.MessageBox.Show("EnDDaT is taking a while to render the GeoDataPortal shapefile. Do you want to comtinue waiting?", "Continue waiting?", MessageBoxButtons.YesNo) == DialogResult.No)
+                            {
+                                return null;
+                            }
+                        }
+                        System.Threading.Thread.Sleep(2000);
+                    }
                 }
             }
 
@@ -2243,7 +2275,14 @@ namespace Prediction
 
             IvMap = null;
             ObsMap = null;
-            dictPredictionElements = new Dictionary<string, object>(); ;
+            //dictPredictionElements = new Dictionary<string, object>();
+            foreach (KeyValuePair<string, object> kvpPlugin in dictPredictionElements)
+            {
+                Dictionary<string, object> dictPlugin = kvpPlugin.Value as Dictionary<string, object>;
+                if (dictPlugin.ContainsKey("IVData")) { dictPlugin.Remove("IVData");}
+                if (dictPlugin.ContainsKey("ObsData")) { dictPlugin.Remove("ObsData");}
+                if (dictPlugin.ContainsKey("StatData")) { dictPlugin.Remove("StatData");}
+            }
             lbAvailableModels.ClearSelected();
 
             InitializeInterface();

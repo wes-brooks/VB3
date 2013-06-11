@@ -148,7 +148,7 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double WindA_comp(double windDirection, double windMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WindComponents wndCmp = new VBCommon.Spatial.WindComponents(windMagnitude, windDirection, beachOrientation);
+            VBCommon.Spatial.WindComponents wndCmp = new VBCommon.Spatial.WindComponents(windDirection, windMagnitude, beachOrientation);
             double dblRetVal = wndCmp._Ucomp;
             return dblRetVal;
         }
@@ -157,7 +157,7 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double WindO_comp(double windDirection, double windMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WindComponents wndCmp = new VBCommon.Spatial.WindComponents(windMagnitude, windDirection, beachOrientation);
+            VBCommon.Spatial.WindComponents wndCmp = new VBCommon.Spatial.WindComponents(windDirection, windMagnitude, beachOrientation);
             double dblRetVal = wndCmp._Vcomp;
             return dblRetVal;
         }
@@ -166,7 +166,7 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double CurrentA_comp(double currentDirection, double currentMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WaterCurrentComponents waterCmp = new VBCommon.Spatial.WaterCurrentComponents(currentMagnitude, currentDirection, beachOrientation);
+            VBCommon.Spatial.WaterCurrentComponents waterCmp = new VBCommon.Spatial.WaterCurrentComponents(currentDirection, currentMagnitude, beachOrientation);
             double dblRetVal = waterCmp._Ucomp;
             return dblRetVal;
         }
@@ -175,7 +175,7 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double CurrentO_comp(double currentDirection, double currentMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WaterCurrentComponents waterCmp = new VBCommon.Spatial.WaterCurrentComponents(currentMagnitude, currentDirection, beachOrientation);
+            VBCommon.Spatial.WaterCurrentComponents waterCmp = new VBCommon.Spatial.WaterCurrentComponents(currentDirection, currentMagnitude, beachOrientation);
             double dblRetVal = waterCmp._Vcomp;
             return dblRetVal;
         }
@@ -184,7 +184,7 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double WaveA_comp(double waveDirection, double waveMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WaveComponents waveCmp = new VBCommon.Spatial.WaveComponents(waveMagnitude, waveDirection, beachOrientation);
+            VBCommon.Spatial.WaveComponents waveCmp = new VBCommon.Spatial.WaveComponents(waveDirection, waveMagnitude, beachOrientation);
             double dblRetVal = waveCmp._Ucomp;
             return dblRetVal;
         }
@@ -193,7 +193,7 @@ namespace Prediction
         // Declare a function that takes a variable number of arguments
         public static double WaveO_comp(double waveDirection, double waveMagnitude, double beachOrientation)
         {
-            VBCommon.Spatial.WaveComponents waveCmp = new VBCommon.Spatial.WaveComponents(waveMagnitude, waveDirection, beachOrientation);
+            VBCommon.Spatial.WaveComponents waveCmp = new VBCommon.Spatial.WaveComponents(waveDirection, waveMagnitude, beachOrientation);
             double dblRetVal = waveCmp._Vcomp;
             return dblRetVal;
         }

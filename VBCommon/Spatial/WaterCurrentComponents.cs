@@ -78,7 +78,7 @@ namespace VBCommon.Spatial
             _VComp = new List<double>();
         }
 
-        public WaterCurrentComponents(DataTable DT, string currentSpeedColumnName, string currentDirectionColumnName, double BeachOrientation)
+        public WaterCurrentComponents(DataTable DT, string currentDirectionColumnName, string currentSpeedColumnName, double BeachOrientation)
         {
             _UComp = new List<double>();
             _VComp = new List<double>();
@@ -90,7 +90,7 @@ namespace VBCommon.Spatial
         }
 
 
-        public WaterCurrentComponents(double currentspeed, double currentdirection, double beachOrientation)
+        public WaterCurrentComponents(double currentdirection, double currentspeed, double beachOrientation)
         {
             _UComp = new List<double>();
             _VComp = new List<double>();
@@ -131,8 +131,8 @@ namespace VBCommon.Spatial
                 //_Vcomp = ws * Math.Sin( (_beachOrientation - wd + 180.0d) * (Math.PI / 180.0d) );
 
                 //change 5/19/2011 vi MC
-                _Ucomp = (-1) * ws * Math.Cos((wd - _beachOrientation) * (Math.PI / 180.0d));
-                _Vcomp = ws * Math.Sin( (wd - _beachOrientation) * (Math.PI / 180.0d));
+                _Ucomp = ws * Math.Cos((wd - _beachOrientation) * (Math.PI / 180.0d));
+                _Vcomp = -1 * ws * Math.Sin( (wd - _beachOrientation) * (Math.PI / 180.0d));
                
             }
             catch (FormatException ef) { showmessage(ef); return false; }
@@ -149,10 +149,8 @@ namespace VBCommon.Spatial
         {
             _ccompColNamesAdded = new List<string>();
             DataTable dt = _dt.Copy();
-            string colA = "CurrentA_comp[" + _currentFlowDirection.ToString() + ","
-                + _currentFlowSpeed.ToString() + "," + _beachOrientation.ToString() + "]";
-            string colO = "CurrentO_comp[" + _currentFlowDirection.ToString() + ","
-                + _currentFlowSpeed.ToString() + "," + _beachOrientation.ToString() + "]";
+            string colA = "CurrentA_comp[" + _currentFlowDirection.ToString() + "," + _currentFlowSpeed.ToString() + "," + _beachOrientation.ToString() + "]";
+            string colO = "CurrentO_comp[" + _currentFlowDirection.ToString() + "," + _currentFlowSpeed.ToString() + "," + _beachOrientation.ToString() + "]";
             dt.Columns.Add(colA, typeof(System.Double));
             dt.Columns.Add(colO, typeof(System.Double));
             _ccompColNamesAdded.Add(colA);

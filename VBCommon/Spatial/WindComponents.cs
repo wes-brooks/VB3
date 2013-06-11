@@ -50,7 +50,7 @@ namespace VBCommon.Spatial
             _VComp = new List<double>();
         }
 
-        public WindComponents(DataTable DT, string WindSpeedColumnName, string WindDirectionColumnName, double BeachOrientation)
+        public WindComponents(DataTable DT, string WindDirectionColumnName, string WindSpeedColumnName, double BeachOrientation)
         {
             _UComp = new List<double>();
             _VComp = new List<double>();
@@ -62,7 +62,7 @@ namespace VBCommon.Spatial
         }
 
 
-        public WindComponents(double windspeed, double winddirection, double beachOrientation)
+        public WindComponents(double winddirection, double windspeed, double beachOrientation)
         {
             _UComp = new List<double>();
             _VComp = new List<double>();
@@ -144,10 +144,8 @@ namespace VBCommon.Spatial
 
             _wcompColNamesAdded = new List<string>();
             DataTable dt = _dt.Copy();
-            string colA = "WindA_comp[" + _windDirColName.ToString() + ","
-                + _windSpeedColName.ToString() + "," + _beachOrientation.ToString() + "]";
-            string colO = "WindO_comp[" + _windDirColName.ToString() + ","
-                + _windSpeedColName.ToString() + "," + _beachOrientation.ToString() + "]";
+            string colA = "WindA_comp[" + _windDirColName.ToString() + "," + _windSpeedColName.ToString() + "," + _beachOrientation.ToString() + "]";
+            string colO = "WindO_comp[" + _windDirColName.ToString() + "," + _windSpeedColName.ToString() + "," + _beachOrientation.ToString() + "]";
             dt.Columns.Add(colA, typeof(System.Double));
             dt.Columns.Add(colO, typeof(System.Double));
             _wcompColNamesAdded.Add(colA);

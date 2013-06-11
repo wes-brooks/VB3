@@ -114,7 +114,7 @@ namespace VBCommon.Controls
 
             if (cbWindDirectionColumn.SelectedIndex >= 0 && cbWindSpeedColumn.SelectedIndex >= 0)
             {
-                VBCommon.Spatial.WindComponents wc = new VBCommon.Spatial.WindComponents(_dt, cbWindSpeedColumn.SelectedItem.ToString(), cbWindDirectionColumn.SelectedItem.ToString(), _bo);
+                VBCommon.Spatial.WindComponents wc = new VBCommon.Spatial.WindComponents(_dt, cbWindDirectionColumn.SelectedItem.ToString(), cbWindSpeedColumn.SelectedItem.ToString(), _bo);
                 
                 if (!wc.Message.Equals("OK"))
                 {
@@ -124,14 +124,21 @@ namespace VBCommon.Controls
                 else
                 {
                     _dt = wc.DT;
+                    _dt.Columns[cbWindDirectionColumn.SelectedItem.ToString()].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
+                    _dt.Columns[cbWindSpeedColumn.SelectedItem.ToString()].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
+                    
                     foreach (string s in wc.WCompColNamesAdded)
+                    {
                         _colsadded.Add(s);
+                        _dt.Columns[s].ExtendedProperties[VBCommon.Globals.DECOMPOSITION] = true;
+                        
+                    }
                 }
             }
 
             if (cbCurrentDirectionColumn.SelectedIndex >= 0 && cbCurrentSpeedColumn.SelectedIndex >= 0)
             {
-                VBCommon.Spatial.WaterCurrentComponents cc = new VBCommon.Spatial.WaterCurrentComponents(_dt, cbCurrentSpeedColumn.SelectedItem.ToString(), cbCurrentDirectionColumn.SelectedItem.ToString(), _bo);
+                VBCommon.Spatial.WaterCurrentComponents cc = new VBCommon.Spatial.WaterCurrentComponents(_dt, cbCurrentDirectionColumn.SelectedItem.ToString(), cbCurrentSpeedColumn.SelectedItem.ToString(), _bo);
                 
                 if (!cc.Message.Equals("OK"))
                 {
@@ -141,14 +148,20 @@ namespace VBCommon.Controls
                 else
                 {
                     _dt = cc.DT;
+                    _dt.Columns[cbCurrentDirectionColumn.SelectedItem.ToString()].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
+                    _dt.Columns[cbCurrentSpeedColumn.SelectedItem.ToString()].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
+
                     foreach (string s in cc.CCompColNamesAdded)
+                    {
                         _colsadded.Add(s);
+                        _dt.Columns[s].ExtendedProperties[VBCommon.Globals.DECOMPOSITION] = true;
+                    }
                 }
             }
 
             if (cbWaveDirection.SelectedIndex >= 0 && cbWaveHeight.SelectedIndex >= 0)
             {
-                VBCommon.Spatial.WaveComponents wc = new VBCommon.Spatial.WaveComponents(_dt, cbWaveHeight.SelectedItem.ToString(), cbWaveDirection.SelectedItem.ToString(), _bo);
+                VBCommon.Spatial.WaveComponents wc = new VBCommon.Spatial.WaveComponents(_dt, cbWaveDirection.SelectedItem.ToString(), cbWaveHeight.SelectedItem.ToString(), _bo);
                 
                 if (!wc.Message.Equals("OK"))
                 {
@@ -158,8 +171,14 @@ namespace VBCommon.Controls
                 else
                 {
                     _dt = wc.DT;
+                    _dt.Columns[cbWaveDirection.SelectedItem.ToString()].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
+                    _dt.Columns[cbWaveHeight.SelectedItem.ToString()].ExtendedProperties[VBCommon.Globals.ENABLED] = false;
+
                     foreach (string s in wc.WCompColNamesAdded)
+                    {
                         _colsadded.Add(s);
+                        _dt.Columns[s].ExtendedProperties[VBCommon.Globals.DECOMPOSITION] = true;
+                    }
                 }
             }
 

@@ -27,7 +27,7 @@ namespace VBCommon.Spatial
         }
 
 
-        public WaveComponents(double waveheight, double wavedirection, double beachOrientation)
+        public WaveComponents(double wavedirection, double waveheight, double beachOrientation)
         {
             this._Ucomp = double.NaN;
             this._Vcomp = double.NaN;
@@ -48,7 +48,7 @@ namespace VBCommon.Spatial
         }
 
 
-        public WaveComponents(DataTable DT, string waveHeightColumnName, string waveDirectionColumnName, double BeachOrientation)
+        public WaveComponents(DataTable DT, string waveDirectionColumnName, string waveHeightColumnName, double BeachOrientation)
         {
             this._Ucomp = double.NaN;
             this._Vcomp = double.NaN;
@@ -118,8 +118,8 @@ namespace VBCommon.Spatial
         {
             try
             {
-                this._Ucomp = -1 * ws * Math.Cos((wd - _beachOrientation) * Math.PI / 180.0d);
-                this._Vcomp = ws * Math.Sin((wd - _beachOrientation) * Math.PI / 180.0d);
+                this._Ucomp = ws * Math.Cos((wd - _beachOrientation) * Math.PI / 180.0d);
+                this._Vcomp = -1 * ws * Math.Sin((wd - _beachOrientation) * Math.PI / 180.0d);
             }
             catch (FormatException exception)
             {

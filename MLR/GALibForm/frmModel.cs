@@ -1487,6 +1487,7 @@ namespace GALibForm
             
             // Make sure the Y axis is rescaled to accommodate actual data
             zedGraphControl2.AxisChange();
+            zedGraphControl2.GraphPane.XAxis.Scale.Max = zedGraphControl2.GraphPane.CurveList[0].NPts;
 
             // Force a redraw
             zedGraphControl2.Invalidate();
@@ -2231,9 +2232,9 @@ namespace GALibForm
             double maxPred = model.PredictedValues.Max();
             double minPred = model.PredictedValues.Min();
             double inc = (maxPred - minPred) / (double)steps;
-            double threshold = minPred;
+            double threshold = minPred - inc;
 
-            while (threshold < maxPred)
+            while (threshold <= maxPred + inc)
             {
                 threshold += inc;
                 pp = ROCpoint(model, threshold, out rocParameters);
@@ -2253,6 +2254,7 @@ namespace GALibForm
                 ppl.Sort();
                 //get rid of multiple X datapoints
                 ppl = weedppl(ppl);
+                if (ppl.Count == 1) { ppl.Add(ppl[0]); }
                 return ppl;
             }
             else
@@ -2280,11 +2282,11 @@ namespace GALibForm
             //double[] x = new double[ppl.Count];
             //double[] y = new double[ppl.Count];
 
-            double x; double y;
+            double x, y, Ypp;
             double Xbase = ppl[0].X;
             double Ybase = ppl[0].Y;
             double Ytot = 0.0d;
-            int ctr = 0;
+            int ctr = 1;
             for (int i = 1; i < ppl.Count; i++)
             {
                 x = ppl[i].X;
@@ -2297,19 +2299,18 @@ namespace GALibForm
                 }
                 else
                 {
-                    //Xbase = x;
-                    if (ctr != 0)
-                    {
-                        y = Ytot / (double)ctr;
-                        ctr = 0;
-                        Ytot = 0;
+                    Ypp = Ytot / (double)ctr;
+                    ppl2.Add(Xbase, Ypp);  
 
-                    }
-                    ppl2.Add(Xbase, y);
+                    ctr = 1;
+                    Ytot = y;                                      
                     Xbase = x;
-                }
-
+                }                
             }
+            //Keep the final entry
+            Ypp = Ytot / (double)ctr;
+            ppl2.Add(Xbase, Ypp); 
+
             return ppl2;
         }
 
